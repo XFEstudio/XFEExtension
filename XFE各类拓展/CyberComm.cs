@@ -1069,7 +1069,9 @@ namespace XFE各类拓展.CyberComm
                                 bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                             }
                             var messageType = XCCMessageType.Binary;
-                            switch (bufferList[0])
+                            var header = bufferList[0];
+                            bufferList.RemoveAt(0);
+                            switch (header)
                             {
                                 case 0x01:
                                     messageType = XCCMessageType.Image;
@@ -1081,8 +1083,7 @@ namespace XFE各类拓展.CyberComm
                                     messageType = XCCMessageType.Binary;
                                     break;
                             }
-                            bufferList.RemoveAt(0);
-                            workBase.MessageReceived?.Invoke(this, new XCCMessageReceivedEventArgsImpl(this, ClientWebSocket, bufferList.ToArray(), messageType, bufferList[0]));
+                            workBase.MessageReceived?.Invoke(this, new XCCMessageReceivedEventArgsImpl(this, ClientWebSocket, bufferList.ToArray(), messageType, header));
                         }
                     }
                     catch (Exception ex)
