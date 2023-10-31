@@ -52,7 +52,7 @@ namespace XFE各类拓展.CyberComm
         /// <summary>
         /// 自动重连最大次数
         /// </summary>
-        public int ReconncetMaxTimes { get; set; } = -1;
+        public int ReconnectMaxTimes { get; set; } = -1;
         /// <summary>
         /// 自动重连尝试间隔
         /// </summary>
@@ -60,7 +60,7 @@ namespace XFE各类拓展.CyberComm
         /// <summary>
         /// 是否自动接收完整消息
         /// </summary>
-        public bool AutoRecevieCompletedMessage { get; set; }
+        public bool AutoReceiveCompletedMessage { get; set; }
         /// <summary>
         /// 收到消息时触发
         /// </summary>
@@ -102,7 +102,7 @@ namespace XFE各类拓展.CyberComm
                 IsConnected = false;
                 if (AutoReconnect)
                 {
-                    if (reconnectTimes <= ReconncetMaxTimes || ReconncetMaxTimes == -1)
+                    if (reconnectTimes <= ReconnectMaxTimes || ReconnectMaxTimes == -1)
                     {
                         Thread.Sleep(ReconnectTryDelay);
                         goto StartConnect;
@@ -126,7 +126,7 @@ namespace XFE各类拓展.CyberComm
                     {
                         string receivedMessage = Encoding.UTF8.GetString(receiveBuffer, 0, receiveResult.Count);
                         //ReceiveCompletedMessageByUsingWhile
-                        if (AutoRecevieCompletedMessage)
+                        if (AutoReceiveCompletedMessage)
                         {
                             while (!receiveResult.EndOfMessage)
                             {
@@ -141,7 +141,7 @@ namespace XFE各类拓展.CyberComm
                         var bufferList = new List<byte>();
                         bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                         //ReceiveCompletedMessageByUsingWhile
-                        if (AutoRecevieCompletedMessage)
+                        if (AutoReceiveCompletedMessage)
                         {
                             while (!receiveResult.EndOfMessage)
                             {
@@ -169,7 +169,7 @@ namespace XFE各类拓展.CyberComm
                         if (AutoReconnect)
                         {
                             Thread.Sleep(ReconnectTryDelay);
-                            if (reconnectTimes <= ReconncetMaxTimes || ReconncetMaxTimes == -1)
+                            if (reconnectTimes <= ReconnectMaxTimes || ReconnectMaxTimes == -1)
                                 goto StartConnect;
                         }
                     }
@@ -232,14 +232,14 @@ namespace XFE各类拓展.CyberComm
         /// <summary>
         /// CyberComm客户端
         /// </summary>
-        /// <param name="ServerURL">WS服务器地址</param>
-        /// <param name="AutoReconnect">是否自动重连</param>
-        /// <param name="AutoRecevieCompletedMessage">是否自动接收完整消息</param>
-        public CyberCommClient(string ServerURL, bool AutoReconnect = true, bool AutoRecevieCompletedMessage = true)
+        /// <param name="serverURL">WS服务器地址</param>
+        /// <param name="autoReconnect">是否自动重连</param>
+        /// <param name="autoReceiveCompletedMessage">是否自动接收完整消息</param>
+        public CyberCommClient(string serverURL, bool autoReconnect = true, bool autoReceiveCompletedMessage = true)
         {
-            this.AutoReconnect = AutoReconnect;
-            this.AutoRecevieCompletedMessage = AutoRecevieCompletedMessage;
-            this.ServerURL = ServerURL;
+            this.AutoReconnect = autoReconnect;
+            this.AutoReceiveCompletedMessage = autoReceiveCompletedMessage;
+            this.ServerURL = serverURL;
         }
         /// <summary>
         /// CyberComm客户端
@@ -257,7 +257,7 @@ namespace XFE各类拓展.CyberComm
         /// <summary>
         /// 是否自动接收完整消息
         /// </summary>
-        public bool AutoRecevieCompletedMessage { get; set; }
+        public bool AutoReceiveCompletedMessage { get; set; }
         /// <summary>
         /// 收到消息时触发
         /// </summary>
@@ -322,7 +322,7 @@ namespace XFE各类拓展.CyberComm
                     {
                         string receivedMessage = Encoding.UTF8.GetString(receiveBuffer, 0, receiveResult.Count);
                         //ReceiveCompletedMessageByUsingWhile
-                        if (AutoRecevieCompletedMessage)
+                        if (AutoReceiveCompletedMessage)
                         {
                             while (!receiveResult.EndOfMessage)
                             {
@@ -335,7 +335,7 @@ namespace XFE各类拓展.CyberComm
                     if (receiveResult.MessageType == WebSocketMessageType.Binary)
                     {
                         //ReceiveCompletedMessageByUsingWhile
-                        if (AutoRecevieCompletedMessage)
+                        if (AutoReceiveCompletedMessage)
                         {
                             var bufferList = new List<byte>();
                             bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
@@ -372,7 +372,7 @@ namespace XFE各类拓展.CyberComm
         public CyberCommServer(int ListenPort, bool AutoReceiveCompletedMessage = true)
         {
             this.serverURL = $"http://*:{ListenPort}/";
-            this.AutoRecevieCompletedMessage = AutoReceiveCompletedMessage;
+            this.AutoReceiveCompletedMessage = AutoReceiveCompletedMessage;
         }
         /// <summary>
         /// CyberComm服务器，使用URL创建
@@ -382,7 +382,7 @@ namespace XFE各类拓展.CyberComm
         public CyberCommServer(string ServerURL, bool AutoReceiveCompletedMessage = true)
         {
             this.serverURL = ServerURL;
-            this.AutoRecevieCompletedMessage = AutoReceiveCompletedMessage;
+            this.AutoReceiveCompletedMessage = AutoReceiveCompletedMessage;
         }
         #endregion
     }
@@ -877,6 +877,14 @@ namespace XFE各类拓展.CyberComm
             /// </summary>
             Binary,
             /// <summary>
+            /// 图片消息
+            /// </summary>
+            Image,
+            /// <summary>
+            /// 音频消息
+            /// </summary>
+            Audio,
+            /// <summary>
             /// 错误消息
             /// </summary>
             Error
@@ -993,11 +1001,11 @@ namespace XFE各类拓展.CyberComm
             /// <summary>
             /// 启动XCC会话
             /// </summary>
-            /// <param name="AutoReconnect">是否自动重连</param>
-            /// <param name="ReconncetMaxTimes">最大重连次数，-1则为无限次</param>
-            /// <param name="ReconnectTryDelay">重连尝试延迟</param>
+            /// <param name="autoReconnect">是否自动重连</param>
+            /// <param name="reconnectMaxTimes">最大重连次数，-1则为无限次</param>
+            /// <param name="reconnectTryDelay">重连尝试延迟</param>
             /// <returns></returns>
-            public async void StartXCC(bool AutoReconnect = true, int ReconncetMaxTimes = -1, int ReconnectTryDelay = 100)
+            public async void StartXCC(bool autoReconnect = true, int reconnectMaxTimes = -1, int reconnectTryDelay = 100)
             {
             XCCReconnect:
                 ClientWebSocket = new ClientWebSocket();
@@ -1016,11 +1024,11 @@ namespace XFE各类拓展.CyberComm
                         workBase.ConnectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, ClientWebSocket, false));
                     }
                     IsConnected = false;
-                    if (AutoReconnect)
+                    if (autoReconnect)
                     {
-                        if (reconnectTimes <= ReconncetMaxTimes || ReconncetMaxTimes == -1)
+                        if (reconnectTimes <= reconnectMaxTimes || reconnectMaxTimes == -1)
                         {
-                            Thread.Sleep(ReconnectTryDelay);
+                            Thread.Sleep(reconnectTryDelay);
                             goto XCCReconnect;
                         }
                     }
@@ -1060,7 +1068,21 @@ namespace XFE各类拓展.CyberComm
                                 receiveResult = await ClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
                                 bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                             }
-                            workBase.MessageReceived?.Invoke(this, new XCCMessageReceivedEventArgsImpl(this, ClientWebSocket, bufferList.ToArray()));
+                            var messageType = XCCMessageType.Binary;
+                            switch (bufferList[0])
+                            {
+                                case 0x01:
+                                    messageType = XCCMessageType.Image;
+                                    break;
+                                case 0x02:
+                                    messageType = XCCMessageType.Audio;
+                                    break;
+                                default:
+                                    messageType = XCCMessageType.Binary;
+                                    break;
+                            }
+                            bufferList.RemoveAt(0);
+                            workBase.MessageReceived?.Invoke(this, new XCCMessageReceivedEventArgsImpl(this, ClientWebSocket, bufferList.ToArray(), messageType, bufferList[0]));
                         }
                     }
                     catch (Exception ex)
@@ -1070,12 +1092,12 @@ namespace XFE各类拓展.CyberComm
                             workBase.ConnectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, ClientWebSocket, false));
                         }
                         IsConnected = false;
-                        if (AutoReconnect)
+                        if (autoReconnect)
                         {
-                            if (AutoReconnect)
+                            if (autoReconnect)
                             {
-                                Thread.Sleep(ReconnectTryDelay);
-                                if (reconnectTimes <= ReconncetMaxTimes || ReconncetMaxTimes == -1)
+                                Thread.Sleep(reconnectTryDelay);
+                                if (reconnectTimes <= reconnectMaxTimes || reconnectMaxTimes == -1)
                                     goto XCCReconnect;
                             }
                         }
@@ -1126,7 +1148,28 @@ namespace XFE各类拓展.CyberComm
                 }
             }
             /// <summary>
-            /// 发送二进制消息
+            /// 发送标准的二进制消息
+            /// </summary>
+            /// <param name="message">二进制消息</param>
+            /// <param name="signature">标识</param>
+            /// <returns></returns>
+            /// <exception cref="XFECyberCommException"></exception>
+            public async Task SendSignedBinaryMessage(byte[] message, byte signature)
+            {
+                try
+                {
+                    byte[] sendBuffer = new byte[message.Length + 1];
+                    sendBuffer[0] = signature;
+                    message.CopyTo(sendBuffer, 1);
+                    await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Binary, true, CancellationToken.None);
+                }
+                catch (Exception ex)
+                {
+                    throw new XFECyberCommException("客户端发送二进制数据到服务器时出现异常", ex);
+                }
+            }
+            /// <summary>
+            /// 发送默认标准的二进制消息
             /// </summary>
             /// <param name="message">待发送的二进制数据</param>
             /// <exception cref="XFECyberCommException"></exception>
@@ -1135,7 +1178,7 @@ namespace XFE各类拓展.CyberComm
             {
                 try
                 {
-                    await ClientWebSocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, CancellationToken.None);
+                    await SendSignedBinaryMessage(message, 0x00);
                 }
                 catch (Exception ex)
                 {
@@ -1152,11 +1195,28 @@ namespace XFE各类拓展.CyberComm
             {
                 try
                 {
-                    await SendBinaryMessage(File.ReadAllBytes(filePath));
+                    await SendSignedBinaryMessage(File.ReadAllBytes(filePath), 0x01);
                 }
                 catch (Exception ex)
                 {
                     throw new XFECyberCommException("客户端发送图片到服务器时出现异常", ex);
+                }
+            }
+            /// <summary>
+            /// 发送音频
+            /// </summary>
+            /// <param name="buffer">二进制音频流</param>
+            /// <returns></returns>
+            /// <exception cref="XFECyberCommException"></exception>
+            public async Task SendAudioBuffer(byte[] buffer)
+            {
+                try
+                {
+                    await SendSignedBinaryMessage(buffer, 0x02);
+                }
+                catch (Exception ex)
+                {
+                    throw new XFECyberCommException("客户端发送音频到服务器时出现异常", ex);
                 }
             }
             /// <summary>
@@ -1232,6 +1292,10 @@ namespace XFE各类拓展.CyberComm
             /// </summary>
             public string TextMessage { get; }
             /// <summary>
+            /// 消息签名
+            /// </summary>
+            public byte Signature { get; }
+            /// <summary>
             /// 触发事件的群组
             /// </summary>
             public XCCGroup Group { get; }
@@ -1276,14 +1340,16 @@ namespace XFE各类拓展.CyberComm
                 CurrentWebSocket = clientWebSocket;
                 TextMessage = message;
                 Group = group;
+                Signature = 0x00;
                 MessageType = XCCMessageType.Text;
             }
-            internal XCCMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, byte[] bytes)
+            internal XCCMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, byte[] bytes, XCCMessageType messageType, byte signature)
             {
                 CurrentWebSocket = clientWebSocket;
                 BinaryMessage = bytes;
                 Group = group;
-                MessageType = XCCMessageType.Binary;
+                Signature = signature;
+                MessageType = messageType;
             }
             internal XCCMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, XFECyberCommException ex)
             {
@@ -1342,7 +1408,7 @@ namespace XFE各类拓展.CyberComm
         class XCCMessageReceivedEventArgsImpl : XCCMessageReceivedEventArgs
         {
             internal XCCMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, string message) : base(group, clientWebSocket, message) { }
-            internal XCCMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, byte[] bytes) : base(group, clientWebSocket, bytes) { }
+            internal XCCMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, byte[] bytes, XCCMessageType messageType, byte signature) : base(group, clientWebSocket, bytes, messageType, signature) { }
             internal XCCMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, XFECyberCommException ex) : base(group, clientWebSocket, ex) { }
         }
         class XCCConnectionClosedEventArgsImpl : XCCConnectionClosedEventArgs
