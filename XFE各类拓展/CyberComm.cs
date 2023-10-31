@@ -52,7 +52,7 @@ namespace XFE各类拓展.CyberComm
         /// <summary>
         /// 自动重连最大次数
         /// </summary>
-        public int ReconncetMaxTimes { get; set; } = -1;
+        public int ReconnectMaxTimes { get; set; } = -1;
         /// <summary>
         /// 自动重连尝试间隔
         /// </summary>
@@ -60,7 +60,7 @@ namespace XFE各类拓展.CyberComm
         /// <summary>
         /// 是否自动接收完整消息
         /// </summary>
-        public bool AutoRecevieCompletedMessage { get; set; }
+        public bool AutoReceiveCompletedMessage { get; set; }
         /// <summary>
         /// 收到消息时触发
         /// </summary>
@@ -102,7 +102,7 @@ namespace XFE各类拓展.CyberComm
                 IsConnected = false;
                 if (AutoReconnect)
                 {
-                    if (reconnectTimes <= ReconncetMaxTimes || ReconncetMaxTimes == -1)
+                    if (reconnectTimes <= ReconnectMaxTimes || ReconnectMaxTimes == -1)
                     {
                         Thread.Sleep(ReconnectTryDelay);
                         goto StartConnect;
@@ -126,7 +126,7 @@ namespace XFE各类拓展.CyberComm
                     {
                         string receivedMessage = Encoding.UTF8.GetString(receiveBuffer, 0, receiveResult.Count);
                         //ReceiveCompletedMessageByUsingWhile
-                        if (AutoRecevieCompletedMessage)
+                        if (AutoReceiveCompletedMessage)
                         {
                             while (!receiveResult.EndOfMessage)
                             {
@@ -141,7 +141,7 @@ namespace XFE各类拓展.CyberComm
                         var bufferList = new List<byte>();
                         bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                         //ReceiveCompletedMessageByUsingWhile
-                        if (AutoRecevieCompletedMessage)
+                        if (AutoReceiveCompletedMessage)
                         {
                             while (!receiveResult.EndOfMessage)
                             {
@@ -169,7 +169,7 @@ namespace XFE各类拓展.CyberComm
                         if (AutoReconnect)
                         {
                             Thread.Sleep(ReconnectTryDelay);
-                            if (reconnectTimes <= ReconncetMaxTimes || ReconncetMaxTimes == -1)
+                            if (reconnectTimes <= ReconnectMaxTimes || ReconnectMaxTimes == -1)
                                 goto StartConnect;
                         }
                     }
@@ -232,14 +232,14 @@ namespace XFE各类拓展.CyberComm
         /// <summary>
         /// CyberComm客户端
         /// </summary>
-        /// <param name="ServerURL">WS服务器地址</param>
-        /// <param name="AutoReconnect">是否自动重连</param>
-        /// <param name="AutoRecevieCompletedMessage">是否自动接收完整消息</param>
-        public CyberCommClient(string ServerURL, bool AutoReconnect = true, bool AutoRecevieCompletedMessage = true)
+        /// <param name="serverURL">WS服务器地址</param>
+        /// <param name="autoReconnect">是否自动重连</param>
+        /// <param name="autoReceiveCompletedMessage">是否自动接收完整消息</param>
+        public CyberCommClient(string serverURL, bool autoReconnect = true, bool autoReceiveCompletedMessage = true)
         {
-            this.AutoReconnect = AutoReconnect;
-            this.AutoRecevieCompletedMessage = AutoRecevieCompletedMessage;
-            this.ServerURL = ServerURL;
+            this.AutoReconnect = autoReconnect;
+            this.AutoReceiveCompletedMessage = autoReceiveCompletedMessage;
+            this.ServerURL = serverURL;
         }
         /// <summary>
         /// CyberComm客户端
@@ -257,7 +257,7 @@ namespace XFE各类拓展.CyberComm
         /// <summary>
         /// 是否自动接收完整消息
         /// </summary>
-        public bool AutoRecevieCompletedMessage { get; set; }
+        public bool AutoReceiveCompletedMessage { get; set; }
         /// <summary>
         /// 收到消息时触发
         /// </summary>
@@ -322,7 +322,7 @@ namespace XFE各类拓展.CyberComm
                     {
                         string receivedMessage = Encoding.UTF8.GetString(receiveBuffer, 0, receiveResult.Count);
                         //ReceiveCompletedMessageByUsingWhile
-                        if (AutoRecevieCompletedMessage)
+                        if (AutoReceiveCompletedMessage)
                         {
                             while (!receiveResult.EndOfMessage)
                             {
@@ -335,7 +335,7 @@ namespace XFE各类拓展.CyberComm
                     if (receiveResult.MessageType == WebSocketMessageType.Binary)
                     {
                         //ReceiveCompletedMessageByUsingWhile
-                        if (AutoRecevieCompletedMessage)
+                        if (AutoReceiveCompletedMessage)
                         {
                             var bufferList = new List<byte>();
                             bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
@@ -372,7 +372,7 @@ namespace XFE各类拓展.CyberComm
         public CyberCommServer(int ListenPort, bool AutoReceiveCompletedMessage = true)
         {
             this.serverURL = $"http://*:{ListenPort}/";
-            this.AutoRecevieCompletedMessage = AutoReceiveCompletedMessage;
+            this.AutoReceiveCompletedMessage = AutoReceiveCompletedMessage;
         }
         /// <summary>
         /// CyberComm服务器，使用URL创建
@@ -382,7 +382,7 @@ namespace XFE各类拓展.CyberComm
         public CyberCommServer(string ServerURL, bool AutoReceiveCompletedMessage = true)
         {
             this.serverURL = ServerURL;
-            this.AutoRecevieCompletedMessage = AutoReceiveCompletedMessage;
+            this.AutoReceiveCompletedMessage = AutoReceiveCompletedMessage;
         }
         #endregion
     }

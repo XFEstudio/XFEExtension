@@ -16,24 +16,24 @@ namespace XFE各类拓展.StringExtension
             /// 根据给定的开头和末尾返回查找到的第一个匹配的字符串（全匹配）
             /// </summary>
             /// <param name="str">被匹配的字符串</param>
-            /// <param name="beginstr">匹配开头字符串</param>
-            /// <param name="endstr">匹配结尾字符串</param>
+            /// <param name="beginString">匹配开头字符串</param>
+            /// <param name="endString">匹配结尾字符串</param>
             /// <returns>返回夹在开头和末尾中间的字符串</returns>
-            public static string GetStringBetweenTwoString(this string str, string beginstr, string endstr)
+            public static string GetStringBetweenTwoString(this string str, string beginString, string endString)
             {
                 if (str != string.Empty && str != null)
                 {
-                    int beginindex = str.IndexOf(beginstr, StringComparison.Ordinal);
-                    if (beginindex == -1 || beginindex == 0)
+                    int beginIndex = str.IndexOf(beginString, StringComparison.Ordinal);
+                    if (beginIndex == -1 || beginIndex == 0)
                     {
                         return string.Empty;
                     }
-                    int endindex = str.IndexOf(endstr, beginindex, StringComparison.Ordinal);
-                    if (endindex == -1 || endindex == 0)
+                    int endIndex = str.IndexOf(endString, beginIndex, StringComparison.Ordinal);
+                    if (endIndex == -1 || endIndex == 0)
                     {
                         return string.Empty;
                     }
-                    return str.Substring(beginindex + beginstr.Length, endindex - beginindex - beginstr.Length);
+                    return str.Substring(beginIndex + beginString.Length, endIndex - beginIndex - beginString.Length);
                 }
                 else
                 {
@@ -78,11 +78,11 @@ namespace XFE各类拓展.StringExtension
         /// <summary>
         /// 判断字符串是否为邮政编码
         /// </summary>
-        /// <param name="str_postalcode"></param>
+        /// <param name="postalCode"></param>
         /// <returns></returns>
-        public static bool IsPostalCode(this string str_postalcode)
+        public static bool IsPostalCode(this string postalCode)
         {
-            return Regex.IsMatch(str_postalcode, @"^\d{6}$");
+            return Regex.IsMatch(postalCode, @"^\d{6}$");
         }
         /// <summary>
         /// 判断字符串是否为数字
@@ -96,11 +96,11 @@ namespace XFE各类拓展.StringExtension
         /// <summary>
         /// 判断字符串是否为身份证件号
         /// </summary>
-        /// <param name="str_idcard"></param>
+        /// <param name="Id"></param>
         /// <returns></returns>
-        public static bool IsIDcard(this string str_idcard)
+        public static bool IsIdCard(this string Id)
         {
-            return Regex.IsMatch(str_idcard, @"(^\d{18}$)|(^\d{15}$)");
+            return Regex.IsMatch(Id, @"(^\d{18}$)|(^\d{15}$)");
         }
         /// <summary>
         /// 判断字符串是否为邮箱地址

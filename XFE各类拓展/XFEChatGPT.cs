@@ -443,58 +443,58 @@ namespace XFE各类拓展.XFEChatGPT
                     {
                         #region 读取消息
                         byte[] buffer = new byte[1024];
-                        WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);//接收消息
-                        string NowreceivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);//将消息转换为字符串
+                        var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);//接收消息
+                        var nowReceivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);//将消息转换为字符串
                         #endregion
                         if (XFEComProtocol == XFEComProtocol.XFEFAST)
                         {
-                            if (NowreceivedMessage == "[DONE]")
+                            if (nowReceivedMessage == "[DONE]")
                             {
                                 XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs("[XFEDONE]", messageId, GenerateState.End));
                                 break;
                             }
-                            else if (NowreceivedMessage.Contains("[XFERemoteAPIError]"))
+                            else if (nowReceivedMessage.Contains("[XFERemoteAPIError]"))
                             {
                                 if (!isStarted)
                                 {
                                     XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs("[XFESTART]", messageId, GenerateState.Start));
                                 }
-                                XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs(NowreceivedMessage.Replace("[XFERemoteAPIError]", string.Empty), messageId, GenerateState.Error));
+                                XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs(nowReceivedMessage.Replace("[XFERemoteAPIError]", string.Empty), messageId, GenerateState.Error));
                             }
-                            else if (NowreceivedMessage == "[XFE]")
+                            else if (nowReceivedMessage == "[XFE]")
                             {
                                 XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs("[XFESTART]", messageId, GenerateState.Start));
                             }
                             else
                             {
-                                XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs(NowreceivedMessage, messageId, GenerateState.Continue));
+                                XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs(nowReceivedMessage, messageId, GenerateState.Continue));
                             }
                         }
                         else
                         {
-                            if (NowreceivedMessage == "[DONE]")
+                            if (nowReceivedMessage == "[DONE]")
                             {
                                 XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs("[XFEDONE]", messageId, GenerateState.End));
                                 break;
                             }
-                            else if (NowreceivedMessage.Contains("[XFERemoteAPIError]"))
+                            else if (nowReceivedMessage.Contains("[XFERemoteAPIError]"))
                             {
                                 if (!isStarted)
                                 {
                                     XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs("[XFESTART]", messageId, GenerateState.Start));
                                 }
-                                XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs(NowreceivedMessage.Replace("[XFERemoteAPIError]", string.Empty), messageId, GenerateState.Error));
+                                XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs(nowReceivedMessage.Replace("[XFERemoteAPIError]", string.Empty), messageId, GenerateState.Error));
                             }
-                            else if (NowreceivedMessage == "[XFE]")
+                            else if (nowReceivedMessage == "[XFE]")
                             {
                                 XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs("[XFESTART]", messageId, GenerateState.Start));
                             }
                             else
                             {
-                                if (NowreceivedMessage.Contains("[XFE]"))
+                                if (nowReceivedMessage.Contains("[XFE]"))
                                 {
-                                    NowreceivedMessage = NowreceivedMessage.Replace("[XFE]", string.Empty);
-                                    XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs(NowreceivedMessage, messageId, GenerateState.Continue));
+                                    nowReceivedMessage = nowReceivedMessage.Replace("[XFE]", string.Empty);
+                                    XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs(nowReceivedMessage, messageId, GenerateState.Continue));
                                 }
                                 else
                                 {
@@ -502,7 +502,7 @@ namespace XFE各类拓展.XFEChatGPT
                                     {
                                         XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs("[XFESTART]", messageId, GenerateState.Start));
                                     }
-                                    XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs(NowreceivedMessage.Replace("[XFERemoteAPIError]", string.Empty), messageId, GenerateState.Error));
+                                    XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs(nowReceivedMessage.Replace("[XFERemoteAPIError]", string.Empty), messageId, GenerateState.Error));
                                 }
                             }
                         }
@@ -531,22 +531,22 @@ namespace XFE各类拓展.XFEChatGPT
                     #region 读取消息
                     byte[] buffer = new byte[1024];
                     WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);//接收消息
-                    string NowreceivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);//将消息转换为字符串
+                    string nowReceivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);//将消息转换为字符串
                     #endregion
                     if (XFEComProtocol == XFEComProtocol.XFEFAST)
                     {
-                        XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs(NowreceivedMessage, messageId, GenerateState.Start));
+                        XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs(nowReceivedMessage, messageId, GenerateState.Start));
                     }
                     else
                     {
-                        if (NowreceivedMessage.Contains("[XFE]"))
+                        if (nowReceivedMessage.Contains("[XFE]"))
                         {
-                            NowreceivedMessage = NowreceivedMessage.Replace("[XFE]", string.Empty);
-                            XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs(NowreceivedMessage, messageId, GenerateState.Start));
+                            nowReceivedMessage = nowReceivedMessage.Replace("[XFE]", string.Empty);
+                            XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs(nowReceivedMessage, messageId, GenerateState.Start));
                         }
                         else
                         {
-                            XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs(NowreceivedMessage.Replace("[XFERemoteAPIError]", string.Empty), messageId, GenerateState.Error));
+                            XFEChatGPTMessageReceived.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs(nowReceivedMessage.Replace("[XFERemoteAPIError]", string.Empty), messageId, GenerateState.Error));
                         }
                     }
                     await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection closed.", CancellationToken.None);
@@ -1184,18 +1184,18 @@ namespace XFE各类拓展.XFEChatGPT
                     #region 读取消息
                     byte[] buffer = new byte[1024];
                     WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);//接收消息
-                    string NowreceivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);//将消息转换为字符串
+                    string nowReceivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);//将消息转换为字符串
                     #endregion
-                    if (NowreceivedMessage.Contains("[XFE]"))
+                    if (nowReceivedMessage.Contains("[XFE]"))
                     {
-                        NowreceivedMessage = NowreceivedMessage.Replace("[XFE]", string.Empty);
-                        xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", NowreceivedMessage, true);
-                        XFEChatGPTMessageReceived.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs(NowreceivedMessage, messageId, GenerateState.Start, dialogId));
+                        nowReceivedMessage = nowReceivedMessage.Replace("[XFE]", string.Empty);
+                        xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", nowReceivedMessage, true);
+                        XFEChatGPTMessageReceived.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs(nowReceivedMessage, messageId, GenerateState.Start, dialogId));
                     }
                     else
                     {
-                        xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", NowreceivedMessage, true);
-                        XFEChatGPTMessageReceived.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs(NowreceivedMessage.Replace("[XFERemoteAPIError]", string.Empty), messageId, GenerateState.Error, dialogId));
+                        xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", nowReceivedMessage, true);
+                        XFEChatGPTMessageReceived.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs(nowReceivedMessage.Replace("[XFERemoteAPIError]", string.Empty), messageId, GenerateState.Error, dialogId));
                     }
                     await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection closed.", CancellationToken.None);
                 }
