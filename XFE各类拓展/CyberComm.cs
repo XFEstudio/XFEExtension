@@ -1142,6 +1142,17 @@ namespace XFE各类拓展.CyberComm
                     throw new XFECyberCommException("客户端发送二进制数据到服务器时出现异常", ex);
                 }
             }
+            public async Task SendImage(string filePath)
+            {
+                try
+                {
+                    await SendBinaryMessage(File.ReadAllBytes(filePath));
+                }
+                catch (Exception ex)
+                {
+                    throw new XFECyberCommException("客户端发送图片数据到服务器时出现异常", ex);
+                }
+            }
             /// <summary>
             /// 发送图片
             /// </summary>
