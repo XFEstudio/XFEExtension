@@ -959,11 +959,12 @@ namespace XFE各类拓展.CyberComm
             /// <summary>
             /// 创建XCC群组会话
             /// </summary>
-            /// <param name="groupId"></param>
+            /// <param name="groupId">群组名称</param>
+            /// <param name="sender">发送者</param>
             /// <returns></returns>
-            public XCCGroup CreateGroup(string groupId)
+            public XCCGroup CreateGroup(string groupId, string sender)
             {
-                var group = new XCCGroupImpl(groupId, xCCNetWorkBase);
+                var group = new XCCGroupImpl(groupId, sender, xCCNetWorkBase);
                 Groups.Add(group);
                 return group;
             }
@@ -989,6 +990,10 @@ namespace XFE各类拓展.CyberComm
             /// </summary>
             public string GroupId { get; }
             /// <summary>
+            /// 发送者
+            /// </summary>
+            public string Sender { get; }
+            /// <summary>
             /// WebSocket客户端
             /// </summary>
             public ClientWebSocket ClientWebSocket { get; private set; }
@@ -1010,8 +1015,10 @@ namespace XFE各类拓展.CyberComm
             XCCReconnect:
                 ClientWebSocket = new ClientWebSocket();
                 Uri serverUri = new Uri("ws://xcc.api.xfegzs.com");
-                string base64GroupId = Convert.ToBase64String(Encoding.UTF8.GetBytes(GroupId));
+                var base64GroupId = Convert.ToBase64String(Encoding.UTF8.GetBytes(GroupId));
+                var base64SenderId = Convert.ToBase64String(Encoding.UTF8.GetBytes(Sender));
                 ClientWebSocket.Options.SetRequestHeader("Group", base64GroupId);
+                ClientWebSocket.Options.SetRequestHeader("Sender", base64SenderId);
                 reconnectTimes++;
                 try
                 {
@@ -1253,9 +1260,10 @@ namespace XFE各类拓展.CyberComm
                 }
             }
             #endregion
-            internal XCCGroup(string groupId, XCCNetWorkBase xCCNetWorkBase)
+            internal XCCGroup(string groupId, string sender, XCCNetWorkBase xCCNetWorkBase)
             {
                 GroupId = groupId;
+                Sender = sender;
                 workBase = xCCNetWorkBase;
             }
         }
@@ -1404,7 +1412,7 @@ namespace XFE各类拓展.CyberComm
         }
         class XCCGroupImpl : XCCGroup
         {
-            internal XCCGroupImpl(string groupId, XCCNetWorkBase xCCNetWorkBase) : base(groupId, xCCNetWorkBase) { }
+            internal XCCGroupImpl(string groupId, string sender, XCCNetWorkBase xCCNetWorkBase) : base(groupId, sender, xCCNetWorkBase) { }
         }
         class XCCMessageReceivedEventArgsImpl : XCCMessageReceivedEventArgs
         {
