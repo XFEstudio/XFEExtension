@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
@@ -1139,6 +1140,17 @@ namespace XFE各类拓展.CyberComm
                 catch (Exception ex)
                 {
                     throw new XFECyberCommException("客户端发送二进制数据到服务器时出现异常", ex);
+                }
+            }
+            public async Task SendImage(string filePath)
+            {
+                try
+                {
+                    await SendBinaryMessage(File.ReadAllBytes(filePath));
+                }
+                catch (Exception ex)
+                {
+                    throw new XFECyberCommException("客户端发送图片到服务器时出现异常", ex);
                 }
             }
             /// <summary>
