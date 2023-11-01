@@ -1143,6 +1143,7 @@ namespace XFE各类拓展.CyberComm
             /// <param name="message">待发送的文本</param>
             /// <exception cref="XFECyberCommException"></exception>
             /// <returns>发送进程</returns>
+            [Obsolete("发送者已统一，请使用SendTextMessage")]
             public async Task SendStandardTextMessage(string role, string message)
             {
                 try
