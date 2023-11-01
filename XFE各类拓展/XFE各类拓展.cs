@@ -444,7 +444,15 @@ namespace XFE各类拓展
                 {
                     var isFirstMethod = true;
                     var failedList = new List<MethodAndCounter>();
-                    object classInstance = subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, classAttribute.Params.GetTypes(), null).Invoke(classAttribute.Params);
+                    object classInstance = classAttribute.Params == null;
+                    if (classAttribute.Params == null)
+                    {
+                        classInstance = subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, new Type[0], null).Invoke(classAttribute.Params);
+                    }
+                    else
+                    {
+                        classInstance = subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, classAttribute.Params.GetTypes(), null).Invoke(classAttribute.Params);
+                    }
                     var setUpAttribute = subClass.GetAttribute<TSetUpAttribute>();
                     if (setUpAttribute != null)
                     {
