@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="ArrayExtension.cs" />
     <Compile Include="AttributeExtension.cs" />
+    <Compile Include="BufferExtension.cs" />
     <Compile Include="CyberComm.cs" />
     <Compile Include="FileExtension.cs" />
     <Compile Include="ListExtension.cs" />
