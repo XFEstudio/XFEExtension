@@ -101,5 +101,34 @@ namespace XFE各类拓展
             }
             return newBuffer;
         }
+        /// <summary>
+        /// 分割Buffer
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <param name="targetBuffer">分割器</param>
+        /// <returns></returns>
+        public static List<byte[]> Split(this byte[] buffer, byte[] targetBuffer)
+        {
+            var list = new List<byte[]>();
+            var indexes = IndexesOf(buffer, targetBuffer);
+            int index = 0;
+            for (int i = 0; i < indexes.Length; i++)
+            {
+                var newBuffer = new byte[indexes[i] - index];
+                for (int j = index; j < indexes[i]; j++)
+                {
+                    newBuffer[j - index] = buffer[j];
+                }
+                list.Add(newBuffer);
+                index = indexes[i] + targetBuffer.Length;
+            }
+            var lastBuffer = new byte[buffer.Length - index];
+            for (int i = index; i < buffer.Length; i++)
+            {
+                lastBuffer[i - index] = buffer[i];
+            }
+            list.Add(lastBuffer);
+            return list;
+        }
     }
 }

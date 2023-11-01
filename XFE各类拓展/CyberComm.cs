@@ -1309,6 +1309,26 @@ namespace XFE各类拓展.CyberComm
             /// </summary>
             public XCCGroup Group { get; }
             /// <summary>
+            /// 群组ID
+            /// </summary>
+            public string GroupId
+            {
+                get
+                {
+                    return Group.GroupId;
+                }
+            }
+            /// <summary>
+            /// 发送者
+            /// </summary>
+            public string Sender
+            {
+                get
+                {
+                    return Group.Sender;
+                }
+            }
+            /// <summary>
             /// 二进制消息
             /// </summary>
             public byte[] BinaryMessage { get; }
