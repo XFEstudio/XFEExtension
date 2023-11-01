@@ -1136,6 +1136,18 @@ namespace XFE各类拓展.CyberComm
                     throw new XFECyberCommException("客户端发送文本到服务器时出现异常", ex);
                 }
             }
+            public async Task SendBinaryTextMessage(string message)
+            {
+                try
+                {
+                    byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
+                    await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Binary, true, CancellationToken.None);
+                }
+                catch (Exception ex)
+                {
+                    throw new XFECyberCommException("客户端发送文本到服务器时出现异常", ex);
+                }
+            }
             /// <summary>
             /// 发送标准的文本消息
             /// </summary>
@@ -1143,7 +1155,7 @@ namespace XFE各类拓展.CyberComm
             /// <param name="message">待发送的文本</param>
             /// <exception cref="XFECyberCommException"></exception>
             /// <returns>发送进程</returns>
-            [Obsolete("发送者已统一，请使用SendTextMessage")]
+            [Obsolete("发送者已统一，请使用SendTextMessage或SendBinaryTextMessage")]
             public async Task SendStandardTextMessage(string role, string message)
             {
                 try
