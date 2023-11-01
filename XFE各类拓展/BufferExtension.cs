@@ -109,8 +109,8 @@ namespace XFE各类拓展
         /// <returns></returns>
         public static List<byte[]> Split(this byte[] buffer, byte[] targetBuffer)
         {
-            var list = new List<byte[]>();
             var indexes = IndexesOf(buffer, targetBuffer);
+            var buffers = new List<byte[]>();
             int index = 0;
             for (int i = 0; i < indexes.Length; i++)
             {
@@ -119,7 +119,7 @@ namespace XFE各类拓展
                 {
                     newBuffer[j - index] = buffer[j];
                 }
-                list.Add(newBuffer);
+                buffers.Add(newBuffer);
                 index = indexes[i] + targetBuffer.Length;
             }
             var lastBuffer = new byte[buffer.Length - index];
@@ -127,8 +127,8 @@ namespace XFE各类拓展
             {
                 lastBuffer[i - index] = buffer[i];
             }
-            list.Add(lastBuffer);
-            return list;
+            buffers.Add(lastBuffer);
+            return buffers;
         }
     }
 }
