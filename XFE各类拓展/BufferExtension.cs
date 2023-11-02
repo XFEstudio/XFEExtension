@@ -194,8 +194,8 @@ namespace XFE各类拓展.BufferExtension
     /// </summary>
     public class XFEBuffer
     {
-        private Dictionary<string, byte[]> bufferDictionary;
-        private List<byte[]> headerBuffers;
+        private Dictionary<string, byte[]> bufferDictionary = new Dictionary<string, byte[]>();
+        private List<byte[]> headerBuffers = new List<byte[]>();
         /// <summary>
         /// 长度
         /// </summary>
