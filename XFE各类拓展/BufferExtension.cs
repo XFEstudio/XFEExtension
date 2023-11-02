@@ -99,7 +99,7 @@ namespace XFE各类拓展
             }
             for (int i = index; i < newBuffer.Length; i++)
             {
-                newBuffer[i] = buffer[i];
+                newBuffer[i] = buffer[i - (targetBuffer.Length - originBuffer.Length) * indexes.Length];
             }
             return newBuffer;
         }
@@ -142,7 +142,7 @@ namespace XFE各类拓展
             var packedBuffer = new List<byte>();
             for (int i = 0; i < buffers.Count; i++)
             {
-                if (i != 0 && i != buffers.Count - 1)
+                if (i != 0)
                     packedBuffer.AddRange(new List<byte> { 0x01, 0x02, 0x03 });
                 packedBuffer.AddRange(buffers[i].Replace(new byte[] { 0x02, 0x03 }, new byte[] { 0x02, 0x02, 0x03 }).ToList());
             }
@@ -171,10 +171,10 @@ namespace XFE各类拓展
         /// <returns></returns>
         public static List<byte[]> UnPackBuffer(this byte[] buffer)
         {
-            var unPackedBuffers = buffer.Split(new byte[] { 0x01, 0x02, 0x03 });
-            foreach (var unPackedBuffer in unPackedBuffers)
+            var unPackedBuffers = new List<byte[]>();
+            foreach (var unPackedBuffer in buffer.Split(new byte[] { 0x01, 0x02, 0x03 }))
             {
-                unPackedBuffer.Replace(new byte[] { 0x02, 0x02, 0x03 }, new byte[] { 0x02, 0x03 });
+                unPackedBuffers.Add(unPackedBuffer.Replace(new byte[] { 0x02, 0x02, 0x03 }, new byte[] { 0x02, 0x03 }));
             }
             return unPackedBuffers;
         }
@@ -184,7 +184,7 @@ namespace XFE各类拓展
     /// </summary>
     public class XFEBuffer
     {
-        private Dictionary<string, byte[]> xFEBuffer;
+        private Dictionary<string, byte[]> bufferDictionary;
         private List<byte[]> headerBuffers;
         /// <summary>
         /// 长度
@@ -193,7 +193,7 @@ namespace XFE各类拓展
         {
             get
             {
-                return xFEBuffer.Count;
+                return bufferDictionary.Count;
             }
         }
         /// <summary>
@@ -205,11 +205,11 @@ namespace XFE各类拓展
         {
             get
             {
-                return xFEBuffer[header];
+                return bufferDictionary[header];
             }
             set
             {
-                xFEBuffer[header] = value;
+                bufferDictionary[header] = value;
             }
         }
         /// <summary>
@@ -234,7 +234,7 @@ namespace XFE各类拓展
             {
                 if (i % 2 == 0)
                 {
-                    xFEBuffer.xFEBuffer.Add(Encoding.UTF8.GetString(buffers[i]), buffers[i + 1]);
+                    xFEBuffer.bufferDictionary.Add(Encoding.UTF8.GetString(buffers[i]), buffers[i + 1]);
                     xFEBuffer.headerBuffers.Add(buffers[i]);
                 }
             }
@@ -247,7 +247,7 @@ namespace XFE各类拓展
         /// <param name="buffer">Buffer</param>
         public void Add(string header, byte[] buffer)
         {
-            xFEBuffer.Add(header, buffer);
+            bufferDictionary.Add(header, buffer);
             headerBuffers.Add(Encoding.UTF8.GetBytes(header));
             headerBuffers.Add(buffer);
         }
@@ -262,7 +262,7 @@ namespace XFE各类拓展
                 throw new XFEExtensionException("头和Buffer必须成对输入");
             for (int i = 0; i < @params.Length; i += 2)
             {
-                xFEBuffer.Add(@params[i].ToString(), (byte[])@params[i + 1]);
+                bufferDictionary.Add(@params[i].ToString(), (byte[])@params[i + 1]);
                 headerBuffers.Add(Encoding.UTF8.GetBytes(@params[i].ToString()));
                 headerBuffers.Add((byte[])@params[i + 1]);
             }
@@ -273,7 +273,7 @@ namespace XFE各类拓展
         /// <param name="header">头</param>
         public void Remove(string header)
         {
-            xFEBuffer.Remove(header);
+            bufferDictionary.Remove(header);
             headerBuffers.Remove(Encoding.UTF8.GetBytes(header));
         }
         /// <summary>
@@ -282,8 +282,8 @@ namespace XFE各类拓展
         /// <param name="index"></param>
         public void RemoveAt(int index)
         {
-            var header = xFEBuffer.Keys.ToArray()[index];
-            xFEBuffer.Remove(header);
+            var header = bufferDictionary.Keys.ToArray()[index];
+            bufferDictionary.Remove(header);
             headerBuffers.Remove(Encoding.UTF8.GetBytes(header));
         }
         /// <summary>
@@ -291,7 +291,7 @@ namespace XFE各类拓展
         /// </summary>
         public void Clear()
         {
-            xFEBuffer.Clear();
+            bufferDictionary.Clear();
             headerBuffers.Clear();
         }
         /// <summary>
@@ -301,7 +301,7 @@ namespace XFE各类拓展
         /// <returns></returns>
         public bool Contains(string header)
         {
-            return xFEBuffer.ContainsKey(header);
+            return bufferDictionary.ContainsKey(header);
         }
         /// <summary>
         /// 获取Buffer
@@ -310,7 +310,7 @@ namespace XFE各类拓展
         /// <returns></returns>
         public byte[] GetBuffer(string header)
         {
-            return xFEBuffer[header];
+            return bufferDictionary[header];
         }
         /// <summary>
         /// 获取头
@@ -318,14 +318,14 @@ namespace XFE各类拓展
         /// <returns></returns>
         public string[] GetHeaders()
         {
-            return xFEBuffer.Keys.ToArray();
+            return bufferDictionary.Keys.ToArray();
         }
         /// <summary>
         /// XFE的二进制数组协议
         /// </summary>
         public XFEBuffer()
         {
-            xFEBuffer = new Dictionary<string, byte[]>();
+            bufferDictionary = new Dictionary<string, byte[]>();
         }
         /// <summary>
         /// XFE的二进制数组协议
@@ -338,7 +338,7 @@ namespace XFE各类拓展
                 throw new XFEExtensionException("头和Buffer必须成对输入");
             for (int i = 0; i < @params.Length; i += 2)
             {
-                xFEBuffer.Add(@params[i].ToString(), (byte[])@params[i + 1]);
+                bufferDictionary.Add(@params[i].ToString(), (byte[])@params[i + 1]);
                 headerBuffers.Add(Encoding.UTF8.GetBytes(@params[i].ToString()));
                 headerBuffers.Add((byte[])@params[i + 1]);
             }
