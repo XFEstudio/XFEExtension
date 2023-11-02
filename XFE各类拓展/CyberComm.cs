@@ -8,7 +8,6 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using XFE各类拓展.ArrayExtension;
 using XFE各类拓展.FormatExtension;
 
 namespace XFE各类拓展.CyberComm
@@ -1076,22 +1075,24 @@ namespace XFE各类拓展.CyberComm
                                 receiveResult = await ClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
                                 bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                             }
+                            var receivedBinaryBuffer = bufferList.ToArray();
                             var messageType = XCCMessageType.Binary;
-                            var header = bufferList[0];
-                            bufferList.RemoveAt(0);
-                            switch (header)
+                            var xFEBuffer = XFEBuffer.ToXFEBuffer(receivedBinaryBuffer);
+                            var sender = Encoding.UTF8.GetString(xFEBuffer["Sender"]);
+                            var signature = Encoding.UTF8.GetString(xFEBuffer["Type"]);
+                            switch (signature)
                             {
-                                case 0x01:
+                                case "image":
                                     messageType = XCCMessageType.Image;
                                     break;
-                                case 0x02:
+                                case "audio":
                                     messageType = XCCMessageType.Audio;
                                     break;
                                 default:
                                     messageType = XCCMessageType.Binary;
                                     break;
                             }
-                            workBase.MessageReceived?.Invoke(this, new XCCMessageReceivedEventArgsImpl(this, ClientWebSocket, bufferList.ToArray(), messageType, header));
+                            workBase.MessageReceived?.Invoke(this, new XCCMessageReceivedEventArgsImpl(this, ClientWebSocket, bufferList.ToArray(), messageType, signature));
                         }
                     }
                     catch (Exception ex)
@@ -1137,11 +1138,17 @@ namespace XFE各类拓展.CyberComm
                     throw new XFECyberCommException("客户端发送文本到服务器时出现异常", ex);
                 }
             }
+            /// <summary>
+            /// 发送二进制文本消息
+            /// </summary>
+            /// <param name="message">消息</param>
+            /// <returns></returns>
+            /// <exception cref="XFECyberCommException"></exception>
             public async Task SendBinaryTextMessage(string message)
             {
                 try
                 {
-                    XFEBuffer waitSendBuffer = new XFEBuffer(Sender, Encoding.UTF8.GetBytes(message));
+                    var waitSendBuffer = new XFEBuffer(Sender, Encoding.UTF8.GetBytes(message));
                     await ClientWebSocket.SendAsync(new ArraySegment<byte>(waitSendBuffer.ToBuffer()), WebSocketMessageType.Binary, true, CancellationToken.None);
                 }
                 catch (Exception ex)
@@ -1170,20 +1177,18 @@ namespace XFE各类拓展.CyberComm
                 }
             }
             /// <summary>
-            /// 发送标准的二进制消息
+            /// 发送签名二进制消息
             /// </summary>
             /// <param name="message">二进制消息</param>
             /// <param name="signature">标识</param>
             /// <returns></returns>
             /// <exception cref="XFECyberCommException"></exception>
-            public async Task SendSignedBinaryMessage(byte[] message, byte signature)
+            public async Task SendSignedBinaryMessage(byte[] message, string signature)
             {
                 try
                 {
-                    byte[] sendBuffer = new byte[message.Length + 1];
-                    sendBuffer[0] = signature;
-                    message.CopyTo(sendBuffer, 1);
-                    await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Binary, true, CancellationToken.None);
+                    var xFEBuffer = new XFEBuffer(Sender, message, "Sender", Encoding.UTF8.GetBytes(Sender), "Type", Encoding.UTF8.GetBytes(signature));
+                    await ClientWebSocket.SendAsync(new ArraySegment<byte>(xFEBuffer.ToBuffer()), WebSocketMessageType.Binary, true, CancellationToken.None);
                 }
                 catch (Exception ex)
                 {
@@ -1200,7 +1205,7 @@ namespace XFE各类拓展.CyberComm
             {
                 try
                 {
-                    await SendSignedBinaryMessage(message, 0x00);
+                    await SendSignedBinaryMessage(message, "binary");
                 }
                 catch (Exception ex)
                 {
@@ -1217,7 +1222,7 @@ namespace XFE各类拓展.CyberComm
             {
                 try
                 {
-                    await SendSignedBinaryMessage(File.ReadAllBytes(filePath), 0x01);
+                    await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "image");
                 }
                 catch (Exception ex)
                 {
@@ -1234,7 +1239,7 @@ namespace XFE各类拓展.CyberComm
             {
                 try
                 {
-                    await SendSignedBinaryMessage(buffer, 0x02);
+                    await SendSignedBinaryMessage(buffer, "audio");
                 }
                 catch (Exception ex)
                 {
@@ -1317,7 +1322,7 @@ namespace XFE各类拓展.CyberComm
             /// <summary>
             /// 消息签名
             /// </summary>
-            public byte Signature { get; }
+            public string Signature { get; }
             /// <summary>
             /// 触发事件的群组
             /// </summary>
@@ -1383,10 +1388,10 @@ namespace XFE各类拓展.CyberComm
                 CurrentWebSocket = clientWebSocket;
                 TextMessage = message;
                 Group = group;
-                Signature = 0x00;
+                Signature = "binary";
                 MessageType = XCCMessageType.Text;
             }
-            internal XCCMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, byte[] bytes, XCCMessageType messageType, byte signature)
+            internal XCCMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, byte[] bytes, XCCMessageType messageType, string signature)
             {
                 CurrentWebSocket = clientWebSocket;
                 BinaryMessage = bytes;
@@ -1451,7 +1456,7 @@ namespace XFE各类拓展.CyberComm
         class XCCMessageReceivedEventArgsImpl : XCCMessageReceivedEventArgs
         {
             internal XCCMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, string message) : base(group, clientWebSocket, message) { }
-            internal XCCMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, byte[] bytes, XCCMessageType messageType, byte signature) : base(group, clientWebSocket, bytes, messageType, signature) { }
+            internal XCCMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, byte[] bytes, XCCMessageType messageType, string signature) : base(group, clientWebSocket, bytes, messageType, signature) { }
             internal XCCMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, XFECyberCommException ex) : base(group, clientWebSocket, ex) { }
         }
         class XCCConnectionClosedEventArgsImpl : XCCConnectionClosedEventArgs

@@ -165,6 +165,16 @@ namespace XFE各类拓展
             return buffers.PackBuffer();
         }
         /// <summary>
+        /// 为Buffer添加头部并封装为XFEBuffer
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <param name="headers"></param>
+        /// <returns></returns>
+        public static byte[] AddHeaderAndPack(this byte[] buffer, params byte[] headers)
+        {
+            return new List<byte[]>() { headers, buffer }.PackBuffer();
+        }
+        /// <summary>
         /// 将XEFBuffer转换为BufferList
         /// </summary>
         /// <param name="buffer"></param>
@@ -302,15 +312,6 @@ namespace XFE各类拓展
         public bool Contains(string header)
         {
             return bufferDictionary.ContainsKey(header);
-        }
-        /// <summary>
-        /// 获取Buffer
-        /// </summary>
-        /// <param name="header"></param>
-        /// <returns></returns>
-        public byte[] GetBuffer(string header)
-        {
-            return bufferDictionary[header];
         }
         /// <summary>
         /// 获取头
