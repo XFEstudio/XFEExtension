@@ -865,9 +865,9 @@ namespace XFE各类拓展.CyberComm
     namespace XCCNetWork
     {
         /// <summary>
-        /// XFE网络通信返回消息类型
+        /// XFE网络通信二进制返回消息类型
         /// </summary>
-        public enum XCCMessageType
+        public enum XCCBinaryMessageType
         {
             /// <summary>
             /// 文本消息
@@ -884,26 +884,40 @@ namespace XFE各类拓展.CyberComm
             /// <summary>
             /// 音频消息
             /// </summary>
-            Audio,
+            Audio
+        }
+        /// <summary>
+        /// XFE网络通信明文返回消息类型
+        /// </summary>
+        public enum XCCTextMessageType
+        {
             /// <summary>
-            /// 错误消息
+            /// 文本消息
             /// </summary>
-            Error
+            Text
         }
         class XCCNetWorkBase
         {
             /// <summary>
-            /// 消息接收时触发
+            /// 明文消息接收时触发
             /// </summary>
-            public EventHandler<XCCMessageReceivedEventArgs> MessageReceived;
+            public EventHandler<XCCTextMessageReceivedEventArgs> textMessageReceived;
+            /// <summary>
+            /// 二进制消息接收时触发
+            /// </summary>
+            public EventHandler<XCCBinaryMessageReceivedEventArgs> binaryMessageReceived;
+            /// <summary>
+            /// 异常消息接收时触发
+            /// </summary>
+            public EventHandler<XCCExceptionMessageReceivedEventArgs> exceptionMessageReceived;
             /// <summary>
             /// 连接关闭时触发
             /// </summary>
-            public EventHandler<XCCConnectionClosedEventArgs> ConnectionClosed;
+            public EventHandler<XCCConnectionClosedEventArgs> connectionClosed;
             /// <summary>
             /// 连接成功时触发
             /// </summary>
-            public EventHandler<XCCConnectedEventArgs> Connected;
+            public EventHandler<XCCConnectedEventArgs> connected;
         }
         /// <summary>
         /// XCC网络通讯
@@ -916,17 +930,45 @@ namespace XFE各类拓展.CyberComm
             /// </summary>
             public List<XCCGroup> Groups { get; set; }
             /// <summary>
-            /// 消息接收时触发
+            /// 明文消息接收时触发
             /// </summary>
-            public event EventHandler<XCCMessageReceivedEventArgs> MessageReceived
+            public event EventHandler<XCCTextMessageReceivedEventArgs> TextMessageReceived
             {
                 add
                 {
-                    xCCNetWorkBase.MessageReceived += value;
+                    xCCNetWorkBase.textMessageReceived += value;
                 }
                 remove
                 {
-                    xCCNetWorkBase.MessageReceived -= value;
+                    xCCNetWorkBase.textMessageReceived -= value;
+                }
+            }
+            /// <summary>
+            /// 二进制消息接收时触发
+            /// </summary>
+            public event EventHandler<XCCBinaryMessageReceivedEventArgs> BinaryMessageReceived
+            {
+                add
+                {
+                    xCCNetWorkBase.binaryMessageReceived += value;
+                }
+                remove
+                {
+                    xCCNetWorkBase.binaryMessageReceived -= value;
+                }
+            }
+            /// <summary>
+            /// 异常消息接收时触发
+            /// </summary>
+            public event EventHandler<XCCExceptionMessageReceivedEventArgs> ExceptionMessageReceived
+            {
+                add
+                {
+                    xCCNetWorkBase.exceptionMessageReceived += value;
+                }
+                remove
+                {
+                    xCCNetWorkBase.exceptionMessageReceived -= value;
                 }
             }
             /// <summary>
@@ -936,11 +978,11 @@ namespace XFE各类拓展.CyberComm
             {
                 add
                 {
-                    xCCNetWorkBase.ConnectionClosed += value;
+                    xCCNetWorkBase.connectionClosed += value;
                 }
                 remove
                 {
-                    xCCNetWorkBase.ConnectionClosed -= value;
+                    xCCNetWorkBase.connectionClosed -= value;
                 }
             }
             /// <summary>
@@ -950,11 +992,11 @@ namespace XFE各类拓展.CyberComm
             {
                 add
                 {
-                    xCCNetWorkBase.Connected += value;
+                    xCCNetWorkBase.connected += value;
                 }
                 remove
                 {
-                    xCCNetWorkBase.Connected -= value;
+                    xCCNetWorkBase.connected -= value;
                 }
             }
             /// <summary>
@@ -1029,7 +1071,7 @@ namespace XFE各类拓展.CyberComm
                 {
                     if (IsConnected == true)
                     {
-                        workBase.ConnectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, ClientWebSocket, false));
+                        workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, ClientWebSocket, false));
                     }
                     IsConnected = false;
                     if (autoReconnect)
@@ -1042,12 +1084,12 @@ namespace XFE各类拓展.CyberComm
                     }
                     else
                     {
-                        workBase.MessageReceived?.Invoke(this, new XCCMessageReceivedEventArgsImpl(this, ClientWebSocket, new XFECyberCommException("与XCC网络通讯服务器建立连接时发生异常", ex)));
+                        workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, ClientWebSocket, new XFECyberCommException("与XCC网络通讯服务器建立连接时发生异常", ex)));
                         return;
                     }
                 }
                 reconnectTimes = 0;
-                workBase.Connected?.Invoke(this, new XCCConnectedEventArgsImpl(this, ClientWebSocket));
+                workBase.connected?.Invoke(this, new XCCConnectedEventArgsImpl(this, ClientWebSocket));
                 IsConnected = true;
                 while (ClientWebSocket.State == WebSocketState.Open)
                 {
@@ -1064,7 +1106,7 @@ namespace XFE各类拓展.CyberComm
                                 receiveResult = await ClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
                                 receivedMessage += Encoding.UTF8.GetString(receiveBuffer, 0, receiveResult.Count);
                             }
-                            workBase.MessageReceived?.Invoke(this, new XCCMessageReceivedEventArgsImpl(this, ClientWebSocket, receivedMessage));
+                            workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, ClientWebSocket, XCCTextMessageType.Text, receivedMessage));
                         }
                         if (receiveResult.MessageType == WebSocketMessageType.Binary)
                         {
@@ -1077,30 +1119,31 @@ namespace XFE各类拓展.CyberComm
                                 bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                             }
                             var receivedBinaryBuffer = bufferList.ToArray();
-                            var messageType = XCCMessageType.Binary;
+                            var messageType = XCCBinaryMessageType.Binary;
                             var xFEBuffer = XFEBuffer.ToXFEBuffer(receivedBinaryBuffer);
                             var sender = Encoding.UTF8.GetString(xFEBuffer["Sender"]);
                             var signature = Encoding.UTF8.GetString(xFEBuffer["Type"]);
+                            var unPackedBuffer = xFEBuffer[sender];
                             switch (signature)
                             {
                                 case "image":
-                                    messageType = XCCMessageType.Image;
+                                    messageType = XCCBinaryMessageType.Image;
                                     break;
                                 case "audio":
-                                    messageType = XCCMessageType.Audio;
+                                    messageType = XCCBinaryMessageType.Audio;
                                     break;
                                 default:
-                                    messageType = XCCMessageType.Binary;
+                                    messageType = XCCBinaryMessageType.Binary;
                                     break;
                             }
-                            workBase.MessageReceived?.Invoke(this, new XCCMessageReceivedEventArgsImpl(this, ClientWebSocket, bufferList.ToArray(), messageType, signature));
+                            workBase.binaryMessageReceived?.Invoke(this, new XCCBinaryMessageReceivedEventArgsImpl(this, ClientWebSocket, unPackedBuffer, messageType, signature));
                         }
                     }
                     catch (Exception ex)
                     {
                         if (IsConnected == true)
                         {
-                            workBase.ConnectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, ClientWebSocket, false));
+                            workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, ClientWebSocket, false));
                         }
                         IsConnected = false;
                         if (autoReconnect)
@@ -1114,12 +1157,12 @@ namespace XFE各类拓展.CyberComm
                         }
                         else
                         {
-                            workBase.MessageReceived?.Invoke(this, new XCCMessageReceivedEventArgsImpl(this, ClientWebSocket, new XFECyberCommException("与XCC网络通讯服务器通讯时发生异常", ex)));
+                            workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, ClientWebSocket, new XFECyberCommException("与XCC网络通讯服务器建立连接时发生异常", ex)));
                             return;
                         }
                     }
                 }
-                workBase.ConnectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, ClientWebSocket, true));
+                workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, ClientWebSocket, true));
             }
             /// <summary>
             /// 发送文本消息
@@ -1131,26 +1174,8 @@ namespace XFE各类拓展.CyberComm
             {
                 try
                 {
-                    byte[] sendBuffer = Encoding.UTF8.GetBytes(new XCCMessage(Sender, message).ToString());
+                    byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
                     await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
-                }
-                catch (Exception ex)
-                {
-                    throw new XFECyberCommException("客户端发送文本到服务器时出现异常", ex);
-                }
-            }
-            /// <summary>
-            /// 发送二进制文本消息
-            /// </summary>
-            /// <param name="message">消息</param>
-            /// <returns></returns>
-            /// <exception cref="XFECyberCommException"></exception>
-            public async Task SendBinaryTextMessage(string message)
-            {
-                try
-                {
-                    var waitSendBuffer = new XFEBuffer(Sender, Encoding.UTF8.GetBytes(message));
-                    await ClientWebSocket.SendAsync(new ArraySegment<byte>(waitSendBuffer.ToBuffer()), WebSocketMessageType.Binary, true, CancellationToken.None);
                 }
                 catch (Exception ex)
                 {
@@ -1169,8 +1194,7 @@ namespace XFE各类拓展.CyberComm
             {
                 try
                 {
-                    byte[] sendBuffer = Encoding.UTF8.GetBytes(new XCCMessage(role, message).ToString());
-                    await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                    await SendTextMessage(message);
                 }
                 catch (Exception ex)
                 {
@@ -1188,12 +1212,29 @@ namespace XFE各类拓展.CyberComm
             {
                 try
                 {
-                    var xFEBuffer = new XFEBuffer(Sender, message, "Sender", Encoding.UTF8.GetBytes(Sender), "Type", Encoding.UTF8.GetBytes(signature));
+                    var xFEBuffer = new XFEBuffer(Sender, message, "Type", Encoding.UTF8.GetBytes(signature), "ID", Guid.NewGuid().ToByteArray());
                     await ClientWebSocket.SendAsync(new ArraySegment<byte>(xFEBuffer.ToBuffer()), WebSocketMessageType.Binary, true, CancellationToken.None);
                 }
                 catch (Exception ex)
                 {
                     throw new XFECyberCommException("客户端发送二进制数据到服务器时出现异常", ex);
+                }
+            }
+            /// <summary>
+            /// 发送二进制文本消息
+            /// </summary>
+            /// <param name="message">消息</param>
+            /// <returns></returns>
+            /// <exception cref="XFECyberCommException"></exception>
+            public async Task SendBinaryTextMessage(string message)
+            {
+                try
+                {
+                    await SendSignedBinaryMessage(Encoding.UTF8.GetBytes(message), "text");
+                }
+                catch (Exception ex)
+                {
+                    throw new XFECyberCommException("客户端发送文本到服务器时出现异常", ex);
                 }
             }
             /// <summary>
@@ -1305,25 +1346,9 @@ namespace XFE各类拓展.CyberComm
         public abstract class XCCMessageReceivedEventArgs : EventArgs
         {
             /// <summary>
-            /// 返回的消息类型
-            /// </summary>
-            public XCCMessageType MessageType { get; }
-            /// <summary>
             /// 当前WebSocket
             /// </summary>
             public ClientWebSocket CurrentWebSocket { get; }
-            /// <summary>
-            /// 异常信息
-            /// </summary>
-            public XFECyberCommException Exception { get; }
-            /// <summary>
-            /// 文本消息
-            /// </summary>
-            public string TextMessage { get; }
-            /// <summary>
-            /// 消息签名
-            /// </summary>
-            public string Signature { get; }
             /// <summary>
             /// 触发事件的群组
             /// </summary>
@@ -1349,20 +1374,32 @@ namespace XFE各类拓展.CyberComm
                 }
             }
             /// <summary>
-            /// 二进制消息
-            /// </summary>
-            public byte[] BinaryMessage { get; }
-            /// <summary>
-            /// 发送文本消息
+            /// 回复文本消息
             /// </summary>
             /// <param name="message">待发送的文本</param>
             /// <returns>发送进程</returns>
-            public async void ReplyMessage(string message)
+            public async void ReplyTextMessage(string message)
             {
                 try
                 {
                     byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
                     await CurrentWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                }
+                catch (Exception ex)
+                {
+                    throw new XFECyberCommException("收到服务器端数据后客户端回复文本数据时出现异常", ex);
+                }
+            }
+            /// <summary>
+            /// 回复二进制消息
+            /// </summary>
+            /// <param name="message">二进制消息</param>
+            /// <exception cref="XFECyberCommException"></exception>
+            public async void ReplyBinaryMessage(byte[] message)
+            {
+                try
+                {
+                    await CurrentWebSocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, CancellationToken.None);
                 }
                 catch (Exception ex)
                 {
@@ -1384,27 +1421,68 @@ namespace XFE各类拓展.CyberComm
                     throw new XFECyberCommException("客户端关闭连接时出现异常", ex);
                 }
             }
-            internal XCCMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, string message)
+            internal XCCMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket)
             {
-                CurrentWebSocket = clientWebSocket;
-                TextMessage = message;
                 Group = group;
-                Signature = "binary";
-                MessageType = XCCMessageType.Text;
+                CurrentWebSocket = clientWebSocket;
             }
-            internal XCCMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, byte[] bytes, XCCMessageType messageType, string signature)
+        }
+        /// <summary>
+        /// XCC网络通讯接收到明文消息事件
+        /// </summary>
+        public abstract class XCCTextMessageReceivedEventArgs : XCCMessageReceivedEventArgs
+        {
+            /// <summary>
+            /// 返回文本消息类型
+            /// </summary>
+            public XCCTextMessageType MessageType { get; }
+            /// <summary>
+            /// 文本消息
+            /// </summary>
+            public string TextMessage { get; }
+            internal XCCTextMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, XCCTextMessageType messageType, string message) : base(group, clientWebSocket)
             {
-                CurrentWebSocket = clientWebSocket;
-                BinaryMessage = bytes;
-                Group = group;
-                Signature = signature;
                 MessageType = messageType;
+                TextMessage = message;
             }
-            internal XCCMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, XFECyberCommException ex)
+
+        }
+        /// <summary>
+        /// XCC网络通讯接收到二进制消息事件
+        /// </summary>
+        public abstract class XCCBinaryMessageReceivedEventArgs : XCCMessageReceivedEventArgs
+        {
+            /// <summary>
+            /// 返回二进制消息类型
+            /// </summary>
+            public XCCBinaryMessageType MessageType { get; }
+            /// <summary>
+            /// 消息签名
+            /// </summary>
+            public string Signature { get; }
+            /// <summary>
+            /// 二进制消息
+            /// </summary>
+            public byte[] BinaryMessage { get; }
+            internal XCCBinaryMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, byte[] buffer, XCCBinaryMessageType messageType, string signature) : base(group, clientWebSocket)
             {
-                CurrentWebSocket = clientWebSocket;
-                Exception = ex;
-                MessageType = XCCMessageType.Error;
+                BinaryMessage = buffer;
+                MessageType = messageType;
+                Signature = signature;
+            }
+        }
+        /// <summary>
+        /// XCC网络通讯期间异常事件
+        /// </summary>
+        public abstract class XCCExceptionMessageReceivedEventArgs : XCCMessageReceivedEventArgs
+        {
+            /// <summary>
+            /// 异常信息
+            /// </summary>
+            public XFECyberCommException Exception { get; }
+            internal XCCExceptionMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, XFECyberCommException exception) : base(group, clientWebSocket)
+            {
+                Exception = exception;
             }
         }
         /// <summary>
@@ -1454,12 +1532,6 @@ namespace XFE各类拓展.CyberComm
         {
             internal XCCGroupImpl(string groupId, string sender, XCCNetWorkBase xCCNetWorkBase) : base(groupId, sender, xCCNetWorkBase) { }
         }
-        class XCCMessageReceivedEventArgsImpl : XCCMessageReceivedEventArgs
-        {
-            internal XCCMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, string message) : base(group, clientWebSocket, message) { }
-            internal XCCMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, byte[] bytes, XCCMessageType messageType, string signature) : base(group, clientWebSocket, bytes, messageType, signature) { }
-            internal XCCMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, XFECyberCommException ex) : base(group, clientWebSocket, ex) { }
-        }
         class XCCConnectionClosedEventArgsImpl : XCCConnectionClosedEventArgs
         {
             internal XCCConnectionClosedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, bool closeNormally) : base(group, clientWebSocket, closeNormally) { }
@@ -1467,6 +1539,18 @@ namespace XFE各类拓展.CyberComm
         class XCCConnectedEventArgsImpl : XCCConnectedEventArgs
         {
             internal XCCConnectedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket) : base(group, clientWebSocket) { }
+        }
+        class XCCTextMessageReceivedEventArgsImpl : XCCTextMessageReceivedEventArgs
+        {
+            internal XCCTextMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, XCCTextMessageType messageType, string message) : base(group, clientWebSocket, messageType, message) { }
+        }
+        class XCCBinaryMessageReceivedEventArgsImpl : XCCBinaryMessageReceivedEventArgs
+        {
+            internal XCCBinaryMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, byte[] buffer, XCCBinaryMessageType messageType, string signature) : base(group, clientWebSocket, buffer, messageType, signature) { }
+        }
+        class XCCExceptionMessageReceivedEventArgsImpl : XCCExceptionMessageReceivedEventArgs
+        {
+            internal XCCExceptionMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, XFECyberCommException exception) : base(group, clientWebSocket, exception) { }
         }
     }
 }
