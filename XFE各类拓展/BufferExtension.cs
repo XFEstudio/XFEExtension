@@ -154,7 +154,7 @@ namespace XFE各类拓展
         /// <param name="buffer"></param>
         /// <param name="headers"></param>
         /// <returns></returns>
-        public static byte[] AddHeader(this byte[] buffer, params string[] headers)
+        public static byte[] AddHeaderAndPack(this byte[] buffer, params string[] headers)
         {
             var buffers = new List<byte[]>();
             foreach (var header in headers)
