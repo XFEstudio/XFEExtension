@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace XFE各类拓展
+namespace XFE各类拓展.BufferExtension
 {
     /// <summary>
     /// 对二进制数组的拓展

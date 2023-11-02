@@ -8,6 +8,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using XFE各类拓展.BufferExtension;
 using XFE各类拓展.FormatExtension;
 
 namespace XFE各类拓展.CyberComm
