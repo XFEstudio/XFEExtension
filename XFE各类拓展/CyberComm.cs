@@ -8,6 +8,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using XFE各类拓展.ArrayExtension;
 using XFE各类拓展.FormatExtension;
 
 namespace XFE各类拓展.CyberComm
@@ -1128,7 +1129,7 @@ namespace XFE各类拓展.CyberComm
             {
                 try
                 {
-                    byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
+                    byte[] sendBuffer = Encoding.UTF8.GetBytes(new XCCMessage(Sender, message).ToString());
                     await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
                 }
                 catch (Exception ex)
@@ -1140,8 +1141,8 @@ namespace XFE各类拓展.CyberComm
             {
                 try
                 {
-                    byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
-                    await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Binary, true, CancellationToken.None);
+                    XFEBuffer waitSendBuffer = new XFEBuffer(Sender, Encoding.UTF8.GetBytes(message));
+                    await ClientWebSocket.SendAsync(new ArraySegment<byte>(waitSendBuffer.ToBuffer()), WebSocketMessageType.Binary, true, CancellationToken.None);
                 }
                 catch (Exception ex)
                 {

@@ -139,14 +139,14 @@ namespace XFE各类拓展
         /// <returns></returns>
         public static byte[] PackBuffer(this List<byte[]> buffers)
         {
-            var xFEBuffer = new List<byte>();
+            var packedBuffer = new List<byte>();
             for (int i = 0; i < buffers.Count; i++)
             {
                 if (i != 0 && i != buffers.Count - 1)
-                    xFEBuffer.AddRange(new List<byte> { 0x01, 0x02, 0x03 });
-                xFEBuffer.AddRange(buffers[i].Replace(new byte[] { 0x02, 0x03 }, new byte[] { 0x02, 0x02, 0x03 }).ToList());
+                    packedBuffer.AddRange(new List<byte> { 0x01, 0x02, 0x03 });
+                packedBuffer.AddRange(buffers[i].Replace(new byte[] { 0x02, 0x03 }, new byte[] { 0x02, 0x02, 0x03 }).ToList());
             }
-            return xFEBuffer.ToArray();
+            return packedBuffer.ToArray();
         }
         /// <summary>
         /// 为Buffer添加头部并封装为XFEBuffer
@@ -171,7 +171,12 @@ namespace XFE各类拓展
         /// <returns></returns>
         public static List<byte[]> UnPackBuffer(this byte[] buffer)
         {
-            return buffer.Split(new byte[] { 0x01, 0x02, 0x03 });
+            var unPackedBuffers = buffer.Split(new byte[] { 0x01, 0x02, 0x03 });
+            foreach (var unPackedBuffer in unPackedBuffers)
+            {
+                unPackedBuffer.Replace(new byte[] { 0x02, 0x02, 0x03 }, new byte[] { 0x02, 0x03 });
+            }
+            return unPackedBuffers;
         }
     }
     /// <summary>
