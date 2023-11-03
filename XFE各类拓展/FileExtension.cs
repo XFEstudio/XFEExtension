@@ -193,6 +193,24 @@ namespace XFE各类拓展.FileExtension
                 return obj;
             }
         }
+        /// <summary>
+        /// 输出文件大小
+        /// </summary>
+        /// <param name="bufferLength"></param>
+        /// <returns></returns>
+        public static string FileSize(this long bufferLength)
+        {
+            string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+            double len = bufferLength;
+            int order = 0;
+            while (len >= 1024 && order < sizes.Length - 1)
+            {
+                order++;
+                len /= 1024;
+            }
+            return String.Format("{0:0.##} {1}", len, sizes[order]);
+        }
+
     }
     /// <summary>
     /// XFE文件监视器
