@@ -50,14 +50,10 @@ namespace XFE各类拓展.ListExtension
         public static List<T> ToXFEList<T>(this string str)
         {
             string[] strings = str.Split(new string[] { "[+-", "-+]" }, StringSplitOptions.None);
+            List<T> list = new List<T>();
             for (int i = 0; i < strings.Length; i++)
             {
-                strings[i] = strings[i].Replace("[++", "[+").Replace("++]", "+]");
-            }
-            List<T> list = new List<T>();
-            for (int i = 0, j = 1; i < list.Count; i++, j += 2)
-            {
-                list[i] = (T)Convert.ChangeType(strings[j], typeof(T));
+                list.Add((T)Convert.ChangeType(strings[i].Replace("[++", "[+").Replace("++]", "+]"), typeof(T)));
             }
             return list;
         }
