@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using XFE各类拓展.ArrayExtension;
 using XFE各类拓展.BufferExtension;
 using XFE各类拓展.FormatExtension;
+using XFE各类拓展.TaskExtension;
 
 namespace XFE各类拓展.CyberComm
 {
@@ -1011,6 +1012,7 @@ namespace XFE各类拓展.CyberComm
         /// </summary>
         public abstract class XCCGroup
         {
+            private event EndTaskTrigger<bool> UpdateTaskTrigger;
             private readonly XCCNetWorkBase workBase;
             private int reconnectTimes = -1;
             #region 公有属性
@@ -1117,6 +1119,9 @@ namespace XFE各类拓展.CyberComm
                                 case "audio":
                                     messageType = XCCBinaryMessageType.Audio;
                                     break;
+                                case "callback":
+                                    UpdateTaskTrigger.Invoke(true, messageId);
+                                    continue;
                                 default:
                                     messageType = XCCBinaryMessageType.Binary;
                                     break;
@@ -1150,17 +1155,30 @@ namespace XFE各类拓展.CyberComm
                 workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, ClientWebSocket, true));
             }
             /// <summary>
+            /// 发送文本消息，返回消息ID
+            /// </summary>
+            /// <param name="message">待发送的文本</param>
+            /// <returns>消息ID</returns>
+            public async Task<string> SendTextMessage(string message)
+            {
+                var messageId = Guid.NewGuid().ToString();
+                await SendTextMessage(message, messageId);
+                return messageId;
+            }
+            /// <summary>
             /// 发送文本消息
             /// </summary>
             /// <param name="message">待发送的文本</param>
+            /// <param name="messageId">消息ID</param>
             /// <exception cref="XFECyberCommException"></exception>
-            /// <returns>发送进程</returns>
-            public async Task SendTextMessage(string message)
+            /// <returns>服务器接收校验等待</returns>
+            public async Task SendTextMessage(string message, string messageId)
             {
                 try
                 {
-                    byte[] sendBuffer = Encoding.UTF8.GetBytes(new string[] { Guid.NewGuid().ToString(), message }.ToXFEString());
+                    byte[] sendBuffer = Encoding.UTF8.GetBytes(new string[] { messageId, message }.ToXFEString());
                     await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                    await new XFEWaitTask<bool>(ref UpdateTaskTrigger, messageId);
                 }
                 catch (Exception ex)
                 {
@@ -1173,13 +1191,13 @@ namespace XFE各类拓展.CyberComm
             /// <param name="role">发送者角色</param>
             /// <param name="message">待发送的文本</param>
             /// <exception cref="XFECyberCommException"></exception>
-            /// <returns>发送进程</returns>
+            /// <returns>消息ID</returns>
             [Obsolete("发送者已统一，请使用SendTextMessage或SendBinaryTextMessage")]
-            public async Task SendStandardTextMessage(string role, string message)
+            public async Task<string> SendStandardTextMessage(string role, string message)
             {
                 try
                 {
-                    await SendTextMessage(message);
+                    return await SendTextMessage(message);
                 }
                 catch (Exception ex)
                 {
@@ -1187,18 +1205,32 @@ namespace XFE各类拓展.CyberComm
                 }
             }
             /// <summary>
+            /// 发送签名二进制消息，返回消息ID
+            /// </summary>
+            /// <param name="message">二进制消息</param>
+            /// <param name="signature">签名标识</param>
+            /// <returns></returns>
+            public async Task<string> SendSignedBinaryMessage(byte[] message, string signature)
+            {
+                var messageId = Guid.NewGuid().ToString();
+                await SendSignedBinaryMessage(message, messageId, signature);
+                return messageId;
+            }
+            /// <summary>
             /// 发送签名二进制消息
             /// </summary>
             /// <param name="message">二进制消息</param>
-            /// <param name="signature">标识</param>
-            /// <returns></returns>
+            /// <param name="messageId">消息ID</param>
+            /// <param name="signature">签名标识</param>
+            /// <returns>服务器接收校验等待</returns>
             /// <exception cref="XFECyberCommException"></exception>
-            public async Task SendSignedBinaryMessage(byte[] message, string signature)
+            public async Task SendSignedBinaryMessage(byte[] message, string messageId, string signature)
             {
                 try
                 {
-                    var xFEBuffer = new XFEBuffer(Sender, message, "Type", Encoding.UTF8.GetBytes(signature), "ID", Guid.NewGuid().ToByteArray());
+                    var xFEBuffer = new XFEBuffer(Sender, message, "Type", Encoding.UTF8.GetBytes(signature), "ID", Encoding.UTF8.GetBytes(messageId));
                     await ClientWebSocket.SendAsync(new ArraySegment<byte>(xFEBuffer.ToBuffer()), WebSocketMessageType.Binary, true, CancellationToken.None);
+                    await new XFEWaitTask<bool>(ref UpdateTaskTrigger, messageId);
                 }
                 catch (Exception ex)
                 {
@@ -1209,13 +1241,13 @@ namespace XFE各类拓展.CyberComm
             /// 发送二进制文本消息
             /// </summary>
             /// <param name="message">消息</param>
-            /// <returns></returns>
+            /// <returns>消息ID</returns>
             /// <exception cref="XFECyberCommException"></exception>
-            public async Task SendBinaryTextMessage(string message)
+            public async Task<string> SendBinaryTextMessage(string message)
             {
                 try
                 {
-                    await SendSignedBinaryMessage(Encoding.UTF8.GetBytes(message), "text");
+                    return await SendSignedBinaryMessage(Encoding.UTF8.GetBytes(message), "text");
                 }
                 catch (Exception ex)
                 {
@@ -1227,12 +1259,12 @@ namespace XFE各类拓展.CyberComm
             /// </summary>
             /// <param name="message">待发送的二进制数据</param>
             /// <exception cref="XFECyberCommException"></exception>
-            /// <returns>发送进程</returns>
-            public async Task SendBinaryMessage(byte[] message)
+            /// <returns>消息ID</returns>
+            public async Task<string> SendBinaryMessage(byte[] message)
             {
                 try
                 {
-                    await SendSignedBinaryMessage(message, "binary");
+                    return await SendSignedBinaryMessage(message, "binary");
                 }
                 catch (Exception ex)
                 {
@@ -1243,13 +1275,13 @@ namespace XFE各类拓展.CyberComm
             /// 发送图片
             /// </summary>
             /// <param name="filePath">图片路径</param>
-            /// <returns></returns>
+            /// <returns>消息ID</returns>
             /// <exception cref="XFECyberCommException"></exception>
-            public async Task SendImage(string filePath)
+            public async Task<string> SendImage(string filePath)
             {
                 try
                 {
-                    await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "image");
+                    return await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "image");
                 }
                 catch (Exception ex)
                 {
@@ -1260,18 +1292,15 @@ namespace XFE各类拓展.CyberComm
             /// 发送音频
             /// </summary>
             /// <param name="buffer">二进制音频流</param>
-            /// <returns></returns>
+            /// <returns>消息ID</returns>
             /// <exception cref="XFECyberCommException"></exception>
-            public async Task SendAudioBuffer(byte[] buffer)
+            public async Task<string> SendAudioBuffer(byte[] buffer)
             {
                 try
                 {
-                    await SendSignedBinaryMessage(buffer, "audio");
+                    return await SendSignedBinaryMessage(buffer, "audio");
                 }
-                catch (Exception ex)
-                {
-                    throw new XFECyberCommException("客户端发送音频到服务器时出现异常", ex);
-                }
+                catch (Exception ex) { throw new XFECyberCommException("客户端发送音频到服务器时出现异常", ex); }
             }
             /// <summary>
             /// 获取历史记录
