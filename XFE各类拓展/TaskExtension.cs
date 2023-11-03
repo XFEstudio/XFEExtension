@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace XFE各类拓展.TaskExtension
@@ -9,6 +10,12 @@ namespace XFE各类拓展.TaskExtension
     /// </summary>
     public static class TaskExtension
     {
+        /// <summary>
+        /// 传入值并终止等待器
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="result">目标等待器返回值</param>
+        public delegate void EndTaskTrigger<T>(T result);
         private static long CTimeCounter = 0;
         #region 新建任务并开始
         /// <summary>
@@ -80,6 +87,38 @@ namespace XFE各类拓展.TaskExtension
                 else
                     Console.WriteLine($"标识名：{timerName}\t执行批次：{CTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds * 1000:F3} 纳秒");
             return elapsedTime;
+        }
+        /// <summary>
+        /// XFE等待器
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        public class XFEWaitTask<T>
+        {
+            private TaskCompletionSource<T> WaitTaskSource { get; set; } = new TaskCompletionSource<T>();
+            /// <summary>
+            /// 结束任务并返回
+            /// </summary>
+            /// <param name="result"></param>
+            public void EndTask(T result)
+            {
+                WaitTaskSource.SetResult(result);
+            }
+            /// <summary>
+            /// 获取等待器
+            /// </summary>
+            /// <returns></returns>
+            public TaskAwaiter<T> GetAwaiter()
+            {
+                return WaitTaskSource.Task.GetAwaiter();
+            }
+            /// <summary>
+            /// XFE等待器
+            /// </summary>
+            /// <param name="endTaskAndReturn">触发任务结束事件</param>
+            public XFEWaitTask(ref EndTaskTrigger<T> endTaskAndReturn)
+            {
+                endTaskAndReturn += EndTask;
+            }
         }
     }
 }
