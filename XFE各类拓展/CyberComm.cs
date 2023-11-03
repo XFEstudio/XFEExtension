@@ -1130,7 +1130,7 @@ namespace XFE各类拓展.CyberComm
                                         messageType = XCCBinaryMessageType.Audio;
                                         break;
                                     case "callback":
-                                        UpdateTaskTrigger.Invoke(true, messageId);
+                                        UpdateTaskTrigger?.Invoke(true, messageId);
                                         continue;
                                     default:
                                         messageType = XCCBinaryMessageType.Binary;
@@ -1174,11 +1174,12 @@ namespace XFE各类拓展.CyberComm
             /// 发送文本消息，返回消息ID
             /// </summary>
             /// <param name="message">待发送的文本</param>
+            /// <param name="timeout">最长超时时长</param>
             /// <returns>消息ID</returns>
-            public async Task<string> SendTextMessage(string message)
+            public async Task<string> SendTextMessage(string message, int timeout = 10000)
             {
                 var messageId = Guid.NewGuid().ToString();
-                await SendTextMessage(message, messageId);
+                await SendTextMessage(message, messageId, timeout);
                 return messageId;
             }
             /// <summary>
@@ -1186,14 +1187,20 @@ namespace XFE各类拓展.CyberComm
             /// </summary>
             /// <param name="message">待发送的文本</param>
             /// <param name="messageId">消息ID</param>
+            /// <param name="timeout">最长超时时长</param>
             /// <exception cref="XFECyberCommException"></exception>
             /// <returns>服务器接收校验等待</returns>
-            public async Task SendTextMessage(string message, string messageId)
+            public async Task SendTextMessage(string message, string messageId, int timeout)
             {
                 try
                 {
                     byte[] sendBuffer = Encoding.UTF8.GetBytes(new string[] { messageId, message }.ToXFEString());
                     await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                    var endTask = Task.Run(() =>
+                    {
+                        Task.Delay(timeout);
+                        UpdateTaskTrigger?.Invoke(false, messageId);
+                    });
                     await new XFEWaitTask<bool>(ref UpdateTaskTrigger, messageId);
                 }
                 catch (Exception ex)
@@ -1225,11 +1232,12 @@ namespace XFE各类拓展.CyberComm
             /// </summary>
             /// <param name="message">二进制消息</param>
             /// <param name="signature">签名标识</param>
+            /// <param name="timeout">最长超时时长</param>
             /// <returns></returns>
-            public async Task<string> SendSignedBinaryMessage(byte[] message, string signature)
+            public async Task<string> SendSignedBinaryMessage(byte[] message, string signature, int timeout = 10000)
             {
                 var messageId = Guid.NewGuid().ToString();
-                await SendSignedBinaryMessage(message, messageId, signature);
+                await SendSignedBinaryMessage(message, messageId, signature, timeout);
                 return messageId;
             }
             /// <summary>
@@ -1238,14 +1246,20 @@ namespace XFE各类拓展.CyberComm
             /// <param name="message">二进制消息</param>
             /// <param name="messageId">消息ID</param>
             /// <param name="signature">签名标识</param>
+            /// <param name="timeout">最长超时时长</param>
             /// <returns>服务器接收校验等待</returns>
             /// <exception cref="XFECyberCommException"></exception>
-            public async Task SendSignedBinaryMessage(byte[] message, string messageId, string signature)
+            public async Task SendSignedBinaryMessage(byte[] message, string messageId, string signature, int timeout)
             {
                 try
                 {
                     var xFEBuffer = new XFEBuffer(Sender, message, "Type", Encoding.UTF8.GetBytes(signature), "ID", Encoding.UTF8.GetBytes(messageId));
                     await ClientWebSocket.SendAsync(new ArraySegment<byte>(xFEBuffer.ToBuffer()), WebSocketMessageType.Binary, true, CancellationToken.None);
+                    var endTask = Task.Run(() =>
+                    {
+                        Task.Delay(timeout);
+                        UpdateTaskTrigger?.Invoke(false, messageId);
+                    });
                     await new XFEWaitTask<bool>(ref UpdateTaskTrigger, messageId);
                 }
                 catch (Exception ex)
@@ -1274,13 +1288,14 @@ namespace XFE各类拓展.CyberComm
             /// 发送默认标准的二进制消息
             /// </summary>
             /// <param name="message">待发送的二进制数据</param>
+            /// <param name="timeout">最长超时时长</param>
             /// <exception cref="XFECyberCommException"></exception>
             /// <returns>消息ID</returns>
-            public async Task<string> SendBinaryMessage(byte[] message)
+            public async Task<string> SendBinaryMessage(byte[] message, int timeout = 1000)
             {
                 try
                 {
-                    return await SendSignedBinaryMessage(message, "binary");
+                    return await SendSignedBinaryMessage(message, "binary", timeout);
                 }
                 catch (Exception ex)
                 {
@@ -1297,7 +1312,7 @@ namespace XFE各类拓展.CyberComm
             {
                 try
                 {
-                    return await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "image");
+                    return await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "image", 30000);
                 }
                 catch (Exception ex)
                 {
