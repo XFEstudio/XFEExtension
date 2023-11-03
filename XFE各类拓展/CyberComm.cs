@@ -1105,8 +1105,11 @@ namespace XFE各类拓展.CyberComm
                             var messageType = XCCBinaryMessageType.Binary;
                             var xFEBuffer = XFEBuffer.ToXFEBuffer(receivedBinaryBuffer);
                             var sender = Encoding.UTF8.GetString(xFEBuffer["Sender"]);
+                            await Console.Out.WriteLineAsync(sender);
                             var signature = Encoding.UTF8.GetString(xFEBuffer["Type"]);
+                            await Console.Out.WriteLineAsync(signature);
                             var messageId = Encoding.UTF8.GetString(xFEBuffer["ID"]);
+                            await Console.Out.WriteLineAsync(messageId);
                             var unPackedBuffer = xFEBuffer[sender];
                             switch (signature)
                             {
@@ -1131,6 +1134,7 @@ namespace XFE各类拓展.CyberComm
                     }
                     catch (Exception ex)
                     {
+                        try { await ClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close", CancellationToken.None); } catch { }
                         if (IsConnected == true)
                         {
                             workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, ClientWebSocket, false));
