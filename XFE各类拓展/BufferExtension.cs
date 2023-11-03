@@ -246,6 +246,7 @@ namespace XFE各类拓展.BufferExtension
                 {
                     xFEBuffer.bufferDictionary.Add(Encoding.UTF8.GetString(buffers[i]), buffers[i + 1]);
                     xFEBuffer.headerBuffers.Add(buffers[i]);
+                    xFEBuffer.headerBuffers.Add(buffers[i + 1]);
                 }
             }
             return xFEBuffer;

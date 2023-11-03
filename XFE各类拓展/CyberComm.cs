@@ -1115,12 +1115,9 @@ namespace XFE各类拓展.CyberComm
                                 var messageType = XCCBinaryMessageType.Binary;
                                 var xFEBuffer = XFEBuffer.ToXFEBuffer(receivedBinaryBuffer);
                                 var sender = Encoding.UTF8.GetString(xFEBuffer["Sender"]);
-                                Console.WriteLine(sender);
                                 var signature = Encoding.UTF8.GetString(xFEBuffer["Type"]);
-                                Console.WriteLine(signature);
                                 var messageId = Encoding.UTF8.GetString(xFEBuffer["ID"]);
-                                Console.WriteLine(messageId);
-                                var unPackedBuffer = xFEBuffer[sender];
+                                byte[] unPackedBuffer = signature == "callback" ? null : xFEBuffer[sender];
                                 switch (signature)
                                 {
                                     case "text":
