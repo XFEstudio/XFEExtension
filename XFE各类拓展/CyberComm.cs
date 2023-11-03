@@ -1175,12 +1175,11 @@ namespace XFE各类拓展.CyberComm
             /// </summary>
             /// <param name="message">待发送的文本</param>
             /// <param name="timeout">最长超时时长</param>
-            /// <returns>消息ID</returns>
-            public async Task<string> SendTextMessage(string message, int timeout = 10000)
+            /// <returns>服务器接收校验是否成功</returns>
+            public async Task<bool> SendTextMessage(string message, int timeout = 10000)
             {
                 var messageId = Guid.NewGuid().ToString();
-                await SendTextMessage(message, messageId, timeout);
-                return messageId;
+                return await SendTextMessage(message, messageId, timeout);
             }
             /// <summary>
             /// 发送文本消息
@@ -1189,8 +1188,8 @@ namespace XFE各类拓展.CyberComm
             /// <param name="messageId">消息ID</param>
             /// <param name="timeout">最长超时时长</param>
             /// <exception cref="XFECyberCommException"></exception>
-            /// <returns>服务器接收校验等待</returns>
-            public async Task SendTextMessage(string message, string messageId, int timeout)
+            /// <returns>服务器接收校验是否成功</returns>
+            public async Task<bool> SendTextMessage(string message, string messageId, int timeout)
             {
                 try
                 {
@@ -1201,7 +1200,7 @@ namespace XFE各类拓展.CyberComm
                         Task.Delay(timeout);
                         UpdateTaskTrigger?.Invoke(false, messageId);
                     });
-                    await new XFEWaitTask<bool>(ref UpdateTaskTrigger, messageId);
+                    return await new XFEWaitTask<bool>(ref UpdateTaskTrigger, messageId);
                 }
                 catch (Exception ex)
                 {
@@ -1214,9 +1213,9 @@ namespace XFE各类拓展.CyberComm
             /// <param name="role">发送者角色</param>
             /// <param name="message">待发送的文本</param>
             /// <exception cref="XFECyberCommException"></exception>
-            /// <returns>消息ID</returns>
+            /// <returns>服务器接收校验是否成功</returns>
             [Obsolete("发送者已统一，请使用SendTextMessage或SendBinaryTextMessage")]
-            public async Task<string> SendStandardTextMessage(string role, string message)
+            public async Task<bool> SendStandardTextMessage(string role, string message)
             {
                 try
                 {
@@ -1233,12 +1232,11 @@ namespace XFE各类拓展.CyberComm
             /// <param name="message">二进制消息</param>
             /// <param name="signature">签名标识</param>
             /// <param name="timeout">最长超时时长</param>
-            /// <returns></returns>
-            public async Task<string> SendSignedBinaryMessage(byte[] message, string signature, int timeout = 10000)
+            /// <returns>服务器接收校验是否成功</returns>
+            public async Task<bool> SendSignedBinaryMessage(byte[] message, string signature, int timeout = 10000)
             {
                 var messageId = Guid.NewGuid().ToString();
-                await SendSignedBinaryMessage(message, messageId, signature, timeout);
-                return messageId;
+                return await SendSignedBinaryMessage(message, messageId, signature, timeout);
             }
             /// <summary>
             /// 发送签名二进制消息
@@ -1247,9 +1245,9 @@ namespace XFE各类拓展.CyberComm
             /// <param name="messageId">消息ID</param>
             /// <param name="signature">签名标识</param>
             /// <param name="timeout">最长超时时长</param>
-            /// <returns>服务器接收校验等待</returns>
+            /// <returns>服务器接收校验是否成功</returns>
             /// <exception cref="XFECyberCommException"></exception>
-            public async Task SendSignedBinaryMessage(byte[] message, string messageId, string signature, int timeout)
+            public async Task<bool> SendSignedBinaryMessage(byte[] message, string messageId, string signature, int timeout)
             {
                 try
                 {
@@ -1260,7 +1258,7 @@ namespace XFE各类拓展.CyberComm
                         Task.Delay(timeout);
                         UpdateTaskTrigger?.Invoke(false, messageId);
                     });
-                    await new XFEWaitTask<bool>(ref UpdateTaskTrigger, messageId);
+                    return await new XFEWaitTask<bool>(ref UpdateTaskTrigger, messageId);
                 }
                 catch (Exception ex)
                 {
@@ -1271,9 +1269,9 @@ namespace XFE各类拓展.CyberComm
             /// 发送二进制文本消息
             /// </summary>
             /// <param name="message">消息</param>
-            /// <returns>消息ID</returns>
+            /// <returns>服务器接收校验是否成功</returns>
             /// <exception cref="XFECyberCommException"></exception>
-            public async Task<string> SendBinaryTextMessage(string message)
+            public async Task<bool> SendBinaryTextMessage(string message)
             {
                 try
                 {
@@ -1290,8 +1288,8 @@ namespace XFE各类拓展.CyberComm
             /// <param name="message">待发送的二进制数据</param>
             /// <param name="timeout">最长超时时长</param>
             /// <exception cref="XFECyberCommException"></exception>
-            /// <returns>消息ID</returns>
-            public async Task<string> SendBinaryMessage(byte[] message, int timeout = 1000)
+            /// <returns>服务器接收校验是否成功</returns>
+            public async Task<bool> SendBinaryMessage(byte[] message, int timeout = 1000)
             {
                 try
                 {
@@ -1306,9 +1304,9 @@ namespace XFE各类拓展.CyberComm
             /// 发送图片
             /// </summary>
             /// <param name="filePath">图片路径</param>
-            /// <returns>消息ID</returns>
+            /// <returns>服务器接收校验是否成功</returns>
             /// <exception cref="XFECyberCommException"></exception>
-            public async Task<string> SendImage(string filePath)
+            public async Task<bool> SendImage(string filePath)
             {
                 try
                 {
@@ -1323,9 +1321,9 @@ namespace XFE各类拓展.CyberComm
             /// 发送音频
             /// </summary>
             /// <param name="buffer">二进制音频流</param>
-            /// <returns>消息ID</returns>
+            /// <returns>服务器接收校验是否成功</returns>
             /// <exception cref="XFECyberCommException"></exception>
-            public async Task<string> SendAudioBuffer(byte[] buffer)
+            public async Task<bool> SendAudioBuffer(byte[] buffer)
             {
                 try
                 {
