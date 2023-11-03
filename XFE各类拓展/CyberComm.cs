@@ -247,7 +247,7 @@ namespace XFE各类拓展.CyberComm
     /// </summary>
     public class CyberCommServer
     {
-        private string serverURL;
+        private readonly string serverURL;
         #region 公共属性
         /// <summary>
         /// 是否自动接收完整消息
@@ -592,7 +592,7 @@ namespace XFE各类拓展.CyberComm
     /// </summary>
     public class CyberCommGroup
     {
-        private List<WebSocket> webSockets = new List<WebSocket>();
+        private readonly List<WebSocket> webSockets = new List<WebSocket>();
         /// <summary>
         /// 组ID
         /// </summary>
@@ -728,7 +728,7 @@ namespace XFE各类拓展.CyberComm
     /// </summary>
     public class CyberCommGroupController
     {
-        private List<CyberCommGroup> commGroups;
+        private readonly List<CyberCommGroup> commGroups;
         /// <summary>
         /// 刷新
         /// </summary>
@@ -910,7 +910,7 @@ namespace XFE各类拓展.CyberComm
         /// </summary>
         public class XCCNetWork
         {
-            private XCCNetWorkBase xCCNetWorkBase;
+            private readonly XCCNetWorkBase xCCNetWorkBase;
             /// <summary>
             /// XCC当前群组
             /// </summary>
@@ -1011,7 +1011,7 @@ namespace XFE各类拓展.CyberComm
         /// </summary>
         public abstract class XCCGroup
         {
-            private XCCNetWorkBase workBase;
+            private readonly XCCNetWorkBase workBase;
             private int reconnectTimes = -1;
             #region 公有属性
             /// <summary>

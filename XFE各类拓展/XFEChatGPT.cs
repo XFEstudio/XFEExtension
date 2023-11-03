@@ -188,7 +188,7 @@ namespace XFE各类拓展.XFEChatGPT
     public class XFEChatGPT : XFEChatGPTBase
     {
         #region 私有字段
-        private XFEAskGPTMessage xFEAskGPTMessage;
+        private readonly XFEAskGPTMessage xFEAskGPTMessage;
         #endregion
         #region 公有封装字段
         /// <summary>
@@ -692,7 +692,7 @@ namespace XFE各类拓展.XFEChatGPT
     /// </summary>
     public class MemorableXFEChatGPT : XFEChatGPTBase
     {
-        private XFEGPTMemoryDialog xFEGPTMemoryDialog;
+        private readonly XFEGPTMemoryDialog xFEGPTMemoryDialog;
         /// <summary>
         /// 获取或设置对话记录
         /// </summary>
@@ -1612,7 +1612,7 @@ namespace XFE各类拓展.XFEChatGPT
     public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     {
         #region 属性
-        private List<XFEGPTMessage> xFEGPTMessages;
+        private readonly List<XFEGPTMessage> xFEGPTMessages;
         /// <summary>
         /// 消息数量
         /// </summary>
