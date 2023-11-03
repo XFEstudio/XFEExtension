@@ -8,6 +8,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using XFE各类拓展.ArrayExtension;
 using XFE各类拓展.BufferExtension;
 using XFE各类拓展.FormatExtension;
 
@@ -123,34 +124,27 @@ namespace XFE各类拓展.CyberComm
                 {
                     byte[] receiveBuffer = new byte[1024];
                     WebSocketReceiveResult receiveResult = await ClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                    var bufferList = new List<byte>();
+                    bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
+                    //ReceiveCompletedMessageByUsingWhile
+                    if (AutoReceiveCompletedMessage)
+                    {
+                        while (!receiveResult.EndOfMessage)
+                        {
+                            receiveResult = await ClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                            bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
+                        }
+                    }
+                    var receivedBinaryBuffer = bufferList.ToArray();
                     if (receiveResult.MessageType == WebSocketMessageType.Text)
                     {
-                        string receivedMessage = Encoding.UTF8.GetString(receiveBuffer, 0, receiveResult.Count);
-                        //ReceiveCompletedMessageByUsingWhile
-                        if (AutoReceiveCompletedMessage)
-                        {
-                            while (!receiveResult.EndOfMessage)
-                            {
-                                receiveResult = await ClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
-                                receivedMessage += Encoding.UTF8.GetString(receiveBuffer, 0, receiveResult.Count);
-                            }
-                        }
+                        var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
                         MessageReceived?.Invoke(this, new CyberCommClientEventArgsImpl(ClientWebSocket, receivedMessage));
                     }
                     if (receiveResult.MessageType == WebSocketMessageType.Binary)
                     {
-                        var bufferList = new List<byte>();
-                        bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
-                        //ReceiveCompletedMessageByUsingWhile
-                        if (AutoReceiveCompletedMessage)
-                        {
-                            while (!receiveResult.EndOfMessage)
-                            {
-                                receiveResult = await ClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
-                                bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
-                            }
-                        }
-                        MessageReceived?.Invoke(this, new CyberCommClientEventArgsImpl(ClientWebSocket, receiveBuffer));
+
+                        MessageReceived?.Invoke(this, new CyberCommClientEventArgsImpl(ClientWebSocket, receivedBinaryBuffer));
                     }
                     if (receiveResult.MessageType == WebSocketMessageType.Close)
                     {
@@ -319,34 +313,26 @@ namespace XFE各类拓展.CyberComm
                 {
                     byte[] receiveBuffer = new byte[1024];
                     WebSocketReceiveResult receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                    //ReceiveCompletedMessageByUsingWhile
+                    var bufferList = new List<byte>();
+                    if (AutoReceiveCompletedMessage)
+                    {
+                        bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
+                        while (!receiveResult.EndOfMessage)
+                        {
+                            receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                            bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
+                        }
+                    }
+                    var receivedBinaryBuffer = bufferList.ToArray();
                     if (receiveResult.MessageType == WebSocketMessageType.Text)
                     {
-                        string receivedMessage = Encoding.UTF8.GetString(receiveBuffer, 0, receiveResult.Count);
-                        //ReceiveCompletedMessageByUsingWhile
-                        if (AutoReceiveCompletedMessage)
-                        {
-                            while (!receiveResult.EndOfMessage)
-                            {
-                                receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
-                                receivedMessage += Encoding.UTF8.GetString(receiveBuffer, 0, receiveResult.Count);
-                            }
-                        }
+                        string receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
                         MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(webSocket, receivedMessage, clientIP, wsHeader));
                     }
                     if (receiveResult.MessageType == WebSocketMessageType.Binary)
                     {
-                        //ReceiveCompletedMessageByUsingWhile
-                        if (AutoReceiveCompletedMessage)
-                        {
-                            var bufferList = new List<byte>();
-                            bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
-                            while (!receiveResult.EndOfMessage)
-                            {
-                                receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
-                                bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
-                            }
-                            MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(webSocket, bufferList.ToArray(), clientIP, wsHeader));
-                        }
+                        MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(webSocket, receivedBinaryBuffer, clientIP, wsHeader));
                     }
                     if (receiveResult.MessageType == WebSocketMessageType.Close)
                     {
@@ -1084,7 +1070,7 @@ namespace XFE各类拓展.CyberComm
                     }
                     else
                     {
-                        workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, ClientWebSocket, new XFECyberCommException("与XCC网络通讯服务器建立连接时发生异常", ex)));
+                        workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, ClientWebSocket, null, null, new XFECyberCommException("与XCC网络通讯服务器建立连接时发生异常", ex)));
                         return;
                     }
                 }
@@ -1097,35 +1083,34 @@ namespace XFE各类拓展.CyberComm
                     {
                         byte[] receiveBuffer = new byte[1024];
                         WebSocketReceiveResult receiveResult = await ClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                        var bufferList = new List<byte>();
+                        bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
+                        //ReceiveCompletedMessageByUsingWhile
+                        while (!receiveResult.EndOfMessage)
+                        {
+                            receiveResult = await ClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                            bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
+                        }
+                        var receivedBinaryBuffer = bufferList.ToArray();
                         if (receiveResult.MessageType == WebSocketMessageType.Text)
                         {
-                            string receivedMessage = Encoding.UTF8.GetString(receiveBuffer, 0, receiveResult.Count);
-                            //ReceiveCompletedMessageByUsingWhile
-                            while (!receiveResult.EndOfMessage)
-                            {
-                                receiveResult = await ClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
-                                receivedMessage += Encoding.UTF8.GetString(receiveBuffer, 0, receiveResult.Count);
-                            }
-                            workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, ClientWebSocket, XCCTextMessageType.Text, receivedMessage));
+                            var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
+                            var unPackedMessage = receivedMessage.ToXFEArray<string>();
+                            workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, ClientWebSocket, unPackedMessage[2], unPackedMessage[0], XCCTextMessageType.Text, unPackedMessage[1]));
                         }
                         if (receiveResult.MessageType == WebSocketMessageType.Binary)
                         {
-                            var bufferList = new List<byte>();
-                            bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
-                            //ReceiveCompletedMessageByUsingWhile
-                            while (!receiveResult.EndOfMessage)
-                            {
-                                receiveResult = await ClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
-                                bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
-                            }
-                            var receivedBinaryBuffer = bufferList.ToArray();
                             var messageType = XCCBinaryMessageType.Binary;
                             var xFEBuffer = XFEBuffer.ToXFEBuffer(receivedBinaryBuffer);
                             var sender = Encoding.UTF8.GetString(xFEBuffer["Sender"]);
                             var signature = Encoding.UTF8.GetString(xFEBuffer["Type"]);
+                            var messageId = Encoding.UTF8.GetString(xFEBuffer["ID"]);
                             var unPackedBuffer = xFEBuffer[sender];
                             switch (signature)
                             {
+                                case "text":
+                                    messageType = XCCBinaryMessageType.Text;
+                                    break;
                                 case "image":
                                     messageType = XCCBinaryMessageType.Image;
                                     break;
@@ -1136,7 +1121,7 @@ namespace XFE各类拓展.CyberComm
                                     messageType = XCCBinaryMessageType.Binary;
                                     break;
                             }
-                            workBase.binaryMessageReceived?.Invoke(this, new XCCBinaryMessageReceivedEventArgsImpl(this, ClientWebSocket, unPackedBuffer, messageType, signature));
+                            workBase.binaryMessageReceived?.Invoke(this, new XCCBinaryMessageReceivedEventArgsImpl(this, ClientWebSocket, sender, messageId, unPackedBuffer, messageType, signature));
                         }
                     }
                     catch (Exception ex)
@@ -1157,7 +1142,7 @@ namespace XFE各类拓展.CyberComm
                         }
                         else
                         {
-                            workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, ClientWebSocket, new XFECyberCommException("与XCC网络通讯服务器建立连接时发生异常", ex)));
+                            workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, ClientWebSocket, null, null, new XFECyberCommException("与XCC网络通讯服务器建立连接时发生异常", ex)));
                             return;
                         }
                     }
@@ -1174,7 +1159,7 @@ namespace XFE各类拓展.CyberComm
             {
                 try
                 {
-                    byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
+                    byte[] sendBuffer = Encoding.UTF8.GetBytes(new string[] { Guid.NewGuid().ToString(), message }.ToXFEString());
                     await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
                 }
                 catch (Exception ex)
@@ -1354,6 +1339,10 @@ namespace XFE各类拓展.CyberComm
             /// </summary>
             public XCCGroup Group { get; }
             /// <summary>
+            /// 消息ID
+            /// </summary>
+            public string MessageId { get; }
+            /// <summary>
             /// 群组ID
             /// </summary>
             public string GroupId
@@ -1366,13 +1355,7 @@ namespace XFE各类拓展.CyberComm
             /// <summary>
             /// 发送者
             /// </summary>
-            public string Sender
-            {
-                get
-                {
-                    return Group.Sender;
-                }
-            }
+            public string Sender { get; }
             /// <summary>
             /// 回复文本消息
             /// </summary>
@@ -1421,10 +1404,12 @@ namespace XFE各类拓展.CyberComm
                     throw new XFECyberCommException("客户端关闭连接时出现异常", ex);
                 }
             }
-            internal XCCMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket)
+            internal XCCMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId)
             {
                 Group = group;
                 CurrentWebSocket = clientWebSocket;
+                Sender = sender;
+                MessageId = messageId;
             }
         }
         /// <summary>
@@ -1440,7 +1425,7 @@ namespace XFE各类拓展.CyberComm
             /// 文本消息
             /// </summary>
             public string TextMessage { get; }
-            internal XCCTextMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, XCCTextMessageType messageType, string message) : base(group, clientWebSocket)
+            internal XCCTextMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, XCCTextMessageType messageType, string message) : base(group, clientWebSocket, sender, messageId)
             {
                 MessageType = messageType;
                 TextMessage = message;
@@ -1464,7 +1449,7 @@ namespace XFE各类拓展.CyberComm
             /// 二进制消息
             /// </summary>
             public byte[] BinaryMessage { get; }
-            internal XCCBinaryMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, byte[] buffer, XCCBinaryMessageType messageType, string signature) : base(group, clientWebSocket)
+            internal XCCBinaryMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, byte[] buffer, XCCBinaryMessageType messageType, string signature) : base(group, clientWebSocket, sender, messageId)
             {
                 BinaryMessage = buffer;
                 MessageType = messageType;
@@ -1480,7 +1465,7 @@ namespace XFE各类拓展.CyberComm
             /// 异常信息
             /// </summary>
             public XFECyberCommException Exception { get; }
-            internal XCCExceptionMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, XFECyberCommException exception) : base(group, clientWebSocket)
+            internal XCCExceptionMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, XFECyberCommException exception) : base(group, clientWebSocket, sender, messageId)
             {
                 Exception = exception;
             }
@@ -1542,15 +1527,15 @@ namespace XFE各类拓展.CyberComm
         }
         class XCCTextMessageReceivedEventArgsImpl : XCCTextMessageReceivedEventArgs
         {
-            internal XCCTextMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, XCCTextMessageType messageType, string message) : base(group, clientWebSocket, messageType, message) { }
+            internal XCCTextMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, XCCTextMessageType messageType, string message) : base(group, clientWebSocket, sender, messageId, messageType, message) { }
         }
         class XCCBinaryMessageReceivedEventArgsImpl : XCCBinaryMessageReceivedEventArgs
         {
-            internal XCCBinaryMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, byte[] buffer, XCCBinaryMessageType messageType, string signature) : base(group, clientWebSocket, buffer, messageType, signature) { }
+            internal XCCBinaryMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, byte[] buffer, XCCBinaryMessageType messageType, string signature) : base(group, clientWebSocket, sender, messageId, buffer, messageType, signature) { }
         }
         class XCCExceptionMessageReceivedEventArgsImpl : XCCExceptionMessageReceivedEventArgs
         {
-            internal XCCExceptionMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, XFECyberCommException exception) : base(group, clientWebSocket, exception) { }
+            internal XCCExceptionMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, XFECyberCommException exception) : base(group, clientWebSocket, sender, messageId, exception) { }
         }
     }
 }
