@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using XFE各类拓展.ArrayExtension;
+using XFE各类拓展.ArrayExtension.AI;
 using XFE各类拓展.BufferExtension;
 using XFE各类拓展.FormatExtension;
 using XFE各类拓展.TaskExtension;
@@ -1096,40 +1097,54 @@ namespace XFE各类拓展.CyberComm
                         var receivedBinaryBuffer = bufferList.ToArray();
                         if (receiveResult.MessageType == WebSocketMessageType.Text)
                         {
-                            var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
-                            var unPackedMessage = receivedMessage.ToXFEArray<string>();
-                            workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, ClientWebSocket, unPackedMessage[2], unPackedMessage[0], XCCTextMessageType.Text, unPackedMessage[1]));
+                            try
+                            {
+                                var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
+                                var unPackedMessage = receivedMessage.ToXFEArray<string>();
+                                workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, ClientWebSocket, unPackedMessage[2], unPackedMessage[0], XCCTextMessageType.Text, unPackedMessage[1]));
+                            }
+                            catch (Exception ex)
+                            {
+                                workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, ClientWebSocket, null, null, new XFECyberCommException("接收XCC服务器消息时发生异常", ex)));
+                            }
                         }
                         if (receiveResult.MessageType == WebSocketMessageType.Binary)
                         {
-                            var messageType = XCCBinaryMessageType.Binary;
-                            var xFEBuffer = XFEBuffer.ToXFEBuffer(receivedBinaryBuffer);
-                            var sender = Encoding.UTF8.GetString(xFEBuffer["Sender"]);
-                            await Console.Out.WriteLineAsync(sender);
-                            var signature = Encoding.UTF8.GetString(xFEBuffer["Type"]);
-                            await Console.Out.WriteLineAsync(signature);
-                            var messageId = Encoding.UTF8.GetString(xFEBuffer["ID"]);
-                            await Console.Out.WriteLineAsync(messageId);
-                            var unPackedBuffer = xFEBuffer[sender];
-                            switch (signature)
+                            try
                             {
-                                case "text":
-                                    messageType = XCCBinaryMessageType.Text;
-                                    break;
-                                case "image":
-                                    messageType = XCCBinaryMessageType.Image;
-                                    break;
-                                case "audio":
-                                    messageType = XCCBinaryMessageType.Audio;
-                                    break;
-                                case "callback":
-                                    UpdateTaskTrigger.Invoke(true, messageId);
-                                    continue;
-                                default:
-                                    messageType = XCCBinaryMessageType.Binary;
-                                    break;
+                                var messageType = XCCBinaryMessageType.Binary;
+                                var xFEBuffer = XFEBuffer.ToXFEBuffer(receivedBinaryBuffer);
+                                var sender = Encoding.UTF8.GetString(xFEBuffer["Sender"]);
+                                Console.WriteLine(sender);
+                                var signature = Encoding.UTF8.GetString(xFEBuffer["Type"]);
+                                Console.WriteLine(signature);
+                                var messageId = Encoding.UTF8.GetString(xFEBuffer["ID"]);
+                                Console.WriteLine(messageId);
+                                var unPackedBuffer = xFEBuffer[sender];
+                                switch (signature)
+                                {
+                                    case "text":
+                                        messageType = XCCBinaryMessageType.Text;
+                                        break;
+                                    case "image":
+                                        messageType = XCCBinaryMessageType.Image;
+                                        break;
+                                    case "audio":
+                                        messageType = XCCBinaryMessageType.Audio;
+                                        break;
+                                    case "callback":
+                                        UpdateTaskTrigger.Invoke(true, messageId);
+                                        continue;
+                                    default:
+                                        messageType = XCCBinaryMessageType.Binary;
+                                        break;
+                                }
+                                workBase.binaryMessageReceived?.Invoke(this, new XCCBinaryMessageReceivedEventArgsImpl(this, ClientWebSocket, sender, messageId, unPackedBuffer, messageType, signature));
                             }
-                            workBase.binaryMessageReceived?.Invoke(this, new XCCBinaryMessageReceivedEventArgsImpl(this, ClientWebSocket, sender, messageId, unPackedBuffer, messageType, signature));
+                            catch (Exception ex)
+                            {
+                                workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, ClientWebSocket, null, null, new XFECyberCommException("接收XCC服务器消息时发生异常", ex)));
+                            }
                         }
                     }
                     catch (Exception ex)
