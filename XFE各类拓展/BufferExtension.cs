@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -82,27 +83,43 @@ namespace XFE各类拓展.BufferExtension
         /// <returns>替换后的Buffer</returns>
         public static byte[] Replace(this byte[] buffer, byte[] originBuffer, byte[] targetBuffer)
         {
-            var indexes = buffer.IndexesOf(originBuffer);
-            var newBuffer = new byte[buffer.Length + (targetBuffer.Length - originBuffer.Length) * indexes.Length];
-            int index = 0;
-            for (int i = 0; i < indexes.Length; i++)
+            if (originBuffer == null || originBuffer.LongLength == 0)
             {
-                for (int j = index; j < indexes[i]; j++)
-                {
-                    newBuffer[j] = buffer[j];
-                }
-                for (int j = 0; j < targetBuffer.Length; j++)
-                {
-                    newBuffer[indexes[i] + j] = targetBuffer[j];
-                }
-                index = indexes[i] + targetBuffer.Length;
+                throw new ArgumentException("Origin buffer cannot be null or empty.");
             }
-            for (int i = index; i < newBuffer.Length; i++)
+            if (buffer == null || buffer.LongLength == 0)
             {
-                newBuffer[i] = buffer[i - (targetBuffer.Length - originBuffer.Length) * indexes.Length];
+                throw new ArgumentException("Input buffer cannot be null or empty.");
             }
-            return newBuffer;
+            List<byte> result = new List<byte>();
+            for (long i = 0; i <= buffer.LongLength - originBuffer.LongLength; i++)
+            {
+                bool isMatch = true;
+                for (long j = 0; j < originBuffer.LongLength; j++)
+                {
+                    if (buffer[i + j] != originBuffer[j])
+                    {
+                        isMatch = false;
+                        break;
+                    }
+                }
+                if (isMatch)
+                {
+                    result.AddRange(targetBuffer);
+                    i += originBuffer.LongLength - 1;
+                }
+                else
+                {
+                    result.Add(buffer[i]);
+                }
+            }
+            for (long i = buffer.LongLength - originBuffer.LongLength + 1; i < buffer.LongLength; i++)
+            {
+                result.Add(buffer[i]);
+            }
+            return result.ToArray();
         }
+
         /// <summary>
         /// 分割Buffer
         /// </summary>
@@ -113,19 +130,19 @@ namespace XFE各类拓展.BufferExtension
         {
             var indexes = buffer.IndexesOf(targetBuffer);
             var buffers = new List<byte[]>();
-            int index = 0;
-            for (int i = 0; i < indexes.Length; i++)
+            long index = 0;
+            for (long i = 0; i < indexes.LongLength; i++)
             {
                 var newBuffer = new byte[indexes[i] - index];
-                for (int j = index; j < indexes[i]; j++)
+                for (long j = index; j < indexes[i]; j++)
                 {
                     newBuffer[j - index] = buffer[j];
                 }
                 buffers.Add(newBuffer);
-                index = indexes[i] + targetBuffer.Length;
+                index = indexes[i] + targetBuffer.LongLength;
             }
-            var lastBuffer = new byte[buffer.Length - index];
-            for (int i = index; i < buffer.Length; i++)
+            var lastBuffer = new byte[buffer.LongLength - index];
+            for (long i = index; i < buffer.LongLength; i++)
             {
                 lastBuffer[i - index] = buffer[i];
             }
@@ -196,6 +213,26 @@ namespace XFE各类拓展.BufferExtension
     {
         private Dictionary<string, byte[]> bufferDictionary = new Dictionary<string, byte[]>();
         private List<byte[]> headerBuffers = new List<byte[]>();
+        /// <summary>
+        /// 所有的头
+        /// </summary>
+        public Dictionary<string, byte[]>.KeyCollection Headers
+        {
+            get
+            {
+                return bufferDictionary.Keys;
+            }
+        }
+        /// <summary>
+        /// 所有的值
+        /// </summary>
+        public Dictionary<string, byte[]>.ValueCollection Buffers
+        {
+            get
+            {
+                return bufferDictionary.Values;
+            }
+        }
         /// <summary>
         /// 长度
         /// </summary>

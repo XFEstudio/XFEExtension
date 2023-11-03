@@ -1195,9 +1195,9 @@ namespace XFE各类拓展.CyberComm
                 {
                     byte[] sendBuffer = Encoding.UTF8.GetBytes(new string[] { messageId, message }.ToXFEString());
                     await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
-                    var endTask = Task.Run(() =>
+                    var endTask = Task.Run(async () =>
                     {
-                        Task.Delay(timeout);
+                        await Task.Delay(timeout);
                         UpdateTaskTrigger?.Invoke(false, messageId);
                     });
                     return await new XFEWaitTask<bool>(ref UpdateTaskTrigger, messageId);
@@ -1253,9 +1253,9 @@ namespace XFE各类拓展.CyberComm
                 {
                     var xFEBuffer = new XFEBuffer(Sender, message, "Type", Encoding.UTF8.GetBytes(signature), "ID", Encoding.UTF8.GetBytes(messageId));
                     await ClientWebSocket.SendAsync(new ArraySegment<byte>(xFEBuffer.ToBuffer()), WebSocketMessageType.Binary, true, CancellationToken.None);
-                    var endTask = Task.Run(() =>
+                    var endTask = Task.Run(async () =>
                     {
-                        Task.Delay(timeout);
+                        await Task.Delay(timeout);
                         UpdateTaskTrigger?.Invoke(false, messageId);
                     });
                     return await new XFEWaitTask<bool>(ref UpdateTaskTrigger, messageId);
