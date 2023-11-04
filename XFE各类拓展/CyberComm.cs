@@ -881,7 +881,15 @@ namespace XFE各类拓展.CyberComm
             /// <summary>
             /// 文本消息
             /// </summary>
-            Text
+            Text,
+            /// <summary>
+            /// 图片消息
+            /// </summary>
+            Image,
+            /// <summary>
+            /// 历史消息
+            /// </summary>
+            History
         }
         class XCCNetWorkBase
         {
@@ -1100,8 +1108,30 @@ namespace XFE各类拓展.CyberComm
                             {
                                 var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
                                 var unPackedMessage = receivedMessage.ToXFEArray<string>();
-                                await Console.Out.WriteLineAsync(unPackedMessage.Length.ToString());
-                                workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, ClientWebSocket, unPackedMessage[2], unPackedMessage[0], XCCTextMessageType.Text, unPackedMessage[1]));
+                                var sender = unPackedMessage[3];
+                                var sendTime = DateTime.Parse(unPackedMessage[4]);
+                                var messageId = unPackedMessage[0];
+                                var signature = unPackedMessage[1];
+                                var message = unPackedMessage[2];
+                                var messageType = XCCTextMessageType.Text;
+                                switch (signature)
+                                {
+                                    case "[XCCTextMessage]":
+                                        messageType = XCCTextMessageType.Text;
+                                        break;
+
+                                    case "[XCCImage]":
+                                        messageType = XCCTextMessageType.Image;
+                                        break;
+
+                                    case "[XCCGetHistory]":
+                                        messageType = XCCTextMessageType.History;
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+                                workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, ClientWebSocket, sender, messageId, sendTime, messageType, message));
                             }
                             catch (Exception ex)
                             {
@@ -1193,7 +1223,7 @@ namespace XFE各类拓展.CyberComm
             {
                 try
                 {
-                    byte[] sendBuffer = Encoding.UTF8.GetBytes(new string[] { messageId, message }.ToXFEString());
+                    byte[] sendBuffer = Encoding.UTF8.GetBytes(new string[] { messageId, "[XCCTextMessage]", message }.ToXFEString());
                     await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
                     var endTask = Task.Run(async () =>
                     {
@@ -1335,12 +1365,19 @@ namespace XFE各类拓展.CyberComm
             /// 获取历史记录
             /// </summary>
             /// <exception cref="XFECyberCommException"></exception>
-            public async Task GetHistory()
+            public async Task<bool> GetHistory()
             {
                 try
                 {
-                    byte[] sendBuffer = Encoding.UTF8.GetBytes("[XCCGetHistory]");
+                    var messageId = Guid.NewGuid().ToString();
+                    byte[] sendBuffer = Encoding.UTF8.GetBytes(new string[] { messageId, "[XCCGetHistory]", "[XCCGetHistory]" }.ToXFEString());
                     await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                    var endTask = Task.Run(async () =>
+                    {
+                        await Task.Delay(5000);
+                        UpdateTaskTrigger?.Invoke(false, messageId);
+                    });
+                    return await new XFEWaitTask<bool>(ref UpdateTaskTrigger, messageId);
                 }
                 catch (Exception ex)
                 {
@@ -1483,10 +1520,15 @@ namespace XFE各类拓展.CyberComm
             /// 文本消息
             /// </summary>
             public string TextMessage { get; }
-            internal XCCTextMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, XCCTextMessageType messageType, string message) : base(group, clientWebSocket, sender, messageId)
+            /// <summary>
+            /// 发送时间
+            /// </summary>
+            public DateTime SendTime { get; }
+            internal XCCTextMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, DateTime sendTime, XCCTextMessageType messageType, string message) : base(group, clientWebSocket, sender, messageId)
             {
                 MessageType = messageType;
                 TextMessage = message;
+                SendTime = sendTime;
             }
 
         }
@@ -1585,7 +1627,7 @@ namespace XFE各类拓展.CyberComm
         }
         class XCCTextMessageReceivedEventArgsImpl : XCCTextMessageReceivedEventArgs
         {
-            internal XCCTextMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, XCCTextMessageType messageType, string message) : base(group, clientWebSocket, sender, messageId, messageType, message) { }
+            internal XCCTextMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, DateTime sendTime, XCCTextMessageType messageType, string message) : base(group, clientWebSocket, sender, messageId, sendTime, messageType, message) { }
         }
         class XCCBinaryMessageReceivedEventArgsImpl : XCCBinaryMessageReceivedEventArgs
         {
