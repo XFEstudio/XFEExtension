@@ -330,7 +330,7 @@ namespace XFE各类拓展.FormatExtension
         /// </summary>
         /// <param name="HeaderAndContentStrings"></param>
         /// <exception cref="XFEDictionaryException"></exception>
-        public XFEDictionary(string[] HeaderAndContentStrings)
+        public XFEDictionary(params string[] HeaderAndContentStrings)
         {
             if (!(HeaderAndContentStrings.Length % 2 == 0))
                 throw new XFEDictionaryException("输入的字符串数组格式不正确，应为Header，Content，Header，Content...");
@@ -595,7 +595,7 @@ namespace XFE各类拓展.FormatExtension
         /// </summary>
         /// <param name="HeaderAndContentStrings"></param>
         /// <exception cref="XFEDictionaryException"></exception>
-        public XFEMultiDictionary(string[] HeaderAndContentStrings)
+        public XFEMultiDictionary(params string[] HeaderAndContentStrings)
         {
             if (!(HeaderAndContentStrings.Length % 2 == 0))
                 throw new XFEDictionaryException("输入的字符串数组格式不正确，应为Header，Content，Header，Content...");
