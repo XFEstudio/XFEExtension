@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using XFE各类拓展.ArrayExtension;
-using XFE各类拓展.ArrayExtension.AI;
 using XFE各类拓展.BufferExtension;
 using XFE各类拓展.FormatExtension;
 using XFE各类拓展.TaskExtension;
@@ -1101,6 +1100,7 @@ namespace XFE各类拓展.CyberComm
                             {
                                 var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
                                 var unPackedMessage = receivedMessage.ToXFEArray<string>();
+                                await Console.Out.WriteLineAsync(unPackedMessage.Length.ToString());
                                 workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, ClientWebSocket, unPackedMessage[2], unPackedMessage[0], XCCTextMessageType.Text, unPackedMessage[1]));
                             }
                             catch (Exception ex)

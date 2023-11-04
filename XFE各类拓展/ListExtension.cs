@@ -51,7 +51,7 @@ namespace XFE各类拓展.ListExtension
         {
             string[] strings = str.Split(new string[] { "[+-", "-+]" }, StringSplitOptions.None);
             List<T> list = new List<T>();
-            for (int j = 1; j < (strings.Length - 1) / 2; j += 2)
+            for (int j = 1; j < strings.Length - 1; j += 2)
             {
                 list.Add((T)Convert.ChangeType(strings[j].Replace("[++", "[+").Replace("++]", "+]"), typeof(T)));
             }
