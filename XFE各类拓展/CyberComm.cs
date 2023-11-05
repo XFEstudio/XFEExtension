@@ -871,7 +871,11 @@ namespace XFE各类拓展.CyberComm
             /// <summary>
             /// 音频消息
             /// </summary>
-            Audio
+            Audio,
+            /// <summary>
+            /// 视频消息
+            /// </summary>
+            Video
         }
         /// <summary>
         /// XFE网络通信明文返回消息类型
@@ -885,7 +889,15 @@ namespace XFE各类拓展.CyberComm
             /// <summary>
             /// 图片消息
             /// </summary>
-            Image
+            Image,
+            /// <summary>
+            /// 音频消息
+            /// </summary>
+            Audio,
+            /// <summary>
+            /// 视频消息
+            /// </summary>
+            Video
         }
         class XCCNetWorkBase
         {
@@ -1120,11 +1132,15 @@ namespace XFE各类拓展.CyberComm
                                     case "[XCCTextMessage]":
                                         messageType = XCCTextMessageType.Text;
                                         break;
-
                                     case "[XCCImage]":
                                         messageType = XCCTextMessageType.Image;
                                         break;
-
+                                    case "[XCCAudio]":
+                                        messageType = XCCTextMessageType.Audio;
+                                        break;
+                                    case "[XCCVideo]":
+                                        messageType = XCCTextMessageType.Video;
+                                        break;
                                     default:
                                         break;
                                 }
@@ -1155,6 +1171,9 @@ namespace XFE各类拓展.CyberComm
                                         break;
                                     case "audio":
                                         messageType = XCCBinaryMessageType.Audio;
+                                        break;
+                                    case "video":
+                                        messageType = XCCBinaryMessageType.Video;
                                         break;
                                     case "callback":
                                         UpdateTaskTrigger?.Invoke(true, messageId);
@@ -1203,7 +1222,7 @@ namespace XFE各类拓展.CyberComm
             /// <param name="message">待发送的文本</param>
             /// <param name="timeout">最长超时时长</param>
             /// <returns>服务器接收校验是否成功</returns>
-            public async Task<bool> SendTextMessage(string message, int timeout = 10000)
+            public async Task<bool> SendTextMessage(string message, int timeout = 30000)
             {
                 var messageId = Guid.NewGuid().ToString();
                 return await SendTextMessage(message, messageId, timeout);
@@ -1337,11 +1356,28 @@ namespace XFE各类拓展.CyberComm
             {
                 try
                 {
-                    return await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "image", 30000);
+                    return await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "image", 60000);
                 }
                 catch (Exception ex)
                 {
                     throw new XFECyberCommException("客户端发送图片到服务器时出现异常", ex);
+                }
+            }
+            /// <summary>
+            /// 发送视频
+            /// </summary>
+            /// <param name="filePath">视频路径</param>
+            /// <returns>服务器接收校验是否成功</returns>
+            /// <exception cref="XFECyberCommException"></exception>
+            public async Task<bool> SendVideo(string filePath)
+            {
+                try
+                {
+                    return await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "video", 300000);
+                }
+                catch (Exception ex)
+                {
+                    throw new XFECyberCommException("客户端发送视频到服务器时出现异常", ex);
                 }
             }
             /// <summary>
