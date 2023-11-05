@@ -86,7 +86,7 @@ namespace XFE各类拓展.CyberComm
         /// 启动CyberComm客户端
         /// </summary>
         /// <returns></returns>
-        public async void StartCyberCommClient()
+        public async Task StartCyberCommClient()
         {
         StartConnect:
             ClientWebSocket = new ClientWebSocket();
@@ -187,7 +187,7 @@ namespace XFE各类拓展.CyberComm
         /// </summary>
         /// <param name="message">待发送的文本</param>
         /// <returns>发送进程</returns>
-        public async void SendTextMessage(string message)
+        public async Task SendTextMessage(string message)
         {
             try
             {
@@ -204,7 +204,7 @@ namespace XFE各类拓展.CyberComm
         /// </summary>
         /// <param name="message">待发送的二进制数据</param>
         /// <returns>发送进程</returns>
-        public async void SendBinaryMessage(byte[] message)
+        public async Task SendBinaryMessage(byte[] message)
         {
             try
             {
@@ -219,7 +219,7 @@ namespace XFE各类拓展.CyberComm
         /// 关闭CyberComm客户端
         /// </summary>
         /// <returns></returns>
-        public async void CloseCyberCommClient()
+        public async Task CloseCyberCommClient()
         {
             await ClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
         }
@@ -280,7 +280,7 @@ namespace XFE各类拓展.CyberComm
         /// 启动CyberComm服务器
         /// </summary>
         /// <returns></returns>
-        public async void StartCyberCommServer()
+        public async Task StartCyberCommServer()
         {
             try
             {
@@ -355,22 +355,22 @@ namespace XFE各类拓展.CyberComm
         /// <summary>
         /// CyberComm服务器，使用端口创建
         /// </summary>
-        /// <param name="ListenPort">监听端口</param>
-        /// <param name="AutoReceiveCompletedMessage">是否自动接收完整消息</param>
-        public CyberCommServer(int ListenPort, bool AutoReceiveCompletedMessage = true)
+        /// <param name="listenPort">监听端口</param>
+        /// <param name="autoReceiveCompletedMessage">是否自动接收完整消息</param>
+        public CyberCommServer(int listenPort, bool autoReceiveCompletedMessage = true)
         {
-            this.serverURL = $"http://*:{ListenPort}/";
-            this.AutoReceiveCompletedMessage = AutoReceiveCompletedMessage;
+            this.serverURL = $"http://*:{listenPort}/";
+            this.AutoReceiveCompletedMessage = autoReceiveCompletedMessage;
         }
         /// <summary>
         /// CyberComm服务器，使用URL创建
         /// </summary>
-        /// <param name="ServerURL">服务器URL</param>
-        /// <param name="AutoReceiveCompletedMessage">是否自动接收完整消息</param>
-        public CyberCommServer(string ServerURL, bool AutoReceiveCompletedMessage = true)
+        /// <param name="serverURL">服务器URL</param>
+        /// <param name="autoReceiveCompletedMessage">是否自动接收完整消息</param>
+        public CyberCommServer(string serverURL, bool autoReceiveCompletedMessage = true)
         {
-            this.serverURL = ServerURL;
-            this.AutoReceiveCompletedMessage = AutoReceiveCompletedMessage;
+            this.serverURL = serverURL;
+            this.AutoReceiveCompletedMessage = autoReceiveCompletedMessage;
         }
         #endregion
     }
@@ -406,7 +406,7 @@ namespace XFE各类拓展.CyberComm
         /// <param name="message">待发送的文本</param>
         /// <exception cref="XFECyberCommException"></exception>
         /// <returns>发送进程</returns>
-        public async void ReplyMessage(string message)
+        public async Task ReplyMessage(string message)
         {
             try
             {
@@ -422,7 +422,7 @@ namespace XFE各类拓展.CyberComm
         /// 关闭连接
         /// </summary>
         /// <exception cref="XFECyberCommException"></exception>
-        public async void Close()
+        public async Task Close()
         {
             try
             {
@@ -491,7 +491,7 @@ namespace XFE各类拓展.CyberComm
         /// <param name="message">待发送的文本</param>
         /// <exception cref="XFECyberCommException"></exception>
         /// <returns>发送进程</returns>
-        public async void ReplyMessage(string message)
+        public async Task ReplyMessage(string message)
         {
             try
             {
@@ -509,7 +509,7 @@ namespace XFE各类拓展.CyberComm
         /// <param name="bytes">二进制消息</param>
         /// <exception cref="XFECyberCommException"></exception>
         /// <returns></returns>
-        public async void ReplyBinaryMessage(byte[] bytes)
+        public async Task ReplyBinaryMessage(byte[] bytes)
         {
             try
             {
@@ -524,7 +524,7 @@ namespace XFE各类拓展.CyberComm
         /// 关闭连接
         /// </summary>
         /// <exception cref="XFECyberCommException"></exception>
-        public async void Close()
+        public async Task Close()
         {
             try
             {
@@ -655,12 +655,12 @@ namespace XFE各类拓展.CyberComm
         /// 发送群组文本消息
         /// </summary>
         /// <param name="message">群发文本消息</param>
-        public void SendGroupTextMessage(string message)
+        public async Task SendGroupTextMessage(string message)
         {
             byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
             foreach (WebSocket webSocket in webSockets)
             {
-                webSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                await webSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
             }
         }
         /// <summary>
@@ -668,14 +668,14 @@ namespace XFE各类拓展.CyberComm
         /// </summary>
         /// <param name="message">群发文本消息</param>
         /// <param name="exceptWebSocket">除了指定的WS客户端外的客户端</param>
-        public void SendGroupTextMessageExcept(string message, WebSocket exceptWebSocket)
+        public async Task SendGroupTextMessageExcept(string message, WebSocket exceptWebSocket)
         {
             byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
             foreach (WebSocket webSocket in webSockets)
             {
                 if (webSocket != exceptWebSocket)
                 {
-                    webSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                    await webSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
                 }
             }
         }
@@ -683,11 +683,11 @@ namespace XFE各类拓展.CyberComm
         /// 发送群组二进制消息
         /// </summary>
         /// <param name="bytes">群发二进制消息</param>
-        public void SendGroupBinaryMessage(byte[] bytes)
+        public async Task SendGroupBinaryMessage(byte[] bytes)
         {
             foreach (WebSocket webSocket in webSockets)
             {
-                webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Binary, true, CancellationToken.None);
+                await webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Binary, true, CancellationToken.None);
             }
         }
         /// <summary>
@@ -695,13 +695,13 @@ namespace XFE各类拓展.CyberComm
         /// </summary>
         /// <param name="bytes">群发二进制消息</param>
         /// <param name="exceptWebSocket">除了指定的WS客户端外的客户端</param>
-        public void SendGroupBinaryMessageExcept(byte[] bytes, WebSocket exceptWebSocket)
+        public async Task SendGroupBinaryMessageExcept(byte[] bytes, WebSocket exceptWebSocket)
         {
             foreach (WebSocket webSocket in webSockets)
             {
                 if (webSocket != exceptWebSocket)
                 {
-                    webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Binary, true, CancellationToken.None);
+                    await webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Binary, true, CancellationToken.None);
                 }
             }
         }
@@ -820,12 +820,12 @@ namespace XFE各类拓展.CyberComm
         /// </summary>
         /// <param name="GroupId">目标群组的ID</param>
         /// <param name="message">发送的文本消息</param>
-        public void SendGroupTextMessage(string GroupId, string message)
+        public async Task SendGroupTextMessage(string GroupId, string message)
         {
             CyberCommGroup commGroup = this[GroupId];
             if (commGroup != null)
             {
-                commGroup.SendGroupTextMessage(message);
+                await commGroup.SendGroupTextMessage(message);
             }
         }
         /// <summary>
@@ -833,12 +833,12 @@ namespace XFE各类拓展.CyberComm
         /// </summary>
         /// <param name="GroupId">目标群组的ID</param>
         /// <param name="bytes">发送的二进制消息</param>
-        public void SendGroupBinaryMessage(string GroupId, byte[] bytes)
+        public async Task SendGroupBinaryMessage(string GroupId, byte[] bytes)
         {
             CyberCommGroup commGroup = this[GroupId];
             if (commGroup != null)
             {
-                commGroup.SendGroupBinaryMessage(bytes);
+                await commGroup.SendGroupBinaryMessage(bytes);
             }
         }
         /// <summary>
@@ -1045,7 +1045,7 @@ namespace XFE各类拓展.CyberComm
             /// <param name="reconnectMaxTimes">最大重连次数，-1则为无限次</param>
             /// <param name="reconnectTryDelay">重连尝试延迟</param>
             /// <returns></returns>
-            public async void StartXCC(bool autoReconnect = true, int reconnectMaxTimes = -1, int reconnectTryDelay = 100)
+            public async Task StartXCC(bool autoReconnect = true, int reconnectMaxTimes = -1, int reconnectTryDelay = 100)
             {
             XCCReconnect:
                 ClientWebSocket = new ClientWebSocket();
@@ -1103,14 +1103,18 @@ namespace XFE各类拓展.CyberComm
                             try
                             {
                                 var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
+                                var isHistory = receivedMessage.IndexOf("[XCCGetHistory]") == 0;
+                                if (isHistory)
+                                {
+                                    receivedMessage = receivedMessage.Substring(15);
+                                }
                                 var unPackedMessage = receivedMessage.ToXFEArray<string>();
-                                var sender = unPackedMessage[3];
-                                var sendTime = DateTime.Parse(unPackedMessage[4]);
                                 var messageId = unPackedMessage[0];
                                 var signature = unPackedMessage[1];
                                 var message = unPackedMessage[2];
+                                var senderName = unPackedMessage[3];
+                                var sendTime = DateTime.Parse(unPackedMessage[4]);
                                 var messageType = XCCTextMessageType.Text;
-                                var isHistory = receivedMessage.IndexOf("[XCCGetHistory]") == 0;
                                 switch (signature)
                                 {
                                     case "[XCCTextMessage]":
@@ -1124,7 +1128,7 @@ namespace XFE各类拓展.CyberComm
                                     default:
                                         break;
                                 }
-                                workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, ClientWebSocket, sender, messageId, sendTime, messageType, message, isHistory));
+                                workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, ClientWebSocket, messageId, messageType, message, senderName, sendTime, isHistory));
                             }
                             catch (Exception ex)
                             {
@@ -1449,7 +1453,7 @@ namespace XFE各类拓展.CyberComm
             /// </summary>
             /// <param name="message">待发送的文本</param>
             /// <returns>发送进程</returns>
-            public async void ReplyTextMessage(string message)
+            public async Task ReplyTextMessage(string message)
             {
                 try
                 {
@@ -1466,7 +1470,7 @@ namespace XFE各类拓展.CyberComm
             /// </summary>
             /// <param name="message">二进制消息</param>
             /// <exception cref="XFECyberCommException"></exception>
-            public async void ReplyBinaryMessage(byte[] message)
+            public async Task ReplyBinaryMessage(byte[] message)
             {
                 try
                 {
@@ -1481,7 +1485,7 @@ namespace XFE各类拓展.CyberComm
             /// 关闭连接
             /// </summary>
             /// <exception cref="XFECyberCommException"></exception>
-            public async void Close()
+            public async Task Close()
             {
                 try
                 {
@@ -1521,7 +1525,7 @@ namespace XFE各类拓展.CyberComm
             /// 是否为历史消息
             /// </summary>
             public bool IsHistory { get; }
-            internal XCCTextMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, DateTime sendTime, XCCTextMessageType messageType, string message, bool isHistory) : base(group, clientWebSocket, sender, messageId)
+            internal XCCTextMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, string messageId, XCCTextMessageType messageType, string message, string sender, DateTime sendTime, bool isHistory) : base(group, clientWebSocket, sender, messageId)
             {
                 MessageType = messageType;
                 TextMessage = message;
@@ -1625,7 +1629,7 @@ namespace XFE各类拓展.CyberComm
         }
         class XCCTextMessageReceivedEventArgsImpl : XCCTextMessageReceivedEventArgs
         {
-            internal XCCTextMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, DateTime sendTime, XCCTextMessageType messageType, string message, bool isHistory) : base(group, clientWebSocket, sender, messageId, sendTime, messageType, message, isHistory) { }
+            internal XCCTextMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, string messageId, XCCTextMessageType messageType, string message, string sender, DateTime sendTime, bool isHistory) : base(group, clientWebSocket, messageId, messageType, message, sender, sendTime, isHistory) { }
         }
         class XCCBinaryMessageReceivedEventArgsImpl : XCCBinaryMessageReceivedEventArgs
         {
