@@ -885,11 +885,7 @@ namespace XFE各类拓展.CyberComm
             /// <summary>
             /// 图片消息
             /// </summary>
-            Image,
-            /// <summary>
-            /// 历史消息
-            /// </summary>
-            History
+            Image
         }
         class XCCNetWorkBase
         {
@@ -1114,6 +1110,7 @@ namespace XFE各类拓展.CyberComm
                                 var signature = unPackedMessage[1];
                                 var message = unPackedMessage[2];
                                 var messageType = XCCTextMessageType.Text;
+                                var isHistory = receivedMessage.IndexOf("[XCCGetHistory]") == 0;
                                 switch (signature)
                                 {
                                     case "[XCCTextMessage]":
@@ -1124,14 +1121,10 @@ namespace XFE各类拓展.CyberComm
                                         messageType = XCCTextMessageType.Image;
                                         break;
 
-                                    case "[XCCGetHistory]":
-                                        messageType = XCCTextMessageType.History;
-                                        break;
-
                                     default:
                                         break;
                                 }
-                                workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, ClientWebSocket, sender, messageId, sendTime, messageType, message));
+                                workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, ClientWebSocket, sender, messageId, sendTime, messageType, message, isHistory));
                             }
                             catch (Exception ex)
                             {
@@ -1524,11 +1517,16 @@ namespace XFE各类拓展.CyberComm
             /// 发送时间
             /// </summary>
             public DateTime SendTime { get; }
-            internal XCCTextMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, DateTime sendTime, XCCTextMessageType messageType, string message) : base(group, clientWebSocket, sender, messageId)
+            /// <summary>
+            /// 是否为历史消息
+            /// </summary>
+            public bool IsHistory { get; }
+            internal XCCTextMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, DateTime sendTime, XCCTextMessageType messageType, string message, bool isHistory) : base(group, clientWebSocket, sender, messageId)
             {
                 MessageType = messageType;
                 TextMessage = message;
                 SendTime = sendTime;
+                IsHistory = isHistory;
             }
 
         }
@@ -1627,7 +1625,7 @@ namespace XFE各类拓展.CyberComm
         }
         class XCCTextMessageReceivedEventArgsImpl : XCCTextMessageReceivedEventArgs
         {
-            internal XCCTextMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, DateTime sendTime, XCCTextMessageType messageType, string message) : base(group, clientWebSocket, sender, messageId, sendTime, messageType, message) { }
+            internal XCCTextMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, DateTime sendTime, XCCTextMessageType messageType, string message, bool isHistory) : base(group, clientWebSocket, sender, messageId, sendTime, messageType, message, isHistory) { }
         }
         class XCCBinaryMessageReceivedEventArgsImpl : XCCBinaryMessageReceivedEventArgs
         {
