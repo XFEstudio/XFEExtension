@@ -873,6 +873,10 @@ namespace XFE各类拓展.CyberComm
             /// </summary>
             Audio,
             /// <summary>
+            /// 实时音频
+            /// </summary>
+            AudioBuffer,
+            /// <summary>
             /// 视频消息
             /// </summary>
             Video
@@ -1172,6 +1176,9 @@ namespace XFE各类拓展.CyberComm
                                     case "audio":
                                         messageType = XCCBinaryMessageType.Audio;
                                         break;
+                                    case "audio-buffer":
+                                        messageType = XCCBinaryMessageType.AudioBuffer;
+                                        break;
                                     case "video":
                                         messageType = XCCBinaryMessageType.Video;
                                         break;
@@ -1383,6 +1390,20 @@ namespace XFE各类拓展.CyberComm
             /// <summary>
             /// 发送音频
             /// </summary>
+            /// <param name="filePath">音频路径</param>
+            /// <returns>服务器接收校验是否成功</returns>
+            /// <exception cref="XFECyberCommException"></exception>
+            public async Task<bool> SendAudio(string filePath)
+            {
+                try
+                {
+                    return await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "audio");
+                }
+                catch (Exception ex) { throw new XFECyberCommException("客户端发送音频到服务器时出现异常", ex); }
+            }
+            /// <summary>
+            /// 发送音频字节流（服务器不会缓存）
+            /// </summary>
             /// <param name="buffer">二进制音频流</param>
             /// <returns>服务器接收校验是否成功</returns>
             /// <exception cref="XFECyberCommException"></exception>
@@ -1390,7 +1411,7 @@ namespace XFE各类拓展.CyberComm
             {
                 try
                 {
-                    return await SendSignedBinaryMessage(buffer, "audio");
+                    return await SendSignedBinaryMessage(buffer, "audio-buffer");
                 }
                 catch (Exception ex) { throw new XFECyberCommException("客户端发送音频到服务器时出现异常", ex); }
             }
