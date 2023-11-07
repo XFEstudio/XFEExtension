@@ -1463,6 +1463,164 @@ namespace XFE各类拓展.CyberComm
             }
         }
         /// <summary>
+        /// XCC图片接收器
+        /// </summary>
+        public class XCCImageReceiveHelper
+        {
+            private Dictionary<string, XCCImage> xCCImageDictionary = new Dictionary<string, XCCImage>();
+            /// <summary>
+            /// 自动保存到本地
+            /// </summary>
+            public bool AutoSaveInLocal { get; }
+            /// <summary>
+            /// 保存的根目录
+            /// </summary>
+            public string SavePathRoot { get; set; }
+            /// <summary>
+            /// 从设置的根目录加载所有图片
+            /// </summary>
+            /// <returns></returns>
+            public async Task LoadImage()
+            {
+                await Task.Run(() =>
+                {
+                    foreach (var groupId in Directory.EnumerateDirectories(SavePathRoot))
+                    {
+                        foreach (var image in Directory.EnumerateFiles($"{SavePathRoot}/{groupId}"))
+                        {
+                            var filePath = $"{SavePathRoot}/{groupId}/{image}";
+                            if (Path.GetExtension(filePath) == ".png")
+                            {
+                                var imageId = Path.GetFileNameWithoutExtension(filePath);
+                                var imageBuffer = File.ReadAllBytes(filePath);
+                                xCCImageDictionary.Add(imageId, new XCCImage(groupId, imageId, imageBuffer));
+                            }
+                        }
+                    }
+                });
+            }
+            /// <summary>
+            /// 添加图片
+            /// </summary>
+            /// <param name="xCCImage">XCC图片实例</param>
+            public void AddImage(XCCImage xCCImage)
+            {
+                xCCImageDictionary.Add(xCCImage.ImageId, xCCImage);
+                if (AutoSaveInLocal && xCCImage.ImageBuffer != null)
+                    Save(xCCImage);
+            }
+            /// <summary>
+            /// 保存图片
+            /// </summary>
+            /// <param name="xCCImage">XCC图片实例</param>
+            public void Save(XCCImage xCCImage)
+            {
+                if (!Directory.Exists($"{SavePathRoot}/{xCCImage.GroupId}"))
+                {
+                    Directory.CreateDirectory($"{SavePathRoot}/{xCCImage.GroupId}");
+                }
+                File.WriteAllBytes($"{SavePathRoot}/{xCCImage.GroupId}/{xCCImage.ImageId}.png", xCCImage.ImageBuffer);
+            }
+            /// <summary>
+            /// 接收图片占位符
+            /// </summary>
+            /// <param name="e">事件参数</param>
+            public void ReceiveImagePlaceHolder(XCCTextMessageReceivedEventArgs e)
+            {
+                if (e.MessageType == XCCTextMessageType.Image && !xCCImageDictionary.ContainsKey(e.MessageId))
+                {
+                    xCCImageDictionary.Add(e.MessageId, new XCCImage(e.GroupId, e.MessageId));
+                }
+            }
+            /// <summary>
+            /// 接收图片
+            /// </summary>
+            /// <param name="e">事件参数</param>
+            public void ReceiveImage(XCCBinaryMessageReceivedEventArgs e)
+            {
+                if (e.MessageType == XCCBinaryMessageType.Image && xCCImageDictionary.ContainsKey(e.MessageId))
+                {
+                    var xCCImage = xCCImageDictionary[e.MessageId];
+                    if (!xCCImage.Loaded)
+                    {
+                        xCCImageDictionary[e.MessageId].LoadImage(e.BinaryMessage);
+                        if (AutoSaveInLocal)
+                            Save(xCCImage);
+                    }
+                }
+            }
+            /// <summary>
+            /// XCC图片接收器
+            /// </summary>
+            /// <param name="savePathRoot">保存根目录</param>
+            /// <param name="autoSaveInLocal">自动保存</param>
+            public XCCImageReceiveHelper(string savePathRoot, bool autoSaveInLocal)
+            {
+                AutoSaveInLocal = autoSaveInLocal;
+                SavePathRoot = savePathRoot;
+            }
+        }
+        /// <summary>
+        /// XCC图片
+        /// </summary>
+        public class XCCImage
+        {
+            /// <summary>
+            /// 图片加载完成时触发
+            /// </summary>
+            public event EventHandler<byte[]> ImageLoaded;
+            /// <summary>
+            /// 群组ID
+            /// </summary>
+            public string GroupId { get; }
+            /// <summary>
+            /// 图片ID
+            /// </summary>
+            public string ImageId { get; }
+            /// <summary>
+            /// 是否已加载
+            /// </summary>
+            public bool Loaded { get; private set; }
+            /// <summary>
+            /// 图片文件流
+            /// </summary>
+            public byte[] ImageBuffer { get; set; }
+            /// <summary>
+            /// 加载图片
+            /// </summary>
+            /// <param name="imageBuffer">文件流</param>
+            public void LoadImage(byte[] imageBuffer)
+            {
+                ImageBuffer = imageBuffer;
+                Loaded = true;
+                ImageLoaded?.Invoke(this, imageBuffer);
+            }
+            /// <summary>
+            /// XCC图片
+            /// </summary>
+            /// <param name="groupId">群组ID</param>
+            /// <param name="imageId">图片ID</param>
+            /// <param name="imageBuffer">图片的Buffer</param>
+            public XCCImage(string groupId, string imageId, byte[] imageBuffer)
+            {
+                GroupId = groupId;
+                ImageId = imageId;
+                ImageBuffer = imageBuffer;
+                Loaded = true;
+            }
+            /// <summary>
+            /// XCC图片
+            /// </summary>
+            /// <param name="groupId">群组ID</param>
+            /// <param name="imageId">图片ID</param>
+            public XCCImage(string groupId, string imageId)
+            {
+                GroupId = groupId;
+                ImageId = imageId;
+                Loaded = false;
+            }
+        }
+        /// <summary>
         /// XCC消息
         /// </summary>
         public class XCCMessage : XFEEntry
