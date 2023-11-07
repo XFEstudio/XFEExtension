@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using XFE各类拓展.ArrayExtension;
@@ -1463,160 +1464,283 @@ namespace XFE各类拓展.CyberComm
             }
         }
         /// <summary>
-        /// XCC图片接收器
+        /// XCC文件类型
         /// </summary>
-        public class XCCImageReceiveHelper
+        public enum XCCFileType
         {
-            private Dictionary<string, XCCImage> xCCImageDictionary = new Dictionary<string, XCCImage>();
+            /// <summary>
+            /// 图片
+            /// </summary>
+            Image,
+            /// <summary>
+            /// 视频
+            /// </summary>
+            Video,
+            /// <summary>
+            /// 音频
+            /// </summary>
+            Audio
+        }
+        /// <summary>
+        /// XCC消息接收器
+        /// </summary>
+        public class XCCMessageReceiveHelper
+        {
+            private readonly Dictionary<string, XCCFile> xCCFileDictionary = new Dictionary<string, XCCFile>();
+            private readonly Dictionary<string, XFEMultiDictionary> xCCMessageDictionary = new Dictionary<string, XFEMultiDictionary>();
             /// <summary>
             /// 自动保存到本地
             /// </summary>
-            public bool AutoSaveInLocal { get; }
+            public bool AutoSaveInLocal { get; set; }
             /// <summary>
             /// 保存的根目录
             /// </summary>
             public string SavePathRoot { get; set; }
             /// <summary>
-            /// 从设置的根目录加载所有图片
+            /// 接收到文件事件
+            /// </summary>
+            public event EventHandler<XCCFile> FileReceived;
+            /// <summary>
+            /// 接收到文本事件
+            /// </summary>
+            public event EventHandler<string> TextReceived;
+            /// <summary>
+            /// 从设置的根目录加载
             /// </summary>
             /// <returns></returns>
-            public async Task LoadImage()
+            public async Task Load()
             {
                 await Task.Run(() =>
                 {
                     foreach (var groupId in Directory.EnumerateDirectories(SavePathRoot))
                     {
-                        foreach (var image in Directory.EnumerateFiles($"{SavePathRoot}/{groupId}"))
+                        foreach (var file in Directory.EnumerateFiles($"{SavePathRoot}/{groupId}"))
                         {
-                            var filePath = $"{SavePathRoot}/{groupId}/{image}";
-                            if (Path.GetExtension(filePath) == ".png")
+                            var filePath = $"{SavePathRoot}/{groupId}/{file}";
+                            if (file == "XFEMessage.xfe")
                             {
-                                var imageId = Path.GetFileNameWithoutExtension(filePath);
-                                var imageBuffer = File.ReadAllBytes(filePath);
-                                xCCImageDictionary.Add(imageId, new XCCImage(groupId, imageId, imageBuffer));
+                                xCCMessageDictionary.Add(groupId, new XFEMultiDictionary(File.ReadAllText(filePath)));
+                            }
+                            else
+                            {
+                                LoadFile(groupId, filePath);
                             }
                         }
                     }
                 });
             }
             /// <summary>
-            /// 添加图片
+            /// 从设置的根目录的指定群组加载
             /// </summary>
-            /// <param name="xCCImage">XCC图片实例</param>
-            public void AddImage(XCCImage xCCImage)
+            /// <param name="groupId">群组ID</param>
+            /// <returns></returns>
+            public async Task LoadGroup(string groupId)
             {
-                xCCImageDictionary.Add(xCCImage.ImageId, xCCImage);
-                if (AutoSaveInLocal && xCCImage.ImageBuffer != null)
-                    Save(xCCImage);
+                await Task.Run(() =>
+                {
+                    foreach (var file in Directory.EnumerateFiles($"{SavePathRoot}/{groupId}"))
+                    {
+                        var filePath = $"{SavePathRoot}/{groupId}/{file}";
+                        if (file == "XFEMessage.xfe")
+                        {
+                            xCCMessageDictionary.Add(groupId, new XFEMultiDictionary(File.ReadAllText(filePath)));
+                        }
+                        else
+                        {
+                            LoadFile(groupId, filePath);
+                        }
+                    }
+                });
+            }
+            private void LoadFile(string groupId, string filePath)
+            {
+                var messageId = Path.GetFileNameWithoutExtension(filePath);
+                var fileBuffer = File.ReadAllBytes(filePath);
+                switch (Path.GetExtension(filePath))
+                {
+                    case ".png":
+                        xCCFileDictionary.Add(messageId, new XCCFile(groupId, messageId, XCCFileType.Image, fileBuffer));
+                        break;
+                    case ".mp4":
+                        xCCFileDictionary.Add(messageId, new XCCFile(groupId, messageId, XCCFileType.Video, fileBuffer));
+                        break;
+                    case ".mp3":
+                        xCCFileDictionary.Add(messageId, new XCCFile(groupId, messageId, XCCFileType.Audio, fileBuffer));
+                        break;
+                    default:
+                        break;
+                }
+            }
+            /// <summary>
+            /// 获取文件
+            /// </summary>
+            /// <param name="messageId">消息ID</param>
+            /// <returns></returns>
+            public XCCFile GetFile(string messageId)
+            {
+                return xCCFileDictionary.ContainsKey(messageId) ? xCCFileDictionary[messageId] : null;
+            }
+            /// <summary>
+            /// 添加文件
+            /// </summary>
+            /// <param name="xCCFile">XCC文件实例</param>
+            public void AddFile(XCCFile xCCFile)
+            {
+                xCCFileDictionary.Add(xCCFile.MessageId, xCCFile);
+                if (AutoSaveInLocal && xCCFile.FileBuffer != null)
+                    Save(xCCFile);
             }
             /// <summary>
             /// 保存图片
             /// </summary>
-            /// <param name="xCCImage">XCC图片实例</param>
-            public void Save(XCCImage xCCImage)
+            /// <param name="xCCFile">XCC图片实例</param>
+            public void Save(XCCFile xCCFile)
             {
-                if (!Directory.Exists($"{SavePathRoot}/{xCCImage.GroupId}"))
+                if (!Directory.Exists($"{SavePathRoot}/{xCCFile.GroupId}"))
                 {
-                    Directory.CreateDirectory($"{SavePathRoot}/{xCCImage.GroupId}");
+                    Directory.CreateDirectory($"{SavePathRoot}/{xCCFile.GroupId}");
                 }
-                File.WriteAllBytes($"{SavePathRoot}/{xCCImage.GroupId}/{xCCImage.ImageId}.png", xCCImage.ImageBuffer);
+                switch (xCCFile.FileType)
+                {
+                    case XCCFileType.Image:
+                        File.WriteAllBytes($"{SavePathRoot}/{xCCFile.GroupId}/{xCCFile.MessageId}.png", xCCFile.FileBuffer);
+                        break;
+                    case XCCFileType.Video:
+                        File.WriteAllBytes($"{SavePathRoot}/{xCCFile.GroupId}/{xCCFile.MessageId}.mp4", xCCFile.FileBuffer);
+                        break;
+                    case XCCFileType.Audio:
+                        File.WriteAllBytes($"{SavePathRoot}/{xCCFile.GroupId}/{xCCFile.MessageId}.mp3", xCCFile.FileBuffer);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            private void ReceiveFilePlaceHolder(XCCTextMessageReceivedEventArgs e, XCCFileType fileType)
+            {
+                if (!xCCFileDictionary.ContainsKey(e.MessageId))
+                {
+                    xCCFileDictionary.Add(e.MessageId, new XCCFile(e.GroupId, e.MessageId, fileType));
+                }
             }
             /// <summary>
-            /// 接收图片占位符
+            /// 接收文本消息
             /// </summary>
+            /// <param name="sender">发送者</param>
             /// <param name="e">事件参数</param>
-            public void ReceiveImagePlaceHolder(XCCTextMessageReceivedEventArgs e)
+            public void ReceiveTextMessage(object sender, XCCTextMessageReceivedEventArgs e)
             {
-                if (e.MessageType == XCCTextMessageType.Image && !xCCImageDictionary.ContainsKey(e.MessageId))
+                switch (e.MessageType)
                 {
-                    xCCImageDictionary.Add(e.MessageId, new XCCImage(e.GroupId, e.MessageId));
+                    case XCCTextMessageType.Text:
+                        //xCCMessageDictionary.Add(e.GroupId, new XFEMultiDictionary(e.));
+                        break;
+                    case XCCTextMessageType.Image:
+                        ReceiveFilePlaceHolder(e, XCCFileType.Image);
+                        break;
+                    case XCCTextMessageType.Audio:
+                        ReceiveFilePlaceHolder(e, XCCFileType.Audio);
+                        break;
+                    case XCCTextMessageType.Video:
+                        ReceiveFilePlaceHolder(e, XCCFileType.Video);
+                        break;
+                    default:
+                        break;
                 }
             }
             /// <summary>
-            /// 接收图片
+            /// 接收二进制消息
             /// </summary>
+            /// <param name="sender">发送者</param>
             /// <param name="e">事件参数</param>
-            public void ReceiveImage(XCCBinaryMessageReceivedEventArgs e)
+            public void ReceiveBinaryMessage(object sender, XCCBinaryMessageReceivedEventArgs e)
             {
-                if (e.MessageType == XCCBinaryMessageType.Image && xCCImageDictionary.ContainsKey(e.MessageId))
+                if (xCCFileDictionary.ContainsKey(e.MessageId))
                 {
-                    var xCCImage = xCCImageDictionary[e.MessageId];
-                    if (!xCCImage.Loaded)
+                    var xCCFile = xCCFileDictionary[e.MessageId];
+                    if (!xCCFile.Loaded)
                     {
-                        xCCImageDictionary[e.MessageId].LoadImage(e.BinaryMessage);
+                        xCCFileDictionary[e.MessageId].LoadFile(e.BinaryMessage);
                         if (AutoSaveInLocal)
-                            Save(xCCImage);
+                            Save(xCCFile);
                     }
                 }
             }
             /// <summary>
-            /// XCC图片接收器
+            /// XCC消息接收器
             /// </summary>
             /// <param name="savePathRoot">保存根目录</param>
             /// <param name="autoSaveInLocal">自动保存</param>
-            public XCCImageReceiveHelper(string savePathRoot, bool autoSaveInLocal)
+            public XCCMessageReceiveHelper(string savePathRoot, bool autoSaveInLocal = true)
             {
                 AutoSaveInLocal = autoSaveInLocal;
                 SavePathRoot = savePathRoot;
             }
         }
         /// <summary>
-        /// XCC图片
+        /// XCC文件
         /// </summary>
-        public class XCCImage
+        public class XCCFile
         {
             /// <summary>
-            /// 图片加载完成时触发
+            /// 文件加载完成时触发
             /// </summary>
-            public event EventHandler<byte[]> ImageLoaded;
+            public event EventHandler<byte[]> FileLoaded;
             /// <summary>
             /// 群组ID
             /// </summary>
             public string GroupId { get; }
             /// <summary>
-            /// 图片ID
+            /// 消息ID
             /// </summary>
-            public string ImageId { get; }
+            public string MessageId { get; }
+            /// <summary>
+            /// XCC文件类型
+            /// </summary>
+            public XCCFileType FileType { get; }
             /// <summary>
             /// 是否已加载
             /// </summary>
             public bool Loaded { get; private set; }
             /// <summary>
-            /// 图片文件流
+            /// 文件流
             /// </summary>
-            public byte[] ImageBuffer { get; set; }
+            public byte[] FileBuffer { get; set; }
             /// <summary>
-            /// 加载图片
+            /// 加载文件
             /// </summary>
-            /// <param name="imageBuffer">文件流</param>
-            public void LoadImage(byte[] imageBuffer)
+            /// <param name="fileBuffer">文件流</param>
+            public void LoadFile(byte[] fileBuffer)
             {
-                ImageBuffer = imageBuffer;
+                FileBuffer = fileBuffer;
                 Loaded = true;
-                ImageLoaded?.Invoke(this, imageBuffer);
+                FileLoaded?.Invoke(this, fileBuffer);
             }
             /// <summary>
-            /// XCC图片
+            /// XCC文件
             /// </summary>
             /// <param name="groupId">群组ID</param>
-            /// <param name="imageId">图片ID</param>
-            /// <param name="imageBuffer">图片的Buffer</param>
-            public XCCImage(string groupId, string imageId, byte[] imageBuffer)
+            /// <param name="messageId">文件消息ID</param>
+            /// <param name="fileType">文件类型</param>
+            /// <param name="fileBuffer">文件的Buffer</param>
+            public XCCFile(string groupId, string messageId, XCCFileType fileType, byte[] fileBuffer)
             {
                 GroupId = groupId;
-                ImageId = imageId;
-                ImageBuffer = imageBuffer;
+                FileType = fileType;
+                MessageId = messageId;
+                FileBuffer = fileBuffer;
                 Loaded = true;
             }
             /// <summary>
-            /// XCC图片
+            /// XCC文件
             /// </summary>
             /// <param name="groupId">群组ID</param>
-            /// <param name="imageId">图片ID</param>
-            public XCCImage(string groupId, string imageId)
+            /// <param name="messageId">文件ID</param>
+            /// <param name="fileType">文件类型</param>
+            public XCCFile(string groupId, string messageId, XCCFileType fileType)
             {
                 GroupId = groupId;
-                ImageId = imageId;
+                FileType = fileType;
+                MessageId = messageId;
                 Loaded = false;
             }
         }
