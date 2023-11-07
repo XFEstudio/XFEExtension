@@ -1559,7 +1559,7 @@ namespace XFE各类拓展.CyberComm
                 switch (Path.GetExtension(filePath))
                 {
                     case ".png":
-                        xCCFileDictionary.Add(messageId, new XCCFile(groupId, messageId, XCCFileType.Image, fileBuffer));
+                        xCCFileDictionary.Add(messageId, new XCCFile(groupId, messageId, XCCFileType.Image,, fileBuffer));
                         break;
                     case ".mp4":
                         xCCFileDictionary.Add(messageId, new XCCFile(groupId, messageId, XCCFileType.Video, fileBuffer));
@@ -1694,6 +1694,14 @@ namespace XFE各类拓展.CyberComm
             /// </summary>
             public string MessageId { get; }
             /// <summary>
+            /// 发送者
+            /// </summary>
+            public string Sender { get; }
+            /// <summary>
+            /// 发送时间
+            /// </summary>
+            public DateTime SendTime { get; }
+            /// <summary>
             /// XCC文件类型
             /// </summary>
             public XCCFileType FileType { get; }
@@ -1721,27 +1729,18 @@ namespace XFE各类拓展.CyberComm
             /// <param name="groupId">群组ID</param>
             /// <param name="messageId">文件消息ID</param>
             /// <param name="fileType">文件类型</param>
+            /// <param name="sender">发送者</param>
+            /// <param name="sendTime">发送时间</param>
             /// <param name="fileBuffer">文件的Buffer</param>
-            public XCCFile(string groupId, string messageId, XCCFileType fileType, byte[] fileBuffer)
+            public XCCFile(string groupId, string messageId, XCCFileType fileType, string sender, DateTime sendTime, byte[] fileBuffer = null)
             {
                 GroupId = groupId;
-                FileType = fileType;
                 MessageId = messageId;
+                FileType = fileType;
+                Sender = sender;
+                SendTime = sendTime;
                 FileBuffer = fileBuffer;
-                Loaded = true;
-            }
-            /// <summary>
-            /// XCC文件
-            /// </summary>
-            /// <param name="groupId">群组ID</param>
-            /// <param name="messageId">文件ID</param>
-            /// <param name="fileType">文件类型</param>
-            public XCCFile(string groupId, string messageId, XCCFileType fileType)
-            {
-                GroupId = groupId;
-                FileType = fileType;
-                MessageId = messageId;
-                Loaded = false;
+                Loaded = fileBuffer != null;
             }
         }
         /// <summary>
