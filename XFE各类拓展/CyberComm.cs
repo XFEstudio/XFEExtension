@@ -1487,7 +1487,7 @@ namespace XFE各类拓展.CyberComm
         public class XCCMessageReceiveHelper
         {
             private readonly Dictionary<string, XCCFile> xCCFileDictionary = new Dictionary<string, XCCFile>();
-            private readonly Dictionary<string, XFEMultiDictionary> xCCMessageDictionary = new Dictionary<string, XFEMultiDictionary>();
+            private readonly Dictionary<string, List<XCCMessage>> xCCMessageDictionary = new Dictionary<string, List<XCCMessage>>();
             /// <summary>
             /// 自动保存到本地
             /// </summary>
@@ -1514,12 +1514,16 @@ namespace XFE各类拓展.CyberComm
                 {
                     foreach (var groupId in Directory.EnumerateDirectories(SavePathRoot))
                     {
+                        if (File.Exists($"{SavePathRoot}/{groupId}/XFEMessage/XFEMessage.xfe"))
+                        {
+                            xCCMessageDictionary.Add(, new XFEMultiDictionary(File.ReadAllText($"{SavePathRoot}/{groupId}/XFEMessage.xfe")));
+                        }
                         foreach (var file in Directory.EnumerateFiles($"{SavePathRoot}/{groupId}"))
                         {
                             var filePath = $"{SavePathRoot}/{groupId}/{file}";
                             if (file == "XFEMessage.xfe")
                             {
-                                xCCMessageDictionary.Add(groupId, new XFEMultiDictionary(File.ReadAllText(filePath)));
+
                             }
                             else
                             {
@@ -1746,14 +1750,69 @@ namespace XFE各类拓展.CyberComm
         /// <summary>
         /// XCC消息
         /// </summary>
-        public class XCCMessage : XFEEntry
+        public class XCCMessage
         {
+            /// <summary>
+            /// 消息ID
+            /// </summary>
+            public string MessageId { get; }
+            /// <summary>
+            /// 消息类型
+            /// </summary>
+            public XCCTextMessageType MessageType { get; }
+            /// <summary>
+            /// 消息内容
+            /// </summary>
+            public string Message { get; }
+            /// <summary>
+            /// 发送者
+            /// </summary>
+            public string Sender { get; }
+            /// <summary>
+            /// 发送时间
+            /// </summary>
+            public DateTime SendTime { get; }
+            /// <summary>
+            /// 群组ID
+            /// </summary>
+            public string GroupId { get; }
+            /// <summary>
+            /// 封装为字符串
+            /// </summary>
+            /// <returns></returns>
+            public override string ToString()
+            {
+                return new string[] { MessageId, MessageType.ToString(), Message, Sender, SendTime.ToString() }.ToXFEString();
+            }
+            /// <summary>
+            /// 将封装后的XCC消息字符串转换为XCC消息对象
+            /// </summary>
+            /// <param name="xCCMessageStringFormat"></param>
+            /// <param name="groupId"></param>
+            /// <returns></returns>
+            public static XCCMessage ConvertToXCCMessage(string xCCMessageStringFormat, string groupId)
+            {
+                var unPackedMessage = xCCMessageStringFormat.ToXFEArray<string>();
+                return new XCCMessage(unPackedMessage[0], (XCCTextMessageType)Enum.Parse(typeof(XCCTextMessageType), unPackedMessage[1]), unPackedMessage[2], unPackedMessage[3], DateTime.Parse(unPackedMessage[4]), groupId);
+            }
             /// <summary>
             /// XCC消息
             /// </summary>
-            /// <param name="Header">XCC头</param>
-            /// <param name="Content">内容</param>
-            public XCCMessage(string Header, string Content) : base(Header, Content) { }
+            /// <param name="messageId">消息ID</param>
+            /// <param name="messageType">消息类型</param>
+            /// <param name="message">消息内容</param>
+            /// <param name="sender">发送者</param>
+            /// <param name="sendTime">发送时间</param>
+            /// <param name="groupId">群组ID</param>
+            public XCCMessage(string messageId, XCCTextMessageType messageType, string message, string sender, DateTime sendTime, string groupId)
+            {
+                MessageId = messageId;
+                MessageType = messageType;
+                Message = message;
+                Sender = sender;
+                SendTime = sendTime;
+                GroupId = groupId;
+            }
         }
         /// <summary>
         /// XCC网络通讯事件
