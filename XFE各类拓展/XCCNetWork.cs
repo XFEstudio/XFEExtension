@@ -632,10 +632,11 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             {
                 foreach (var groupId in Directory.EnumerateDirectories(SavePathRoot))
                 {
-                    if (File.Exists($"{SavePathRoot}/{groupId}/XFEMessage/XFEMessage.xfe"))
+                    if (File.Exists($"{groupId}/XFEMessage/XFEMessage.xfe"))
                     {
+                        Console.WriteLine("有XCC消息");
                         var xCCMessageList = new List<XCCMessage>();
-                        foreach (var entry in new XFEMultiDictionary(File.ReadAllText($"{SavePathRoot}/{groupId}/XFEMessage/XFEMessage.xfe")))
+                        foreach (var entry in new XFEMultiDictionary(File.ReadAllText($"{groupId}/XFEMessage/XFEMessage.xfe")))
                         {
                             var xCCMessage = XCCMessage.ConvertToXCCMessage(entry.Content, groupId);
                             xCCMessageList.Add(xCCMessage);
@@ -643,6 +644,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                                 TextReceived?.Invoke(true, xCCMessage);
                             else
                                 FileReceived?.Invoke(true, LoadFile(xCCMessage));
+                            Console.WriteLine("实际有");
                         }
                         xCCMessageDictionary.Add(groupId, xCCMessageList);
                     }
@@ -659,17 +661,17 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         {
             await Task.Run(() =>
             {
-                if (File.Exists($"{SavePathRoot}/{groupId}/XFEMessage/XFEMessage.xfe"))
+                if (File.Exists($"{groupId}/XFEMessage/XFEMessage.xfe"))
                 {
                     var xCCMessageList = new List<XCCMessage>();
-                    foreach (var entry in new XFEMultiDictionary(File.ReadAllText($"{SavePathRoot}/{groupId}/XFEMessage/XFEMessage.xfe")))
+                    foreach (var entry in new XFEMultiDictionary(File.ReadAllText($"{groupId}/XFEMessage/XFEMessage.xfe")))
                     {
                         var xCCMessage = XCCMessage.ConvertToXCCMessage(entry.Content, groupId);
                         xCCMessageList.Add(xCCMessage);
                         if (xCCMessage.MessageType == XCCTextMessageType.Text)
                             TextReceived?.Invoke(true, xCCMessage);
                         else
-                            LoadFile(xCCMessage);
+                            FileReceived?.Invoke(true, LoadFile(xCCMessage));
                     }
                     xCCMessageDictionary.Add(groupId, xCCMessageList);
                 }
