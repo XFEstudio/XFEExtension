@@ -849,6 +849,19 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             AutoSaveInLocal = autoSaveInLocal;
             SavePathRoot = savePathRoot;
         }
+        /// <summary>
+        /// XCC消息接收器
+        /// </summary>
+        /// <param name="savePathRoot">保存根目录</param>
+        /// <param name="xCCNetWork">XCC网络通讯实例</param>
+        /// <param name="autoSaveInLocal">自动保存</param>
+        public XCCMessageReceiveHelper(string savePathRoot, XCCNetWork xCCNetWork, bool autoSaveInLocal = true)
+        {
+            AutoSaveInLocal = autoSaveInLocal;
+            SavePathRoot = savePathRoot;
+            xCCNetWork.TextMessageReceived += ReceiveTextMessage;
+            xCCNetWork.BinaryMessageReceived += ReceiveBinaryMessage;
+        }
     }
     /// <summary>
     /// XCC文件
