@@ -1,16 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
-using System;
+using System.Threading.Tasks;
 using XFE各类拓展.ArrayExtension;
 using XFE各类拓展.BufferExtension;
-using XFE各类拓展.TaskExtension;
-using XFE各类拓展;
 using XFE各类拓展.FormatExtension;
+using XFE各类拓展.TaskExtension;
 
 namespace XFE各类拓展.CyberComm.XCCNetWork
 {
@@ -754,10 +753,19 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                     break;
             }
         }
+        /// <summary>
+        /// 保存群组消息
+        /// </summary>
+        /// <param name="groupId"></param>
         public void SaveMessage(string groupId)
         {
             var filePath = $"{SavePathRoot}/{groupId}/XFEMessage/XFEMessage.xfe";
-
+            var storageDictionary = new XFEDictionary();
+            foreach (var xCCMessage in xCCMessageDictionary[groupId])
+            {
+                storageDictionary.Add(xCCMessage.MessageId, xCCMessage.ToString());
+            }
+            File.WriteAllText(filePath, storageDictionary.ToString());
         }
         private void ReceiveFilePlaceHolder(XCCTextMessageReceivedEventArgs e, XCCFileType fileType)
         {
@@ -770,6 +778,8 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                 HistoryFileReceived.Invoke(this, xCCFile);
             else
                 FileReceived.Invoke(this, xCCFile);
+            if (AutoSaveInLocal)
+                SaveMessage(e.GroupId);
         }
         /// <summary>
         /// 接收文本消息
@@ -795,6 +805,8 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                         HistoryTextReceived.Invoke(this, message);
                     else
                         TextReceived.Invoke(this, message);
+                    if (AutoSaveInLocal)
+                        SaveMessage(e.GroupId);
                     break;
                 case XCCTextMessageType.Image:
                     ReceiveFilePlaceHolder(e, XCCFileType.Image);

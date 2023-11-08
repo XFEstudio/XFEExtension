@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using XFE各类拓展.ArrayExtension;
-using XFE各类拓展.BufferExtension;
-using XFE各类拓展.FormatExtension;
-using XFE各类拓展.TaskExtension;
 
 namespace XFE各类拓展.CyberComm
 {
