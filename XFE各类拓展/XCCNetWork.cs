@@ -591,6 +591,13 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         Audio
     }
     /// <summary>
+    /// 消息接收触发器
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="isHistory">是否为历史消息</param>
+    /// <param name="message">消息</param>
+    public delegate void MessageReceivedHandler<T>(bool isHistory, T message);
+    /// <summary>
     /// XCC消息接收器
     /// </summary>
     public class XCCMessageReceiveHelper
@@ -608,19 +615,11 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <summary>
         /// 接收到文件事件
         /// </summary>
-        public event EventHandler<XCCFile> FileReceived;
+        public event MessageReceivedHandler<XCCFile> FileReceived;
         /// <summary>
         /// 接收到文本事件
         /// </summary>
-        public event EventHandler<XCCMessage> TextReceived;
-        /// <summary>
-        /// 接收到历史文件事件
-        /// </summary>
-        public event EventHandler<XCCFile> HistoryFileReceived;
-        /// <summary>
-        /// 接收到历史文本事件
-        /// </summary>
-        public event EventHandler<XCCMessage> HistoryTextReceived;
+        public event MessageReceivedHandler<XCCMessage> TextReceived;
         /// <summary>
         /// 从设置的根目录加载
         /// </summary>
@@ -774,10 +773,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             {
                 xCCFileDictionary.Add(e.MessageId, xCCFile);
             }
-            if (e.IsHistory)
-                HistoryFileReceived.Invoke(this, xCCFile);
-            else
-                FileReceived.Invoke(this, xCCFile);
+            FileReceived.Invoke(e.IsHistory, xCCFile);
             if (AutoSaveInLocal)
                 SaveMessage(e.GroupId);
         }
@@ -801,10 +797,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             switch (e.MessageType)
             {
                 case XCCTextMessageType.Text:
-                    if (e.IsHistory)
-                        HistoryTextReceived.Invoke(this, message);
-                    else
-                        TextReceived.Invoke(this, message);
+                    TextReceived.Invoke(e.IsHistory, message);
                     if (AutoSaveInLocal)
                         SaveMessage(e.GroupId);
                     break;
