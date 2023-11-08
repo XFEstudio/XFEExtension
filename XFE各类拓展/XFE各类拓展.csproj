@@ -63,6 +63,7 @@
     <Compile Include="ObjectExtension.cs" />
     <Compile Include="FormatExtension.cs" />
     <Compile Include="ReflectionExtension.cs" />
+    <Compile Include="XCCNetWork.cs" />
     <Compile Include="XFPManager.cs" />
     <Compile Include="StringExtension.cs" />
     <Compile Include="TaskExtension.cs" />
