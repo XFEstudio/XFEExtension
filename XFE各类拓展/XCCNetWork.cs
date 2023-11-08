@@ -758,13 +758,17 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <param name="groupId"></param>
         public void SaveMessage(string groupId)
         {
-            var filePath = $"{SavePathRoot}/{groupId}/XFEMessage/XFEMessage.xfe";
+            var filePath = $"{SavePathRoot}/{groupId}/XFEMessage";
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
             var storageDictionary = new XFEDictionary();
             foreach (var xCCMessage in xCCMessageDictionary[groupId])
             {
                 storageDictionary.Add(xCCMessage.MessageId, xCCMessage.ToString());
             }
-            File.WriteAllText(filePath, storageDictionary.ToString());
+            File.WriteAllText(filePath + "/XFEMessage.xfe", storageDictionary.ToString());
         }
         private void ReceiveFilePlaceHolder(XCCTextMessageReceivedEventArgs e, XCCFileType fileType)
         {
