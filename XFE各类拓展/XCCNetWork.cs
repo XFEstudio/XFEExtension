@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using XFE各类拓展.ArrayExtension;
@@ -604,6 +605,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
     {
         private readonly Dictionary<string, XCCFile> xCCFileDictionary = new Dictionary<string, XCCFile>();
         private readonly Dictionary<string, List<XCCMessage>> xCCMessageDictionary = new Dictionary<string, List<XCCMessage>>();
+        private bool loaded = false;
         /// <summary>
         /// 自动保存到本地
         /// </summary>
@@ -635,17 +637,18 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                         var xCCMessageList = new List<XCCMessage>();
                         foreach (var entry in new XFEMultiDictionary(File.ReadAllText($"{SavePathRoot}/{groupId}/XFEMessage.xfe")))
                         {
-                            xCCMessageList.Add(XCCMessage.ConvertToXCCMessage(entry.Content, groupId));
+                            var xCCMessage = XCCMessage.ConvertToXCCMessage(entry.Content, groupId);
+                            xCCMessageList.Add(xCCMessage);
+                            if (xCCMessage.MessageType == XCCTextMessageType.Text)
+                                TextReceived?.Invoke(true, xCCMessage);
+                            else
+                                LoadFile(xCCMessage);
                         }
                         xCCMessageDictionary.Add(groupId, xCCMessageList);
                     }
-                    foreach (var file in Directory.EnumerateFiles($"{SavePathRoot}/{groupId}"))
-                    {
-                        var filePath = $"{SavePathRoot}/{groupId}/{file}";
-                        LoadFile(groupId, filePath);
-                    }
                 }
             });
+            loaded = true;
         }
         /// <summary>
         /// 从设置的根目录的指定群组加载
@@ -661,52 +664,63 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                     var xCCMessageList = new List<XCCMessage>();
                     foreach (var entry in new XFEMultiDictionary(File.ReadAllText($"{SavePathRoot}/{groupId}/XFEMessage.xfe")))
                     {
-                        xCCMessageList.Add(XCCMessage.ConvertToXCCMessage(entry.Content, groupId));
+                        var xCCMessage = XCCMessage.ConvertToXCCMessage(entry.Content, groupId);
+                        xCCMessageList.Add(xCCMessage);
+                        if (xCCMessage.MessageType == XCCTextMessageType.Text)
+                            TextReceived?.Invoke(true, xCCMessage);
+                        else
+                            LoadFile(xCCMessage);
                     }
                     xCCMessageDictionary.Add(groupId, xCCMessageList);
                 }
-                foreach (var file in Directory.EnumerateFiles($"{SavePathRoot}/{groupId}"))
+            });
+            loaded = true;
+        }
+        /// <summary>
+        /// 清理无用文件
+        /// </summary>
+        /// <returns></returns>
+        public async Task ClearUselessFile()
+        {
+            if (!loaded)
+                throw new XFEExtensionException("不能在加载完成前调用清理");
+            await Task.Run(() =>
+            {
+                foreach (var groupId in xCCMessageDictionary.Keys)
                 {
-                    var filePath = $"{SavePathRoot}/{groupId}/{file}";
-                    LoadFile(groupId, filePath);
+                    foreach (var file in Directory.EnumerateFiles($"{SavePathRoot}/{groupId}"))
+                    {
+                        var filePath = $"{SavePathRoot}/{groupId}/{file}";
+                        var messageId = Path.GetFileNameWithoutExtension(filePath);
+                        if (!xCCMessageDictionary.ContainsKey(groupId) || xCCMessageDictionary[groupId].Find(x => x.MessageId == messageId) == null)
+                        {
+                            File.Delete(filePath);
+                        }
+                    }
                 }
             });
         }
-        private void LoadFile(string groupId, string filePath)
+        private XCCFile LoadFile(XCCMessage xCCMessage)
         {
-            var messageId = Path.GetFileNameWithoutExtension(filePath);
+            var filePath = $"{SavePathRoot}/{xCCMessage.GroupId}/{xCCMessage.MessageId}";
             var fileBuffer = File.ReadAllBytes(filePath);
-            if (xCCMessageDictionary.ContainsKey(groupId))
+            XCCFile xCCFile = null;
+            switch (xCCMessage.MessageType)
             {
-                var xCCMessage = xCCMessageDictionary[groupId].Find(x => x.MessageId == messageId);
-                if (xCCMessage == null)
-                {
-                    File.Delete(filePath);
-                }
-                else
-                {
-                    switch (xCCMessage.MessageType)
-                    {
-                        case XCCTextMessageType.Text:
-                            break;
-                        case XCCTextMessageType.Image:
-                            xCCFileDictionary.Add(messageId, new XCCFile(groupId, messageId, XCCFileType.Image, xCCMessage.Sender, xCCMessage.SendTime, fileBuffer));
-                            break;
-                        case XCCTextMessageType.Audio:
-                            xCCFileDictionary.Add(messageId, new XCCFile(groupId, messageId, XCCFileType.Audio, xCCMessage.Sender, xCCMessage.SendTime, fileBuffer));
-                            break;
-                        case XCCTextMessageType.Video:
-                            xCCFileDictionary.Add(messageId, new XCCFile(groupId, messageId, XCCFileType.Video, xCCMessage.Sender, xCCMessage.SendTime, fileBuffer));
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                case XCCTextMessageType.Image:
+                    xCCFile = new XCCFile(xCCMessage.GroupId, xCCMessage.MessageId, XCCFileType.Image, xCCMessage.Sender, xCCMessage.SendTime, fileBuffer);
+                    break;
+                case XCCTextMessageType.Audio:
+                    xCCFile = new XCCFile(xCCMessage.GroupId, xCCMessage.MessageId, XCCFileType.Audio, xCCMessage.Sender, xCCMessage.SendTime, fileBuffer);
+                    break;
+                case XCCTextMessageType.Video:
+                    xCCFile = new XCCFile(xCCMessage.GroupId, xCCMessage.MessageId, XCCFileType.Video, xCCMessage.Sender, xCCMessage.SendTime, fileBuffer);
+                    break;
+                default:
+                    return null;
             }
-            else
-            {
-                File.Delete(filePath);
-            }
+            xCCFileDictionary.Add(xCCMessage.MessageId, xCCFile);
+            return xCCFile;
         }
         /// <summary>
         /// 获取文件
@@ -737,20 +751,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             {
                 Directory.CreateDirectory($"{SavePathRoot}/{xCCFile.GroupId}");
             }
-            switch (xCCFile.FileType)
-            {
-                case XCCFileType.Image:
-                    File.WriteAllBytes($"{SavePathRoot}/{xCCFile.GroupId}/{xCCFile.MessageId}.png", xCCFile.FileBuffer);
-                    break;
-                case XCCFileType.Video:
-                    File.WriteAllBytes($"{SavePathRoot}/{xCCFile.GroupId}/{xCCFile.MessageId}.mp4", xCCFile.FileBuffer);
-                    break;
-                case XCCFileType.Audio:
-                    File.WriteAllBytes($"{SavePathRoot}/{xCCFile.GroupId}/{xCCFile.MessageId}.mp3", xCCFile.FileBuffer);
-                    break;
-                default:
-                    break;
-            }
+            File.WriteAllBytes($"{SavePathRoot}/{xCCFile.GroupId}/{xCCFile.MessageId}.xfe", xCCFile.FileBuffer);
         }
         /// <summary>
         /// 保存群组消息
@@ -777,7 +778,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             {
                 xCCFileDictionary.Add(e.MessageId, xCCFile);
             }
-            FileReceived.Invoke(e.IsHistory, xCCFile);
+            FileReceived?.Invoke(e.IsHistory, xCCFile);
             if (AutoSaveInLocal)
                 SaveMessage(e.GroupId);
         }
@@ -801,7 +802,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             switch (e.MessageType)
             {
                 case XCCTextMessageType.Text:
-                    TextReceived.Invoke(e.IsHistory, message);
+                    TextReceived?.Invoke(e.IsHistory, message);
                     if (AutoSaveInLocal)
                         SaveMessage(e.GroupId);
                     break;
