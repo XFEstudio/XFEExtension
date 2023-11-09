@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using XFE各类拓展.ArrayExtension;
@@ -630,24 +629,29 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         {
             await Task.Run(() =>
             {
-                foreach (var groupId in Directory.EnumerateDirectories(SavePathRoot))
+                if (Directory.Exists(SavePathRoot))
                 {
-                    if (File.Exists($"{groupId}/XFEMessage/XFEMessage.xfe"))
+                    foreach (var groupId in Directory.EnumerateDirectories(SavePathRoot))
                     {
-                        Console.WriteLine("有XCC消息");
-                        var xCCMessageList = new List<XCCMessage>();
-                        foreach (var entry in new XFEMultiDictionary(File.ReadAllText($"{groupId}/XFEMessage/XFEMessage.xfe")))
+                        if (File.Exists($"{groupId}/XFEMessage/XFEMessage.xfe"))
                         {
-                            var xCCMessage = XCCMessage.ConvertToXCCMessage(entry.Content, groupId);
-                            xCCMessageList.Add(xCCMessage);
-                            if (xCCMessage.MessageType == XCCTextMessageType.Text)
-                                TextReceived?.Invoke(true, xCCMessage);
-                            else
-                                FileReceived?.Invoke(true, LoadFile(xCCMessage));
-                            Console.WriteLine("实际有");
+                            var xCCMessageList = new List<XCCMessage>();
+                            foreach (var entry in new XFEMultiDictionary(File.ReadAllText($"{groupId}/XFEMessage/XFEMessage.xfe")))
+                            {
+                                var xCCMessage = XCCMessage.ConvertToXCCMessage(entry.Content, groupId);
+                                xCCMessageList.Add(xCCMessage);
+                                if (xCCMessage.MessageType == XCCTextMessageType.Text)
+                                    TextReceived?.Invoke(true, xCCMessage);
+                                else
+                                    FileReceived?.Invoke(true, LoadFile(xCCMessage));
+                            }
+                            xCCMessageDictionary.Add(groupId, xCCMessageList);
                         }
-                        xCCMessageDictionary.Add(groupId, xCCMessageList);
                     }
+                }
+                else
+                {
+                    Directory.CreateDirectory(SavePathRoot);
                 }
             });
             loaded = true;
@@ -796,6 +800,8 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             {
                 if (xCCMessageDictionary[e.GroupId].Find(x => x.MessageId == e.MessageId) == null)
                     xCCMessageDictionary[e.GroupId].Add(message);
+                else
+                    return;
             }
             else
             {
