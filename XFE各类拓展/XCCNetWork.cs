@@ -670,7 +670,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                 if (File.Exists($"{SavePathRoot}/{groupId}/XFEMessage/XFEMessage.xfe"))
                 {
                     var xCCMessageList = new List<XCCMessage>();
-                    foreach (var entry in new XFEMultiDictionary(File.ReadAllText($"{groupId}/XFEMessage/XFEMessage.xfe")))
+                    foreach (var entry in new XFEMultiDictionary(File.ReadAllText($"{SavePathRoot}/{groupId}/XFEMessage/XFEMessage.xfe")))
                     {
                         var xCCMessage = XCCMessage.ConvertToXCCMessage(entry.Content, groupId);
                         xCCMessageList.Add(xCCMessage);
@@ -711,8 +711,10 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         private XCCFile LoadFile(XCCMessage xCCMessage)
         {
             var filePath = $"{SavePathRoot}/{xCCMessage.GroupId}/{xCCMessage.MessageId}.xfe";
-            var fileBuffer = File.ReadAllBytes(filePath);
-            XCCFile xCCFile = null;
+            byte[] fileBuffer = null;
+            if (File.Exists(filePath))
+                fileBuffer = File.ReadAllBytes(filePath);
+            XCCFile xCCFile;
             switch (xCCMessage.MessageType)
             {
                 case XCCTextMessageType.Image:
