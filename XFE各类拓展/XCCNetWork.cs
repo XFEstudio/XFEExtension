@@ -632,12 +632,13 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             {
                 if (Directory.Exists(SavePathRoot))
                 {
-                    foreach (var groupId in Directory.EnumerateDirectories(SavePathRoot))
+                    foreach (var groupIdFullPath in Directory.EnumerateDirectories(SavePathRoot))
                     {
-                        if (File.Exists($"{groupId}/XFEMessage/XFEMessage.xfe"))
+                        var groupId = Path.GetFileName(groupIdFullPath);
+                        if (File.Exists($"{groupIdFullPath}/XFEMessage/XFEMessage.xfe"))
                         {
                             var xCCMessageList = new List<XCCMessage>();
-                            foreach (var entry in new XFEMultiDictionary(File.ReadAllText($"{groupId}/XFEMessage/XFEMessage.xfe")))
+                            foreach (var entry in new XFEMultiDictionary(File.ReadAllText($"{groupIdFullPath}/XFEMessage/XFEMessage.xfe")))
                             {
                                 var xCCMessage = XCCMessage.ConvertToXCCMessage(entry.Content, groupId);
                                 xCCMessageList.Add(xCCMessage);
@@ -646,7 +647,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                                 else
                                     FileReceived?.Invoke(true, LoadFile(xCCMessage));
                             }
-                            xCCMessageDictionary.Add(Path.GetFileName(groupId), xCCMessageList);
+                            xCCMessageDictionary.Add(groupId, xCCMessageList);
                         }
                     }
                 }
@@ -666,7 +667,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         {
             await Task.Run(() =>
             {
-                if (File.Exists($"{groupId}/XFEMessage/XFEMessage.xfe"))
+                if (File.Exists($"{SavePathRoot}/{groupId}/XFEMessage/XFEMessage.xfe"))
                 {
                     var xCCMessageList = new List<XCCMessage>();
                     foreach (var entry in new XFEMultiDictionary(File.ReadAllText($"{groupId}/XFEMessage/XFEMessage.xfe")))
@@ -678,7 +679,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                         else
                             FileReceived?.Invoke(true, LoadFile(xCCMessage));
                     }
-                    xCCMessageDictionary.Add(Path.GetFileName(groupId), xCCMessageList);
+                    xCCMessageDictionary.Add(groupId, xCCMessageList);
                 }
             });
             loaded = true;
@@ -709,7 +710,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         }
         private XCCFile LoadFile(XCCMessage xCCMessage)
         {
-            var filePath = $"{SavePathRoot}/{xCCMessage.GroupId}/{xCCMessage.MessageId}";
+            var filePath = $"{SavePathRoot}/{xCCMessage.GroupId}/{xCCMessage.MessageId}.xfe";
             var fileBuffer = File.ReadAllBytes(filePath);
             XCCFile xCCFile = null;
             switch (xCCMessage.MessageType)
