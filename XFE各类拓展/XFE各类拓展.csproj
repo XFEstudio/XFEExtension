@@ -57,6 +57,7 @@
     <Compile Include="AttributeExtension.cs" />
     <Compile Include="BufferExtension.cs" />
     <Compile Include="CyberComm.cs" />
+    <Compile Include="DelegateExtension.cs" />
     <Compile Include="FileExtension.cs" />
     <Compile Include="ListExtension.cs" />
     <Compile Include="MailExtension.cs" />

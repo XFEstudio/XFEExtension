@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using XFE各类拓展.ArrayExtension;
 using XFE各类拓展.BufferExtension;
+using XFE各类拓展.DelegateExtension;
 using XFE各类拓展.FormatExtension;
 using XFE各类拓展.TaskExtension;
 
@@ -881,7 +882,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <summary>
         /// 文件加载完成时触发
         /// </summary>
-        public event EventHandler<byte[]> FileLoaded;
+        public event XFEEventHandler<XCCFile> FileLoaded;
         /// <summary>
         /// 群组ID
         /// </summary>
@@ -918,7 +919,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         {
             FileBuffer = fileBuffer;
             Loaded = true;
-            FileLoaded?.Invoke(this, fileBuffer);
+            FileLoaded?.Invoke(this);
         }
         /// <summary>
         /// XCC文件
