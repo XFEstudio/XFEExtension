@@ -38,6 +38,20 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         public EventHandler<XCCConnectedEventArgs> connected;
     }
     /// <summary>
+    /// XCC客户端连接类型
+    /// </summary>
+    public enum XCCClientType
+    {
+        /// <summary>
+        /// 明文类型
+        /// </summary>
+        TextMessageClient,
+        /// <summary>
+        /// 文件类型
+        /// </summary>
+        FileTransportClient
+    }
+    /// <summary>
     /// XCC网络通讯
     /// </summary>
     public class XCCNetWork
@@ -156,9 +170,13 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// </summary>
         public string Sender { get; }
         /// <summary>
-        /// WebSocket客户端
+        /// WebSocket明文传输客户端
         /// </summary>
-        public ClientWebSocket ClientWebSocket { get; private set; }
+        public ClientWebSocket TextMessageClientWebSocket { get; private set; }
+        /// <summary>
+        /// WebSocket文件传输客户端
+        /// </summary>
+        public ClientWebSocket FileTransportClientWebSocket { get; private set; }
         /// <summary>
         /// 是否已连接
         /// </summary>
@@ -174,23 +192,38 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <returns></returns>
         public async Task StartXCC(bool autoReconnect = true, int reconnectMaxTimes = -1, int reconnectTryDelay = 100)
         {
+            var textMessageXCCTask = StartTextMessageXCC(autoReconnect, reconnectMaxTimes, reconnectTryDelay);
+            var fileTransportXCCTask = StartFileTransportXCC(autoReconnect, reconnectMaxTimes, reconnectTryDelay);
+            await Task.WhenAll(textMessageXCCTask, fileTransportXCCTask);
+        }
+        /// <summary>
+        /// 启动XCC文本会话
+        /// </summary>
+        /// <param name="autoReconnect">是否自动重连</param>
+        /// <param name="reconnectMaxTimes">最大重连次数，-1则为无限次</param>
+        /// <param name="reconnectTryDelay">重连尝试延迟</param>
+        /// <returns></returns>
+        public async Task StartTextMessageXCC(bool autoReconnect = true, int reconnectMaxTimes = -1, int reconnectTryDelay = 100)
+        {
         XCCReconnect:
-            ClientWebSocket = new ClientWebSocket();
+            TextMessageClientWebSocket = new ClientWebSocket();
             Uri serverUri = new Uri("ws://xcc.api.xfegzs.com");
             var base64GroupId = Convert.ToBase64String(Encoding.UTF8.GetBytes(GroupId));
             var base64SenderId = Convert.ToBase64String(Encoding.UTF8.GetBytes(Sender));
-            ClientWebSocket.Options.SetRequestHeader("Group", base64GroupId);
-            ClientWebSocket.Options.SetRequestHeader("Sender", base64SenderId);
+            TextMessageClientWebSocket.Options.SetRequestHeader("Group", base64GroupId);
+            TextMessageClientWebSocket.Options.SetRequestHeader("Sender", base64SenderId);
+            TextMessageClientWebSocket.Options.SetRequestHeader("Type", "Text");
             reconnectTimes++;
             try
             {
-                await ClientWebSocket.ConnectAsync(serverUri, CancellationToken.None);
+                if (TextMessageClientWebSocket.State != WebSocketState.Open)
+                    await TextMessageClientWebSocket.ConnectAsync(serverUri, CancellationToken.None);
             }
             catch (Exception ex)
             {
                 if (IsConnected == true)
                 {
-                    workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, ClientWebSocket, false));
+                    workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.TextMessageClient, TextMessageClientWebSocket, FileTransportClientWebSocket, false));
                 }
                 IsConnected = false;
                 if (autoReconnect)
@@ -203,25 +236,25 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                 }
                 else
                 {
-                    workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, ClientWebSocket, null, null, new XFECyberCommException("与XCC网络通讯服务器建立连接时发生异常", ex)));
+                    workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.TextMessageClient, null, null, new XFECyberCommException("与XCC网络通讯明文服务器建立连接时发生异常", ex)));
                     return;
                 }
             }
             reconnectTimes = 0;
-            workBase.connected?.Invoke(this, new XCCConnectedEventArgsImpl(this, ClientWebSocket));
+            workBase.connected?.Invoke(this, new XCCConnectedEventArgsImpl(this, XCCClientType.TextMessageClient, TextMessageClientWebSocket, FileTransportClientWebSocket));
             IsConnected = true;
-            while (ClientWebSocket.State == WebSocketState.Open)
+            while (TextMessageClientWebSocket.State == WebSocketState.Open)
             {
                 try
                 {
                     byte[] receiveBuffer = new byte[1024];
-                    WebSocketReceiveResult receiveResult = await ClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                    WebSocketReceiveResult receiveResult = await TextMessageClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
                     var bufferList = new List<byte>();
                     bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                     //ReceiveCompletedMessageByUsingWhile
                     while (!receiveResult.EndOfMessage)
                     {
-                        receiveResult = await ClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                        receiveResult = await TextMessageClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
                         bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                     }
                     var receivedBinaryBuffer = bufferList.ToArray();
@@ -259,11 +292,141 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                                 default:
                                     break;
                             }
-                            workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, ClientWebSocket, messageId, messageType, message, senderName, sendTime, isHistory));
+                            workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.TextMessageClient, messageId, messageType, message, senderName, sendTime, isHistory));
                         }
                         catch (Exception ex)
                         {
-                            workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, ClientWebSocket, null, null, new XFECyberCommException("接收XCC服务器消息时发生异常", ex)));
+                            workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.TextMessageClient, null, null, new XFECyberCommException("接收XCC服务器消息时发生异常", ex)));
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    try { await TextMessageClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close", CancellationToken.None); } catch { }
+                    if (IsConnected == true)
+                    {
+                        workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.TextMessageClient, TextMessageClientWebSocket, FileTransportClientWebSocket, false));
+                    }
+                    IsConnected = false;
+                    if (autoReconnect)
+                    {
+                        if (autoReconnect)
+                        {
+                            Thread.Sleep(reconnectTryDelay);
+                            if (reconnectTimes <= reconnectMaxTimes || reconnectMaxTimes == -1)
+                                goto XCCReconnect;
+                        }
+                    }
+                    else
+                    {
+                        workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.TextMessageClient, null, null, new XFECyberCommException("与XCC网络通讯服务器建立连接时发生异常", ex)));
+                        return;
+                    }
+                }
+            }
+            workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.TextMessageClient, TextMessageClientWebSocket, FileTransportClientWebSocket, true));
+        }
+        /// <summary>
+        /// 启动XCC文件传输会话
+        /// </summary>
+        /// <param name="autoReconnect">是否自动重连</param>
+        /// <param name="reconnectMaxTimes">最大重连次数，-1则为无限次</param>
+        /// <param name="reconnectTryDelay">重连尝试延迟</param>
+        /// <returns></returns>
+        public async Task StartFileTransportXCC(bool autoReconnect = true, int reconnectMaxTimes = -1, int reconnectTryDelay = 100)
+        {
+        XCCReconnect:
+            FileTransportClientWebSocket = new ClientWebSocket();
+            Uri serverUri = new Uri("ws://xcc.api.xfegzs.com");
+            var base64GroupId = Convert.ToBase64String(Encoding.UTF8.GetBytes(GroupId));
+            var base64SenderId = Convert.ToBase64String(Encoding.UTF8.GetBytes(Sender));
+            FileTransportClientWebSocket.Options.SetRequestHeader("Group", base64GroupId);
+            FileTransportClientWebSocket.Options.SetRequestHeader("Sender", base64SenderId);
+            FileTransportClientWebSocket.Options.SetRequestHeader("Type", "File");
+            reconnectTimes++;
+            try
+            {
+                if (FileTransportClientWebSocket.State != WebSocketState.Open)
+                    await FileTransportClientWebSocket.ConnectAsync(serverUri, CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                if (IsConnected == true)
+                {
+                    workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.FileTransportClient, TextMessageClientWebSocket, FileTransportClientWebSocket, false));
+                }
+                IsConnected = false;
+                if (autoReconnect)
+                {
+                    if (reconnectTimes <= reconnectMaxTimes || reconnectMaxTimes == -1)
+                    {
+                        Thread.Sleep(reconnectTryDelay);
+                        goto XCCReconnect;
+                    }
+                }
+                else
+                {
+                    workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.FileTransportClient, null, null, new XFECyberCommException("与XCC网络通讯明文服务器建立连接时发生异常", ex)));
+                    return;
+                }
+            }
+            reconnectTimes = 0;
+            workBase.connected?.Invoke(this, new XCCConnectedEventArgsImpl(this, XCCClientType.FileTransportClient, TextMessageClientWebSocket, FileTransportClientWebSocket));
+            IsConnected = true;
+            while (FileTransportClientWebSocket.State == WebSocketState.Open)
+            {
+                try
+                {
+                    byte[] receiveBuffer = new byte[1024];
+                    WebSocketReceiveResult receiveResult = await TextMessageClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                    var bufferList = new List<byte>();
+                    bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
+                    //ReceiveCompletedMessageByUsingWhile
+                    while (!receiveResult.EndOfMessage)
+                    {
+                        receiveResult = await TextMessageClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                        bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
+                    }
+                    var receivedBinaryBuffer = bufferList.ToArray();
+                    if (receiveResult.MessageType == WebSocketMessageType.Text)
+                    {
+                        try
+                        {
+                            var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
+                            var isHistory = receivedMessage.IndexOf("[XCCGetHistory]") == 0;
+                            if (isHistory)
+                            {
+                                receivedMessage = receivedMessage.Substring(15);
+                            }
+                            var unPackedMessage = receivedMessage.ToXFEArray<string>();
+                            var messageId = unPackedMessage[0];
+                            var signature = unPackedMessage[1];
+                            var message = unPackedMessage[2];
+                            var senderName = unPackedMessage[3];
+                            var sendTime = DateTime.Parse(unPackedMessage[4]);
+                            var messageType = XCCTextMessageType.Text;
+                            switch (signature)
+                            {
+                                case "[XCCTextMessage]":
+                                    messageType = XCCTextMessageType.Text;
+                                    break;
+                                case "[XCCImage]":
+                                    messageType = XCCTextMessageType.Image;
+                                    break;
+                                case "[XCCAudio]":
+                                    messageType = XCCTextMessageType.Audio;
+                                    break;
+                                case "[XCCVideo]":
+                                    messageType = XCCTextMessageType.Video;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.FileTransportClient, messageId, messageType, message, senderName, sendTime, isHistory));
+                        }
+                        catch (Exception ex)
+                        {
+                            workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.FileTransportClient, null, null, new XFECyberCommException("接收XCC服务器消息时发生异常", ex)));
                         }
                     }
                     if (receiveResult.MessageType == WebSocketMessageType.Binary)
@@ -300,20 +463,20 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                                     messageType = XCCBinaryMessageType.Binary;
                                     break;
                             }
-                            workBase.binaryMessageReceived?.Invoke(this, new XCCBinaryMessageReceivedEventArgsImpl(this, ClientWebSocket, sender, messageId, unPackedBuffer, messageType, signature));
+                            workBase.binaryMessageReceived?.Invoke(this, new XCCBinaryMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.FileTransportClient, sender, messageId, unPackedBuffer, messageType, signature));
                         }
                         catch (Exception ex)
                         {
-                            workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, ClientWebSocket, null, null, new XFECyberCommException("接收XCC服务器消息时发生异常", ex)));
+                            workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.FileTransportClient, null, null, new XFECyberCommException("接收XCC服务器消息时发生异常", ex)));
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    try { await ClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close", CancellationToken.None); } catch { }
+                    try { await TextMessageClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close", CancellationToken.None); } catch { }
                     if (IsConnected == true)
                     {
-                        workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, ClientWebSocket, false));
+                        workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.FileTransportClient, TextMessageClientWebSocket, FileTransportClientWebSocket, false));
                     }
                     IsConnected = false;
                     if (autoReconnect)
@@ -327,12 +490,12 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                     }
                     else
                     {
-                        workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, ClientWebSocket, null, null, new XFECyberCommException("与XCC网络通讯服务器建立连接时发生异常", ex)));
+                        workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.FileTransportClient, null, null, new XFECyberCommException("与XCC网络通讯服务器建立连接时发生异常", ex)));
                         return;
                     }
                 }
             }
-            workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, ClientWebSocket, true));
+            workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.FileTransportClient, TextMessageClientWebSocket, FileTransportClientWebSocket, true));
         }
         /// <summary>
         /// 发送文本消息，返回消息ID
@@ -358,7 +521,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             try
             {
                 byte[] sendBuffer = Encoding.UTF8.GetBytes(new string[] { messageId, "[XCCTextMessage]", message }.ToXFEString());
-                await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                await TextMessageClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
                 var endTask = Task.Run(async () =>
                 {
                     await Task.Delay(timeout);
@@ -416,7 +579,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             try
             {
                 var xFEBuffer = new XFEBuffer(Sender, message, "Type", Encoding.UTF8.GetBytes(signature), "ID", Encoding.UTF8.GetBytes(messageId));
-                await ClientWebSocket.SendAsync(new ArraySegment<byte>(xFEBuffer.ToBuffer()), WebSocketMessageType.Binary, true, CancellationToken.None);
+                await TextMessageClientWebSocket.SendAsync(new ArraySegment<byte>(xFEBuffer.ToBuffer()), WebSocketMessageType.Binary, true, CancellationToken.None);
                 var endTask = Task.Run(async () =>
                 {
                     await Task.Delay(timeout);
@@ -536,7 +699,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             {
                 var messageId = Guid.NewGuid().ToString();
                 byte[] sendBuffer = Encoding.UTF8.GetBytes(new string[] { messageId, "[XCCGetHistory]", "[XCCGetHistory]" }.ToXFEString());
-                await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                await TextMessageClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
                 var endTask = Task.Run(async () =>
                 {
                     await Task.Delay(5000);
@@ -558,7 +721,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         {
             try
             {
-                await ClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "客户端主动关闭连接", CancellationToken.None);
+                await TextMessageClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "客户端主动关闭连接", CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -1017,13 +1180,21 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
     public abstract class XCCMessageReceivedEventArgs : EventArgs
     {
         /// <summary>
-        /// 当前WebSocket
-        /// </summary>
-        public ClientWebSocket CurrentWebSocket { get; }
-        /// <summary>
         /// 触发事件的群组
         /// </summary>
         public XCCGroup Group { get; }
+        /// <summary>
+        /// WebSocket明文传输客户端
+        /// </summary>
+        public ClientWebSocket TextMessageClientWebSocket { get; private set; }
+        /// <summary>
+        /// WebSocket文件传输客户端
+        /// </summary>
+        public ClientWebSocket FileTransportClientWebSocket { get; private set; }
+        /// <summary>
+        /// XCC服务器连接类型
+        /// </summary>
+        public XCCClientType XCCClientType { get; }
         /// <summary>
         /// 消息ID
         /// </summary>
@@ -1052,7 +1223,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             try
             {
                 byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
-                await CurrentWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                await TextMessageClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -1068,7 +1239,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         {
             try
             {
-                await CurrentWebSocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, CancellationToken.None);
+                await FileTransportClientWebSocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -1083,17 +1254,22 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         {
             try
             {
-                await CurrentWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "客户端主动关闭连接", CancellationToken.None);
+                if (TextMessageClientWebSocket.State == WebSocketState.Open)
+                    await TextMessageClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "客户端主动关闭连接", CancellationToken.None);
+                if (FileTransportClientWebSocket.State == WebSocketState.Open)
+                    await FileTransportClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "客户端主动关闭连接", CancellationToken.None);
             }
             catch (Exception ex)
             {
                 throw new XFECyberCommException("客户端关闭连接时出现异常", ex);
             }
         }
-        internal XCCMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId)
+        internal XCCMessageReceivedEventArgs(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string sender, string messageId)
         {
             Group = group;
-            CurrentWebSocket = clientWebSocket;
+            TextMessageClientWebSocket = textMessageClientWebSocket;
+            FileTransportClientWebSocket = fileTransportClientWebSocket;
+            XCCClientType = xCCClientType;
             Sender = sender;
             MessageId = messageId;
         }
@@ -1141,7 +1317,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// 是否为历史消息
         /// </summary>
         public bool IsHistory { get; }
-        internal XCCTextMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, string messageId, XCCTextMessageType messageType, string message, string sender, DateTime sendTime, bool isHistory) : base(group, clientWebSocket, sender, messageId)
+        internal XCCTextMessageReceivedEventArgs(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string messageId, XCCTextMessageType messageType, string message, string sender, DateTime sendTime, bool isHistory) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId)
         {
             MessageType = messageType;
             TextMessage = message;
@@ -1197,7 +1373,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// 二进制消息
         /// </summary>
         public byte[] BinaryMessage { get; }
-        internal XCCBinaryMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, byte[] buffer, XCCBinaryMessageType messageType, string signature) : base(group, clientWebSocket, sender, messageId)
+        internal XCCBinaryMessageReceivedEventArgs(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string sender, string messageId, byte[] buffer, XCCBinaryMessageType messageType, string signature) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId)
         {
             BinaryMessage = buffer;
             MessageType = messageType;
@@ -1213,7 +1389,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// 异常信息
         /// </summary>
         public XFECyberCommException Exception { get; }
-        internal XCCExceptionMessageReceivedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, XFECyberCommException exception) : base(group, clientWebSocket, sender, messageId)
+        internal XCCExceptionMessageReceivedEventArgs(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string sender, string messageId, XFECyberCommException exception) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId)
         {
             Exception = exception;
         }
@@ -1224,22 +1400,33 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
     public abstract class XCCConnectionClosedEventArgs : EventArgs
     {
         /// <summary>
-        /// 当前WebSocket
+        /// 触发事件的群组
         /// </summary>
-        public ClientWebSocket CurrentWebSocket { get; }
+        public XCCGroup Group { get; }
+        /// <summary>
+        /// XCC服务器连接类型
+        /// </summary>
+        public XCCClientType XCCClientType { get; }
+        /// <summary>
+        /// WebSocket明文传输客户端
+        /// </summary>
+        public ClientWebSocket TextMessageClientWebSocket { get; private set; }
+        /// <summary>
+        /// WebSocket文件传输客户端
+        /// </summary>
+        public ClientWebSocket FileTransportClientWebSocket { get; private set; }
         /// <summary>
         /// 是否正常关闭
         /// </summary>
         public bool ClosedNormally { get; }
-        /// <summary>
-        /// 触发事件的群组
-        /// </summary>
-        public XCCGroup Group { get; }
-        internal XCCConnectionClosedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket, bool closeNormally)
+
+        internal XCCConnectionClosedEventArgs(XCCGroup group, XCCClientType xCCClientType, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, bool closedNormally)
         {
-            CurrentWebSocket = clientWebSocket;
             Group = group;
-            ClosedNormally = closeNormally;
+            XCCClientType = xCCClientType;
+            TextMessageClientWebSocket = textMessageClientWebSocket;
+            FileTransportClientWebSocket = fileTransportClientWebSocket;
+            ClosedNormally = closedNormally;
         }
     }
     /// <summary>
@@ -1248,17 +1435,28 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
     public abstract class XCCConnectedEventArgs : EventArgs
     {
         /// <summary>
-        /// 当前WebSocket
-        /// </summary>
-        public ClientWebSocket CurrentWebSocket { get; }
-        /// <summary>
         /// 触发事件的群组
         /// </summary>
         public XCCGroup Group { get; }
-        internal XCCConnectedEventArgs(XCCGroup group, ClientWebSocket clientWebSocket)
+        /// <summary>
+        /// XCC服务器连接类型
+        /// </summary>
+        public XCCClientType XCCClientType { get; }
+        /// <summary>
+        /// WebSocket明文传输客户端
+        /// </summary>
+        public ClientWebSocket TextMessageClientWebSocket { get; private set; }
+        /// <summary>
+        /// WebSocket文件传输客户端
+        /// </summary>
+        public ClientWebSocket FileTransportClientWebSocket { get; private set; }
+
+        internal XCCConnectedEventArgs(XCCGroup group, XCCClientType xCCClientType, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket)
         {
-            CurrentWebSocket = clientWebSocket;
             Group = group;
+            XCCClientType = xCCClientType;
+            TextMessageClientWebSocket = textMessageClientWebSocket;
+            FileTransportClientWebSocket = fileTransportClientWebSocket;
         }
     }
     class XCCGroupImpl : XCCGroup
@@ -1267,22 +1465,22 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
     }
     class XCCConnectionClosedEventArgsImpl : XCCConnectionClosedEventArgs
     {
-        internal XCCConnectionClosedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, bool closeNormally) : base(group, clientWebSocket, closeNormally) { }
+        public XCCConnectionClosedEventArgsImpl(XCCGroup group, XCCClientType xCCClientType, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, bool closedNormally) : base(group, xCCClientType, textMessageClientWebSocket, fileTransportClientWebSocket, closedNormally) { }
     }
     class XCCConnectedEventArgsImpl : XCCConnectedEventArgs
     {
-        internal XCCConnectedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket) : base(group, clientWebSocket) { }
+        public XCCConnectedEventArgsImpl(XCCGroup group, XCCClientType xCCClientType, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket) : base(group, xCCClientType, textMessageClientWebSocket, fileTransportClientWebSocket) { }
     }
     class XCCTextMessageReceivedEventArgsImpl : XCCTextMessageReceivedEventArgs
     {
-        internal XCCTextMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, string messageId, XCCTextMessageType messageType, string message, string sender, DateTime sendTime, bool isHistory) : base(group, clientWebSocket, messageId, messageType, message, sender, sendTime, isHistory) { }
+        internal XCCTextMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string messageId, XCCTextMessageType messageType, string message, string sender, DateTime sendTime, bool isHistory) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, messageId, messageType, message, sender, sendTime, isHistory) { }
     }
     class XCCBinaryMessageReceivedEventArgsImpl : XCCBinaryMessageReceivedEventArgs
     {
-        internal XCCBinaryMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, byte[] buffer, XCCBinaryMessageType messageType, string signature) : base(group, clientWebSocket, sender, messageId, buffer, messageType, signature) { }
+        internal XCCBinaryMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string sender, string messageId, byte[] buffer, XCCBinaryMessageType messageType, string signature) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId, buffer, messageType, signature) { }
     }
     class XCCExceptionMessageReceivedEventArgsImpl : XCCExceptionMessageReceivedEventArgs
     {
-        internal XCCExceptionMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket clientWebSocket, string sender, string messageId, XFECyberCommException exception) : base(group, clientWebSocket, sender, messageId, exception) { }
+        internal XCCExceptionMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string sender, string messageId, XFECyberCommException exception) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId, exception) { }
     }
 }
