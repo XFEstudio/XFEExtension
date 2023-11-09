@@ -645,7 +645,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                                 else
                                     FileReceived?.Invoke(true, LoadFile(xCCMessage));
                             }
-                            xCCMessageDictionary.Add(groupId, xCCMessageList);
+                            xCCMessageDictionary.Add(Path.GetFileName(groupId), xCCMessageList);
                         }
                     }
                 }
@@ -677,7 +677,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                         else
                             FileReceived?.Invoke(true, LoadFile(xCCMessage));
                     }
-                    xCCMessageDictionary.Add(groupId, xCCMessageList);
+                    xCCMessageDictionary.Add(Path.GetFileName(groupId), xCCMessageList);
                 }
             });
             loaded = true;
@@ -799,9 +799,13 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             if (xCCMessageDictionary.ContainsKey(e.GroupId))
             {
                 if (xCCMessageDictionary[e.GroupId].Find(x => x.MessageId == e.MessageId) == null)
+                {
                     xCCMessageDictionary[e.GroupId].Add(message);
+                }
                 else
+                {
                     return;
+                }
             }
             else
             {
