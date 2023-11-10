@@ -299,6 +299,21 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                             workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.TextMessageClient, null, null, new XFECyberCommException("接收XCC服务器消息时发生异常", ex)));
                         }
                     }
+                    else if (receiveResult.MessageType == WebSocketMessageType.Binary)
+                    {
+                        try
+                        {
+                            var xFEBuffer = XFEBuffer.ToXFEBuffer(receivedBinaryBuffer);
+                            var signature = Encoding.UTF8.GetString(xFEBuffer["Type"]);
+                            var messageId = Encoding.UTF8.GetString(xFEBuffer["ID"]);
+                            if (signature == "callback")
+                                UpdateTaskTrigger?.Invoke(true, messageId);
+                        }
+                        catch (Exception ex)
+                        {
+                            workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.TextMessageClient, null, null, new XFECyberCommException("接收XCC服务器消息时发生异常", ex)));
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -388,47 +403,6 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                         bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                     }
                     var receivedBinaryBuffer = bufferList.ToArray();
-                    if (receiveResult.MessageType == WebSocketMessageType.Text)
-                    {
-                        try
-                        {
-                            var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
-                            var isHistory = receivedMessage.IndexOf("[XCCGetHistory]") == 0;
-                            if (isHistory)
-                            {
-                                receivedMessage = receivedMessage.Substring(15);
-                            }
-                            var unPackedMessage = receivedMessage.ToXFEArray<string>();
-                            var messageId = unPackedMessage[0];
-                            var signature = unPackedMessage[1];
-                            var message = unPackedMessage[2];
-                            var senderName = unPackedMessage[3];
-                            var sendTime = DateTime.Parse(unPackedMessage[4]);
-                            var messageType = XCCTextMessageType.Text;
-                            switch (signature)
-                            {
-                                case "[XCCTextMessage]":
-                                    messageType = XCCTextMessageType.Text;
-                                    break;
-                                case "[XCCImage]":
-                                    messageType = XCCTextMessageType.Image;
-                                    break;
-                                case "[XCCAudio]":
-                                    messageType = XCCTextMessageType.Audio;
-                                    break;
-                                case "[XCCVideo]":
-                                    messageType = XCCTextMessageType.Video;
-                                    break;
-                                default:
-                                    break;
-                            }
-                            workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.FileTransportClient, messageId, messageType, message, senderName, sendTime, isHistory));
-                        }
-                        catch (Exception ex)
-                        {
-                            workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.FileTransportClient, null, null, new XFECyberCommException("接收XCC服务器消息时发生异常", ex)));
-                        }
-                    }
                     if (receiveResult.MessageType == WebSocketMessageType.Binary)
                     {
                         try
