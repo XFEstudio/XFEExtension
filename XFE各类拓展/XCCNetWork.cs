@@ -139,7 +139,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <returns></returns>
         public XCCGroup CreateGroup(string groupId, string sender)
         {
-            var group = new XCCGroupImpl(groupId, sender, xCCNetWorkBase);
+            var group = new XCCGroupImpl(Guid.NewGuid().ToString(), groupId, sender, xCCNetWorkBase);
             Groups.Add(group);
             return group;
         }
@@ -162,6 +162,10 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         private int reconnectTimes = -1;
         #region 公有属性
         /// <summary>
+        /// 客户端标识名
+        /// </summary>
+        public string Signature { get; }
+        /// <summary>
         /// 群组ID
         /// </summary>
         public string GroupId { get; }
@@ -170,6 +174,14 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// </summary>
         public string Sender { get; }
         /// <summary>
+        /// 明文传输服务器是否连接
+        /// </summary>
+        public bool TextMessageClientConnected { get; private set; } = false;
+        /// <summary>
+        /// 文件传输服务器是否连接
+        /// </summary>
+        public bool FileTransportClientConnected { get; private set; } = false;
+        /// <summary>
         /// WebSocket明文传输客户端
         /// </summary>
         public ClientWebSocket TextMessageClientWebSocket { get; private set; }
@@ -177,10 +189,6 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// WebSocket文件传输客户端
         /// </summary>
         public ClientWebSocket FileTransportClientWebSocket { get; private set; }
-        /// <summary>
-        /// 是否已连接
-        /// </summary>
-        public bool IsConnected { get; private set; } = false;
         #endregion
         #region 公有方法
         /// <summary>
@@ -213,6 +221,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             TextMessageClientWebSocket.Options.SetRequestHeader("Group", base64GroupId);
             TextMessageClientWebSocket.Options.SetRequestHeader("Sender", base64SenderId);
             TextMessageClientWebSocket.Options.SetRequestHeader("Type", "Text");
+            TextMessageClientWebSocket.Options.SetRequestHeader("Signature", Signature);
             reconnectTimes++;
             try
             {
@@ -221,11 +230,11 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             }
             catch (Exception ex)
             {
-                if (IsConnected == true)
+                if (TextMessageClientConnected == true)
                 {
                     workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.TextMessageClient, TextMessageClientWebSocket, FileTransportClientWebSocket, false));
                 }
-                IsConnected = false;
+                TextMessageClientConnected = false;
                 if (autoReconnect)
                 {
                     if (reconnectTimes <= reconnectMaxTimes || reconnectMaxTimes == -1)
@@ -241,8 +250,8 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                 }
             }
             reconnectTimes = 0;
+            TextMessageClientConnected = true;
             workBase.connected?.Invoke(this, new XCCConnectedEventArgsImpl(this, XCCClientType.TextMessageClient, TextMessageClientWebSocket, FileTransportClientWebSocket));
-            IsConnected = true;
             while (TextMessageClientWebSocket.State == WebSocketState.Open)
             {
                 try
@@ -318,11 +327,11 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                 catch (Exception ex)
                 {
                     try { await TextMessageClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close", CancellationToken.None); } catch { }
-                    if (IsConnected == true)
+                    if (TextMessageClientConnected == true)
                     {
                         workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.TextMessageClient, TextMessageClientWebSocket, FileTransportClientWebSocket, false));
                     }
-                    IsConnected = false;
+                    TextMessageClientConnected = false;
                     if (autoReconnect)
                     {
                         if (autoReconnect)
@@ -358,6 +367,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             FileTransportClientWebSocket.Options.SetRequestHeader("Group", base64GroupId);
             FileTransportClientWebSocket.Options.SetRequestHeader("Sender", base64SenderId);
             FileTransportClientWebSocket.Options.SetRequestHeader("Type", "File");
+            FileTransportClientWebSocket.Options.SetRequestHeader("Signature", Signature);
             reconnectTimes++;
             try
             {
@@ -366,11 +376,11 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             }
             catch (Exception ex)
             {
-                if (IsConnected == true)
+                if (FileTransportClientConnected == true)
                 {
                     workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.FileTransportClient, TextMessageClientWebSocket, FileTransportClientWebSocket, false));
                 }
-                IsConnected = false;
+                FileTransportClientConnected = false;
                 if (autoReconnect)
                 {
                     if (reconnectTimes <= reconnectMaxTimes || reconnectMaxTimes == -1)
@@ -386,20 +396,20 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                 }
             }
             reconnectTimes = 0;
+            FileTransportClientConnected = true;
             workBase.connected?.Invoke(this, new XCCConnectedEventArgsImpl(this, XCCClientType.FileTransportClient, TextMessageClientWebSocket, FileTransportClientWebSocket));
-            IsConnected = true;
             while (FileTransportClientWebSocket.State == WebSocketState.Open)
             {
                 try
                 {
                     byte[] receiveBuffer = new byte[1024];
-                    WebSocketReceiveResult receiveResult = await TextMessageClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                    WebSocketReceiveResult receiveResult = await FileTransportClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
                     var bufferList = new List<byte>();
                     bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                     //ReceiveCompletedMessageByUsingWhile
                     while (!receiveResult.EndOfMessage)
                     {
-                        receiveResult = await TextMessageClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                        receiveResult = await FileTransportClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
                         bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                     }
                     var receivedBinaryBuffer = bufferList.ToArray();
@@ -447,12 +457,12 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                 }
                 catch (Exception ex)
                 {
-                    try { await TextMessageClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close", CancellationToken.None); } catch { }
-                    if (IsConnected == true)
+                    try { await FileTransportClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close", CancellationToken.None); } catch { }
+                    if (FileTransportClientConnected == true)
                     {
                         workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.FileTransportClient, TextMessageClientWebSocket, FileTransportClientWebSocket, false));
                     }
-                    IsConnected = false;
+                    FileTransportClientConnected = false;
                     if (autoReconnect)
                     {
                         if (autoReconnect)
@@ -472,7 +482,15 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.FileTransportClient, TextMessageClientWebSocket, FileTransportClientWebSocket, true));
         }
         /// <summary>
-        /// 发送文本消息，返回消息ID
+        /// 等待明文服务器和文件服务器均连接
+        /// </summary>
+        /// <returns></returns>
+        public async Task WaitConnect()
+        {
+            await Task.Run(() => { while (!TextMessageClientConnected || !FileTransportClientConnected) { } });
+        }
+        /// <summary>
+        /// 发送文本消息
         /// </summary>
         /// <param name="message">待发送的文本</param>
         /// <param name="timeout">最长超时时长</param>
@@ -528,7 +546,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             }
         }
         /// <summary>
-        /// 发送签名二进制消息，返回消息ID
+        /// 发送签名二进制消息
         /// </summary>
         /// <param name="message">二进制消息</param>
         /// <param name="signature">签名标识</param>
@@ -553,7 +571,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             try
             {
                 var xFEBuffer = new XFEBuffer(Sender, message, "Type", Encoding.UTF8.GetBytes(signature), "ID", Encoding.UTF8.GetBytes(messageId));
-                await TextMessageClientWebSocket.SendAsync(new ArraySegment<byte>(xFEBuffer.ToBuffer()), WebSocketMessageType.Binary, true, CancellationToken.None);
+                await FileTransportClientWebSocket.SendAsync(new ArraySegment<byte>(xFEBuffer.ToBuffer()), WebSocketMessageType.Binary, true, CancellationToken.None);
                 var endTask = Task.Run(async () =>
                 {
                     await Task.Delay(timeout);
@@ -703,8 +721,9 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             }
         }
         #endregion
-        internal XCCGroup(string groupId, string sender, XCCNetWorkBase xCCNetWorkBase)
+        internal XCCGroup(string signature, string groupId, string sender, XCCNetWorkBase xCCNetWorkBase)
         {
+            Signature = signature;
             GroupId = groupId;
             Sender = sender;
             workBase = xCCNetWorkBase;
@@ -989,6 +1008,28 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                         SaveFile(xCCFile);
                 }
             }
+            else
+            {
+                var fileType = XCCFileType.Image;
+                switch (e.MessageType)
+                {
+                    case XCCBinaryMessageType.Image:
+                        fileType = XCCFileType.Image;
+                        break;
+                    case XCCBinaryMessageType.Audio:
+                        fileType = XCCFileType.Audio;
+                        break;
+                    case XCCBinaryMessageType.AudioBuffer:
+                        break;
+                    case XCCBinaryMessageType.Video:
+                        fileType = XCCFileType.Video;
+                        break;
+                    default:
+                        break;
+                }
+                xCCFileDictionary.Add(e.MessageId, new XCCFile(e.GroupId, e.MessageId, fileType, e.Sender, null, e.BinaryMessage));
+                FileReceived?.Invoke(e.)
+            }
         }
         /// <summary>
         /// XCC消息接收器
@@ -1038,7 +1079,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <summary>
         /// 发送时间
         /// </summary>
-        public DateTime SendTime { get; }
+        public DateTime? SendTime { get; }
         /// <summary>
         /// XCC文件类型
         /// </summary>
@@ -1070,7 +1111,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <param name="sender">发送者</param>
         /// <param name="sendTime">发送时间</param>
         /// <param name="fileBuffer">文件的Buffer</param>
-        public XCCFile(string groupId, string messageId, XCCFileType fileType, string sender, DateTime sendTime, byte[] fileBuffer = null)
+        public XCCFile(string groupId, string messageId, XCCFileType fileType, string sender, DateTime? sendTime, byte[] fileBuffer = null)
         {
             GroupId = groupId;
             MessageId = messageId;
@@ -1435,7 +1476,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
     }
     class XCCGroupImpl : XCCGroup
     {
-        internal XCCGroupImpl(string groupId, string sender, XCCNetWorkBase xCCNetWorkBase) : base(groupId, sender, xCCNetWorkBase) { }
+        internal XCCGroupImpl(string signature, string groupId, string sender, XCCNetWorkBase xCCNetWorkBase) : base(signature, groupId, sender, xCCNetWorkBase) { }
     }
     class XCCConnectionClosedEventArgsImpl : XCCConnectionClosedEventArgs
     {

@@ -588,7 +588,7 @@ namespace XFE各类拓展.CyberComm
     /// </summary>
     public class CyberCommGroup
     {
-        private readonly List<WebSocket> webSockets = new List<WebSocket>();
+        private readonly List<CyberCommServerEventArgs> cyberCommList = new List<CyberCommServerEventArgs>();
         /// <summary>
         /// 组ID
         /// </summary>
@@ -596,18 +596,18 @@ namespace XFE各类拓展.CyberComm
         /// <summary>
         /// 添加客户端
         /// </summary>
-        /// <param name="webSocket">客户端</param>
-        public void Add(WebSocket webSocket)
+        /// <param name="e">客户端</param>
+        public void Add(CyberCommServerEventArgs e)
         {
-            webSockets.Add(webSocket);
+            cyberCommList.Add(e);
         }
         /// <summary>
-        /// 获取指定的客户端
+        /// 移除指定的客户端
         /// </summary>
         /// <param name="webSocket">客户端</param>
         public void Remove(WebSocket webSocket)
         {
-            webSockets.Remove(webSocket);
+            cyberCommList.Remove(cyberCommList.Find(x => x.CurrentWebSocket == webSocket));
         }
         /// <summary>
         /// 移除指定索引的客户端
@@ -615,14 +615,14 @@ namespace XFE各类拓展.CyberComm
         /// <param name="index">客户单索引</param>
         public void RemoveAt(int index)
         {
-            webSockets.RemoveAt(index);
+            cyberCommList.RemoveAt(index);
         }
         /// <summary>
         /// 清空列表
         /// </summary>
         public void Clear()
         {
-            webSockets.Clear();
+            cyberCommList.Clear();
         }
         /// <summary>
         /// 群组客户端数量
@@ -631,19 +631,19 @@ namespace XFE各类拓展.CyberComm
         {
             get
             {
-                return webSockets.Count;
+                return cyberCommList.Count;
             }
         }
         /// <summary>
         /// 索引器
         /// </summary>
-        /// <param name="index">索引</param>
+        /// <param name="findFunc">查找</param>
         /// <returns>客户端</returns>
-        public WebSocket this[int index]
+        public CyberCommServerEventArgs this[Predicate<CyberCommServerEventArgs> findFunc]
         {
             get
             {
-                return webSockets[index];
+                return cyberCommList.Find(findFunc);
             }
         }
         /// <summary>
@@ -652,27 +652,29 @@ namespace XFE各类拓展.CyberComm
         /// <param name="message">群发文本消息</param>
         public async Task SendGroupTextMessage(string message)
         {
-            byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
-            foreach (WebSocket webSocket in webSockets)
+            List<Task> tasks = new List<Task>();
+            foreach (CyberCommServerEventArgs cyberCommServerEventArgs in cyberCommList)
             {
-                await webSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                tasks.Add(cyberCommServerEventArgs.ReplyMessage(message));
             }
+            await Task.WhenAll(tasks);
         }
         /// <summary>
-        /// 向除了指定的WS客户端外的客户端发送群组文本消息
+        /// 向指定的WS客户端发送群组文本消息
         /// </summary>
         /// <param name="message">群发文本消息</param>
-        /// <param name="exceptWebSocket">除了指定的WS客户端外的客户端</param>
-        public async Task SendGroupTextMessageExcept(string message, WebSocket exceptWebSocket)
+        /// <param name="findFunc">指定的WS客户端</param>
+        public async Task SendGroupTextMessage(string message, Func<CyberCommServerEventArgs, bool> findFunc)
         {
-            byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
-            foreach (WebSocket webSocket in webSockets)
+            List<Task> tasks = new List<Task>();
+            foreach (CyberCommServerEventArgs cyberCommServerEventArgs in cyberCommList)
             {
-                if (webSocket != exceptWebSocket)
+                if (findFunc.Invoke(cyberCommServerEventArgs))
                 {
-                    await webSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                    tasks.Add(cyberCommServerEventArgs.ReplyMessage(message));
                 }
             }
+            await Task.WhenAll(tasks);
         }
         /// <summary>
         /// 发送群组二进制消息
@@ -680,25 +682,29 @@ namespace XFE各类拓展.CyberComm
         /// <param name="bytes">群发二进制消息</param>
         public async Task SendGroupBinaryMessage(byte[] bytes)
         {
-            foreach (WebSocket webSocket in webSockets)
+            List<Task> tasks = new List<Task>();
+            foreach (CyberCommServerEventArgs cyberCommServerEventArgs in cyberCommList)
             {
-                await webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Binary, true, CancellationToken.None);
+                tasks.Add(cyberCommServerEventArgs.ReplyBinaryMessage(bytes));
             }
+            await Task.WhenAll(tasks);
         }
         /// <summary>
-        /// 向除了指定的WS客户端外的客户端发送群组二进制消息
+        /// 向指定的WS客户端发送群组二进制消息
         /// </summary>
         /// <param name="bytes">群发二进制消息</param>
-        /// <param name="exceptWebSocket">除了指定的WS客户端外的客户端</param>
-        public async Task SendGroupBinaryMessageExcept(byte[] bytes, WebSocket exceptWebSocket)
+        /// <param name="findFunc">指定的WS客户端</param>
+        public async Task SendGroupBinaryMessage(byte[] bytes, Func<CyberCommServerEventArgs, bool> findFunc)
         {
-            foreach (WebSocket webSocket in webSockets)
+            List<Task> tasks = new List<Task>();
+            foreach (CyberCommServerEventArgs cyberCommServerEventArgs in cyberCommList)
             {
-                if (webSocket != exceptWebSocket)
+                if (findFunc.Invoke(cyberCommServerEventArgs))
                 {
-                    await webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Binary, true, CancellationToken.None);
+                    tasks.Add(cyberCommServerEventArgs.ReplyBinaryMessage(bytes));
                 }
             }
+            await Task.WhenAll(tasks);
         }
         /// <summary>
         /// 客户端群组
@@ -712,11 +718,35 @@ namespace XFE各类拓展.CyberComm
         /// 客户端群组
         /// </summary>
         /// <param name="GroupId">群组ID</param>
-        /// <param name="webSockets">客户端群组</param>
-        public CyberCommGroup(string GroupId, List<WebSocket> webSockets)
+        /// <param name="cyberCommList">客户端群组</param>
+        public CyberCommGroup(string GroupId, List<CyberCommServerEventArgs> cyberCommList)
         {
             this.GroupId = GroupId;
-            this.webSockets = webSockets;
+            this.cyberCommList = cyberCommList;
+        }
+    }
+    /// <summary>
+    /// 代签名的WebSocket
+    /// </summary>
+    public class SignedWebSocket
+    {
+        /// <summary>
+        /// 签名
+        /// </summary>
+        public string Signature { get; set; }
+        /// <summary>
+        /// 服务器
+        /// </summary>
+        public WebSocket WebSocket { get; set; }
+        /// <summary>
+        /// 签名WebSocket
+        /// </summary>
+        /// <param name="signature">签名</param>
+        /// <param name="webSocket">WebSocket</param>
+        public SignedWebSocket(string signature, WebSocket webSocket)
+        {
+            Signature = signature;
+            WebSocket = webSocket;
         }
     }
     /// <summary>
