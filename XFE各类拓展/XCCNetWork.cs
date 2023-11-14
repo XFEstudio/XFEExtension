@@ -421,8 +421,12 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                             var xFEBuffer = XFEBuffer.ToXFEBuffer(receivedBinaryBuffer);
                             var sender = Encoding.UTF8.GetString(xFEBuffer["Sender"]);
                             var signature = Encoding.UTF8.GetString(xFEBuffer["Type"]);
+                            if (signature == "callback")
+                                return;
                             var messageId = Encoding.UTF8.GetString(xFEBuffer["ID"]);
-                            byte[] unPackedBuffer = signature == "callback" ? null : xFEBuffer[sender];
+                            bool isHistory = Encoding.UTF8.GetString(xFEBuffer["IsHistory"]) == "True";
+                            var sendTime = DateTime.Parse(Encoding.UTF8.GetString(xFEBuffer["SendTime"]));
+                            byte[] unPackedBuffer = xFEBuffer[sender];
                             switch (signature)
                             {
                                 case "text":
@@ -447,7 +451,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                                     messageType = XCCBinaryMessageType.Binary;
                                     break;
                             }
-                            workBase.binaryMessageReceived?.Invoke(this, new XCCBinaryMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.FileTransportClient, sender, messageId, unPackedBuffer, messageType, signature));
+                            workBase.binaryMessageReceived?.Invoke(this, new XCCBinaryMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.FileTransportClient, sender, messageId, unPackedBuffer, messageType, signature, sendTime, isHistory));
                         }
                         catch (Exception ex)
                         {
@@ -871,6 +875,12 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             if (File.Exists(filePath))
                 fileBuffer = File.ReadAllBytes(filePath);
             XCCFile xCCFile;
+            if (xCCFileDictionary.ContainsKey(xCCMessage.MessageId))
+            {
+                if (!xCCFileDictionary[xCCMessage.MessageId].Loaded && fileBuffer != null)
+                    xCCFileDictionary[xCCMessage.MessageId].LoadFile(fileBuffer);
+                return xCCFileDictionary[xCCMessage.MessageId];
+            }
             switch (xCCMessage.MessageType)
             {
                 case XCCTextMessageType.Image:
@@ -1027,8 +1037,10 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                     default:
                         break;
                 }
-                xCCFileDictionary.Add(e.MessageId, new XCCFile(e.GroupId, e.MessageId, fileType, e.Sender, null, e.BinaryMessage));
-                FileReceived?.Invoke(e.)
+                var xCCFile = new XCCFile(e.GroupId, e.MessageId, fileType, e.Sender, e.SendTime, e.BinaryMessage);
+                xCCFileDictionary.Add(e.MessageId, xCCFile);
+                if (!e.IsHistory)
+                    FileReceived?.Invoke(e.IsHistory, xCCFile);
             }
         }
         /// <summary>
@@ -1388,11 +1400,21 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// 二进制消息
         /// </summary>
         public byte[] BinaryMessage { get; }
-        internal XCCBinaryMessageReceivedEventArgs(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string sender, string messageId, byte[] buffer, XCCBinaryMessageType messageType, string signature) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId)
+        /// <summary>
+        /// 发送时间
+        /// </summary>
+        public DateTime SendTime { get; }
+        /// <summary>
+        /// 是否为历史消息
+        /// </summary>
+        public bool IsHistory { get; }
+        internal XCCBinaryMessageReceivedEventArgs(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string sender, string messageId, byte[] buffer, XCCBinaryMessageType messageType, string signature, DateTime sendTime, bool isHistory) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId)
         {
             BinaryMessage = buffer;
             MessageType = messageType;
             Signature = signature;
+            SendTime = sendTime;
+            IsHistory = isHistory;
         }
     }
     /// <summary>
@@ -1492,7 +1514,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
     }
     class XCCBinaryMessageReceivedEventArgsImpl : XCCBinaryMessageReceivedEventArgs
     {
-        internal XCCBinaryMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string sender, string messageId, byte[] buffer, XCCBinaryMessageType messageType, string signature) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId, buffer, messageType, signature) { }
+        internal XCCBinaryMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string sender, string messageId, byte[] buffer, XCCBinaryMessageType messageType, string signature, DateTime sendTime, bool isHistory) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId, buffer, messageType, signature, sendTime, isHistory) { }
     }
     class XCCExceptionMessageReceivedEventArgsImpl : XCCExceptionMessageReceivedEventArgs
     {
