@@ -783,6 +783,14 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// </summary>
         public event MessageReceivedHandler<XCCMessage> TextReceived;
         /// <summary>
+        /// 错误发生事件
+        /// </summary>
+        public event XFEEventHandler<XFECyberCommException> ExceptionOccurred;
+        /// <summary>
+        /// 接收到实时音频字节流事件
+        /// </summary>
+        public event XFEEventHandler<byte[]> AudioBufferReceived;
+        /// <summary>
         /// 从设置的根目录加载
         /// </summary>
         /// <returns></returns>
@@ -958,12 +966,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             if (AutoSaveInLocal)
                 SaveMessage(e.GroupId);
         }
-        /// <summary>
-        /// 接收文本消息
-        /// </summary>
-        /// <param name="sender">发送者</param>
-        /// <param name="e">事件参数</param>
-        public void ReceiveTextMessage(object sender, XCCTextMessageReceivedEventArgs e)
+        private void ReceiveTextMessage(object sender, XCCTextMessageReceivedEventArgs e)
         {
             var message = new XCCMessage(e.MessageId, e.MessageType, e.TextMessage, e.Sender, e.SendTime, e.GroupId);
             if (xCCMessageDictionary.ContainsKey(e.GroupId))
@@ -1001,13 +1004,13 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                     break;
             }
         }
-        /// <summary>
-        /// 接收二进制消息
-        /// </summary>
-        /// <param name="sender">发送者</param>
-        /// <param name="e">事件参数</param>
-        public void ReceiveBinaryMessage(object sender, XCCBinaryMessageReceivedEventArgs e)
+        private void ReceiveBinaryMessage(object sender, XCCBinaryMessageReceivedEventArgs e)
         {
+            if (e.MessageType == XCCBinaryMessageType.AudioBuffer)
+            {
+                AudioBufferReceived?.Invoke(e.BinaryMessage);
+                return;
+            }
             if (xCCFileDictionary.ContainsKey(e.MessageId))
             {
                 var xCCFile = xCCFileDictionary[e.MessageId];
@@ -1043,6 +1046,10 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                     FileReceived?.Invoke(e.IsHistory, xCCFile);
             }
         }
+        private void XCCNetWork_ExceptionMessageReceived(object sender, XCCExceptionMessageReceivedEventArgs e)
+        {
+            ExceptionOccurred?.Invoke(e.Exception);
+        }
         /// <summary>
         /// XCC消息接收器
         /// </summary>
@@ -1065,6 +1072,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             SavePathRoot = savePathRoot;
             xCCNetWork.TextMessageReceived += ReceiveTextMessage;
             xCCNetWork.BinaryMessageReceived += ReceiveBinaryMessage;
+            xCCNetWork.ExceptionMessageReceived += XCCNetWork_ExceptionMessageReceived;
         }
     }
     /// <summary>
