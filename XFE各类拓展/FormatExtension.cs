@@ -487,6 +487,17 @@ namespace XFE各类拓展.FormatExtension
             xFEMultiDictionaryList.CopyTo(array, arrayIndex);
         }
         /// <summary>
+        /// 获取内容
+        /// </summary>
+        /// <param name="header">头</param>
+        /// <returns></returns>
+        public List<string> GetContents(string header)
+        {
+            var list = new List<string>();
+            xFEMultiDictionaryList.FindAll(x => x.Header == header)?.ForEach(y => list.Add(y.Content));
+            return list;
+        }
+        /// <summary>
         /// 获取索引器
         /// </summary>
         /// <returns></returns>
