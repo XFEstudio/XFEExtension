@@ -69,6 +69,14 @@ namespace XFE各类拓展.XFEChatGPT
         /// </summary>
         gpt4,
         /// <summary>
+        /// 最新的GPT-4模型，具有改进的指令跟随、JSON模式、可复制输出、并行函数调用等功能。最多返回4096个输出标记。此预览模型还不适合生产流量。
+        /// </summary>
+        gpt4turbo,
+        /// <summary>
+        /// 能够理解图像，以及所有其他GPT-4 Turbo功能。最多返回4096个输出标记。这是一个预览模型版本，还不适合生产流量。
+        /// </summary>
+        gpt4turbovision,
+        /// <summary>
         /// 13 年 2023 月 3 日带有函数调用数据的快照。与gpt-4不同，此模型不会收到更新，并将在新版本发布3个月后弃用。基于gpt-4
         /// </summary>
         gpt40613,
@@ -124,6 +132,18 @@ namespace XFE各类拓展.XFEChatGPT
         {
             switch (chatGPTModel)
             {
+                case ChatGPTModel.gpt4:
+                    return "gpt-4";
+                case ChatGPTModel.gpt4turbo:
+                    return "gpt-4-1106-preview";
+                case ChatGPTModel.gpt4turbovision:
+                    return "gpt-4-vision-preview";
+                case ChatGPTModel.gpt40613:
+                    return "gpt-4-0613";
+                case ChatGPTModel.gpt432k:
+                    return "gpt-4-32k";
+                case ChatGPTModel.gpt432k0613:
+                    return "gpt-4-32k-0613";
                 case ChatGPTModel.gpt3point5turbo:
                     return "gpt-3.5-turbo";
                 case ChatGPTModel.gpt3point5turbo16k:

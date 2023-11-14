@@ -160,6 +160,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         private event EndTaskTrigger<bool> UpdateTaskTrigger;
         private readonly XCCNetWorkBase workBase;
         private int reconnectTimes = -1;
+        private bool readyToClose = false;
         #region 公有属性
         /// <summary>
         /// 客户端标识名
@@ -230,6 +231,10 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             }
             catch (Exception ex)
             {
+                if (readyToClose)
+                {
+                    return;
+                }
                 if (TextMessageClientConnected == true)
                 {
                     workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.TextMessageClient, TextMessageClientWebSocket, FileTransportClientWebSocket, false));
@@ -376,6 +381,10 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             }
             catch (Exception ex)
             {
+                if (readyToClose)
+                {
+                    return;
+                }
                 if (FileTransportClientConnected == true)
                 {
                     workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.FileTransportClient, TextMessageClientWebSocket, FileTransportClientWebSocket, false));
@@ -717,7 +726,9 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         {
             try
             {
+                readyToClose = true;
                 await TextMessageClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "客户端主动关闭连接", CancellationToken.None);
+                await FileTransportClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "客户端主动关闭连接", CancellationToken.None);
             }
             catch (Exception ex)
             {
