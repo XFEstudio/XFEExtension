@@ -1,4 +1,4 @@
-﻿namespace XFE各类拓展.ArrayExtension;
+﻿namespace XFE各类拓展.NetCore.ArrayExtension;
 
 /// <summary>
 /// 对数组的拓展

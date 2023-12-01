@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace XFE各类拓展.ObjectExtension
+﻿namespace XFE各类拓展.NetCore.ObjectExtension
 {
     /// <summary>
     /// 所有类的基类的拓展
@@ -16,11 +14,9 @@ namespace XFE各类拓展.ObjectExtension
         /// <exception cref="ArgumentNullException">无类型错误</exception>
         public static T ActiveCopyOf<T>(this T source) where T : class
         {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-            return (T)source.GetType().GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(source, null);
+            return source == null
+                ? throw new ArgumentNullException(nameof(source))
+                : (T)source.GetType().GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)?.Invoke(source, null)!;
         }
         /// <summary>
         /// 进行静态拷贝
@@ -28,7 +24,7 @@ namespace XFE各类拓展.ObjectExtension
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <returns>静态拷贝后的对象</returns>
-        public static T StaticCopyOf<T>(this T source) where T : class
+        public static T? StaticCopyOf<T>(this T source) where T : class
         {
             if (source == null)
             {
@@ -71,8 +67,8 @@ namespace XFE各类拓展.ObjectExtension
             var fields = type.GetFields();
             foreach (var property in properties)
             {
-                object value1 = property.GetValue(obj1);
-                object value2 = property.GetValue(obj2);
+                var value1 = property.GetValue(obj1);
+                var value2 = property.GetValue(obj2);
 
                 if (!Equals(value1, value2))
                 {
@@ -81,8 +77,8 @@ namespace XFE各类拓展.ObjectExtension
             }
             foreach (var field in fields)
             {
-                object value1 = field.GetValue(obj1);
-                object value2 = field.GetValue(obj2);
+                var value1 = field.GetValue(obj1);
+                var value2 = field.GetValue(obj2);
 
                 if (!Equals(value1, value2))
                 {

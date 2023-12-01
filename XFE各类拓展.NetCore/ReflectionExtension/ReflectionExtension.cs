@@ -1,7 +1,6 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 
-namespace XFE各类拓展.ReflectionExtension
+namespace XFE各类拓展.NetCore.ReflectionExtension
 {
     /// <summary>
     /// 反射拓展
@@ -13,10 +12,10 @@ namespace XFE各类拓展.ReflectionExtension
         /// </summary>
         /// <param name="method"></param>
         /// <returns></returns>
-        public static object[] GetDefaultParameters(this MethodInfo method)
+        public static object?[] GetDefaultParameters(this MethodInfo method)
         {
             var parameters = method.GetParameters();
-            var defaultParameters = new object[parameters.Length];
+            object?[] defaultParameters = new object[parameters.Length];
             for (int i = 0; i < parameters.Length; i++)
             {
                 var paramType = parameters[i].ParameterType;
@@ -34,7 +33,7 @@ namespace XFE各类拓展.ReflectionExtension
         public static T GetPrivateField<T>(this object obj, string fieldName)
         {
             var field = obj.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
-            return (T)field.GetValue(obj);
+            return (T)field?.GetValue(obj)!;
         }
         /// <summary>
         /// 设置某个类中的某个私有字段的值
@@ -45,7 +44,7 @@ namespace XFE各类拓展.ReflectionExtension
         public static void SetPrivateField(this object obj, string fieldName, object value)
         {
             var field = obj.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
-            field.SetValue(obj, value);
+            field?.SetValue(obj, value);
         }
         /// <summary>
         /// 获取某个类中的某个私有属性的值
@@ -57,7 +56,7 @@ namespace XFE各类拓展.ReflectionExtension
         public static T GetPrivateProperty<T>(this object obj, string propertyName)
         {
             var property = obj.GetType().GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Instance);
-            return (T)property.GetValue(obj);
+            return (T)property?.GetValue(obj)!;
         }
         /// <summary>
         /// 设置某个类中的某个私有属性的值
@@ -68,7 +67,7 @@ namespace XFE各类拓展.ReflectionExtension
         public static void SetPrivateProperty(this object obj, string propertyName, object value)
         {
             var property = obj.GetType().GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Instance);
-            property.SetValue(obj, value);
+            property?.SetValue(obj, value);
         }
         /// <summary>
         /// 获取某个类中的某个私有静态字段的值
@@ -80,7 +79,7 @@ namespace XFE各类拓展.ReflectionExtension
         public static T GetPrivateStaticField<T>(this Type type, string fieldName)
         {
             var field = type.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Static);
-            return (T)field.GetValue(null);
+            return (T)field?.GetValue(null)!;
         }
         /// <summary>
         /// 设置某个类中的某个私有静态字段的值
@@ -91,7 +90,7 @@ namespace XFE各类拓展.ReflectionExtension
         public static void SetPrivateStaticField(this Type type, string fieldName, object value)
         {
             var field = type.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Static);
-            field.SetValue(null, value);
+            field?.SetValue(null, value);
         }
         /// <summary>
         /// 获取某个类中的某个私有静态属性的值
@@ -103,7 +102,7 @@ namespace XFE各类拓展.ReflectionExtension
         public static T GetPrivateStaticProperty<T>(this Type type, string propertyName)
         {
             var property = type.GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Static);
-            return (T)property.GetValue(null);
+            return (T)property?.GetValue(null)!;
         }
         /// <summary>
         /// 设置某个类中的某个私有静态属性的值
@@ -114,7 +113,7 @@ namespace XFE各类拓展.ReflectionExtension
         public static void SetPrivateStaticProperty(this Type type, string propertyName, object value)
         {
             var property = type.GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Static);
-            property.SetValue(null, value);
+            property?.SetValue(null, value);
         }
         /// <summary>
         /// 调用某个类中的某个私有方法
@@ -127,7 +126,7 @@ namespace XFE各类拓展.ReflectionExtension
         public static T InvokePrivateMethod<T>(this object obj, string methodName, params object[] parameters)
         {
             var method = obj.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
-            return (T)method.Invoke(obj, parameters);
+            return (T)method?.Invoke(obj, parameters)!;
         }
         /// <summary>
         /// 调用某个类中的某个私有方法
@@ -138,7 +137,7 @@ namespace XFE各类拓展.ReflectionExtension
         public static void InvokePrivateMethod(this object obj, string methodName, params object[] parameters)
         {
             var method = obj.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
-            method.Invoke(obj, parameters);
+            method?.Invoke(obj, parameters);
         }
         /// <summary>
         /// 调用某个类中的某个私有静态方法
@@ -151,7 +150,7 @@ namespace XFE各类拓展.ReflectionExtension
         public static T InvokePrivateStaticMethod<T>(this Type type, string methodName, params object[] parameters)
         {
             var method = type.GetMethod(methodName);
-            return (T)method.Invoke(null, parameters);
+            return (T)method?.Invoke(null, parameters)!;
         }
     }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace XFE各类拓展.ListExtension
+﻿namespace XFE各类拓展.NetCore.ListExtension
 {
     /// <summary>
     /// 列表的拓展
@@ -20,7 +17,7 @@ namespace XFE各类拓展.ListExtension
             foreach (var ary in list)
             {
                 if (ary != null)
-                    str += $"[+-{ary.ToString().Replace("[+", "[++").Replace("+]", "++]")}-+]";
+                    str += $"[+-{ary.ToString()?.Replace("[+", "[++").Replace("+]", "++]")}-+]";
             }
             return str;
         }
@@ -37,7 +34,7 @@ namespace XFE各类拓展.ListExtension
             foreach (var ary in list)
             {
                 if (ary != null)
-                    str += $"[+-{ary.GetType().GetProperty(propertyName).GetValue(ary).ToString().Replace("[+", "[++").Replace("+]", "++]")}-+]";
+                    str += $"[+-{ary.GetType().GetProperty(propertyName)?.GetValue(ary)?.ToString()?.Replace("[+", "[++").Replace("+]", "++]")}-+]";
             }
             return str;
         }

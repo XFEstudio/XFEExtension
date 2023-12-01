@@ -1,4 +1,4 @@
-﻿namespace XFE各类拓展.ArrayExtension.AI;
+﻿namespace XFE各类拓展.NetCore.ArrayExtension.AI;
 
 /// <summary>
 /// 对神经网络算法的数组矩阵的拓展

@@ -1,62 +1,28 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace XFE各类拓展.StringExtension
+namespace XFE各类拓展.NetCore.StringExtension
 {
-    namespace Json
-    {
-        /// <summary>
-        /// 对string类进行Json操作的扩展
-        /// </summary>
-        public static class JsonStringExtension
-        {
-            /// <summary>
-            /// 根据给定的开头和末尾返回查找到的第一个匹配的字符串（全匹配）
-            /// </summary>
-            /// <param name="str">被匹配的字符串</param>
-            /// <param name="beginString">匹配开头字符串</param>
-            /// <param name="endString">匹配结尾字符串</param>
-            /// <returns>返回夹在开头和末尾中间的字符串</returns>
-            public static string GetStringBetweenTwoString(this string str, string beginString, string endString)
-            {
-                if (str != string.Empty && str != null)
-                {
-                    int beginIndex = str.IndexOf(beginString, StringComparison.Ordinal);
-                    if (beginIndex == -1 || beginIndex == 0)
-                    {
-                        return string.Empty;
-                    }
-                    int endIndex = str.IndexOf(endString, beginIndex, StringComparison.Ordinal);
-                    if (endIndex == -1 || endIndex == 0)
-                    {
-                        return string.Empty;
-                    }
-                    return str.Substring(beginIndex + beginString.Length, endIndex - beginIndex - beginString.Length);
-                }
-                else
-                {
-                    return string.Empty;
-                }
-            }
-            /// <summary>
-            /// 通过给定的文本格式查找对应的字段
-            /// </summary>
-            /// <param name="str">待匹配文本</param>
-            /// <param name="form">查找的文本格式</param>
-            /// <returns></returns>
-            public static string GetTextByForm(this string str, string form)
-            {
-                return GetStringBetweenTwoString(str, form + ":", ",");
-            }
-        }
-    }
     /// <summary>
     /// 字符串拓展类
     /// </summary>
-    public static class StringExtension
+    public static partial class StringExtension
     {
+        #region 正则表达式
+        [GeneratedRegex(@"^(\d{3,4}-)?\d{6,8}$")]
+        private static partial Regex TelePhoneRegex();
+        [GeneratedRegex(@"^1[3456789]\d{9}$")]
+        private static partial Regex MobPhoneNumberRegex();
+        [GeneratedRegex(@"^\d{6}$")]
+        private static partial Regex PostalCodeRegex();
+        [GeneratedRegex(@"^[0-9]*$")]
+        private static partial Regex NumberRegex();
+        [GeneratedRegex(@"(^\d{18}$)|(^\d{15}$)")]
+        private static partial Regex IdCardRegex();
+        [GeneratedRegex(@"(?:https?|www)\:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z]{2,})+(?:\/[^\s]*)?")]
+        private static partial Regex UrlRegex();
+        #endregion
         /// <summary>
         /// 判断字符串是否为座机号码
         /// </summary>
@@ -64,7 +30,7 @@ namespace XFE各类拓展.StringExtension
         /// <returns></returns>
         public static bool IsTelePhone(this string str_telephone)
         {
-            return Regex.IsMatch(str_telephone, @"^(\d{3,4}-)?\d{6,8}$");
+            return TelePhoneRegex().IsMatch(str_telephone);
         }
         /// <summary>
         /// 判断字符串是否为手机号码
@@ -73,7 +39,7 @@ namespace XFE各类拓展.StringExtension
         /// <returns></returns>
         public static bool IsMobPhoneNumber(this string str_handset)
         {
-            return Regex.IsMatch(str_handset, @"^1[3456789]\d{9}$");
+            return MobPhoneNumberRegex().IsMatch(str_handset);
         }
         /// <summary>
         /// 判断字符串是否为邮政编码
@@ -82,7 +48,7 @@ namespace XFE各类拓展.StringExtension
         /// <returns></returns>
         public static bool IsPostalCode(this string postalCode)
         {
-            return Regex.IsMatch(postalCode, @"^\d{6}$");
+            return PostalCodeRegex().IsMatch(postalCode);
         }
         /// <summary>
         /// 判断字符串是否为数字
@@ -91,7 +57,7 @@ namespace XFE各类拓展.StringExtension
         /// <returns></returns>
         public static bool IsNumber(this string str_number)
         {
-            return Regex.IsMatch(str_number, @"^[0-9]*$");
+            return NumberRegex().IsMatch(str_number);
         }
         /// <summary>
         /// 判断字符串是否为身份证件号
@@ -100,7 +66,7 @@ namespace XFE各类拓展.StringExtension
         /// <returns></returns>
         public static bool IsIdCard(this string Id)
         {
-            return Regex.IsMatch(Id, @"(^\d{18}$)|(^\d{15}$)");
+            return IdCardRegex().IsMatch(Id);
         }
         /// <summary>
         /// 判断字符串是否为邮箱地址
@@ -148,7 +114,7 @@ namespace XFE各类拓展.StringExtension
         /// <returns></returns>
         public static bool IsMatch(string expression, string str)
         {
-            Regex reg = new Regex(expression);
+            Regex reg = new(expression);
             if (string.IsNullOrEmpty(str))
                 return false;
             return reg.IsMatch(str);
@@ -158,12 +124,11 @@ namespace XFE各类拓展.StringExtension
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        public static string[] GetUrl(this string str)
+        public static string[]? GetUrl(this string str)
         {
             if (str != null)
             {
-                string pattern = @"(?:https?|www)\:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z]{2,})+(?:\/[^\s]*)?";
-                Regex regex = new Regex(pattern);
+                Regex regex = UrlRegex();
                 MatchCollection matches = regex.Matches(str);
                 string[] result = new string[matches.Count];
                 for (int i = 0; i < matches.Count; i++)
@@ -220,7 +185,7 @@ namespace XFE各类拓展.StringExtension
         /// <returns></returns>
         public static string WrapText(this string text, int width)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder stringBuilder = new();
             int startIndex = 0;
             while (startIndex < text.Length)
             {
@@ -229,7 +194,7 @@ namespace XFE各类拓展.StringExtension
                 if (endIndex >= text.Length)
                 {
                     // 如果已经到达文本末尾，则直接添加剩余部分并结束循环
-                    sb.Append(text.Substring(startIndex));
+                    stringBuilder.Append(text[startIndex..]);
                     break;
                 }
                 else
@@ -239,28 +204,28 @@ namespace XFE各类拓展.StringExtension
                     if (lastSpaceIndex > startIndex)
                     {
                         // 如果找到了空格字符，则将文本从起始位置到空格字符位置添加到结果中，并进行换行
-                        sb.Append(text.Substring(startIndex, lastSpaceIndex - startIndex));
-                        sb.AppendLine();
+                        stringBuilder.Append(text[startIndex..lastSpaceIndex]);
+                        stringBuilder.AppendLine();
                         startIndex = lastSpaceIndex + 1;
                     }
                     else
                     {
                         // 如果没有找到空格字符，则直接添加指定宽度的文本到结果中，并进行换行
-                        sb.Append(text.Substring(startIndex, width));
-                        sb.AppendLine();
+                        stringBuilder.Append(text.AsSpan(startIndex, width));
+                        stringBuilder.AppendLine();
                         startIndex += width;
                     }
                 }
             }
 
-            return sb.ToString();
+            return stringBuilder.ToString();
         }
         /// <summary>
         /// 输出到控制台并返回
         /// </summary>
         /// <param name="obj"></param>
         /// <returns>ToString后的内容</returns>
-        public static string WriteLineToConsole(this object obj)
+        public static string? WriteLineToConsole(this object obj)
         {
             Console.WriteLine(obj);
             return obj.ToString();
@@ -310,7 +275,7 @@ namespace XFE各类拓展.StringExtension
         public static string GenerateRandomString(int length)
         {
             string allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            Random random = new Random();
+            Random random = new();
             char[] randomChars = new char[length];
 
             for (int i = 0; i < length; i++)
@@ -329,7 +294,7 @@ namespace XFE各类拓展.StringExtension
         /// <returns></returns>
         public static string GenerateRandomString(int length, string allowedChars)
         {
-            Random random = new Random();
+            Random random = new();
             char[] randomChars = new char[length];
 
             for (int i = 0; i < length; i++)

@@ -2,7 +2,6 @@
 
 namespace XFE各类拓展.NetCore.CyberComm
 {
-    #endregion
     /// <summary>
     /// CyberComm客户端群组
     /// </summary>

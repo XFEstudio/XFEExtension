@@ -1,9 +1,7 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 
-namespace XFE各类拓展.TaskExtension
+namespace XFE各类拓展.NetCore.TaskExtension
 {
     /// <summary>
     /// 任务的拓展
@@ -138,7 +136,7 @@ namespace XFE各类拓展.TaskExtension
         /// <summary>
         /// 当前任务
         /// </summary>
-        public Task CurrentTask { get; set; }
+        public Task? CurrentTask { get; set; }
         /// <summary>
         /// 返回当前任务的等待器
         /// </summary>
@@ -166,9 +164,6 @@ namespace XFE各类拓展.TaskExtension
         /// 任务同步器
         /// </summary>
         /// <param name="task">第一个待执行任务</param>
-        public TaskSynchronizer(Task task)
-        {
-            CurrentTask = task;
-        }
+        public TaskSynchronizer(Task task) => CurrentTask = task;
     }
 }

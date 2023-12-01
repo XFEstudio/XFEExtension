@@ -1,4 +1,4 @@
-﻿namespace XFE各类拓展.DelegateExtension
+﻿namespace XFE各类拓展.NetCore.DelegateExtension
 {
     /// <summary>
     /// 指定发送者泛型的委托事件
@@ -17,7 +17,5 @@
     /// <summary>
     /// 委托事件拓展
     /// </summary>
-    public static class DelegateExtension
-    {
-    }
+    public static class DelegateExtension { }
 }

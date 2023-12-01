@@ -1,41 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using XFE各类拓展.ArrayExtension;
-using XFE各类拓展.DelegateExtension;
-using XFE各类拓展.FormatExtension;
+using XFE各类拓展.NetCore.ArrayExtension;
 using XFE各类拓展.NetCore.BufferExtension;
-using XFE各类拓展.TaskExtension;
+using XFE各类拓展.NetCore.DelegateExtension;
+using XFE各类拓展.NetCore.FormatExtension;
+using XFE各类拓展.NetCore.TaskExtension;
 
-namespace XFE各类拓展.CyberComm.XCCNetWork
+namespace XFE各类拓展.NetCore.CyberComm.XCCNetWork
 {
     class XCCNetWorkBase
     {
         /// <summary>
         /// 明文消息接收时触发
         /// </summary>
-        public EventHandler<XCCTextMessageReceivedEventArgs> textMessageReceived;
+        public EventHandler<XCCTextMessageReceivedEventArgs>? textMessageReceived;
         /// <summary>
         /// 二进制消息接收时触发
         /// </summary>
-        public EventHandler<XCCBinaryMessageReceivedEventArgs> binaryMessageReceived;
+        public EventHandler<XCCBinaryMessageReceivedEventArgs>? binaryMessageReceived;
         /// <summary>
         /// 异常消息接收时触发
         /// </summary>
-        public EventHandler<XCCExceptionMessageReceivedEventArgs> exceptionMessageReceived;
+        public EventHandler<XCCExceptionMessageReceivedEventArgs>? exceptionMessageReceived;
         /// <summary>
         /// 连接关闭时触发
         /// </summary>
-        public EventHandler<XCCConnectionClosedEventArgs> connectionClosed;
+        public EventHandler<XCCConnectionClosedEventArgs>? connectionClosed;
         /// <summary>
         /// 连接成功时触发
         /// </summary>
-        public EventHandler<XCCConnectedEventArgs> connected;
+        public EventHandler<XCCConnectedEventArgs>? connected;
     }
     /// <summary>
     /// XCC客户端连接类型
@@ -149,7 +143,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         public XCCNetWork()
         {
             xCCNetWorkBase = new XCCNetWorkBase();
-            Groups = new List<XCCGroup>();
+            Groups = [];
         }
     }
     /// <summary>
@@ -157,7 +151,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
     /// </summary>
     public abstract class XCCGroup
     {
-        private event EndTaskTrigger<bool> UpdateTaskTrigger;
+        private event EndTaskTrigger<bool>? UpdateTaskTrigger;
         private readonly XCCNetWorkBase workBase;
         private int reconnectTimes = -1;
         private bool readyToClose = false;
@@ -185,11 +179,11 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <summary>
         /// WebSocket明文传输客户端
         /// </summary>
-        public ClientWebSocket TextMessageClientWebSocket { get; private set; }
+        public ClientWebSocket? TextMessageClientWebSocket { get; private set; }
         /// <summary>
         /// WebSocket文件传输客户端
         /// </summary>
-        public ClientWebSocket FileTransportClientWebSocket { get; private set; }
+        public ClientWebSocket? FileTransportClientWebSocket { get; private set; }
         #endregion
         #region 公有方法
         /// <summary>
@@ -216,7 +210,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         {
         XCCReconnect:
             TextMessageClientWebSocket = new ClientWebSocket();
-            Uri serverUri = new Uri("ws://xcc.api.xfegzs.com");
+            var serverUri = new Uri("ws://xcc.api.xfegzs.com");
             var base64GroupId = Convert.ToBase64String(Encoding.UTF8.GetBytes(GroupId));
             var base64SenderId = Convert.ToBase64String(Encoding.UTF8.GetBytes(Sender));
             TextMessageClientWebSocket.Options.SetRequestHeader("Group", base64GroupId);
@@ -498,21 +492,14 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// 等待明文服务器和文件服务器均连接
         /// </summary>
         /// <returns></returns>
-        public async Task WaitConnect()
-        {
-            await Task.Run(() => { while (!TextMessageClientConnected || !FileTransportClientConnected) { } });
-        }
+        public async Task WaitConnect() => await Task.Run(() => { while (!TextMessageClientConnected || !FileTransportClientConnected) { } });
         /// <summary>
         /// 发送文本消息
         /// </summary>
         /// <param name="message">待发送的文本</param>
         /// <param name="timeout">最长超时时长</param>
         /// <returns>服务器接收校验是否成功</returns>
-        public async Task<bool> SendTextMessage(string message, int timeout = 30000)
-        {
-            var messageId = Guid.NewGuid().ToString();
-            return await SendTextMessage(message, messageId, timeout);
-        }
+        public async Task<bool> SendTextMessage(string message, int timeout = 30000) => await SendTextMessage(message, Guid.NewGuid().ToString(), timeout);
         /// <summary>
         /// 发送文本消息
         /// </summary>
@@ -526,13 +513,13 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             try
             {
                 byte[] sendBuffer = Encoding.UTF8.GetBytes(new string[] { messageId, "[XCCTextMessage]", message }.ToXFEString());
-                await TextMessageClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                await TextMessageClientWebSocket!.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
                 var endTask = Task.Run(async () =>
                 {
                     await Task.Delay(timeout);
                     UpdateTaskTrigger?.Invoke(false, messageId);
                 });
-                return await new XFEWaitTask<bool>(ref UpdateTaskTrigger, messageId);
+                return await new XFEWaitTask<bool>(ref UpdateTaskTrigger!, messageId);
             }
             catch (Exception ex)
             {
@@ -549,14 +536,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         [Obsolete("发送者已统一，请使用SendTextMessage或SendBinaryTextMessage")]
         public async Task<bool> SendStandardTextMessage(string role, string message)
         {
-            try
-            {
-                return await SendTextMessage(message);
-            }
-            catch (Exception ex)
-            {
-                throw new XFECyberCommException("客户端发送文本到服务器时出现异常", ex);
-            }
+            try { return await SendTextMessage(message); } catch (Exception ex) { throw new XFECyberCommException("客户端发送文本到服务器时出现异常", ex); }
         }
         /// <summary>
         /// 发送签名二进制消息
@@ -565,11 +545,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <param name="signature">签名标识</param>
         /// <param name="timeout">最长超时时长</param>
         /// <returns>服务器接收校验是否成功</returns>
-        public async Task<bool> SendSignedBinaryMessage(byte[] message, string signature, int timeout = 10000)
-        {
-            var messageId = Guid.NewGuid().ToString();
-            return await SendSignedBinaryMessage(message, messageId, signature, timeout);
-        }
+        public async Task<bool> SendSignedBinaryMessage(byte[] message, string signature, int timeout = 10000) => await SendSignedBinaryMessage(message, Guid.NewGuid().ToString(), signature, timeout);
         /// <summary>
         /// 发送签名二进制消息
         /// </summary>
@@ -584,13 +560,13 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             try
             {
                 var xFEBuffer = new XFEBuffer(Sender, message, "Type", Encoding.UTF8.GetBytes(signature), "ID", Encoding.UTF8.GetBytes(messageId));
-                await FileTransportClientWebSocket.SendAsync(new ArraySegment<byte>(xFEBuffer.ToBuffer()), WebSocketMessageType.Binary, true, CancellationToken.None);
+                await FileTransportClientWebSocket!.SendAsync(new ArraySegment<byte>(xFEBuffer.ToBuffer()), WebSocketMessageType.Binary, true, CancellationToken.None);
                 var endTask = Task.Run(async () =>
                 {
                     await Task.Delay(timeout);
                     UpdateTaskTrigger?.Invoke(false, messageId);
                 });
-                return await new XFEWaitTask<bool>(ref UpdateTaskTrigger, messageId);
+                return await new XFEWaitTask<bool>(ref UpdateTaskTrigger!, messageId);
             }
             catch (Exception ex)
             {
@@ -605,14 +581,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <exception cref="XFECyberCommException"></exception>
         public async Task<bool> SendBinaryTextMessage(string message)
         {
-            try
-            {
-                return await SendSignedBinaryMessage(Encoding.UTF8.GetBytes(message), "text");
-            }
-            catch (Exception ex)
-            {
-                throw new XFECyberCommException("客户端发送文本到服务器时出现异常", ex);
-            }
+            try { return await SendSignedBinaryMessage(Encoding.UTF8.GetBytes(message), "text"); } catch (Exception ex) { throw new XFECyberCommException("客户端发送文本到服务器时出现异常", ex); }
         }
         /// <summary>
         /// 发送默认标准的二进制消息
@@ -623,14 +592,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <returns>服务器接收校验是否成功</returns>
         public async Task<bool> SendBinaryMessage(byte[] message, int timeout = 1000)
         {
-            try
-            {
-                return await SendSignedBinaryMessage(message, "binary", timeout);
-            }
-            catch (Exception ex)
-            {
-                throw new XFECyberCommException("客户端发送二进制数据到服务器时出现异常", ex);
-            }
+            try { return await SendSignedBinaryMessage(message, "binary", timeout); } catch (Exception ex) { throw new XFECyberCommException("客户端发送二进制数据到服务器时出现异常", ex); }
         }
         /// <summary>
         /// 发送图片
@@ -640,14 +602,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <exception cref="XFECyberCommException"></exception>
         public async Task<bool> SendImage(string filePath)
         {
-            try
-            {
-                return await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "image", 60000);
-            }
-            catch (Exception ex)
-            {
-                throw new XFECyberCommException("客户端发送图片到服务器时出现异常", ex);
-            }
+            try { return await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "image", 60000); } catch (Exception ex) { throw new XFECyberCommException("客户端发送图片到服务器时出现异常", ex); }
         }
         /// <summary>
         /// 发送视频
@@ -657,14 +612,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <exception cref="XFECyberCommException"></exception>
         public async Task<bool> SendVideo(string filePath)
         {
-            try
-            {
-                return await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "video", 300000);
-            }
-            catch (Exception ex)
-            {
-                throw new XFECyberCommException("客户端发送视频到服务器时出现异常", ex);
-            }
+            try { return await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "video", 300000); } catch (Exception ex) { throw new XFECyberCommException("客户端发送视频到服务器时出现异常", ex); }
         }
         /// <summary>
         /// 发送音频
@@ -674,11 +622,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <exception cref="XFECyberCommException"></exception>
         public async Task<bool> SendAudio(string filePath)
         {
-            try
-            {
-                return await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "audio");
-            }
-            catch (Exception ex) { throw new XFECyberCommException("客户端发送音频到服务器时出现异常", ex); }
+            try { return await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "audio"); } catch (Exception ex) { throw new XFECyberCommException("客户端发送音频到服务器时出现异常", ex); }
         }
         /// <summary>
         /// 发送音频字节流（服务器不会缓存）
@@ -704,13 +648,13 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             {
                 var messageId = Guid.NewGuid().ToString();
                 byte[] sendBuffer = Encoding.UTF8.GetBytes(new string[] { messageId, "[XCCGetHistory]", "[XCCGetHistory]" }.ToXFEString());
-                await TextMessageClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                await TextMessageClientWebSocket!.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
                 var endTask = Task.Run(async () =>
                 {
                     await Task.Delay(5000);
                     UpdateTaskTrigger?.Invoke(false, messageId);
                 });
-                return await new XFEWaitTask<bool>(ref UpdateTaskTrigger, messageId);
+                return await new XFEWaitTask<bool>(ref UpdateTaskTrigger!, messageId);
             }
             catch (Exception ex)
             {
@@ -727,8 +671,8 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             try
             {
                 readyToClose = true;
-                await TextMessageClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "客户端主动关闭连接", CancellationToken.None);
-                await FileTransportClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "客户端主动关闭连接", CancellationToken.None);
+                await TextMessageClientWebSocket!.CloseAsync(WebSocketCloseStatus.NormalClosure, "客户端主动关闭连接", CancellationToken.None);
+                await FileTransportClientWebSocket!.CloseAsync(WebSocketCloseStatus.NormalClosure, "客户端主动关闭连接", CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -788,19 +732,19 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <summary>
         /// 接收到文件事件
         /// </summary>
-        public event MessageReceivedHandler<XCCFile> FileReceived;
+        public event MessageReceivedHandler<XCCFile>? FileReceived;
         /// <summary>
         /// 接收到文本事件
         /// </summary>
-        public event MessageReceivedHandler<XCCMessage> TextReceived;
+        public event MessageReceivedHandler<XCCMessage>? TextReceived;
         /// <summary>
         /// 错误发生事件
         /// </summary>
-        public event XFEEventHandler<XFECyberCommException> ExceptionOccurred;
+        public event XFEEventHandler<XFECyberCommException>? ExceptionOccurred;
         /// <summary>
         /// 接收到实时音频字节流事件
         /// </summary>
-        public event XFEEventHandler<byte[]> AudioBufferReceived;
+        public event XFEEventHandler<byte[]>? AudioBufferReceived;
         /// <summary>
         /// 从设置的根目录加载
         /// </summary>
@@ -824,7 +768,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                                 if (xCCMessage.MessageType == XCCTextMessageType.Text)
                                     TextReceived?.Invoke(true, xCCMessage);
                                 else
-                                    FileReceived?.Invoke(true, LoadFile(xCCMessage));
+                                    FileReceived?.Invoke(true, LoadFile(xCCMessage)!);
                             }
                             xCCMessageDictionary.Add(groupId, xCCMessageList);
                         }
@@ -856,7 +800,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                         if (xCCMessage.MessageType == XCCTextMessageType.Text)
                             TextReceived?.Invoke(true, xCCMessage);
                         else
-                            FileReceived?.Invoke(true, LoadFile(xCCMessage));
+                            FileReceived?.Invoke(true, LoadFile(xCCMessage)!);
                     }
                     xCCMessageDictionary.Add(groupId, xCCMessageList);
                 }
@@ -879,7 +823,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                     {
                         var filePath = $"{SavePathRoot}/{groupId}/{file}";
                         var messageId = Path.GetFileNameWithoutExtension(filePath);
-                        if (!xCCMessageDictionary.ContainsKey(groupId) || xCCMessageDictionary[groupId].Find(x => x.MessageId == messageId) == null)
+                        if (!xCCMessageDictionary.TryGetValue(groupId, out List<XCCMessage>? value) || value.Find(x => x.MessageId == messageId) == null)
                         {
                             File.Delete(filePath);
                         }
@@ -887,18 +831,18 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                 }
             });
         }
-        private XCCFile LoadFile(XCCMessage xCCMessage)
+        private XCCFile? LoadFile(XCCMessage xCCMessage)
         {
             var filePath = $"{SavePathRoot}/{xCCMessage.GroupId}/{xCCMessage.MessageId}.xfe";
-            byte[] fileBuffer = null;
+            byte[]? fileBuffer = null;
             if (File.Exists(filePath))
                 fileBuffer = File.ReadAllBytes(filePath);
             XCCFile xCCFile;
-            if (xCCFileDictionary.ContainsKey(xCCMessage.MessageId))
+            if (xCCFileDictionary.TryGetValue(xCCMessage.MessageId, out XCCFile? value))
             {
-                if (!xCCFileDictionary[xCCMessage.MessageId].Loaded && fileBuffer != null)
-                    xCCFileDictionary[xCCMessage.MessageId].LoadFile(fileBuffer);
-                return xCCFileDictionary[xCCMessage.MessageId];
+                if (!value.Loaded && fileBuffer != null)
+                    value.LoadFile(fileBuffer);
+                return value;
             }
             switch (xCCMessage.MessageType)
             {
@@ -922,9 +866,9 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// </summary>
         /// <param name="messageId">消息ID</param>
         /// <returns></returns>
-        public XCCFile GetFile(string messageId)
+        public XCCFile? GetFile(string messageId)
         {
-            return xCCFileDictionary.ContainsKey(messageId) ? xCCFileDictionary[messageId] : null;
+            return xCCFileDictionary.TryGetValue(messageId, out XCCFile? value) ? value : null;
         }
         /// <summary>
         /// 添加文件
@@ -946,7 +890,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             {
                 Directory.CreateDirectory($"{SavePathRoot}/{xCCFile.GroupId}");
             }
-            File.WriteAllBytes($"{SavePathRoot}/{xCCFile.GroupId}/{xCCFile.MessageId}.xfe", xCCFile.FileBuffer);
+            File.WriteAllBytes($"{SavePathRoot}/{xCCFile.GroupId}/{xCCFile.MessageId}.xfe", xCCFile.FileBuffer!);
         }
         /// <summary>
         /// 保存群组消息
@@ -968,23 +912,20 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         }
         private void ReceiveFilePlaceHolder(XCCTextMessageReceivedEventArgs e, XCCFileType fileType)
         {
-            var xCCFile = new XCCFile(e.GroupId, e.MessageId, fileType, e.Sender, e.SendTime);
-            if (!xCCFileDictionary.ContainsKey(e.MessageId))
-            {
-                xCCFileDictionary.Add(e.MessageId, xCCFile);
-            }
+            var xCCFile = new XCCFile(e.GroupId, e.MessageId!, fileType, e.Sender!, e.SendTime);
+            xCCFileDictionary.TryAdd(e.MessageId!, xCCFile);
             FileReceived?.Invoke(e.IsHistory, xCCFile);
             if (AutoSaveInLocal)
                 SaveMessage(e.GroupId);
         }
-        private void ReceiveTextMessage(object sender, XCCTextMessageReceivedEventArgs e)
+        private void ReceiveTextMessage(object? sender, XCCTextMessageReceivedEventArgs e)
         {
-            var message = new XCCMessage(e.MessageId, e.MessageType, e.TextMessage, e.Sender, e.SendTime, e.GroupId);
-            if (xCCMessageDictionary.ContainsKey(e.GroupId))
+            var message = new XCCMessage(e.MessageId!, e.MessageType, e.TextMessage, e.Sender!, e.SendTime, e.GroupId);
+            if (xCCMessageDictionary.TryGetValue(e.GroupId, out List<XCCMessage>? value))
             {
-                if (xCCMessageDictionary[e.GroupId].Find(x => x.MessageId == e.MessageId) == null)
+                if (value.Find(x => x.MessageId == e.MessageId) == null)
                 {
-                    xCCMessageDictionary[e.GroupId].Add(message);
+                    value.Add(message);
                 }
                 else
                 {
@@ -993,7 +934,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             }
             else
             {
-                xCCMessageDictionary.Add(e.GroupId, new List<XCCMessage>() { message });
+                xCCMessageDictionary.Add(e.GroupId, [message]);
             }
             switch (e.MessageType)
             {
@@ -1015,19 +956,19 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                     break;
             }
         }
-        private void ReceiveBinaryMessage(object sender, XCCBinaryMessageReceivedEventArgs e)
+        private void ReceiveBinaryMessage(object? sender, XCCBinaryMessageReceivedEventArgs e)
         {
             if (e.MessageType == XCCBinaryMessageType.AudioBuffer)
             {
                 AudioBufferReceived?.Invoke(e.BinaryMessage);
                 return;
             }
-            if (xCCFileDictionary.ContainsKey(e.MessageId))
+            if (xCCFileDictionary.TryGetValue(e.MessageId!, out XCCFile? value))
             {
-                var xCCFile = xCCFileDictionary[e.MessageId];
+                var xCCFile = value;
                 if (!xCCFile.Loaded)
                 {
-                    xCCFileDictionary[e.MessageId].LoadFile(e.BinaryMessage);
+                    value.LoadFile(e.BinaryMessage);
                     if (AutoSaveInLocal)
                         SaveFile(xCCFile);
                 }
@@ -1051,13 +992,13 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                     default:
                         break;
                 }
-                var xCCFile = new XCCFile(e.GroupId, e.MessageId, fileType, e.Sender, e.SendTime, e.BinaryMessage);
-                xCCFileDictionary.Add(e.MessageId, xCCFile);
+                var xCCFile = new XCCFile(e.GroupId, e.MessageId!, fileType, e.Sender!, e.SendTime, e.BinaryMessage);
+                xCCFileDictionary.Add(e.MessageId!, xCCFile);
                 if (!e.IsHistory)
                     FileReceived?.Invoke(e.IsHistory, xCCFile);
             }
         }
-        private void XCCNetWork_ExceptionMessageReceived(object sender, XCCExceptionMessageReceivedEventArgs e)
+        private void XCCNetWork_ExceptionMessageReceived(object? sender, XCCExceptionMessageReceivedEventArgs e)
         {
             ExceptionOccurred?.Invoke(e.Exception);
         }
@@ -1089,40 +1030,46 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
     /// <summary>
     /// XCC文件
     /// </summary>
-    public class XCCFile
+    /// <param name="groupId">群组ID</param>
+    /// <param name="messageId">文件消息ID</param>
+    /// <param name="fileType">文件类型</param>
+    /// <param name="sender">发送者</param>
+    /// <param name="sendTime">发送时间</param>
+    /// <param name="fileBuffer">文件的Buffer</param>
+    public class XCCFile(string groupId, string messageId, XCCFileType fileType, string sender, DateTime? sendTime, byte[]? fileBuffer = null)
     {
         /// <summary>
         /// 文件加载完成时触发
         /// </summary>
-        public event XFEEventHandler<XCCFile> FileLoaded;
+        public event XFEEventHandler<XCCFile>? FileLoaded;
         /// <summary>
         /// 群组ID
         /// </summary>
-        public string GroupId { get; }
+        public string GroupId { get; } = groupId;
         /// <summary>
         /// 消息ID
         /// </summary>
-        public string MessageId { get; }
+        public string MessageId { get; } = messageId;
         /// <summary>
         /// 发送者
         /// </summary>
-        public string Sender { get; }
+        public string Sender { get; } = sender;
         /// <summary>
         /// 发送时间
         /// </summary>
-        public DateTime? SendTime { get; }
+        public DateTime? SendTime { get; } = sendTime;
         /// <summary>
         /// XCC文件类型
         /// </summary>
-        public XCCFileType FileType { get; }
+        public XCCFileType FileType { get; } = fileType;
         /// <summary>
         /// 是否已加载
         /// </summary>
-        public bool Loaded { get; private set; }
+        public bool Loaded { get; private set; } = fileBuffer != null;
         /// <summary>
         /// 文件流
         /// </summary>
-        public byte[] FileBuffer { get; set; }
+        public byte[]? FileBuffer { get; set; } = fileBuffer;
         /// <summary>
         /// 加载文件
         /// </summary>
@@ -1132,25 +1079,6 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             FileBuffer = fileBuffer;
             Loaded = true;
             FileLoaded?.Invoke(this);
-        }
-        /// <summary>
-        /// XCC文件
-        /// </summary>
-        /// <param name="groupId">群组ID</param>
-        /// <param name="messageId">文件消息ID</param>
-        /// <param name="fileType">文件类型</param>
-        /// <param name="sender">发送者</param>
-        /// <param name="sendTime">发送时间</param>
-        /// <param name="fileBuffer">文件的Buffer</param>
-        public XCCFile(string groupId, string messageId, XCCFileType fileType, string sender, DateTime? sendTime, byte[] fileBuffer = null)
-        {
-            GroupId = groupId;
-            MessageId = messageId;
-            FileType = fileType;
-            Sender = sender;
-            SendTime = sendTime;
-            FileBuffer = fileBuffer;
-            Loaded = fileBuffer != null;
         }
     }
     /// <summary>
@@ -1232,11 +1160,11 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <summary>
         /// WebSocket明文传输客户端
         /// </summary>
-        public ClientWebSocket TextMessageClientWebSocket { get; private set; }
+        public ClientWebSocket? TextMessageClientWebSocket { get; private set; }
         /// <summary>
         /// WebSocket文件传输客户端
         /// </summary>
-        public ClientWebSocket FileTransportClientWebSocket { get; private set; }
+        public ClientWebSocket? FileTransportClientWebSocket { get; private set; }
         /// <summary>
         /// XCC服务器连接类型
         /// </summary>
@@ -1244,7 +1172,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <summary>
         /// 消息ID
         /// </summary>
-        public string MessageId { get; }
+        public string? MessageId { get; }
         /// <summary>
         /// 群组ID
         /// </summary>
@@ -1258,7 +1186,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <summary>
         /// 发送者
         /// </summary>
-        public string Sender { get; }
+        public string? Sender { get; }
         /// <summary>
         /// 回复文本消息
         /// </summary>
@@ -1269,7 +1197,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             try
             {
                 byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
-                await TextMessageClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                await TextMessageClientWebSocket!.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -1285,7 +1213,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         {
             try
             {
-                await FileTransportClientWebSocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, CancellationToken.None);
+                await FileTransportClientWebSocket!.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -1300,9 +1228,9 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         {
             try
             {
-                if (TextMessageClientWebSocket.State == WebSocketState.Open)
+                if (TextMessageClientWebSocket?.State == WebSocketState.Open)
                     await TextMessageClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "客户端主动关闭连接", CancellationToken.None);
-                if (FileTransportClientWebSocket.State == WebSocketState.Open)
+                if (FileTransportClientWebSocket?.State == WebSocketState.Open)
                     await FileTransportClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "客户端主动关闭连接", CancellationToken.None);
             }
             catch (Exception ex)
@@ -1310,7 +1238,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                 throw new XFECyberCommException("客户端关闭连接时出现异常", ex);
             }
         }
-        internal XCCMessageReceivedEventArgs(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string sender, string messageId)
+        internal XCCMessageReceivedEventArgs(XCCGroup group, ClientWebSocket? textMessageClientWebSocket, ClientWebSocket? fileTransportClientWebSocket, XCCClientType xCCClientType, string? sender, string? messageId)
         {
             Group = group;
             TextMessageClientWebSocket = textMessageClientWebSocket;
@@ -1363,7 +1291,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// 是否为历史消息
         /// </summary>
         public bool IsHistory { get; }
-        internal XCCTextMessageReceivedEventArgs(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string messageId, XCCTextMessageType messageType, string message, string sender, DateTime sendTime, bool isHistory) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId)
+        internal XCCTextMessageReceivedEventArgs(XCCGroup group, ClientWebSocket? textMessageClientWebSocket, ClientWebSocket? fileTransportClientWebSocket, XCCClientType xCCClientType, string messageId, XCCTextMessageType messageType, string message, string sender, DateTime sendTime, bool isHistory) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId)
         {
             MessageType = messageType;
             TextMessage = message;
@@ -1427,7 +1355,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// 是否为历史消息
         /// </summary>
         public bool IsHistory { get; }
-        internal XCCBinaryMessageReceivedEventArgs(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string sender, string messageId, byte[] buffer, XCCBinaryMessageType messageType, string signature, DateTime sendTime, bool isHistory) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId)
+        internal XCCBinaryMessageReceivedEventArgs(XCCGroup group, ClientWebSocket? textMessageClientWebSocket, ClientWebSocket? fileTransportClientWebSocket, XCCClientType xCCClientType, string sender, string messageId, byte[] buffer, XCCBinaryMessageType messageType, string signature, DateTime sendTime, bool isHistory) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId)
         {
             BinaryMessage = buffer;
             MessageType = messageType;
@@ -1445,10 +1373,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// 异常信息
         /// </summary>
         public XFECyberCommException Exception { get; }
-        internal XCCExceptionMessageReceivedEventArgs(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string sender, string messageId, XFECyberCommException exception) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId)
-        {
-            Exception = exception;
-        }
+        internal XCCExceptionMessageReceivedEventArgs(XCCGroup group, ClientWebSocket? textMessageClientWebSocket, ClientWebSocket? fileTransportClientWebSocket, XCCClientType xCCClientType, string? sender, string? messageId, XFECyberCommException exception) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId) { Exception = exception; }
     }
     /// <summary>
     /// XCC会话关闭事件
@@ -1466,17 +1391,17 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <summary>
         /// WebSocket明文传输客户端
         /// </summary>
-        public ClientWebSocket TextMessageClientWebSocket { get; private set; }
+        public ClientWebSocket? TextMessageClientWebSocket { get; private set; }
         /// <summary>
         /// WebSocket文件传输客户端
         /// </summary>
-        public ClientWebSocket FileTransportClientWebSocket { get; private set; }
+        public ClientWebSocket? FileTransportClientWebSocket { get; private set; }
         /// <summary>
         /// 是否正常关闭
         /// </summary>
         public bool ClosedNormally { get; }
 
-        internal XCCConnectionClosedEventArgs(XCCGroup group, XCCClientType xCCClientType, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, bool closedNormally)
+        internal XCCConnectionClosedEventArgs(XCCGroup group, XCCClientType xCCClientType, ClientWebSocket? textMessageClientWebSocket, ClientWebSocket? fileTransportClientWebSocket, bool closedNormally)
         {
             Group = group;
             XCCClientType = xCCClientType;
@@ -1501,13 +1426,13 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
         /// <summary>
         /// WebSocket明文传输客户端
         /// </summary>
-        public ClientWebSocket TextMessageClientWebSocket { get; private set; }
+        public ClientWebSocket? TextMessageClientWebSocket { get; private set; }
         /// <summary>
         /// WebSocket文件传输客户端
         /// </summary>
-        public ClientWebSocket FileTransportClientWebSocket { get; private set; }
+        public ClientWebSocket? FileTransportClientWebSocket { get; private set; }
 
-        internal XCCConnectedEventArgs(XCCGroup group, XCCClientType xCCClientType, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket)
+        internal XCCConnectedEventArgs(XCCGroup group, XCCClientType xCCClientType, ClientWebSocket? textMessageClientWebSocket, ClientWebSocket? fileTransportClientWebSocket)
         {
             Group = group;
             XCCClientType = xCCClientType;
@@ -1515,28 +1440,10 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             FileTransportClientWebSocket = fileTransportClientWebSocket;
         }
     }
-    class XCCGroupImpl : XCCGroup
-    {
-        internal XCCGroupImpl(string signature, string groupId, string sender, XCCNetWorkBase xCCNetWorkBase) : base(signature, groupId, sender, xCCNetWorkBase) { }
-    }
-    class XCCConnectionClosedEventArgsImpl : XCCConnectionClosedEventArgs
-    {
-        public XCCConnectionClosedEventArgsImpl(XCCGroup group, XCCClientType xCCClientType, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, bool closedNormally) : base(group, xCCClientType, textMessageClientWebSocket, fileTransportClientWebSocket, closedNormally) { }
-    }
-    class XCCConnectedEventArgsImpl : XCCConnectedEventArgs
-    {
-        public XCCConnectedEventArgsImpl(XCCGroup group, XCCClientType xCCClientType, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket) : base(group, xCCClientType, textMessageClientWebSocket, fileTransportClientWebSocket) { }
-    }
-    class XCCTextMessageReceivedEventArgsImpl : XCCTextMessageReceivedEventArgs
-    {
-        internal XCCTextMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string messageId, XCCTextMessageType messageType, string message, string sender, DateTime sendTime, bool isHistory) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, messageId, messageType, message, sender, sendTime, isHistory) { }
-    }
-    class XCCBinaryMessageReceivedEventArgsImpl : XCCBinaryMessageReceivedEventArgs
-    {
-        internal XCCBinaryMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string sender, string messageId, byte[] buffer, XCCBinaryMessageType messageType, string signature, DateTime sendTime, bool isHistory) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId, buffer, messageType, signature, sendTime, isHistory) { }
-    }
-    class XCCExceptionMessageReceivedEventArgsImpl : XCCExceptionMessageReceivedEventArgs
-    {
-        internal XCCExceptionMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, XCCClientType xCCClientType, string sender, string messageId, XFECyberCommException exception) : base(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId, exception) { }
-    }
+    class XCCGroupImpl(string signature, string groupId, string sender, XCCNetWorkBase xCCNetWorkBase) : XCCGroup(signature, groupId, sender, xCCNetWorkBase) { }
+    class XCCConnectionClosedEventArgsImpl(XCCGroup group, XCCClientType xCCClientType, ClientWebSocket? textMessageClientWebSocket, ClientWebSocket? fileTransportClientWebSocket, bool closedNormally) : XCCConnectionClosedEventArgs(group, xCCClientType, textMessageClientWebSocket, fileTransportClientWebSocket, closedNormally) { }
+    class XCCConnectedEventArgsImpl(XCCGroup group, XCCClientType xCCClientType, ClientWebSocket? textMessageClientWebSocket, ClientWebSocket? fileTransportClientWebSocket) : XCCConnectedEventArgs(group, xCCClientType, textMessageClientWebSocket, fileTransportClientWebSocket) { }
+    class XCCTextMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket? textMessageClientWebSocket, ClientWebSocket? fileTransportClientWebSocket, XCCClientType xCCClientType, string messageId, XCCTextMessageType messageType, string message, string sender, DateTime sendTime, bool isHistory) : XCCTextMessageReceivedEventArgs(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, messageId, messageType, message, sender, sendTime, isHistory) { }
+    class XCCBinaryMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket? textMessageClientWebSocket, ClientWebSocket? fileTransportClientWebSocket, XCCClientType xCCClientType, string sender, string messageId, byte[] buffer, XCCBinaryMessageType messageType, string signature, DateTime sendTime, bool isHistory) : XCCBinaryMessageReceivedEventArgs(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId, buffer, messageType, signature, sendTime, isHistory) { }
+    class XCCExceptionMessageReceivedEventArgsImpl(XCCGroup group, ClientWebSocket? textMessageClientWebSocket, ClientWebSocket? fileTransportClientWebSocket, XCCClientType xCCClientType, string? sender, string? messageId, XFECyberCommException exception) : XCCExceptionMessageReceivedEventArgs(group, textMessageClientWebSocket, fileTransportClientWebSocket, xCCClientType, sender, messageId, exception) { }
 }

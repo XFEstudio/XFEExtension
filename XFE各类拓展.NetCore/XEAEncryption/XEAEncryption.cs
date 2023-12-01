@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace XFE各类拓展.XEAEncryption
+﻿namespace XFE各类拓展.NetCore.XEAEncryption
 {
     /// <summary>
     /// XEA加密算法

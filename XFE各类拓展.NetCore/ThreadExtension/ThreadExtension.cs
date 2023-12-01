@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace XFE各类拓展.ThreadExtension
+namespace XFE各类拓展.NetCore.ThreadExtension
 {
     /// <summary>
     /// 线程的拓展
@@ -94,7 +94,7 @@ namespace XFE各类拓展.ThreadExtension
         /// <returns></returns>
         public static Thread StartNewThread(ParameterizedThreadStart method, object parameter)
         {
-            Thread thread = new Thread(method);
+            Thread thread = new(method);
             thread.Start(parameter);
             return thread;
         }
@@ -105,7 +105,7 @@ namespace XFE各类拓展.ThreadExtension
         /// <returns></returns>
         public static Thread StartNewThread(ThreadStart method)
         {
-            Thread thread = new Thread(method);
+            Thread thread = new(method);
             thread.Start();
             return thread;
         }
@@ -118,8 +118,12 @@ namespace XFE各类拓展.ThreadExtension
         /// <returns></returns>
         public static Thread StartNewThread(ParameterizedThreadStart method, object parameter, ApartmentState apartmentState)
         {
-            Thread thread = new Thread(method);
+            Thread thread = new(method);
+#if WINDOWS
+#pragma warning disable CA1416 // 验证平台兼容性
             thread.SetApartmentState(apartmentState);
+#pragma warning restore CA1416 // 验证平台兼容性
+#endif
             thread.Start(parameter);
             return thread;
         }
@@ -131,8 +135,12 @@ namespace XFE各类拓展.ThreadExtension
         /// <returns></returns>
         public static Thread StartNewThread(ThreadStart method, ApartmentState apartmentState)
         {
-            Thread thread = new Thread(method);
+            Thread thread = new(method);
+#if WINDOWS
+#pragma warning disable CA1416 // 验证平台兼容性
             thread.SetApartmentState(apartmentState);
+#pragma warning restore CA1416 // 验证平台兼容性
+#endif
             thread.Start();
             return thread;
         }
