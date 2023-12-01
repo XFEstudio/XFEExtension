@@ -139,27 +139,11 @@ namespace XFE各类拓展.WebExtension
             }
         }
     }
-    /// <summary>
-    /// XFE下载器
-    /// </summary>
     public class XFEDownloader
     {
-        /// <summary>
-        /// 下载事件
-        /// </summary>
         public event EventHandler<FileDownloadedEventArgs> BufferDownloaded;
-        /// <summary>
-        /// 下载文件目标URL
-        /// </summary>
         public string DownloadUrl { get; set; }
-        /// <summary>
-        /// 文件储存位置
-        /// </summary>
         public string SavePath { get; set; }
-        /// <summary>
-        /// 开始下载
-        /// </summary>
-        /// <returns></returns>
         public async Task Download()
         {
             using (HttpClient client = new HttpClient())
@@ -199,22 +183,10 @@ namespace XFE各类拓展.WebExtension
             }
         }
     }
-    /// <summary>
-    /// 文件下载事件
-    /// </summary>
     public class FileDownloadedEventArgs : EventArgs
     {
-        /// <summary>
-        /// 当前下载的字节大小
-        /// </summary>
         public long CurrentBufferSize { get; set; }
-        /// <summary>
-        /// 总计下载的字节大小
-        /// </summary>
         public long DownloadedBufferSize { get; set; }
-        /// <summary>
-        /// 总共需要下载的字节大小
-        /// </summary>
         public long TotalBufferSize { get; set; }
     }
 }
