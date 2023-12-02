@@ -77,7 +77,7 @@
         /// </summary>
         /// <param name="GroupId"></param>
         /// <returns></returns>
-        public CyberCommGroup this[string GroupId]
+        public CyberCommGroup? this[string GroupId]
         {
             get
             {
@@ -98,7 +98,7 @@
         /// <param name="message">发送的文本消息</param>
         public async Task SendGroupTextMessage(string GroupId, string message)
         {
-            CyberCommGroup commGroup = this[GroupId];
+            var commGroup = this[GroupId];
             if (commGroup != null)
             {
                 await commGroup.SendGroupTextMessage(message);
@@ -111,7 +111,7 @@
         /// <param name="bytes">发送的二进制消息</param>
         public async Task SendGroupBinaryMessage(string GroupId, byte[] bytes)
         {
-            CyberCommGroup commGroup = this[GroupId];
+            var commGroup = this[GroupId];
             if (commGroup != null)
             {
                 await commGroup.SendGroupBinaryMessage(bytes);

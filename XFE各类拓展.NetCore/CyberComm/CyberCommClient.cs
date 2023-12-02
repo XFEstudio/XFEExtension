@@ -14,7 +14,7 @@ namespace XFE各类拓展.NetCore.CyberComm
         /// <summary>
         /// 指定的WS服务器URL
         /// </summary>
-        public string ServerURL { get; set; }
+        public string? ServerURL { get; set; }
         /// <summary>
         /// 是否已连接
         /// </summary>
@@ -50,7 +50,7 @@ namespace XFE各类拓展.NetCore.CyberComm
         /// <summary>
         /// WebSocket客户端
         /// </summary>
-        public ClientWebSocket ClientWebSocket { get; private set; }
+        public ClientWebSocket? ClientWebSocket { get; private set; }
         #endregion
         #region 公有方法
         /// <summary>
@@ -61,10 +61,10 @@ namespace XFE各类拓展.NetCore.CyberComm
         {
         StartConnect:
             ClientWebSocket = new ClientWebSocket();
-            Uri serverUri = new Uri(ServerURL);
             reconnectTimes++;
             try
             {
+                Uri serverUri = new(ServerURL!);
                 await ClientWebSocket.ConnectAsync(serverUri, CancellationToken.None);
             }
             catch (Exception ex)
@@ -163,7 +163,7 @@ namespace XFE各类拓展.NetCore.CyberComm
             try
             {
                 byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
-                await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                await ClientWebSocket!.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -179,7 +179,7 @@ namespace XFE各类拓展.NetCore.CyberComm
         {
             try
             {
-                await ClientWebSocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, CancellationToken.None);
+                await ClientWebSocket!.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -192,7 +192,7 @@ namespace XFE各类拓展.NetCore.CyberComm
         /// <returns></returns>
         public async Task CloseCyberCommClient()
         {
-            await ClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+            await ClientWebSocket!.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
         }
         #endregion
         #region 构造函数

@@ -16,7 +16,7 @@
         /// <summary>
         /// 结束原因
         /// </summary>
-        public string finishReason { get; private set; }
+        public string FinishReason { get; private set; }
         /// <summary>
         /// 消息索引
         /// </summary>
@@ -32,7 +32,7 @@
         {
             this.Delta = delta;
             this.Message = message;
-            this.finishReason = finishReason;
+            this.FinishReason = finishReason;
             this.Index = index;
         }
         /// <summary>
@@ -44,7 +44,7 @@
         public MessageChoice(GPTMessage message, string finishReason, int index)
         {
             this.Message = message;
-            this.finishReason = finishReason;
+            this.FinishReason = finishReason;
             this.Index = index;
         }
     }

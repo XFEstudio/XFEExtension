@@ -19,19 +19,19 @@ namespace XFE各类拓展.NetCore.CyberComm
         /// <summary>
         /// 收到消息时触发
         /// </summary>
-        public event EventHandler<CyberCommServerEventArgs> MessageReceived;
+        public event EventHandler<CyberCommServerEventArgs>? MessageReceived;
         /// <summary>
         /// 客户端连接时触发
         /// </summary>
-        public event EventHandler<CyberCommServerEventArgs> ClientConnected;
+        public event EventHandler<CyberCommServerEventArgs>? ClientConnected;
         /// <summary>
         /// 服务器启动时触发
         /// </summary>
-        public event EventHandler ServerStarted;
+        public event EventHandler? ServerStarted;
         /// <summary>
         /// 连接关闭时触发
         /// </summary>
-        public event EventHandler<CyberCommServerEventArgs> ConnectionClosed;
+        public event EventHandler<CyberCommServerEventArgs>? ConnectionClosed;
         /// <summary>
         /// WebSocket服务器
         /// </summary>

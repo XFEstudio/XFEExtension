@@ -253,8 +253,8 @@ namespace XFE各类拓展.NetCore.XFEChatGPT
         private async void StartGetGPTMessage(object sender)
         {
             var messageIdAndThread = (MessageIdAndThread)sender;
-            string messageId = messageIdAndThread.messageId;
-            Thread thread = messageIdAndThread.thread;
+            string messageId = messageIdAndThread.MessageId;
+            Thread thread = messageIdAndThread.Thread;
             if (StreamMode)
             {
                 bool isStarted = false;

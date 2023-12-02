@@ -26,7 +26,9 @@ namespace XFE各类拓展.NetCore.CyberComm
         /// <param name="webSocket">客户端</param>
         public void Remove(WebSocket webSocket)
         {
-            cyberCommList.Remove(cyberCommList.Find(x => x.CurrentWebSocket == webSocket));
+            var cyberCommServerEventArgs = cyberCommList.Find(x => x.CurrentWebSocket == webSocket);
+            if (cyberCommServerEventArgs is not null)
+                cyberCommList.Remove(cyberCommServerEventArgs);
         }
         /// <summary>
         /// 移除指定索引的客户端
@@ -58,7 +60,7 @@ namespace XFE各类拓展.NetCore.CyberComm
         /// </summary>
         /// <param name="findFunc">查找</param>
         /// <returns>客户端</returns>
-        public CyberCommServerEventArgs this[Predicate<CyberCommServerEventArgs> findFunc]
+        public CyberCommServerEventArgs? this[Predicate<CyberCommServerEventArgs> findFunc]
         {
             get
             {
@@ -71,7 +73,7 @@ namespace XFE各类拓展.NetCore.CyberComm
         /// <param name="message">群发文本消息</param>
         public async Task SendGroupTextMessage(string message)
         {
-            List<Task> tasks = new List<Task>();
+            List<Task> tasks = [];
             foreach (CyberCommServerEventArgs cyberCommServerEventArgs in cyberCommList)
             {
                 tasks.Add(cyberCommServerEventArgs.ReplyMessage(message));

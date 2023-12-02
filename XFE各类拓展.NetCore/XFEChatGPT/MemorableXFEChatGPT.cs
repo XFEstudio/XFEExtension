@@ -360,9 +360,9 @@ namespace XFE各类拓展.NetCore.XFEChatGPT
         private async void StartGetGPTMessage(object sender)
         {
             var messageIdAndThread = (MessageIdDialogIdAndThread)sender;
-            string dialogId = messageIdAndThread.dialogId;
-            string messageId = messageIdAndThread.messageId;
-            Thread thread = messageIdAndThread.thread;
+            string dialogId = messageIdAndThread.DialogId;
+            string messageId = messageIdAndThread.MessageId;
+            Thread thread = messageIdAndThread.Thread;
             var nowDialog = xFEGPTMemoryDialog[dialogId];
             if (nowDialog.StreamMode)
             {
