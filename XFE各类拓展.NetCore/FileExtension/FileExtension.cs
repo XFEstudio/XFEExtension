@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization.Formatters.Binary;
+﻿using System.Diagnostics;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
 namespace XFE各类拓展.NetCore.FileExtension;
@@ -192,5 +193,38 @@ public static class FileExtension
         }
         return string.Format("{0:0.##} {1}", len, sizes[order]);
     }
+    /// <summary>
+    /// 获取占用某个文件的程序
+    /// </summary>
+    /// <param name="filePath">文件路径</param>
+    /// <returns></returns>
+    public static Process? GetOwningProcess(this string filePath)
+    {
+        try
+        {
+            // 获取所有正在运行的进程
+            Process[] processes = Process.GetProcesses();
 
+            foreach (Process process in processes)
+            {
+                try
+                {
+                    // 获取进程打开的文件句柄信息
+                    foreach (ProcessModule module in process.Modules)
+                    {
+                        if (module.FileName.Equals(filePath, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return process; // 返回占用文件的进程
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    // 忽略无法访问的进程
+                }
+            }
+        }
+        catch { }
+        return null; // 如果没有找到占用文件的进程，返回null
+    }
 }
