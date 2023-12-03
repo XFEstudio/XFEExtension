@@ -33,7 +33,7 @@ public class XFEMultiDictionary : ICollection<XFEEntry>
     /// <summary>
     /// 追加条目
     /// </summary>
-    /// <param name="EntryString">条目字符串</param>
+    /// <param name="entryString">条目字符串</param>
     public void Add(string entryString)
     {
         var entry = XFEEntry.ToEntry(entryString);

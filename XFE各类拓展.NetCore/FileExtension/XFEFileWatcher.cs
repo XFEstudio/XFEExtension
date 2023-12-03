@@ -69,8 +69,10 @@ public class XFEFileWatcher
         {
             try
             {
-                FileSystemWatcher subdirectoryWatcher = new FileSystemWatcher(subdirectory);
-                subdirectoryWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+                FileSystemWatcher subdirectoryWatcher = new(subdirectory)
+                {
+                    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName
+                };
                 watchers.Add(subdirectoryWatcher);
                 subdirectoryWatcher.Changed += OnFileChanged;
                 subdirectoryWatcher.Created += OnFileChanged;
@@ -101,7 +103,7 @@ public class XFEFileWatcher
                 {
                     await new Action(() => { MonitorSubdirectories(Path); }).StartNewTask();
                 }
-                FileSystemWatcher rootWatcher = new FileSystemWatcher(Path);
+                FileSystemWatcher rootWatcher = new(Path);
                 watchers.Add(rootWatcher);
                 rootWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
                 rootWatcher.Changed += OnFileChanged;
@@ -134,7 +136,7 @@ public class XFEFileWatcher
                 {
                     MonitorSubdirectories(Path);
                 }
-                FileSystemWatcher rootWatcher = new FileSystemWatcher(Path);
+                FileSystemWatcher rootWatcher = new(Path);
                 watchers.Add(rootWatcher);
                 rootWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
                 rootWatcher.Changed += OnFileChanged;

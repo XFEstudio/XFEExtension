@@ -5,7 +5,13 @@
 /// </summary>
 public class XFEDictionary : ICollection<XFEEntry>
 {
+    /// <summary>
+    /// 字典分隔符
+    /// </summary>
     public static string[] DictionarySeparator { get; } = ["|{+-", "-+}|"];
+    /// <summary>
+    /// 条目分隔符
+    /// </summary>
     public static string[] EntrySeparator { get; } = ["[+-", "-+]"];
     private List<XFEEntry> xFEDictionaryList = [];
     /// <summary>
