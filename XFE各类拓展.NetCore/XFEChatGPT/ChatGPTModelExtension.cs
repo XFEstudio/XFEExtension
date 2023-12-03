@@ -1,77 +1,54 @@
-﻿namespace XFE各类拓展.NetCore.XFEChatGPT
+﻿namespace XFE各类拓展.NetCore.XFEChatGPT;
+
+/// <summary>
+/// ChatGPT模型的拓展
+/// </summary>
+public static class ChatGPTModelExtension
 {
     /// <summary>
-    /// ChatGPT模型的拓展
+    /// 获取模型的字符串
     /// </summary>
-    public static class ChatGPTModelExtension
+    /// <param name="chatGPTModel"></param>
+    /// <returns></returns>
+    /// <exception cref="XFEChatGPTException">意料之外的模型</exception>
+    public static string GetModelString(this ChatGPTModel chatGPTModel)
     {
-        /// <summary>
-        /// 获取模型的字符串
-        /// </summary>
-        /// <param name="chatGPTModel"></param>
-        /// <returns></returns>
-        /// <exception cref="XFEChatGPTException">意料之外的模型</exception>
-        public static string GetModelString(this ChatGPTModel chatGPTModel)
+        return chatGPTModel switch
         {
-            switch (chatGPTModel)
-            {
-                case ChatGPTModel.gpt4:
-                    return "gpt-4";
-                case ChatGPTModel.gpt4turbo:
-                    return "gpt-4-1106-preview";
-                case ChatGPTModel.gpt4turbovision:
-                    return "gpt-4-vision-preview";
-                case ChatGPTModel.gpt40613:
-                    return "gpt-4-0613";
-                case ChatGPTModel.gpt432k:
-                    return "gpt-4-32k";
-                case ChatGPTModel.gpt432k0613:
-                    return "gpt-4-32k-0613";
-                case ChatGPTModel.gpt3point5turbo:
-                    return "gpt-3.5-turbo";
-                case ChatGPTModel.gpt3point5turbo16k:
-                    return "gpt-3.5-turbo-16k";
-                case ChatGPTModel.gpt3point5turbo0613:
-                    return "gpt-3.5-turbo-0613";
-                case ChatGPTModel.gpt3point5turbo16k0613:
-                    return "gpt-3.5-turbo-16k-0613";
-                case ChatGPTModel.textdavinci003:
-                    return "text-davinci-003";
-                case ChatGPTModel.textdavinci002:
-                    return "text-davinci-002";
-                case ChatGPTModel.codedavinci002:
-                    return "code-davinci-002";
-                default:
-                    throw new XFEChatGPTException("未知的ChatGPT模型");
-            }
-        }
-        /// <summary>
-        /// 通过字符串获取模型
-        /// </summary>
-        /// <param name="chatGPTModel"></param>
-        /// <returns></returns>
-        /// <exception cref="XFEChatGPTException">意料之外的模型</exception>
-        public static ChatGPTModel GetModel(this string chatGPTModel)
+            ChatGPTModel.gpt4 => "gpt-4",
+            ChatGPTModel.gpt4turbo => "gpt-4-1106-preview",
+            ChatGPTModel.gpt4turbovision => "gpt-4-vision-preview",
+            ChatGPTModel.gpt40613 => "gpt-4-0613",
+            ChatGPTModel.gpt432k => "gpt-4-32k",
+            ChatGPTModel.gpt432k0613 => "gpt-4-32k-0613",
+            ChatGPTModel.gpt3point5turbo => "gpt-3.5-turbo",
+            ChatGPTModel.gpt3point5turbo16k => "gpt-3.5-turbo-16k",
+            ChatGPTModel.gpt3point5turbo0613 => "gpt-3.5-turbo-0613",
+            ChatGPTModel.gpt3point5turbo16k0613 => "gpt-3.5-turbo-16k-0613",
+            ChatGPTModel.textdavinci003 => "text-davinci-003",
+            ChatGPTModel.textdavinci002 => "text-davinci-002",
+            ChatGPTModel.codedavinci002 => "code-davinci-002",
+            _ => throw new XFEChatGPTException("未知的ChatGPT模型"),
+        };
+    }
+    /// <summary>
+    /// 通过字符串获取模型
+    /// </summary>
+    /// <param name="chatGPTModel"></param>
+    /// <returns></returns>
+    /// <exception cref="XFEChatGPTException">意料之外的模型</exception>
+    public static ChatGPTModel GetModel(this string chatGPTModel)
+    {
+        return chatGPTModel switch
         {
-            switch (chatGPTModel)
-            {
-                case "gpt-3.5-turbo":
-                    return ChatGPTModel.gpt3point5turbo;
-                case "gpt-3.5-turbo-16k":
-                    return ChatGPTModel.gpt3point5turbo16k;
-                case "gpt-3.5-turbo-0613":
-                    return ChatGPTModel.gpt3point5turbo0613;
-                case "gpt-3.5-turbo-16k-0613":
-                    return ChatGPTModel.gpt3point5turbo16k0613;
-                case "text-davinci-003":
-                    return ChatGPTModel.textdavinci003;
-                case "text-davinci-002":
-                    return ChatGPTModel.textdavinci002;
-                case "code-davinci-002":
-                    return ChatGPTModel.codedavinci002;
-                default:
-                    throw new XFEChatGPTException("未知的ChatGPT模型");
-            }
-        }
+            "gpt-3.5-turbo" => ChatGPTModel.gpt3point5turbo,
+            "gpt-3.5-turbo-16k" => ChatGPTModel.gpt3point5turbo16k,
+            "gpt-3.5-turbo-0613" => ChatGPTModel.gpt3point5turbo0613,
+            "gpt-3.5-turbo-16k-0613" => ChatGPTModel.gpt3point5turbo16k0613,
+            "text-davinci-003" => ChatGPTModel.textdavinci003,
+            "text-davinci-002" => ChatGPTModel.textdavinci002,
+            "code-davinci-002" => ChatGPTModel.codedavinci002,
+            _ => throw new XFEChatGPTException("未知的ChatGPT模型"),
+        };
     }
 }

@@ -1,17 +1,16 @@
-﻿namespace XFE各类拓展.NetCore.XFEChatGPT
+﻿namespace XFE各类拓展.NetCore.XFEChatGPT;
+
+/// <summary>
+/// XFE通讯协议
+/// </summary>
+public enum XFEComProtocol
 {
     /// <summary>
-    /// XFE通讯协议
+    /// 响应速度快速，不安全的通讯协议
     /// </summary>
-    public enum XFEComProtocol
-    {
-        /// <summary>
-        /// 响应速度快速，不安全的通讯协议
-        /// </summary>
-        XFEFAST,
-        /// <summary>
-        /// 响应速度适中，安全的通讯协议
-        /// </summary>
-        XFEHARD
-    }
+    XFEFAST,
+    /// <summary>
+    /// 响应速度适中，安全的通讯协议
+    /// </summary>
+    XFEHARD
 }

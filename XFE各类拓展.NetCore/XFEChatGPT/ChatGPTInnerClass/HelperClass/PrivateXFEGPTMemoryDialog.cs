@@ -1,7 +1,6 @@
-﻿namespace XFE各类拓展.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass
+﻿namespace XFE各类拓展.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass;
+
+class PrivateXFEGPTMemoryDialog : XFEGPTMemoryDialog
 {
-    class PrivateXFEGPTMemoryDialog : XFEGPTMemoryDialog
-    {
-        public PrivateXFEGPTMemoryDialog() { }
-    }
+    public PrivateXFEGPTMemoryDialog() { }
 }

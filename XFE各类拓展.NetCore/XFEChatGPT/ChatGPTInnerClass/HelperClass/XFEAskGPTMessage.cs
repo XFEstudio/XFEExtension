@@ -1,26 +1,25 @@
 ﻿using XFE各类拓展.NetCore.XFEChatGPT.ChatGPTInnerClass.DefaultClass;
 
-namespace XFE各类拓展.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass
+namespace XFE各类拓展.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass;
+
+class XFEAskGPTMessage
 {
-    class XFEAskGPTMessage
+    public bool IsSelfEditData { get; set; }
+    public bool Stream { get; set; }
+    public string? ChatGPTModel { get; set; }
+    public EnvironmentGPTData? EnvironmentGPTData { get; set; }
+    public XFEComProtocol ComProtocol { get; set; }
+    public string? SystemContent { get; set; }
+    public string? AskContent { get; set; }
+    public XFEAskGPTMessage(bool isSelfEditData, bool stream, string chatGPTModel, EnvironmentGPTData? environmentGPTData, XFEComProtocol comProtocol, string systemContent, string askContent)
     {
-        public bool isSelfEditData { get; set; }
-        public bool stream { get; set; }
-        public string chatGPTModel { get; set; }
-        public EnvironmentGPTData EnvironmentGPTData { get; set; }
-        public XFEComProtocol comProtocol { get; set; }
-        public string systemContent { get; set; }
-        public string askContent { get; set; }
-        public XFEAskGPTMessage(bool isSelfEditData, bool stream, string chatGPTModel, EnvironmentGPTData EnvironmentGPTData, XFEComProtocol comProtocol, string systemContent, string askContent)
-        {
-            this.isSelfEditData = isSelfEditData;
-            this.stream = stream;
-            this.chatGPTModel = chatGPTModel;
-            this.EnvironmentGPTData = EnvironmentGPTData;
-            this.comProtocol = comProtocol;
-            this.systemContent = systemContent;
-            this.askContent = askContent;
-        }
-        public XFEAskGPTMessage() { }
+        this.IsSelfEditData = isSelfEditData;
+        this.Stream = stream;
+        this.ChatGPTModel = chatGPTModel;
+        this.EnvironmentGPTData = environmentGPTData;
+        this.ComProtocol = comProtocol;
+        this.SystemContent = systemContent;
+        this.AskContent = askContent;
     }
+    public XFEAskGPTMessage() { }
 }

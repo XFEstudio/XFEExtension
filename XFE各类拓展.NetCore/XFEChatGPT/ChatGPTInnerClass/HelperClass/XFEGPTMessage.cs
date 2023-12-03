@@ -1,29 +1,23 @@
 ﻿using XFE各类拓展.NetCore.XFEChatGPT.ChatGPTInnerClass.DefaultClass;
 
-namespace XFE各类拓展.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass
+namespace XFE各类拓展.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass;
+
+/// <summary>
+/// XFEGPT消息（具有消息ID）
+/// </summary>
+/// <remarks>
+/// XFEGPT消息（具有消息ID）
+/// </remarks>
+/// <param name="messageId">消息ID</param>
+/// <param name="gPTMessage">GPT消息</param>
+public class XFEGPTMessage(string messageId, GPTMessage gPTMessage)
 {
     /// <summary>
-    /// XFEGPT消息（具有消息ID）
+    /// 消息ID
     /// </summary>
-    public class XFEGPTMessage
-    {
-        /// <summary>
-        /// 消息ID
-        /// </summary>
-        public string messageId { get; set; }
-        /// <summary>
-        /// GPT消息
-        /// </summary>
-        public GPTMessage gPTMessage { get; set; }
-        /// <summary>
-        /// XFEGPT消息（具有消息ID）
-        /// </summary>
-        /// <param name="messageId">消息ID</param>
-        /// <param name="gPTMessage">GPT消息</param>
-        public XFEGPTMessage(string messageId, GPTMessage gPTMessage)
-        {
-            this.messageId = messageId;
-            this.gPTMessage = gPTMessage;
-        }
-    }
+    public string MessageId { get; set; } = messageId;
+    /// <summary>
+    /// GPT消息
+    /// </summary>
+    public GPTMessage GPTMessage { get; set; } = gPTMessage;
 }
