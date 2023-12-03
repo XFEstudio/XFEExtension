@@ -128,7 +128,7 @@ namespace XFE各类拓展.ArrayExtension
         /// <returns></returns>
         public static Type[] GetTypes(this object[] objects)
         {
-            if (objects == null)
+            if (objects is null)
                 return null;
             Type[] types = new Type[objects.Length];
             for (int i = 0; i < objects.Length; i++)

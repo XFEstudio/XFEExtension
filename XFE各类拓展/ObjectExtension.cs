@@ -16,7 +16,7 @@ namespace XFE各类拓展.ObjectExtension
         /// <exception cref="ArgumentNullException">无类型错误</exception>
         public static T ActiveCopyOf<T>(this T source) where T : class
         {
-            if (source == null)
+            if (source is null)
             {
                 throw new ArgumentNullException(nameof(source));
             }
@@ -30,7 +30,7 @@ namespace XFE各类拓展.ObjectExtension
         /// <returns>静态拷贝后的对象</returns>
         public static T StaticCopyOf<T>(this T source) where T : class
         {
-            if (source == null)
+            if (source is null)
             {
                 return default;
             }
@@ -56,12 +56,12 @@ namespace XFE各类拓展.ObjectExtension
         /// <returns></returns>
         public static bool AboutEqual<T>(this T obj1, T obj2)
         {
-            if (obj1 == null && obj2 == null)
+            if (obj1 is null && obj2 is null)
             {
                 return true;
             }
 
-            if (obj1 == null || obj2 == null)
+            if (obj1 is null || obj2 is null)
             {
                 return false;
             }

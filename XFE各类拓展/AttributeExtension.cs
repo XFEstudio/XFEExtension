@@ -21,14 +21,14 @@ namespace XFE各类拓展.AttributeExtension
         public static T GetAttributeInMethod<T>(string className, string methodName) where T : Attribute
         {
             var type = Assembly.GetCallingAssembly().GetType(className, false, true);
-            if (type == null)
+            if (type is null)
             {
                 throw new XFEExtensionException($"未找到类{className}");
             }
             else
             {
                 var method = type.GetMethod(methodName);
-                if (method == null)
+                if (method is null)
                 {
                     throw new XFEExtensionException($"未找到方法{methodName}");
                 }
@@ -48,14 +48,14 @@ namespace XFE各类拓展.AttributeExtension
         public static List<T> GetAttributesInMethod<T>(string className, string methodName) where T : Attribute
         {
             var type = Assembly.GetCallingAssembly().GetType(className, false, true);
-            if (type == null)
+            if (type is null)
             {
                 throw new XFEExtensionException($"未找到类{className}");
             }
             else
             {
                 var method = type.GetMethod(methodName);
-                if (method == null)
+                if (method is null)
                 {
                     throw new XFEExtensionException($"未找到方法{methodName}");
                 }
@@ -75,14 +75,14 @@ namespace XFE各类拓展.AttributeExtension
         public static T GetAttributeInField<T>(string className, string fieldName) where T : Attribute
         {
             var type = Assembly.GetCallingAssembly().GetType(className, false, true);
-            if (type == null)
+            if (type is null)
             {
                 throw new XFEExtensionException($"未找到类{className}");
             }
             else
             {
                 var field = type.GetField(fieldName);
-                if (field == null)
+                if (field is null)
                 {
                     throw new XFEExtensionException($"未找到字段{fieldName}");
                 }
@@ -102,14 +102,14 @@ namespace XFE各类拓展.AttributeExtension
         public static List<T> GetAttributesInField<T>(string className, string fieldName) where T : Attribute
         {
             var type = Assembly.GetCallingAssembly().GetType(className, false, true);
-            if (type == null)
+            if (type is null)
             {
                 throw new XFEExtensionException($"未找到类{className}");
             }
             else
             {
                 var field = type.GetField(fieldName);
-                if (field == null)
+                if (field is null)
                 {
                     throw new XFEExtensionException($"未找到字段{fieldName}");
                 }
@@ -129,14 +129,14 @@ namespace XFE各类拓展.AttributeExtension
         public static T GetAttributeInProperty<T>(string className, string propertyName) where T : Attribute
         {
             var type = Assembly.GetCallingAssembly().GetType(className, false, true);
-            if (type == null)
+            if (type is null)
             {
                 throw new XFEExtensionException($"未找到类{className}");
             }
             else
             {
                 var property = type.GetProperty(propertyName);
-                if (property == null)
+                if (property is null)
                 {
                     throw new XFEExtensionException($"未找到属性{propertyName}");
                 }
@@ -156,14 +156,14 @@ namespace XFE各类拓展.AttributeExtension
         public static List<T> GetAttributesInProperty<T>(string className, string propertyName) where T : Attribute
         {
             var type = Assembly.GetCallingAssembly().GetType(className, false, true);
-            if (type == null)
+            if (type is null)
             {
                 throw new XFEExtensionException($"未找到类{className}");
             }
             else
             {
                 var property = type.GetProperty(propertyName);
-                if (property == null)
+                if (property is null)
                 {
                     throw new XFEExtensionException($"未找到属性{propertyName}");
                 }
@@ -184,21 +184,21 @@ namespace XFE各类拓展.AttributeExtension
         public static T GetAttributeInParam<T>(string className, string methodName, string paramName) where T : Attribute
         {
             var type = Assembly.GetCallingAssembly().GetType(className, false, true);
-            if (type == null)
+            if (type is null)
             {
                 throw new XFEExtensionException($"未找到类{className}");
             }
             else
             {
                 var method = type.GetMethod(methodName);
-                if (method == null)
+                if (method is null)
                 {
                     throw new XFEExtensionException($"未找到方法{methodName}");
                 }
                 else
                 {
                     var param = method.GetParameters().FirstOrDefault(x => x.Name == paramName);
-                    if (param == null)
+                    if (param is null)
                     {
                         throw new XFEExtensionException($"未找到参数{paramName}");
                     }
@@ -220,21 +220,21 @@ namespace XFE各类拓展.AttributeExtension
         public static List<T> GetAttributesInParam<T>(string className, string methodName, string paramName) where T : Attribute
         {
             var type = Assembly.GetCallingAssembly().GetType(className, false, true);
-            if (type == null)
+            if (type is null)
             {
                 throw new XFEExtensionException($"未找到类{className}");
             }
             else
             {
                 var method = type.GetMethod(methodName);
-                if (method == null)
+                if (method is null)
                 {
                     throw new XFEExtensionException($"未找到方法{methodName}");
                 }
                 else
                 {
                     var param = method.GetParameters().FirstOrDefault(x => x.Name == paramName);
-                    if (param == null)
+                    if (param is null)
                     {
                         throw new XFEExtensionException($"未找到参数{paramName}");
                     }
@@ -254,7 +254,7 @@ namespace XFE各类拓展.AttributeExtension
         public static T GetAttributeOnClass<T>(string className) where T : Attribute
         {
             var type = Assembly.GetCallingAssembly().GetType(className, false, true);
-            if (type == null)
+            if (type is null)
             {
                 throw new XFEExtensionException($"未找到类{className}");
             }
@@ -272,7 +272,7 @@ namespace XFE各类拓展.AttributeExtension
         public static List<T> GetAttributesOnClass<T>(string className) where T : Attribute
         {
             var type = Assembly.GetCallingAssembly().GetType(className, false, true);
-            if (type == null)
+            if (type is null)
             {
                 throw new XFEExtensionException($"未找到类{className}");
             }
@@ -321,7 +321,7 @@ namespace XFE各类拓展.AttributeExtension
             var className = tarClass.GetType().ToString();
             var type = Assembly.GetCallingAssembly().GetType(className, false, true) ?? throw new XFEExtensionException($"未找到类{className}");
             var method = type.GetMethod(methodName);
-            if (method == null)
+            if (method is null)
             {
                 throw new XFEExtensionException($"未找到方法{methodName}");
             }
@@ -343,7 +343,7 @@ namespace XFE各类拓展.AttributeExtension
             var className = tarClass.GetType().ToString();
             var type = Assembly.GetCallingAssembly().GetType(className, false, true) ?? throw new XFEExtensionException($"未找到类{className}");
             var method = type.GetMethod(methodName);
-            if (method == null)
+            if (method is null)
             {
                 throw new XFEExtensionException($"未找到方法{methodName}");
             }
@@ -364,7 +364,7 @@ namespace XFE各类拓展.AttributeExtension
             var className = tarClass.GetType().ToString();
             var type = Assembly.GetCallingAssembly().GetType(className, false, true) ?? throw new XFEExtensionException($"未找到类{className}");
             var field = type.GetField(fieldName);
-            if (field == null)
+            if (field is null)
             {
                 throw new XFEExtensionException($"未找到字段{fieldName}");
             }
@@ -385,7 +385,7 @@ namespace XFE各类拓展.AttributeExtension
             var className = tarClass.GetType().ToString();
             var type = Assembly.GetCallingAssembly().GetType(className, false, true) ?? throw new XFEExtensionException($"未找到类{className}");
             var field = type.GetField(fieldName);
-            if (field == null)
+            if (field is null)
             {
                 throw new XFEExtensionException($"未找到字段{fieldName}");
             }
@@ -406,7 +406,7 @@ namespace XFE各类拓展.AttributeExtension
             var className = tarClass.GetType().ToString();
             var type = Assembly.GetCallingAssembly().GetType(className, false, true) ?? throw new XFEExtensionException($"未找到类{className}");
             var property = type.GetProperty(propertyName);
-            if (property == null)
+            if (property is null)
             {
                 throw new XFEExtensionException($"未找到属性{propertyName}");
             }
@@ -427,7 +427,7 @@ namespace XFE各类拓展.AttributeExtension
             var className = tarClass.GetType().ToString();
             var type = Assembly.GetCallingAssembly().GetType(className, false, true) ?? throw new XFEExtensionException($"未找到类{className}");
             var property = type.GetProperty(propertyName);
-            if (property == null)
+            if (property is null)
             {
                 throw new XFEExtensionException($"未找到属性{propertyName}");
             }
@@ -449,14 +449,14 @@ namespace XFE各类拓展.AttributeExtension
             var className = tarClass.GetType().ToString();
             var type = Assembly.GetCallingAssembly().GetType(className, false, true) ?? throw new XFEExtensionException($"未找到类{className}");
             var method = type.GetMethod(methodName);
-            if (method == null)
+            if (method is null)
             {
                 throw new XFEExtensionException($"未找到方法{methodName}");
             }
             else
             {
                 var param = method.GetParameters().FirstOrDefault(x => x.Name == paramName);
-                if (param == null)
+                if (param is null)
                 {
                     throw new XFEExtensionException($"未找到参数{paramName}");
                 }
@@ -479,14 +479,14 @@ namespace XFE各类拓展.AttributeExtension
             var className = tarClass.GetType().ToString();
             var type = Assembly.GetCallingAssembly().GetType(className, false, true) ?? throw new XFEExtensionException($"未找到类{className}");
             var method = type.GetMethod(methodName);
-            if (method == null)
+            if (method is null)
             {
                 throw new XFEExtensionException($"未找到方法{methodName}");
             }
             else
             {
                 var param = method.GetParameters().FirstOrDefault(x => x.Name == paramName);
-                if (param == null)
+                if (param is null)
                 {
                     throw new XFEExtensionException($"未找到参数{paramName}");
                 }

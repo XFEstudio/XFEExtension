@@ -16,7 +16,7 @@ public static class ListExtension
         string str = string.Empty;
         foreach (var ary in list)
         {
-            if (ary != null)
+            if (ary is not null)
                 str += $"[+-{ary.ToString()?.Replace("[+", "[++").Replace("+]", "++]")}-+]";
         }
         return str;
@@ -33,7 +33,7 @@ public static class ListExtension
         string str = string.Empty;
         foreach (var ary in list)
         {
-            if (ary != null)
+            if (ary is not null)
                 str += $"[+-{ary.GetType().GetProperty(propertyName)?.GetValue(ary)?.ToString()?.Replace("[+", "[++").Replace("+]", "++]")}-+]";
         }
         return str;

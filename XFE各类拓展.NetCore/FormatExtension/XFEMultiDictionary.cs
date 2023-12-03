@@ -8,7 +8,7 @@ public class XFEMultiDictionary : ICollection<XFEEntry>
     private List<XFEEntry> xFEMultiDictionaryList = [];
     /// <summary>
     /// 字典中的条目数
-    /// </summary>
+    /// </summary>(T)item.Property
     public int Count => xFEMultiDictionaryList.Count;
     /// <summary>
     /// 只读
@@ -118,7 +118,7 @@ public class XFEMultiDictionary : ICollection<XFEEntry>
     /// <returns></returns>
     public bool Contains(string headerString)
     {
-        return xFEMultiDictionaryList.Find(x => x.Header == headerString) != null;
+        return xFEMultiDictionaryList.Find(x => x.Header == headerString) is not null;
     }
     /// <summary>
     /// 检测是否包含内容
@@ -127,7 +127,7 @@ public class XFEMultiDictionary : ICollection<XFEEntry>
     /// <returns></returns>
     public bool ContainContent(string contentString)
     {
-        return xFEMultiDictionaryList.Find(x => x.Content == contentString) != null;
+        return xFEMultiDictionaryList.Find(x => x.Content == contentString) is not null;
     }
     /// <summary>
     /// 复制
@@ -174,7 +174,7 @@ public class XFEMultiDictionary : ICollection<XFEEntry>
     public bool Remove(string headerString)
     {
         var entry = xFEMultiDictionaryList.Find(x => x.Header == headerString);
-        if (entry != null)
+        if (entry is not null)
             return xFEMultiDictionaryList.Remove(entry);
         else
             return false;

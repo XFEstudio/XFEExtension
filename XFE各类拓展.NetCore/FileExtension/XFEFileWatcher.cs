@@ -93,7 +93,7 @@ public class XFEFileWatcher
     /// <exception cref="XFEExtensionException"></exception>
     public async Task StartWatchingAsync()
     {
-        if (Path != null && Path != string.Empty)
+        if (Path is not null && Path != string.Empty)
         {
             if (File.Exists(Path) || Directory.Exists(Path))
             {
@@ -126,7 +126,7 @@ public class XFEFileWatcher
     /// <exception cref="XFEExtensionException"></exception>
     public void StartWatching()
     {
-        if (Path != null && Path != string.Empty)
+        if (Path is not null && Path != string.Empty)
         {
             if (File.Exists(Path) || Directory.Exists(Path))
             {

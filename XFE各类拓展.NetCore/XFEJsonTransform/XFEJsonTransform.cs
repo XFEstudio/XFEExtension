@@ -17,7 +17,7 @@ public static class XFEJsonTransformer
     /// <exception cref="XFEJsonTransformException">空对象异常</exception>
     public static string? ConvertToJson(this object obj)
     {
-        if (obj == null)
+        if (obj is null)
         {
             throw new XFEJsonTransformException("对象为空");
         }
@@ -96,7 +96,7 @@ public static class XFEJsonTransformer
             var propertyName = property.Name;
             var propertyValue = property.GetValue(obj);
 
-            if (propertyValue == null)
+            if (propertyValue is null)
             {
                 jsonProperties.Add($"\"{propertyName}\":null");
             }
@@ -142,7 +142,7 @@ public static class XFEJsonTransformer
             var propertyValue = jsonProperty.Value;
 
             var property = objectType.GetProperty(propertyName);
-            if (property != null)
+            if (property is not null)
             {
                 var convertedValue = ConvertToPropertyValue(propertyValue, property.PropertyType);
                 property.SetValue(jsonObject, convertedValue);

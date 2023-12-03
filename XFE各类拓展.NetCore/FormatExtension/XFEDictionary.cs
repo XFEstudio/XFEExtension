@@ -148,7 +148,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <returns></returns>
     public bool Contains(string headerString)
     {
-        return xFEDictionaryList.Find(x => x.Header == headerString) != null;
+        return xFEDictionaryList.Find(x => x.Header == headerString) is not null;
     }
     /// <summary>
     /// 检测是否包含内容
@@ -157,7 +157,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <returns></returns>
     public bool ContainContent(string contentString)
     {
-        return xFEDictionaryList.Find(x => x.Content == contentString) != null;
+        return xFEDictionaryList.Find(x => x.Content == contentString) is not null;
     }
     /// <summary>
     /// 复制
@@ -193,7 +193,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     public bool Remove(string headerString)
     {
         var entry = xFEDictionaryList.Find(x => x.Header == headerString);
-        if (entry != null)
+        if (entry is not null)
             return xFEDictionaryList.Remove(entry);
         else
             return false;

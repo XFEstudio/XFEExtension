@@ -444,8 +444,8 @@ namespace XFE各类拓展
                 {
                     var isFirstMethod = true;
                     var failedList = new List<MethodAndCounter>();
-                    object classInstance = classAttribute.Params == null;
-                    if (classAttribute.Params == null)
+                    object classInstance = classAttribute.Params is null;
+                    if (classAttribute.Params is null)
                     {
                         classInstance = subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, new Type[0], null).Invoke(classAttribute.Params);
                     }

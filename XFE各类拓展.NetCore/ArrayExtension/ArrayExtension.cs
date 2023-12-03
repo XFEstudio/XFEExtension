@@ -17,7 +17,7 @@ public static class ArrayExtension
         string str = string.Empty;
         foreach (var ary in arrays)
         {
-            if (ary != null)
+            if (ary is not null)
                 str += $"[+-{ary?.ToString()?.Replace("[+", "[++").Replace("+]", "++]")}-+]";
         }
         return str;
@@ -34,7 +34,7 @@ public static class ArrayExtension
         string str = string.Empty;
         foreach (var ary in arrays)
         {
-            if (ary != null)
+            if (ary is not null)
                 str += $"[+-{ary?.GetType()?.GetProperty(propertyName)?.GetValue(ary)?.ToString()?.Replace("[+", "[++").Replace("+]", "++]")}-+]";
         }
         return str;
@@ -68,7 +68,7 @@ public static class ArrayExtension
     /// <returns></returns>
     public static Type[]? GetTypes(this object[] objects)
     {
-        if (objects == null)
+        if (objects is null)
             return null;
         Type[] types = new Type[objects.Length];
         for (int i = 0; i < objects.Length; i++)

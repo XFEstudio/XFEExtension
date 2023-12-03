@@ -879,7 +879,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
                     {
                         var filePath = $"{SavePathRoot}/{groupId}/{file}";
                         var messageId = Path.GetFileNameWithoutExtension(filePath);
-                        if (!xCCMessageDictionary.ContainsKey(groupId) || xCCMessageDictionary[groupId].Find(x => x.MessageId == messageId) == null)
+                        if (!xCCMessageDictionary.ContainsKey(groupId) || xCCMessageDictionary[groupId].Find(x => x.MessageId == messageId) is null)
                         {
                             File.Delete(filePath);
                         }
@@ -982,7 +982,7 @@ namespace XFE各类拓展.CyberComm.XCCNetWork
             var message = new XCCMessage(e.MessageId, e.MessageType, e.TextMessage, e.Sender, e.SendTime, e.GroupId);
             if (xCCMessageDictionary.ContainsKey(e.GroupId))
             {
-                if (xCCMessageDictionary[e.GroupId].Find(x => x.MessageId == e.MessageId) == null)
+                if (xCCMessageDictionary[e.GroupId].Find(x => x.MessageId == e.MessageId) is null)
                 {
                     xCCMessageDictionary[e.GroupId].Add(message);
                 }

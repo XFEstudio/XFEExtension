@@ -14,7 +14,7 @@ public static class JsonStringExtension
     /// <returns>返回夹在开头和末尾中间的字符串</returns>
     public static string GetStringBetweenTwoString(this string str, string beginString, string endString)
     {
-        if (str != string.Empty && str != null)
+        if (str != string.Empty && str is not null)
         {
             int beginIndex = str.IndexOf(beginString, StringComparison.Ordinal);
             if (beginIndex == -1 || beginIndex == 0)

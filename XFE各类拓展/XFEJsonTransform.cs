@@ -20,7 +20,7 @@ namespace XFE各类拓展.XFEJsonTransform
         /// <exception cref="XFEJsonTransformException">空对象异常</exception>
         public static string ConvertToJson(this object obj)
         {
-            if (obj == null)
+            if (obj is null)
             {
                 throw new XFEJsonTransformException("对象为空");
             }
@@ -92,7 +92,7 @@ namespace XFE各类拓展.XFEJsonTransform
                 var propertyName = property.Name;
                 var propertyValue = property.GetValue(obj);
 
-                if (propertyValue == null)
+                if (propertyValue is null)
                 {
                     jsonProperties.Add($"\"{propertyName}\":null");
                 }

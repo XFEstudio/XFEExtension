@@ -822,7 +822,7 @@ public class XCCMessageReceiveHelper
                 {
                     var filePath = $"{SavePathRoot}/{groupId}/{file}";
                     var messageId = Path.GetFileNameWithoutExtension(filePath);
-                    if (!xCCMessageDictionary.TryGetValue(groupId, out List<XCCMessage>? value) || value.Find(x => x.MessageId == messageId) == null)
+                    if (!xCCMessageDictionary.TryGetValue(groupId, out List<XCCMessage>? value) || value.Find(x => x.MessageId == messageId) is null)
                     {
                         File.Delete(filePath);
                     }
@@ -839,7 +839,7 @@ public class XCCMessageReceiveHelper
         XCCFile xCCFile;
         if (xCCFileDictionary.TryGetValue(xCCMessage.MessageId, out XCCFile? value))
         {
-            if (!value.Loaded && fileBuffer != null)
+            if (!value.Loaded && fileBuffer is not null)
                 value.LoadFile(fileBuffer);
             return value;
         }
@@ -876,7 +876,7 @@ public class XCCMessageReceiveHelper
     public void AddFile(XCCFile xCCFile)
     {
         xCCFileDictionary.Add(xCCFile.MessageId, xCCFile);
-        if (AutoSaveInLocal && xCCFile.FileBuffer != null)
+        if (AutoSaveInLocal && xCCFile.FileBuffer is not null)
             SaveFile(xCCFile);
     }
     /// <summary>
@@ -922,7 +922,7 @@ public class XCCMessageReceiveHelper
         var message = new XCCMessage(e.MessageId!, e.MessageType, e.TextMessage, e.Sender!, e.SendTime, e.GroupId);
         if (xCCMessageDictionary.TryGetValue(e.GroupId, out List<XCCMessage>? value))
         {
-            if (value.Find(x => x.MessageId == e.MessageId) == null)
+            if (value.Find(x => x.MessageId == e.MessageId) is null)
             {
                 value.Add(message);
             }
@@ -1064,7 +1064,7 @@ public class XCCFile(string groupId, string messageId, XCCFileType fileType, str
     /// <summary>
     /// 是否已加载
     /// </summary>
-    public bool Loaded { get; private set; } = fileBuffer != null;
+    public bool Loaded { get; private set; } = fileBuffer is not null;
     /// <summary>
     /// 文件流
     /// </summary>

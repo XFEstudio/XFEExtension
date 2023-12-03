@@ -197,7 +197,7 @@ public abstract class XFECode
                                 timerName = "标识名：" + resultAttribute.TimerName;
                             }
                             object?[]? paramsForMethod;
-                            if (attribute.Params != null)
+                            if (attribute.Params is not null)
                             {
                                 paramsForMethod = attribute.Params;
                             }
@@ -222,7 +222,7 @@ public abstract class XFECode
                                 Console.WriteLine("\n\n\n\n\n");
                             }
                             var borderCount = (Console.BufferWidth - timerName.DisplayLength()) / 2;
-                            if (timerName != null)
+                            if (timerName is not null)
                             {
                                 for (int i = 0; i < borderCount; i++)
                                 {
@@ -365,7 +365,7 @@ public abstract class XFECode
                     var isFirstMethod = true;
                     var failedList = new List<MethodAndCounter>();
                     object? classInstance;
-                    if (classAttribute.Params == null)
+                    if (classAttribute.Params is null)
                     {
                         classInstance = subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, new Type[0], null)?.Invoke(classAttribute.Params);
                     }
@@ -374,7 +374,7 @@ public abstract class XFECode
                         classInstance = subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, classAttribute.Params.GetTypes()!, null)?.Invoke(classAttribute.Params);
                     }
                     var setUpAttribute = subClass.GetAttribute<TSetUpAttribute>();
-                    if (setUpAttribute != null)
+                    if (setUpAttribute is not null)
                     {
                         var setUpMethod = subClass.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).Where(m => m.IsDefined(typeof(TSetUpAttribute))).FirstOrDefault();
                         setUpMethod?.Invoke(classInstance, setUpMethod.GetDefaultParameters());
@@ -396,7 +396,7 @@ public abstract class XFECode
                         Console.WriteLine("\n\n\n\n\n\n\n\n");
                     }
                     var borderCount = (Console.BufferWidth - classOtherName.DisplayLength()) / 2;
-                    if (classOtherName != null)
+                    if (classOtherName is not null)
                     {
                         for (int i = 0; i < borderCount; i++)
                         {
@@ -458,7 +458,7 @@ public abstract class XFECode
                                     methodOtherName = "标识名：" + resultAttribute.MethodOtherName;
                                 }
                                 object?[]? paramsForMethod;
-                                if (attribute.Params != null)
+                                if (attribute.Params is not null)
                                 {
                                     paramsForMethod = attribute.Params;
                                 }
@@ -483,7 +483,7 @@ public abstract class XFECode
                                     Console.WriteLine("\n\n\n\n\n");
                                 }
                                 borderCount = (Console.BufferWidth - methodOtherName.DisplayLength()) / 2;
-                                if (methodOtherName != null)
+                                if (methodOtherName is not null)
                                 {
                                     for (int i = 0; i < borderCount; i++)
                                     {

@@ -99,7 +99,7 @@ public class CyberCommGroupController
     public async Task SendGroupTextMessage(string GroupId, string message)
     {
         var commGroup = this[GroupId];
-        if (commGroup != null)
+        if (commGroup is not null)
         {
             await commGroup.SendGroupTextMessage(message);
         }
@@ -112,7 +112,7 @@ public class CyberCommGroupController
     public async Task SendGroupBinaryMessage(string GroupId, byte[] bytes)
     {
         var commGroup = this[GroupId];
-        if (commGroup != null)
+        if (commGroup is not null)
         {
             await commGroup.SendGroupBinaryMessage(bytes);
         }

@@ -126,7 +126,7 @@ public static partial class StringExtension
     /// <returns></returns>
     public static string[]? GetUrl(this string str)
     {
-        if (str != null)
+        if (str is not null)
         {
             Regex regex = UrlRegex();
             MatchCollection matches = regex.Matches(str);

@@ -1963,7 +1963,7 @@ namespace XFE各类拓展.XFEChatGPT
         public void InstanceUpdate(string dialogId, string messageId, string nowMessage, bool clear)
         {
             var xFEGPTMessages = gPTMessageWithId[dialogId];
-            if (xFEGPTMessages.GetXFEGPTMessageByMessageId(messageId) == null)
+            if (xFEGPTMessages.GetXFEGPTMessageByMessageId(messageId) is null)
             {
                 xFEGPTMessages.Add(new XFEGPTMessage(messageId, new GPTMessage("assistant", nowMessage)));
             }

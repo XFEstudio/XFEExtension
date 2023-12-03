@@ -83,11 +83,11 @@ namespace XFE各类拓展.BufferExtension
         /// <returns>替换后的Buffer</returns>
         public static byte[] Replace(this byte[] buffer, byte[] originBuffer, byte[] targetBuffer)
         {
-            if (originBuffer == null || originBuffer.LongLength == 0)
+            if (originBuffer is null || originBuffer.LongLength == 0)
             {
                 throw new ArgumentException("Origin buffer cannot be null or empty.");
             }
-            if (buffer == null || buffer.LongLength == 0)
+            if (buffer is null || buffer.LongLength == 0)
             {
                 throw new ArgumentException("Input buffer cannot be null or empty.");
             }
