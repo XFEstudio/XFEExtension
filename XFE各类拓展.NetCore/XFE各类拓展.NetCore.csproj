@@ -22,9 +22,9 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>C:\Users\XFEstudio\Desktop\work\C#\OtherProject\XFE各类拓展\XFE各类拓展\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <AssemblyVersion>1.0.1.1</AssemblyVersion>
-    <FileVersion>1.0.1.1</FileVersion>
-    <Version>1.0.2</Version>
+    <AssemblyVersion>1.1.2.0</AssemblyVersion>
+    <FileVersion>1.1.2.0</FileVersion>
+    <Version>1.1.0</Version>
     <Authors>XFE寰宇朽力</Authors>
   </PropertyGroup>
 
