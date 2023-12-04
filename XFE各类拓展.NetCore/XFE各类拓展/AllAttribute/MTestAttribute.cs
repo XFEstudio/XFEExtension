@@ -1,6 +1,4 @@
-﻿using XFE各类拓展.NetCore.XFE各类拓展.AllAttribute;
-
-namespace XFE各类拓展.NetCore;
+﻿namespace XFE各类拓展.NetCore;
 
 /// <summary>
 /// 方法测试
