@@ -7,7 +7,7 @@ namespace XFE各类拓展.NetCore.CyberComm;
 /// </summary>
 public class CyberCommGroup
 {
-    private readonly List<CyberCommServerEventArgs> cyberCommList = new List<CyberCommServerEventArgs>();
+    private readonly List<CyberCommServerEventArgs> cyberCommList = [];
     /// <summary>
     /// 组ID
     /// </summary>
@@ -87,7 +87,7 @@ public class CyberCommGroup
     /// <param name="findFunc">指定的WS客户端</param>
     public async Task SendGroupTextMessage(string message, Func<CyberCommServerEventArgs, bool> findFunc)
     {
-        List<Task> tasks = new List<Task>();
+        List<Task> tasks = [];
         foreach (CyberCommServerEventArgs cyberCommServerEventArgs in cyberCommList)
         {
             if (findFunc.Invoke(cyberCommServerEventArgs))
@@ -103,7 +103,7 @@ public class CyberCommGroup
     /// <param name="bytes">群发二进制消息</param>
     public async Task SendGroupBinaryMessage(byte[] bytes)
     {
-        List<Task> tasks = new List<Task>();
+        List<Task> tasks = [];
         foreach (CyberCommServerEventArgs cyberCommServerEventArgs in cyberCommList)
         {
             tasks.Add(cyberCommServerEventArgs.ReplyBinaryMessage(bytes));
@@ -117,7 +117,7 @@ public class CyberCommGroup
     /// <param name="findFunc">指定的WS客户端</param>
     public async Task SendGroupBinaryMessage(byte[] bytes, Func<CyberCommServerEventArgs, bool> findFunc)
     {
-        List<Task> tasks = new List<Task>();
+        List<Task> tasks = [];
         foreach (CyberCommServerEventArgs cyberCommServerEventArgs in cyberCommList)
         {
             if (findFunc.Invoke(cyberCommServerEventArgs))

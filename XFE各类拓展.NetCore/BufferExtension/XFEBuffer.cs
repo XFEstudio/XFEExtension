@@ -153,7 +153,7 @@ public class XFEBuffer
     /// <returns></returns>
     public string[] GetHeaders()
     {
-        return bufferDictionary.Keys.ToArray();
+        return [.. bufferDictionary.Keys];
     }
     /// <summary>
     /// XFE的二进制数组协议

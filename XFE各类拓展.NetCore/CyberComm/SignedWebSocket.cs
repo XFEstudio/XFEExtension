@@ -5,24 +5,19 @@ namespace XFE各类拓展.NetCore.CyberComm;
 /// <summary>
 /// 代签名的WebSocket
 /// </summary>
-public class SignedWebSocket
+/// <remarks>
+/// 签名WebSocket
+/// </remarks>
+/// <param name="signature">签名</param>
+/// <param name="webSocket">WebSocket</param>
+public class SignedWebSocket(string signature, WebSocket webSocket)
 {
     /// <summary>
     /// 签名
     /// </summary>
-    public string Signature { get; set; }
+    public string Signature { get; set; } = signature;
     /// <summary>
     /// 服务器
     /// </summary>
-    public WebSocket WebSocket { get; set; }
-    /// <summary>
-    /// 签名WebSocket
-    /// </summary>
-    /// <param name="signature">签名</param>
-    /// <param name="webSocket">WebSocket</param>
-    public SignedWebSocket(string signature, WebSocket webSocket)
-    {
-        Signature = signature;
-        WebSocket = webSocket;
-    }
+    public WebSocket WebSocket { get; set; } = webSocket;
 }

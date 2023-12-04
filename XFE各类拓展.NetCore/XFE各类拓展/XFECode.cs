@@ -20,10 +20,10 @@ public abstract class XFECode
     /// <summary>
     /// 暂停
     /// </summary>
-    /// <param name="ShowText">是否显示提示</param>
-    protected static void Pause(bool ShowText = true)
+    /// <param name="showText">是否显示提示</param>
+    protected static void Pause(bool showText = true)
     {
-        if (ShowText)
+        if (showText)
         {
             Console.WriteLine("按任意键继续...");
         }
@@ -32,10 +32,10 @@ public abstract class XFECode
     /// <summary>
     /// 暂停
     /// </summary>
-    /// <param name="ShowText">显示的文字</param>
-    protected static void Pause(string ShowText)
+    /// <param name="showText">显示的文字</param>
+    protected static void Pause(string showText)
     {
-        Console.WriteLine(ShowText);
+        Console.WriteLine(showText);
         Console.ReadKey();
     }
     /// <summary>
@@ -51,10 +51,10 @@ public abstract class XFECode
     /// 暂停，按下指定按键继续
     /// </summary>
     /// <param name="consoleKey">指定的按键</param>
-    /// <param name="ShowText">显示的文字</param>
-    protected static void Pause(ConsoleKey consoleKey, string ShowText)
+    /// <param name="showText">显示的文字</param>
+    protected static void Pause(ConsoleKey consoleKey, string showText)
     {
-        Console.WriteLine(ShowText);
+        Console.WriteLine(showText);
         while (Console.ReadKey().Key != consoleKey) ;
     }
     #endregion
@@ -231,9 +231,9 @@ public abstract class XFECode
                                 if ((Console.BufferWidth - timerName.DisplayLength()) % 2 == 1)
                                     Console.Write("=");
                                 Console.ForegroundColor = mainColor;
-                                Console.Write(timerName.Substring(0, 4));
+                                Console.Write(timerName[..4]);
                                 Console.ForegroundColor = methodColor;
-                                Console.Write(timerName.Substring(4));
+                                Console.Write(timerName[4..]);
                                 Console.ForegroundColor = methodBorderColor;
                                 for (int i = 0; i < borderCount; i++)
                                 {
@@ -367,7 +367,7 @@ public abstract class XFECode
                     object? classInstance;
                     if (classAttribute.Params is null)
                     {
-                        classInstance = subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, new Type[0], null)?.Invoke(classAttribute.Params);
+                        classInstance = subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, [], null)?.Invoke(classAttribute.Params);
                     }
                     else
                     {
@@ -492,9 +492,9 @@ public abstract class XFECode
                                     if ((Console.BufferWidth - methodOtherName.DisplayLength()) % 2 == 1)
                                         Console.Write("=");
                                     Console.ForegroundColor = mainColor;
-                                    Console.Write(methodOtherName.Substring(0, 4));
+                                    Console.Write(methodOtherName[..4]);
                                     Console.ForegroundColor = methodColor;
-                                    Console.Write(methodOtherName.Substring(4));
+                                    Console.Write(methodOtherName[4..]);
                                     Console.ForegroundColor = methodBorderColor;
                                     for (int i = 0; i < borderCount; i++)
                                     {

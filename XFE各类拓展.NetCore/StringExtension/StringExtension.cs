@@ -26,20 +26,20 @@ public static partial class StringExtension
     /// <summary>
     /// 判断字符串是否为座机号码
     /// </summary>
-    /// <param name="str_telephone"></param>
+    /// <param name="telephoneNum"></param>
     /// <returns></returns>
-    public static bool IsTelePhone(this string str_telephone)
+    public static bool IsTelePhone(this string telephoneNum)
     {
-        return TelePhoneRegex().IsMatch(str_telephone);
+        return TelePhoneRegex().IsMatch(telephoneNum);
     }
     /// <summary>
     /// 判断字符串是否为手机号码
     /// </summary>
-    /// <param name="str_handset"></param>
+    /// <param name="mobPhoneNum"></param>
     /// <returns></returns>
-    public static bool IsMobPhoneNumber(this string str_handset)
+    public static bool IsMobPhoneNumber(this string mobPhoneNum)
     {
-        return MobPhoneNumberRegex().IsMatch(str_handset);
+        return MobPhoneNumberRegex().IsMatch(mobPhoneNum);
     }
     /// <summary>
     /// 判断字符串是否为邮政编码
@@ -53,36 +53,36 @@ public static partial class StringExtension
     /// <summary>
     /// 判断字符串是否为数字
     /// </summary>
-    /// <param name="str_number"></param>
+    /// <param name="number"></param>
     /// <returns></returns>
-    public static bool IsNumber(this string str_number)
+    public static bool IsNumber(this string number)
     {
-        return NumberRegex().IsMatch(str_number);
+        return NumberRegex().IsMatch(number);
     }
     /// <summary>
     /// 判断字符串是否为身份证件号
     /// </summary>
-    /// <param name="Id"></param>
+    /// <param name="idNumber"></param>
     /// <returns></returns>
-    public static bool IsIdCard(this string Id)
+    public static bool IsIdCard(this string idNumber)
     {
-        return IdCardRegex().IsMatch(Id);
+        return IdCardRegex().IsMatch(idNumber);
     }
     /// <summary>
     /// 判断字符串是否为邮箱地址
     /// </summary>
-    /// <param name="email"></param>
+    /// <param name="emailString"></param>
     /// <returns></returns>
-    public static bool IsValidEmail(this string email)
+    public static bool IsValidEmail(this string emailString)
     {
-        if (string.IsNullOrWhiteSpace(email))
+        if (string.IsNullOrWhiteSpace(emailString))
             return false;
 
         try
         {
-            email = Regex.Replace(email, @"(@)(.+)$", DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
-            var validDomain = new System.Net.Mail.MailAddress(email).Host;
-            return Regex.IsMatch(email, @"^(?("")("".+?""@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)[0-9a-zA-Z]\@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,}))$", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+            emailString = Regex.Replace(emailString, @"(@)(.+)$", DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
+            var validDomain = new System.Net.Mail.MailAddress(emailString).Host;
+            return Regex.IsMatch(emailString, @"^(?("")("".+?""@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)[0-9a-zA-Z]\@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,}))$", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
         }
         catch (FormatException)
         {

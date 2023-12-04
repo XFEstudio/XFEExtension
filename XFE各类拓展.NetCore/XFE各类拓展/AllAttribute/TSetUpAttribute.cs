@@ -1,4 +1,6 @@
-﻿namespace XFE各类拓展.NetCore;
+﻿using XFE各类拓展.NetCore.XFE各类拓展.AllAttribute;
+
+namespace XFE各类拓展.NetCore;
 
 /// <summary>
 /// 用于标记测试类初始函数的特性

@@ -32,24 +32,24 @@ Console.WriteLine(result);
 
 ```csharp
 //使用XFEChatGPT类来进行GPT的交互
-XFEChatGPT xFEChatGPT = new XFEChatGPT("你是一个人工智能AI");
+XFEChatGPT xFEChatGPT = new XFEChatGPT("你是一个人工智能AI", true);
 
 //订阅事件
 xFEChatGPT.XFEChatGPTMessageReceived += (sender, e) =>
 {
-    switch (e.generateState)
+    switch (e.GenerateState)
     {
         case GenerateState.Start:
             Console.Write("【输出开始】ChatGPT:");
             break;
         case GenerateState.Continue:
-            Console.Write(e.message);
+            Console.Write(e.Message);
             break;
         case GenerateState.End:
             Console.WriteLine("【输出完成】");
             break;
         case GenerateState.Error:
-            Console.WriteLine($"【发生错误】{e.message}");
+            Console.WriteLine($"【发生错误】{e.Message}");
             break;
         default:
             break;
@@ -70,24 +70,24 @@ xFEChatGPT.SendGPTMessage(Guid.NewGuid().ToString(), askContent);
 MemorableXFEChatGPT memorableXFEChatGPT = new MemorableXFEChatGPT();
 
 //创建一个新的对话并设置System内容
-memorableXFEChatGPT.CreateDialog("新的对话ID", "你是一个由寰宇朽力网络科技开发的人工智能AI");
+memorableXFEChatGPT.CreateDialog("新的对话ID", "你是一个由寰宇朽力网络科技开发的人工智能AI", true, true);
 
 //订阅消息接收事件
 memorableXFEChatGPT.XFEChatGPTMessageReceived += (sender, e) =>
 {
-    switch (e.generateState)
+    switch (e.GenerateState)
     {
         case GenerateState.Start:
             Console.Write("【输出开始】ChatGPT:");
             break;
         case GenerateState.Continue:
-            Console.Write(e.message);
+            Console.Write(e.Message);
             break;
         case GenerateState.End:
             Console.WriteLine("【输出完成】");
             break;
         case GenerateState.Error:
-            Console.WriteLine($"【发生错误】{e.message}");
+            Console.WriteLine($"【发生错误】{e.Message}");
             break;
         default:
             break;
@@ -98,14 +98,14 @@ memorableXFEChatGPT.XFEChatGPTMessageReceived += (sender, e) =>
 var askContent = Console.ReadLine();
 
 //填写之前创建的对话ID，生成随机的消息ID，并输入刚刚读取的询问内容
-memorableXFEChatGPT.AskChatGPT("新的对话ID", Guid.NewGuid().ToString(), "你好");
+memorableXFEChatGPT.AskChatGPT("新的对话ID", Guid.NewGuid().ToString(), askContent);
 ```
 
 ### IO流拓展操作示例
 
 ```csharp
 // 使用XFEExtension来简化文件读取/写入操作
-"Hello World!".WriteIn("test.txt");//Write Using XFE各类拓展.FileExtension
+"Hello World!".WriteIn("test.txt");
 string txt = "test.txt".ReadOut();
 ```
 

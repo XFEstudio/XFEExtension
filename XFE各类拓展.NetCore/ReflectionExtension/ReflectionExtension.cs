@@ -30,10 +30,10 @@ public static class ReflectionExtension
     /// <param name="obj"></param>
     /// <param name="fieldName">字段名称</param>
     /// <returns></returns>
-    public static T GetPrivateField<T>(this object obj, string fieldName)
+    public static T? GetPrivateField<T>(this object obj, string fieldName)
     {
         var field = obj.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
-        return (T)field?.GetValue(obj)!;
+        return (T?)field?.GetValue(obj);
     }
     /// <summary>
     /// 设置某个类中的某个私有字段的值
@@ -53,10 +53,10 @@ public static class ReflectionExtension
     /// <param name="obj"></param>
     /// <param name="propertyName">属性名称</param>
     /// <returns></returns>
-    public static T GetPrivateProperty<T>(this object obj, string propertyName)
+    public static T? GetPrivateProperty<T>(this object obj, string propertyName)
     {
         var property = obj.GetType().GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Instance);
-        return (T)property?.GetValue(obj)!;
+        return (T?)property?.GetValue(obj);
     }
     /// <summary>
     /// 设置某个类中的某个私有属性的值
@@ -76,10 +76,10 @@ public static class ReflectionExtension
     /// <param name="type"></param>
     /// <param name="fieldName">字段名称</param>
     /// <returns></returns>
-    public static T GetPrivateStaticField<T>(this Type type, string fieldName)
+    public static T? GetPrivateStaticField<T>(this Type type, string fieldName)
     {
         var field = type.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Static);
-        return (T)field?.GetValue(null)!;
+        return (T?)field?.GetValue(null);
     }
     /// <summary>
     /// 设置某个类中的某个私有静态字段的值
@@ -99,10 +99,10 @@ public static class ReflectionExtension
     /// <param name="type"></param>
     /// <param name="propertyName">属性名称</param>
     /// <returns></returns>
-    public static T GetPrivateStaticProperty<T>(this Type type, string propertyName)
+    public static T? GetPrivateStaticProperty<T>(this Type type, string propertyName)
     {
         var property = type.GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Static);
-        return (T)property?.GetValue(null)!;
+        return (T?)property?.GetValue(null);
     }
     /// <summary>
     /// 设置某个类中的某个私有静态属性的值
@@ -123,10 +123,10 @@ public static class ReflectionExtension
     /// <param name="methodName">方法名称</param>
     /// <param name="parameters">传入的参数</param>
     /// <returns></returns>
-    public static T InvokePrivateMethod<T>(this object obj, string methodName, params object[] parameters)
+    public static T? InvokePrivateMethod<T>(this object obj, string methodName, params object[] parameters)
     {
         var method = obj.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
-        return (T)method?.Invoke(obj, parameters)!;
+        return (T?)method?.Invoke(obj, parameters);
     }
     /// <summary>
     /// 调用某个类中的某个私有方法
@@ -147,9 +147,9 @@ public static class ReflectionExtension
     /// <param name="methodName">方法名称</param>
     /// <param name="parameters">传入参数</param>
     /// <returns></returns>
-    public static T InvokePrivateStaticMethod<T>(this Type type, string methodName, params object[] parameters)
+    public static T? InvokePrivateStaticMethod<T>(this Type type, string methodName, params object[] parameters)
     {
         var method = type.GetMethod(methodName);
-        return (T)method?.Invoke(null, parameters)!;
+        return (T?)method?.Invoke(null, parameters);
     }
 }

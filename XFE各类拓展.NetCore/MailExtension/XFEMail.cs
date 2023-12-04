@@ -35,8 +35,10 @@ public class XFEMail
             client.Credentials = new NetworkCredential("mail@xfegzs.com", Password);
             client.EnableSsl = true;
             MailAddress fromMailAddress = new MailAddress("mail@xfegzs.com", SenderName);
-            MailMessage message = new MailMessage();
-            message.From = fromMailAddress;
+            MailMessage message = new()
+            {
+                From = fromMailAddress
+            };
             if (ToAddress is not null)
                 message.To.Add(ToAddress);
             else

@@ -25,9 +25,11 @@ public static class MailExtension
                 client.UseDefaultCredentials = false;
                 client.Credentials = new NetworkCredential("mail@xfegzs.com", password);
                 client.EnableSsl = true;
-                MailAddress fromMailAddress = new MailAddress("mail@xfegzs.com", "XFEMail");
-                MailMessage message = new MailMessage();
-                message.From = fromMailAddress;
+                MailAddress fromMailAddress = new("mail@xfegzs.com", "XFEMail");
+                MailMessage message = new()
+                {
+                    From = fromMailAddress
+                };
                 message.To.Add(to);
                 message.Subject = subTitle;
                 message.Body = content;
@@ -58,9 +60,11 @@ public static class MailExtension
                 client.UseDefaultCredentials = false;
                 client.Credentials = new NetworkCredential("mail@xfegzs.com", password);
                 client.EnableSsl = true;
-                MailAddress fromMailAddress = new MailAddress("mail@xfegzs.com", name);
-                MailMessage message = new MailMessage();
-                message.From = fromMailAddress;
+                MailAddress fromMailAddress = new("mail@xfegzs.com", name);
+                MailMessage message = new()
+                {
+                    From = fromMailAddress
+                };
                 message.To.Add(to);
                 message.Subject = subTitle;
                 message.Body = content;

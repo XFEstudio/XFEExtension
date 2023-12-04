@@ -198,7 +198,7 @@ public class XFEChatGPT : XFEChatGPTBase
         string receivedMessage = string.Empty;
         try
         {
-            ClientWebSocket webSocket = new ClientWebSocket();
+            ClientWebSocket webSocket = new();
             await webSocket.ConnectAsync(new Uri("ws://gpt.api.xfegzs.com/"), CancellationToken.None);
             await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(message)), WebSocketMessageType.Text, true, CancellationToken.None);
             byte[] buffer = new byte[1024];
@@ -233,7 +233,7 @@ public class XFEChatGPT : XFEChatGPTBase
             {
                 command = commandString;
             }
-            ClientWebSocket webSocket = new ClientWebSocket();
+            ClientWebSocket webSocket = new();
             webSocket.Options.SetRequestHeader("XFEPassword", password);
             await webSocket.ConnectAsync(new Uri("ws://api.xfegzs.com/"), CancellationToken.None);
             await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(command)), WebSocketMessageType.Text, true, CancellationToken.None);

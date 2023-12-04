@@ -62,7 +62,7 @@ public class XFManager
         {
             if (item.Name == name)
             {
-                return item.Property is null ? default : (T)item.Property;
+                return (T?)item.Property;
             }
         }
         return default;
@@ -87,8 +87,8 @@ public class XFManager
     /// </summary>
     public XFManager()
     {
-        Properties = new List<XProperty>();
-        Fields = new List<XField>();
+        Properties = [];
+        Fields = [];
     }
     /// <summary>
     /// XFE字段属性管理器
@@ -97,8 +97,8 @@ public class XFManager
     /// <param name="IsProperty">是否为属性</param>
     public XFManager(bool IsProperty, params object[] nameAndValue)
     {
-        Properties = new List<XProperty>();
-        Fields = new List<XField>();
+        Properties = [];
+        Fields = [];
         if (IsProperty)
         {
             for (int i = 0; i < nameAndValue.Length; i += 2)
@@ -120,8 +120,8 @@ public class XFManager
     /// <param name="nameAndValue">字段名称和其值</param>
     public XFManager(params object[] nameAndValue)
     {
-        Properties = new List<XProperty>();
-        Fields = new List<XField>();
+        Properties = [];
+        Fields = [];
         for (int i = 0; i < nameAndValue.Length; i += 2)
         {
             Fields.Add(new XField() { name = nameAndValue[i].ToString(), field = nameAndValue[i + 1] });

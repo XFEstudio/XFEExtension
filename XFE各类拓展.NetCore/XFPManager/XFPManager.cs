@@ -46,7 +46,7 @@ public class XFPManager
         {
             if (item.Name == name)
             {
-                return item.Property is null ? default : (T)item.Property;
+                return (T?)item.Property;
             }
         }
         return default;
