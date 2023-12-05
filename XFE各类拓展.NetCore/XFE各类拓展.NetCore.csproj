@@ -13,19 +13,22 @@
     <SignAssembly>True</SignAssembly>
     <Copyright>XFE工作室版权所有</Copyright>
     <PackageProjectUrl>https://github.com/XFEstudio/XFEExtension</PackageProjectUrl>
-    <PackageIcon>寰宇朽力定稿版_透明图标.png</PackageIcon>
+    <PackageIcon>logoIcon.png</PackageIcon>
     <Description>XFE各类拓展为代码拓展</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>XFE;XFEExtension;XFE各类拓展</PackageTags>
-    <PackageReleaseNotes>暂无</PackageReleaseNotes>
+    <PackageReleaseNotes>修改markdown文件说明
+新增XFE下载器
+修改ChatGPT对接的部分协议
+优化部分代码结构</PackageReleaseNotes>
     <NeutralLanguage>zh-CN</NeutralLanguage>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <AssemblyOriginatorKeyFile>C:\Users\XFEstudio\Desktop\work\C#\OtherProject\XFE各类拓展\XFE各类拓展\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <AssemblyVersion>1.1.2.0</AssemblyVersion>
-    <FileVersion>1.1.2.0</FileVersion>
-    <Version>1.1.0</Version>
-    <Authors>XFE寰宇朽力</Authors>
+    <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyVersion>1.1.3.1</AssemblyVersion>
+    <FileVersion>1.1.3.1</FileVersion>
+    <Version>1.1.1</Version>
+    <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -37,15 +40,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\..\LOGO\寰宇朽力定稿版_透明图标.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
     <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
     <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\XFEstudio.pfx">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\logoIcon.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

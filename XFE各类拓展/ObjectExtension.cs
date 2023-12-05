@@ -56,12 +56,12 @@ namespace XFE各类拓展.ObjectExtension
         /// <returns></returns>
         public static bool AboutEqual<T>(this T obj1, T obj2)
         {
-            if (obj1 is null && obj2 is null)
+            if (obj1 == null && obj2 == null)
             {
                 return true;
             }
 
-            if (obj1 is null || obj2 is null)
+            if (obj1 == null || obj2 == null)
             {
                 return false;
             }

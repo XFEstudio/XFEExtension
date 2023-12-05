@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using XFE各类拓展.DelegateExtension;
 using XFE各类拓展.TaskExtension;
 
 namespace XFE各类拓展.WebExtension
@@ -145,53 +146,55 @@ namespace XFE各类拓展.WebExtension
     public class XFEDownloader
     {
         /// <summary>
-        /// 下载事件
+        /// 字节下载事件
         /// </summary>
-        public event EventHandler<FileDownloadedEventArgs> BufferDownloaded;
+        public event XFEEventHandler<XFEDownloader, FileDownloadedEventArgs> BufferDownloaded;
         /// <summary>
-        /// 下载文件目标URL
+        /// 目标下载地址
         /// </summary>
         public string DownloadUrl { get; set; }
         /// <summary>
-        /// 文件储存位置
+        /// 储存位置
         /// </summary>
         public string SavePath { get; set; }
         /// <summary>
+        /// 已下载
+        /// </summary>
+        public bool Downloaded { get; }
+        /// <summary>
         /// 开始下载
         /// </summary>
+        /// <param name="continueFromLastDownload"></param>
         /// <returns></returns>
-        public async Task Download()
+        public async Task Download(bool continueFromLastDownload = true)
         {
-            using (HttpClient client = new HttpClient())
+            using (var client = new HttpClient())
             {
-                using (HttpResponseMessage response = await client.GetAsync(DownloadUrl, HttpCompletionOption.ResponseHeadersRead))
+                var continueDownload = continueFromLastDownload && File.Exists(SavePath);
+                using (var fileStream = new FileStream(SavePath, continueDownload ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
                 {
-                    response.EnsureSuccessStatusCode();
-
-                    long? totalFileSize = response.Content.Headers.ContentLength;
-
-                    using (Stream contentStream = await response.Content.ReadAsStreamAsync())
+                    long totalRead = 0;
+                    long lastBufferDownloadSize = fileStream.Length;
+                    if (continueDownload)
                     {
-                        using (FileStream fileStream = new FileStream(SavePath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
+                        client.DefaultRequestHeaders.Range = new System.Net.Http.Headers.RangeHeaderValue(lastBufferDownloadSize, null);
+                        totalRead = lastBufferDownloadSize;
+                    }
+                    using (var response = await client.GetAsync(DownloadUrl, HttpCompletionOption.ResponseHeadersRead))
+                    {
+                        response.EnsureSuccessStatusCode();
+                        long? totalFileSize = response.Content.Headers.ContentLength + lastBufferDownloadSize;
+                        using (var contentStream = await response.Content.ReadAsStreamAsync())
                         {
                             byte[] buffer = new byte[8192];
-                            long totalRead = 0;
-                            int read;
-
-                            while ((read = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                            int currentRead;
+                            while ((currentRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                             {
-                                await fileStream.WriteAsync(buffer, 0, read);
-                                totalRead += read;
-
-                                if (totalFileSize.HasValue)
-                                {
-                                    double percentage = ((double)totalRead / totalFileSize.Value) * 100;
-                                    Console.WriteLine($"Downloaded {totalRead}/{totalFileSize} bytes ({percentage:F2}%)");
-                                }
-                                else
-                                {
-                                    Console.WriteLine($"Downloaded {totalRead} bytes");
-                                }
+                                await fileStream.WriteAsync(buffer, 0, currentRead);
+                                totalRead += currentRead;
+                                var bufferCopy = new byte[8192];
+                                bufferCopy.CopyTo(buffer, 0);
+                                BufferDownloaded?.Invoke(this, new FileDownloadedEventArgs(bufferCopy, totalRead, totalFileSize, currentRead != 8192));
                             }
                         }
                     }
@@ -199,22 +202,41 @@ namespace XFE各类拓展.WebExtension
             }
         }
     }
+
     /// <summary>
-    /// 文件下载事件
+    /// 字符下载事件
     /// </summary>
     public class FileDownloadedEventArgs : EventArgs
     {
         /// <summary>
-        /// 当前下载的字节大小
+        /// 当前下载到的字节
         /// </summary>
-        public long CurrentBufferSize { get; set; }
+        public byte[] CurrentBuffer { get; }
         /// <summary>
-        /// 总计下载的字节大小
+        /// 总计下载的字节长度
         /// </summary>
-        public long DownloadedBufferSize { get; set; }
+        public long DownloadedBufferSize { get; }
         /// <summary>
         /// 总共需要下载的字节大小
         /// </summary>
-        public long TotalBufferSize { get; set; }
+        public long? TotalBufferSize { get; }
+        /// <summary>
+        /// 是否下载完成
+        /// </summary>
+        public bool Downloaded { get; }
+        /// <summary>
+        /// 字符下载事件
+        /// </summary>
+        /// <param name="currentBuffer">当前下载的字符</param>
+        /// <param name="downloadedBufferSize">已下载的字节大小</param>
+        /// <param name="totalBufferSize">总计需要下载的字节大小</param>
+        /// <param name="downloaded">是否已经下载完成</param>
+        public FileDownloadedEventArgs(byte[] currentBuffer, long downloadedBufferSize, long? totalBufferSize, bool downloaded)
+        {
+            this.CurrentBuffer = currentBuffer;
+            this.DownloadedBufferSize = downloadedBufferSize;
+            this.TotalBufferSize = totalBufferSize;
+            this.Downloaded = downloaded;
+        }
     }
 }

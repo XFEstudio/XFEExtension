@@ -8,7 +8,7 @@ namespace XFE各类拓展.NetCore.TaskExtension;
 /// </summary>
 public static class TaskExtension
 {
-    private static long CTimeCounter = 0;
+    private static long cTimeCounter = 0;
     #region 新建任务并开始
     /// <summary>
     /// 新建一个任务并开始
@@ -65,19 +65,19 @@ public static class TaskExtension
         timeCounter.Start();
         action?.Invoke();
         timeCounter.Stop();
-        CTimeCounter++;
+        cTimeCounter++;
         var elapsedTime = timeCounter.Elapsed;
         if (autoOutPut)
             if (elapsedTime.TotalHours >= 1)
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{CTimeCounter}\t执行时间：{elapsedTime}");
+                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间：{elapsedTime}");
             else if (elapsedTime.TotalMinutes >= 1)
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{CTimeCounter}\t执行时间: {Math.Floor(elapsedTime.TotalMinutes)} 分 {elapsedTime.Seconds} 秒");
+                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {Math.Floor(elapsedTime.TotalMinutes)} 分 {elapsedTime.Seconds} 秒");
             else if (elapsedTime.TotalSeconds >= 1)
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{CTimeCounter}\t执行时间: {elapsedTime.TotalSeconds:F3} 秒");
+                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalSeconds:F3} 秒");
             else if (elapsedTime.TotalMilliseconds >= 1)
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{CTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds:F3} 毫秒");
+                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds:F3} 毫秒");
             else
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{CTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds * 1000:F3} 纳秒");
+                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds * 1000:F3} 纳秒");
         return elapsedTime;
     }
 }

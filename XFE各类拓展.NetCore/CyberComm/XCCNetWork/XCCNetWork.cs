@@ -270,10 +270,10 @@ public abstract class XCCGroup
                     try
                     {
                         var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
-                        var isHistory = receivedMessage.IndexOf("[XCCGetHistory]") == 0;
+                        var isHistory = receivedMessage.StartsWith("[XCCGetHistory]");
                         if (isHistory)
                         {
-                            receivedMessage = receivedMessage.Substring(15);
+                            receivedMessage = receivedMessage[15..];
                         }
                         var unPackedMessage = receivedMessage.ToXFEArray<string>();
                         var messageId = unPackedMessage[0];
@@ -359,7 +359,7 @@ public abstract class XCCGroup
     {
     XCCReconnect:
         FileTransportClientWebSocket = new ClientWebSocket();
-        Uri serverUri = new Uri("ws://xcc.api.xfegzs.com");
+        Uri serverUri = new("ws://xcc.api.xfegzs.com");
         var base64GroupId = Convert.ToBase64String(Encoding.UTF8.GetBytes(GroupId));
         var base64SenderId = Convert.ToBase64String(Encoding.UTF8.GetBytes(Sender));
         FileTransportClientWebSocket.Options.SetRequestHeader("Group", base64GroupId);
@@ -717,8 +717,8 @@ public delegate void MessageReceivedHandler<T>(bool isHistory, T message);
 /// </summary>
 public class XCCMessageReceiveHelper
 {
-    private readonly Dictionary<string, XCCFile> xCCFileDictionary = new Dictionary<string, XCCFile>();
-    private readonly Dictionary<string, List<XCCMessage>> xCCMessageDictionary = new Dictionary<string, List<XCCMessage>>();
+    private readonly Dictionary<string, XCCFile> xCCFileDictionary = [];
+    private readonly Dictionary<string, List<XCCMessage>> xCCMessageDictionary = [];
     private bool loaded = false;
     /// <summary>
     /// 自动保存到本地
@@ -1083,32 +1083,41 @@ public class XCCFile(string groupId, string messageId, XCCFileType fileType, str
 /// <summary>
 /// XCC消息
 /// </summary>
-public class XCCMessage
+/// <remarks>
+/// XCC消息
+/// </remarks>
+/// <param name="messageId">消息ID</param>
+/// <param name="messageType">消息类型</param>
+/// <param name="message">消息内容</param>
+/// <param name="sender">发送者</param>
+/// <param name="sendTime">发送时间</param>
+/// <param name="groupId">群组ID</param>
+public class XCCMessage(string messageId, XCCTextMessageType messageType, string message, string sender, DateTime sendTime, string groupId)
 {
     /// <summary>
     /// 消息ID
     /// </summary>
-    public string MessageId { get; }
+    public string MessageId { get; } = messageId;
     /// <summary>
     /// 消息类型
     /// </summary>
-    public XCCTextMessageType MessageType { get; }
+    public XCCTextMessageType MessageType { get; } = messageType;
     /// <summary>
     /// 消息内容
     /// </summary>
-    public string Message { get; }
+    public string Message { get; } = message;
     /// <summary>
     /// 发送者
     /// </summary>
-    public string Sender { get; }
+    public string Sender { get; } = sender;
     /// <summary>
     /// 发送时间
     /// </summary>
-    public DateTime SendTime { get; }
+    public DateTime SendTime { get; } = sendTime;
     /// <summary>
     /// 群组ID
     /// </summary>
-    public string GroupId { get; }
+    public string GroupId { get; } = groupId;
     /// <summary>
     /// 封装为字符串
     /// </summary>
@@ -1127,24 +1136,6 @@ public class XCCMessage
     {
         var unPackedMessage = xCCMessageStringFormat.ToXFEArray<string>();
         return new XCCMessage(unPackedMessage[0], (XCCTextMessageType)Enum.Parse(typeof(XCCTextMessageType), unPackedMessage[1]), unPackedMessage[2], unPackedMessage[3], DateTime.Parse(unPackedMessage[4]), groupId);
-    }
-    /// <summary>
-    /// XCC消息
-    /// </summary>
-    /// <param name="messageId">消息ID</param>
-    /// <param name="messageType">消息类型</param>
-    /// <param name="message">消息内容</param>
-    /// <param name="sender">发送者</param>
-    /// <param name="sendTime">发送时间</param>
-    /// <param name="groupId">群组ID</param>
-    public XCCMessage(string messageId, XCCTextMessageType messageType, string message, string sender, DateTime sendTime, string groupId)
-    {
-        MessageId = messageId;
-        MessageType = messageType;
-        Message = message;
-        Sender = sender;
-        SendTime = sendTime;
-        GroupId = groupId;
     }
 }
 /// <summary>

@@ -12,13 +12,13 @@ public static class FileExtension
     /// <summary>
     /// 将字符串写入文件
     /// </summary>
-    /// <param name="txt"></param>
+    /// <param name="text"></param>
     /// <param name="fileName">目标文件路径及文件名</param>
-    public static void WriteIn(this string txt, string fileName)
+    public static void WriteIn(this string text, string fileName)
     {
         FileInfo fileInfo = new(fileName);
         using var fileStream = fileInfo.Create();
-        var stream = Encoding.UTF8.GetBytes(txt);
+        var stream = Encoding.UTF8.GetBytes(text);
         fileStream.Write(stream, 0, stream.Length);
         fileStream.Flush();
     }

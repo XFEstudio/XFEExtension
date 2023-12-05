@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace XFE各类拓展.ArrayExtension
 {

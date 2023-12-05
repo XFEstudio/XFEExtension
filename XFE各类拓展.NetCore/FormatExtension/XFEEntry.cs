@@ -3,18 +3,18 @@
 /// <summary>
 /// XFE条目
 /// </summary>
-/// <param name="Header">头</param>
-/// <param name="Content">内容</param>
-public class XFEEntry(string Header, string Content)
+/// <param name="header">头</param>
+/// <param name="content">内容</param>
+public class XFEEntry(string header, string content)
 {
     /// <summary>
     /// 头
     /// </summary>
-    public string Header { get; set; } = Header;
+    public string Header { get; set; } = header;
     /// <summary>
     /// 内容
     /// </summary>
-    public string Content { get; set; } = Content;
+    public string Content { get; set; } = content;
     /// <summary>
     /// 转换为字符串
     /// </summary>
@@ -26,11 +26,11 @@ public class XFEEntry(string Header, string Content)
     /// <summary>
     /// 将字符串转化为条目对象
     /// </summary>
-    /// <param name="EntryString"></param>
+    /// <param name="entryString"></param>
     /// <returns></returns>
-    public static XFEEntry? ToEntry(string EntryString)
+    public static XFEEntry? ToEntry(string entryString)
     {
-        string[] messages = EntryString.Split(XFEDictionary.DictionarySeparator, StringSplitOptions.None);
+        string[] messages = entryString.Split(XFEDictionary.DictionarySeparator, StringSplitOptions.None);
         foreach (string message in messages)
         {
             string[] xFEDictionaryString = message.Split(XFEDictionary.EntrySeparator, StringSplitOptions.None);

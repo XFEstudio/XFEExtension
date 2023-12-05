@@ -5,7 +5,13 @@
 /// </summary>
 public class XFEDictionary : ICollection<XFEEntry>
 {
+    /// <summary>
+    /// 字典分隔符
+    /// </summary>
     public static string[] DictionarySeparator { get; } = ["|{+-", "-+}|"];
+    /// <summary>
+    /// 条目分隔符
+    /// </summary>
     public static string[] EntrySeparator { get; } = ["[+-", "-+]"];
     private List<XFEEntry> xFEDictionaryList = [];
     /// <summary>
@@ -273,12 +279,12 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <summary>
     /// 将字符串转换为XFEDictionary
     /// </summary>
-    /// <param name="DictionaryString">字符串</param>
+    /// <param name="dictionaryString">字符串</param>
     /// <returns></returns>
     /// <exception cref="XFEDictionaryException"></exception>
-    public static XFEDictionary ToDictionary(string DictionaryString)
+    public static XFEDictionary ToDictionary(string dictionaryString)
     {
-        return new XFEDictionary(ToList(DictionaryString));
+        return new XFEDictionary(ToList(dictionaryString));
     }
     /// <summary>
     /// XFE字典存储
@@ -291,24 +297,24 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <summary>
     /// XFE字典存储
     /// </summary>
-    /// <param name="HeaderAndContentStrings"></param>
+    /// <param name="headerAndContentStrings"></param>
     /// <exception cref="XFEDictionaryException"></exception>
-    public XFEDictionary(params string[] HeaderAndContentStrings)
+    public XFEDictionary(params string[] headerAndContentStrings)
     {
-        if (!(HeaderAndContentStrings.Length % 2 == 0))
+        if (!(headerAndContentStrings.Length % 2 == 0))
             throw new XFEDictionaryException("输入的字符串数组格式不正确，应为Header，Content，Header，Content...");
-        for (int i = 0; i < HeaderAndContentStrings.Length; i += 2)
+        for (int i = 0; i < headerAndContentStrings.Length; i += 2)
         {
-            xFEDictionaryList.Add(new XFEEntry(HeaderAndContentStrings[i], HeaderAndContentStrings[i + 1]));
+            xFEDictionaryList.Add(new XFEEntry(headerAndContentStrings[i], headerAndContentStrings[i + 1]));
         }
     }
     /// <summary>
     /// XFE字典存储
     /// </summary>
-    /// <param name="DictionaryString">字典字符串</param>
-    public XFEDictionary(string DictionaryString)
+    /// <param name="dictionaryString">字典字符串</param>
+    public XFEDictionary(string dictionaryString)
     {
-        xFEDictionaryList = ToList(DictionaryString);
+        xFEDictionaryList = ToList(dictionaryString);
     }
     /// <summary>
     /// XFE字典存储

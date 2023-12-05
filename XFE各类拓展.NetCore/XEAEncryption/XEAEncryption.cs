@@ -57,9 +57,9 @@ public static class XEAEncryption
     public static string XEADecrypt(string encryptedString, string secretKey)
     {
         string decrypted = string.Empty;
-        string randomSeed = encryptedString.Substring(0, 5);
+        string randomSeed = encryptedString[..5];
         string decryptedRandomSeed = string.Empty;
-        string encrypted = encryptedString.Substring(5);
+        string encrypted = encryptedString[5..];
         string middleKey = string.Empty;
         char middleChar = ' ';
         for (int i = 0; i < secretKey.Length / 2; i++)

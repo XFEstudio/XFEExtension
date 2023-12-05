@@ -88,7 +88,7 @@ public static class BufferExtension
         {
             throw new ArgumentException("Input buffer cannot be null or empty.");
         }
-        List<byte> result = new List<byte>();
+        List<byte> result = [];
         for (long i = 0; i <= buffer.LongLength - originBuffer.LongLength; i++)
         {
             bool isMatch = true;
@@ -158,7 +158,7 @@ public static class BufferExtension
         {
             if (i != 0)
                 packedBuffer.AddRange(new List<byte> { 0x01, 0x02, 0x03 });
-            packedBuffer.AddRange(buffers[i].Replace(new byte[] { 0x02, 0x03 }, new byte[] { 0x02, 0x02, 0x03 }).ToList());
+            packedBuffer.AddRange(buffers[i].Replace([0x02, 0x03], [0x02, 0x02, 0x03]).ToList());
         }
         return [.. packedBuffer];
     }
@@ -196,9 +196,9 @@ public static class BufferExtension
     public static List<byte[]> UnPackBuffer(this byte[] buffer)
     {
         var unPackedBuffers = new List<byte[]>();
-        foreach (var unPackedBuffer in buffer.Split(new byte[] { 0x01, 0x02, 0x03 }))
+        foreach (var unPackedBuffer in buffer.Split([0x01, 0x02, 0x03]))
         {
-            unPackedBuffers.Add(unPackedBuffer.Replace(new byte[] { 0x02, 0x02, 0x03 }, new byte[] { 0x02, 0x03 }));
+            unPackedBuffers.Add(unPackedBuffer.Replace([0x02, 0x02, 0x03], [0x02, 0x03]));
         }
         return unPackedBuffers;
     }

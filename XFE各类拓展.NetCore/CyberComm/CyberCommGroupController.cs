@@ -75,15 +75,15 @@ public class CyberCommGroupController
     /// <summary>
     /// 索引器
     /// </summary>
-    /// <param name="GroupId"></param>
+    /// <param name="groupId"></param>
     /// <returns></returns>
-    public CyberCommGroup? this[string GroupId]
+    public CyberCommGroup? this[string groupId]
     {
         get
         {
             foreach (CyberCommGroup commGroup in commGroups)
             {
-                if (commGroup.GroupId == GroupId)
+                if (commGroup.GroupId == groupId)
                 {
                     return commGroup;
                 }
@@ -94,11 +94,11 @@ public class CyberCommGroupController
     /// <summary>
     /// 通信群组控制器发送文本消息
     /// </summary>
-    /// <param name="GroupId">目标群组的ID</param>
+    /// <param name="groupId">目标群组的ID</param>
     /// <param name="message">发送的文本消息</param>
-    public async Task SendGroupTextMessage(string GroupId, string message)
+    public async Task SendGroupTextMessage(string groupId, string message)
     {
-        var commGroup = this[GroupId];
+        var commGroup = this[groupId];
         if (commGroup is not null)
         {
             await commGroup.SendGroupTextMessage(message);
@@ -107,11 +107,11 @@ public class CyberCommGroupController
     /// <summary>
     /// 通信群组控制器发送二进制消息
     /// </summary>
-    /// <param name="GroupId">目标群组的ID</param>
+    /// <param name="groupId">目标群组的ID</param>
     /// <param name="bytes">发送的二进制消息</param>
-    public async Task SendGroupBinaryMessage(string GroupId, byte[] bytes)
+    public async Task SendGroupBinaryMessage(string groupId, byte[] bytes)
     {
-        var commGroup = this[GroupId];
+        var commGroup = this[groupId];
         if (commGroup is not null)
         {
             await commGroup.SendGroupBinaryMessage(bytes);
@@ -122,6 +122,6 @@ public class CyberCommGroupController
     /// </summary>
     public CyberCommGroupController()
     {
-        commGroups = new List<CyberCommGroup>();
+        commGroups = [];
     }
 }
