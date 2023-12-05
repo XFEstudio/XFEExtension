@@ -21,21 +21,22 @@ public static class XFEExtension
     /// <returns></returns>
     public static TaskAwaiter GetAwaiter(this double waitTime)
         => Task.Delay(TimeSpan.FromSeconds(waitTime)).GetAwaiter();
-    //public static IEnumerator<int> GetEnumerator(this Range range)
-    //{
-
-    //}
-    public static IEnumerator<int> GetEnumerator(this int count)
+    /// <summary>
+    /// 获取枚举器
+    /// </summary>
+    /// <param name="range">范围运算符</param>
+    /// <returns></returns>
+    public static XFEIntEnumerator GetEnumerator(this Range range)
     {
-        for (int i = 0; i <= count; i++)
-        {
-            yield return i;
-        }
+        return new XFEIntEnumerator(range);
     }
-}
-public class XFEEnumerator(Range range)
-{
-    private int current;
-    private readonly int end;
-    
+    /// <summary>
+    /// 获取枚举器
+    /// </summary>
+    /// <param name="count">计数</param>
+    /// <returns></returns>
+    public static XFEIntEnumerator GetEnumerator(this int count)
+    {
+        return new XFEIntEnumerator(..count);
+    }
 }
