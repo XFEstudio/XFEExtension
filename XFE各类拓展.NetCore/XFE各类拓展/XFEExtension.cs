@@ -21,4 +21,21 @@ public static class XFEExtension
     /// <returns></returns>
     public static TaskAwaiter GetAwaiter(this double waitTime)
         => Task.Delay(TimeSpan.FromSeconds(waitTime)).GetAwaiter();
+    //public static IEnumerator<int> GetEnumerator(this Range range)
+    //{
+
+    //}
+    public static IEnumerator<int> GetEnumerator(this int count)
+    {
+        for (int i = 0; i <= count; i++)
+        {
+            yield return i;
+        }
+    }
+}
+public class XFEEnumerator(Range range)
+{
+    private int current;
+    private readonly int end;
+    
 }
