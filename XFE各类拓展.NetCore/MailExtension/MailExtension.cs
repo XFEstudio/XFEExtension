@@ -20,22 +20,20 @@ public static class MailExtension
     {
         try
         {
-            using (var client = new SmtpClient("smtp.exmail.qq.com", 587))
+            using var client = new SmtpClient("smtp.exmail.qq.com", 587);
+            client.UseDefaultCredentials = false;
+            client.Credentials = new NetworkCredential("mail@xfegzs.com", password);
+            client.EnableSsl = true;
+            MailAddress fromMailAddress = new("mail@xfegzs.com", "XFEMail");
+            MailMessage message = new()
             {
-                client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential("mail@xfegzs.com", password);
-                client.EnableSsl = true;
-                MailAddress fromMailAddress = new("mail@xfegzs.com", "XFEMail");
-                MailMessage message = new()
-                {
-                    From = fromMailAddress
-                };
-                message.To.Add(to);
-                message.Subject = subTitle;
-                message.Body = content;
-                // 发送邮件
-                client.Send(message);
-            }
+                From = fromMailAddress
+            };
+            message.To.Add(to);
+            message.Subject = subTitle;
+            message.Body = content;
+            // 发送邮件
+            client.Send(message);
         }
         catch (Exception ex)
         {
@@ -55,22 +53,20 @@ public static class MailExtension
     {
         try
         {
-            using (var client = new SmtpClient("smtp.exmail.qq.com", 587))
+            using var client = new SmtpClient("smtp.exmail.qq.com", 587);
+            client.UseDefaultCredentials = false;
+            client.Credentials = new NetworkCredential("mail@xfegzs.com", password);
+            client.EnableSsl = true;
+            MailAddress fromMailAddress = new("mail@xfegzs.com", name);
+            MailMessage message = new()
             {
-                client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential("mail@xfegzs.com", password);
-                client.EnableSsl = true;
-                MailAddress fromMailAddress = new("mail@xfegzs.com", name);
-                MailMessage message = new()
-                {
-                    From = fromMailAddress
-                };
-                message.To.Add(to);
-                message.Subject = subTitle;
-                message.Body = content;
-                // 发送邮件
-                client.SendAsync(message, null);
-            }
+                From = fromMailAddress
+            };
+            message.To.Add(to);
+            message.Subject = subTitle;
+            message.Body = content;
+            // 发送邮件
+            client.SendAsync(message, null);
         }
         catch (Exception ex)
         {
