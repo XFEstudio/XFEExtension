@@ -127,3 +127,30 @@ Console.WriteLine("解密内容：" + encrypt.XEADecrypt(password));//解密
 // 使用XFE各类拓展来简化特性读取操作
 string str = testObject.GetAttribute<string>();
 ```
+
+### 使用XUnit测试框架
+
+```csharp
+[CTest]
+class TestClass : XFECode
+{
+    [MTest]
+    void Test()
+    {
+        Assert(true, "断言内容");
+    }
+}
+public class Program : XFECode
+{
+    public static void Main(string[] args)
+    {
+        Pause();
+    }
+}
+```
+
+### 快速搭建网络通讯服务器
+
+```csharp
+
+```
