@@ -227,4 +227,38 @@ public static class FileExtension
         catch { }
         return null; // 如果没有找到占用文件的进程，返回null
     }
+    /// <summary>
+    /// 获取文件的有效起始位置
+    /// </summary>
+    /// <param name="fileStream">文件流</param>
+    /// <param name="startPosition">起始搜寻位置</param>
+    /// <param name="endPosition">结束搜寻位置</param>
+    /// <returns>一个长整型，介于起始位置和结束位置之间</returns>
+    public static async Task<long> GetValidPosition(this FileStream fileStream, long startPosition, long endPosition)
+    {
+        long seekPosition = endPosition;
+        fileStream.Seek(startPosition, SeekOrigin.Begin);
+        byte[] buffer = new byte[endPosition - startPosition];
+        await fileStream.ReadAsync(buffer.AsMemory(0, (int)(endPosition - startPosition)));
+        for (int i = buffer.Length - 1; i >= 0; i--)
+        {
+            if (buffer[i] != 0)
+                break;
+            seekPosition--;
+        }
+        return seekPosition > startPosition ? seekPosition : startPosition;
+    }
+    /// <summary>
+    /// 获取文件的有效起始位置
+    /// </summary>
+    /// <param name="fileStream">文件流</param>
+    /// <param name="startPosition">起始搜寻位置</param>
+    /// <returns>一个长整型，介于起始位置和结束位置之间</returns>
+    public static async Task<long> GetValidPosition(this FileStream fileStream, long startPosition) => await GetValidPosition(fileStream, startPosition, fileStream.Length);
+    /// <summary>
+    /// 获取文件的有效起始位置
+    /// </summary>
+    /// <param name="fileStream">文件流</param>
+    /// <returns>一个长整型，介于起始位置和结束位置之间</returns>
+    public static async Task<long> GetValidPosition(this FileStream fileStream) => await GetValidPosition(fileStream, 0, fileStream.Length);
 }

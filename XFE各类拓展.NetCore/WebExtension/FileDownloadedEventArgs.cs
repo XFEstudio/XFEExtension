@@ -3,7 +3,7 @@
 /// <summary>
 /// 字符下载事件
 /// </summary>
-public class FileDownloadedEventArgs(byte[] currentBuffer, long downloadedBufferSize, long? totalBufferSize, bool downloaded) : EventArgs
+public class FileDownloadedEventArgs(byte[] currentBuffer, long downloadedBufferSize, long? totalBufferSize, long currentSegmentTotalBufferSize, long currentSegmentDownloadedBufferSize, int currentSegmentIndex, bool downloaded) : EventArgs
 {
 
     /// <summary>
@@ -11,13 +11,25 @@ public class FileDownloadedEventArgs(byte[] currentBuffer, long downloadedBuffer
     /// </summary>
     public byte[] CurrentBuffer { get; } = currentBuffer;
     /// <summary>
-    /// 总计下载的字节长度
+    /// 总共已下载的字节大小
     /// </summary>
     public long DownloadedBufferSize { get; } = downloadedBufferSize;
     /// <summary>
     /// 总共需要下载的字节大小
     /// </summary>
     public long? TotalBufferSize { get; } = totalBufferSize;
+    /// <summary>
+    /// 当前节的总计需要下载的字节大小
+    /// </summary>
+    public long CurrentSegmentTotalBufferSize { get; } = currentSegmentTotalBufferSize;
+    /// <summary>
+    /// 当前节的已下载的字节大小
+    /// </summary>
+    public long CurrentSegmentDownloadedBufferSize { get; } = currentSegmentDownloadedBufferSize;
+    /// <summary>
+    /// 当前节的索引
+    /// </summary>
+    public int CurrentSegmentIndex { get; } = currentSegmentIndex;
     /// <summary>
     /// 是否下载完成
     /// </summary>

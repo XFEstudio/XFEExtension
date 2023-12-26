@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net.Http;
+using System.Text;
 using XFE各类拓展.NetCore.TaskExtension;
 
 namespace XFE各类拓展.NetCore.WebExtension;
@@ -151,5 +152,19 @@ public static class WebExtension
         {
             return null;
         }
+    }
+    /// <summary>
+    /// 通过给定的URL获取其文件名
+    /// </summary>
+    /// <param name="url">指定的URL</param>
+    /// <returns></returns>
+    public static async Task<string?> GetFileNameFromURL(this string url)
+    {
+        var response = await new HttpClient().GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+        response.EnsureSuccessStatusCode();
+        if (response.Content.Headers.ContentDisposition?.FileName is null)
+            return Path.GetFileName(response.RequestMessage?.RequestUri?.AbsolutePath);
+        else
+            return response.Content.Headers.ContentDisposition.FileNameStar;
     }
 }
