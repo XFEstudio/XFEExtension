@@ -320,4 +320,14 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// XFE字典存储
     /// </summary>
     public XFEDictionary() { }
+    /// <summary>
+    /// 从字符串加载字典
+    /// </summary>
+    /// <param name="dictionaryString"></param>
+    public static implicit operator XFEDictionary(string dictionaryString) => new(dictionaryString);
+    /// <summary>
+    /// 将字典转为字符串
+    /// </summary>
+    /// <param name="xFEEntries"></param>
+    public static implicit operator string(XFEDictionary xFEEntries) => new(xFEEntries.ToString());
 }

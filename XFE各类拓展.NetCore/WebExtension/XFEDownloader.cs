@@ -8,6 +8,7 @@ namespace XFE各类拓展.NetCore.WebExtension;
 /// <summary>
 /// XFE下载器
 /// </summary>
+[Obsolete("出现严重漏洞，暂停使用，预计下个版本恢复", true)]
 public class XFEDownloader : IDisposable
 {
     private bool disposedValue;
@@ -59,9 +60,11 @@ public class XFEDownloader : IDisposable
             downloadTasks.Add(Task.Run(async () =>
             {
                 using var fileStream = new FileStream(SavePath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, 8192, true);
-                long lastBufferDownloadSize = continueDownload ? await fileStream.GetValidPosition() : fileStream.Length / FileSegmentCount * currentSegment;
                 long endPosition = currentSegment == FileSegmentCount - 1 ? fileStream.Length - fileStream.Length / FileSegmentCount * currentSegment : fileStream.Length / FileSegmentCount * (currentSegment + 1);
+                long startBufferIndex = fileStream.Length / FileSegmentCount * currentSegment;
+                long lastBufferDownloadSize = continueDownload ? await fileStream.GetValidPosition(startBufferIndex, endPosition) : startBufferIndex;
                 fileStream.Seek(lastBufferDownloadSize, SeekOrigin.Begin);
+                long currentSegmentDownloadedBuffeSize = lastBufferDownloadSize - startBufferIndex;
                 if (continueDownload)
                 {
                     httpClient.DefaultRequestHeaders.Range = new System.Net.Http.Headers.RangeHeaderValue(lastBufferDownloadSize, endPosition);
@@ -76,11 +79,12 @@ public class XFEDownloader : IDisposable
                         while (!IsPaused && !disposedValue) { }
                     await fileStream.WriteAsync(buffer.AsMemory(0, currentRead));
                     totalRead += currentRead;
+                    currentSegmentDownloadedBuffeSize += currentRead;
                     var bufferCopy = new byte[8192];
                     bufferCopy.CopyTo(buffer, 0);
                     if (totalRead == totalFileSize)
                         Downloaded = true;
-                    BufferDownloaded?.Invoke(this, new FileDownloadedEventArgs(bufferCopy, totalRead, totalFileSize, Downloaded));
+                    BufferDownloaded?.Invoke(this, new FileDownloadedEventArgs(bufferCopy, totalRead, totalFileSize, fileStream.Length / FileSegmentCount, currentSegmentDownloadedBuffeSize, currentSegment, Downloaded));
                 }
             }));
         }
