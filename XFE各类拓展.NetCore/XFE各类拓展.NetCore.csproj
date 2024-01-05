@@ -17,14 +17,25 @@
     <Description>XFE各类拓展提供Xunit测试框架，快速搭建服务器/客户端，免费ChatGPTAPI接口，免费通讯服务器，XFE下载器，新增格式等</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
-    <PackageReleaseNotes>优化部分代码结构</PackageReleaseNotes>
+    <PackageReleaseNotes>## 调整
+
+XFE字典储存新增与string之间的隐式转换
+
+## 新增
+
+新增UAC权限管理器
+新增配置文件管理器
+
+## 严重
+
+XFE下载器暂停使用，发现严重漏洞，预计下个版本修复</PackageReleaseNotes>
     <NeutralLanguage>zh-CN</NeutralLanguage>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <AssemblyVersion>1.2.5.0</AssemblyVersion>
-    <FileVersion>1.2.5.0</FileVersion>
-    <Version>1.2.3</Version>
+    <AssemblyVersion>1.3.7.0</AssemblyVersion>
+    <FileVersion>1.3.7.0</FileVersion>
+    <Version>1.3.0</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
