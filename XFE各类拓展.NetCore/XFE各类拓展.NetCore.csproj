@@ -33,9 +33,9 @@ XFE下载器暂停使用，发现严重漏洞，预计下个版本修复</Packag
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <AssemblyVersion>1.3.7.0</AssemblyVersion>
-    <FileVersion>1.3.7.0</FileVersion>
-    <Version>1.3.0</Version>
+    <AssemblyVersion>1.3.8.1</AssemblyVersion>
+    <FileVersion>1.3.8.1</FileVersion>
+    <Version>1.3.1</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
