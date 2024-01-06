@@ -49,7 +49,7 @@ public static class FileExtension
         if (fileInfo.Exists)
         {
             using StreamReader streamReader = fileInfo.OpenText();
-            content = streamReader.ReadLine();
+            content = streamReader.ReadToEnd();
             streamReader.Close();
             return true;
         }
@@ -70,7 +70,7 @@ public static class FileExtension
         if (fileInfo.Exists)
         {
             using var streamReader = fileInfo.OpenText();
-            var text = streamReader.ReadLine();
+            var text = streamReader.ReadToEnd();
             streamReader.Close();
             return text;
         }

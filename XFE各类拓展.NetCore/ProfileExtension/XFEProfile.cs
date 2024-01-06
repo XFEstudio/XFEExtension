@@ -64,6 +64,9 @@ public abstract class XFEProfile
         var saveProfileDictionary = new XFEDictionary();
         foreach (var property in waitSaveProfile.PropertiesInfo)
             saveProfileDictionary.Add(property.Name, property.Value is null ? string.Empty : property.Value);
+        var fileSavePath = Path.GetDirectoryName(waitSaveProfile.Path);
+        if (!Directory.Exists(fileSavePath) && fileSavePath is not null && fileSavePath != string.Empty)
+            Directory.CreateDirectory(fileSavePath);
         await File.WriteAllTextAsync(waitSaveProfile.Path, saveProfileDictionary);
     }
     /// <summary>
