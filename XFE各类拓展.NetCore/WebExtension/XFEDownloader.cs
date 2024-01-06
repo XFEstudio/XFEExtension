@@ -8,11 +8,10 @@ namespace XFE各类拓展.NetCore.WebExtension;
 /// <summary>
 /// XFE下载器
 /// </summary>
-[Obsolete("出现严重漏洞，暂停使用，预计下个版本恢复", true)]
 public class XFEDownloader : IDisposable
 {
     private bool disposedValue;
-    private readonly HttpClient httpClient = new();
+    private readonly List<HttpClient> httpClientList = [];
     private HttpResponseMessage? responseMessage;
     private readonly List<HttpResponseMessage> httpResponseMessages = [];
     private readonly List<Task> downloadTasks = [];
@@ -49,7 +48,8 @@ public class XFEDownloader : IDisposable
     {
         var continueDownload = continueFromLastDownload && File.Exists(SavePath);
         long totalRead = 0;
-        responseMessage ??= await GetHttpResponseMessage();
+        var getInfoClient = new HttpClient();
+        responseMessage ??= await GetHttpResponseMessage(getInfoClient);
         long? totalFileSize = responseMessage.Content.Headers.ContentLength;
         using var createFileStream = new FileStream(SavePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite, 8192, true);
         if (totalFileSize is not null)
@@ -60,31 +60,34 @@ public class XFEDownloader : IDisposable
             downloadTasks.Add(Task.Run(async () =>
             {
                 using var fileStream = new FileStream(SavePath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, 8192, true);
-                long endPosition = currentSegment == FileSegmentCount - 1 ? fileStream.Length - fileStream.Length / FileSegmentCount * currentSegment : fileStream.Length / FileSegmentCount * (currentSegment + 1);
-                long startBufferIndex = fileStream.Length / FileSegmentCount * currentSegment;
-                long lastBufferDownloadSize = continueDownload ? await fileStream.GetValidPosition(startBufferIndex, endPosition) : startBufferIndex;
-                fileStream.Seek(lastBufferDownloadSize, SeekOrigin.Begin);
-                long currentSegmentDownloadedBuffeSize = lastBufferDownloadSize - startBufferIndex;
+                long currentSegmentTotalBufferSize = fileStream.Length / FileSegmentCount;
+                long endPosition = currentSegment == FileSegmentCount - 1 ? fileStream.Length : currentSegmentTotalBufferSize * (currentSegment + 1);
+                long startBufferIndex = currentSegmentTotalBufferSize * currentSegment;
+                long startPosition = continueDownload ? await fileStream.GetValidPosition(startBufferIndex, endPosition) : startBufferIndex;
+                fileStream.Seek(startPosition, SeekOrigin.Begin);
+                long currentSegmentDownloadedBuffeSize = startPosition - startBufferIndex;
+                var httpClient = new HttpClient();
+                httpClientList.Add(httpClient);
+                httpClient.DefaultRequestHeaders.Range = new System.Net.Http.Headers.RangeHeaderValue(startPosition, endPosition);
                 if (continueDownload)
-                {
-                    httpClient.DefaultRequestHeaders.Range = new System.Net.Http.Headers.RangeHeaderValue(lastBufferDownloadSize, endPosition);
-                    totalRead += lastBufferDownloadSize;
-                }
-                using var contentStream = await (await GetHttpResponseMessage()).Content.ReadAsStreamAsync();
+                    totalRead += currentSegmentDownloadedBuffeSize;
+                using var contentStream = await (await GetHttpResponseMessage(httpClient)).Content.ReadAsStreamAsync();
                 byte[] buffer = new byte[8192];
                 int currentRead;
                 while ((currentRead = await contentStream.ReadAsync(buffer)) > 0 && !disposedValue)
                 {
                     if (IsPaused)
-                        while (!IsPaused && !disposedValue) { }
+                        while (IsPaused && !disposedValue) { }
                     await fileStream.WriteAsync(buffer.AsMemory(0, currentRead));
                     totalRead += currentRead;
                     currentSegmentDownloadedBuffeSize += currentRead;
                     var bufferCopy = new byte[8192];
                     bufferCopy.CopyTo(buffer, 0);
-                    if (totalRead == totalFileSize)
+                    if (Downloaded)
+                        return;
+                    if (totalRead >= totalFileSize)
                         Downloaded = true;
-                    BufferDownloaded?.Invoke(this, new FileDownloadedEventArgs(bufferCopy, totalRead, totalFileSize, fileStream.Length / FileSegmentCount, currentSegmentDownloadedBuffeSize, currentSegment, Downloaded));
+                    BufferDownloaded?.Invoke(this, new FileDownloadedEventArgs(bufferCopy, totalRead, totalFileSize, currentSegmentTotalBufferSize, currentSegmentDownloadedBuffeSize, currentSegment, Downloaded));
                 }
             }));
         }
@@ -105,10 +108,11 @@ public class XFEDownloader : IDisposable
     /// <returns></returns>
     public async Task<(string? fileName, long? fileSize)> GetDownloadInfo()
     {
-        responseMessage ??= await GetHttpResponseMessage();
+        using var httpClient = new HttpClient();
+        responseMessage ??= await GetHttpResponseMessage(httpClient);
         return (Path.GetFileName(responseMessage.RequestMessage?.RequestUri?.AbsolutePath), responseMessage.Content.Headers.ContentLength);
     }
-    private async Task<HttpResponseMessage> GetHttpResponseMessage()
+    private async Task<HttpResponseMessage> GetHttpResponseMessage(HttpClient httpClient)
     {
         var response = await httpClient.GetAsync(DownloadUrl, HttpCompletionOption.ResponseHeadersRead);
         response.EnsureSuccessStatusCode();
@@ -124,8 +128,11 @@ public class XFEDownloader : IDisposable
         {
             if (disposing)
             {
-                httpClient.Dispose();
                 responseMessage?.Dispose();
+                foreach (var httpClient in httpClientList)
+                {
+                    httpClient.Dispose();
+                }
                 foreach (var response in httpResponseMessages)
                 {
                     response.Dispose();

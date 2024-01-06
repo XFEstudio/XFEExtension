@@ -17,7 +17,7 @@ public class ProfileInfo(Type profileType, string path = "", string description 
     /// <summary>
     /// 配置文件储存位置
     /// </summary>
-    public string Path { get; init; } = path == "" ? $"{profileType.Name}.xfe" : path;
+    public string Path { get; init; } = path == "" ? $"Profile/{profileType.Name}.xfe" : path;
     /// <summary>
     /// 配置文件描述
     /// </summary>
