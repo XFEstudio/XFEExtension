@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Security.Principal;
-using XFE各类拓展.NetCore.FileExtension;
 
 namespace XFE各类拓展.NetCore.PermissionExtension;
 
@@ -26,13 +25,12 @@ public static partial class AdministratorPermission
         return principal.IsInRole(WindowsBuiltInRole.Administrator);
     }
     /// <summary>
-    /// 
+    /// 请求管理员权限并重启程序
     /// </summary>
     public static void GetPermissionAndReboot()
     {
         try
         {
-            "0".WriteIn("pm.xfe");
             var startInfo = new ProcessStartInfo
             {
                 UseShellExecute = true,
@@ -45,27 +43,17 @@ public static partial class AdministratorPermission
         }
         catch (Exception ex)
         {
-            File.Delete("pm.xfe");
+            PermissionState = CurrentPermissionState.PermissionDenied;
             throw new XFEExtensionException("无法获取管理员权限", ex);
         }
     }
     static AdministratorPermission()
     {
-        var result = "pm.xfe".ReadOut();
         var isAdmin = IsAdministrator();
         if (isAdmin)
-        {
             PermissionState = CurrentPermissionState.Administration;
-        }
         else
-        {
-            if (result == "-1")
-                PermissionState = CurrentPermissionState.Normal;
-            else
-                PermissionState = CurrentPermissionState.PermissionDenied;
-        }
-        if (File.Exists("pm.xfe"))
-            File.Delete("pm.xfe");
+            PermissionState = CurrentPermissionState.Normal;
     }
 }
 #pragma warning restore CA1416 // 验证平台兼容性
