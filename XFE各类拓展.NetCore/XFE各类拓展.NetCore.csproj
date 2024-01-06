@@ -19,8 +19,7 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-修复文件读取拓展的部分bug
-现在XFEProfile中储存配置文件时会自动创建文件夹
+
 
 ## 新增
 
@@ -28,14 +27,14 @@
 
 ## 严重
 
-XFE下载器暂停使用，发现严重漏洞，预计下个版本修复</PackageReleaseNotes>
+无</PackageReleaseNotes>
     <NeutralLanguage>zh-CN</NeutralLanguage>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <AssemblyVersion>1.3.9.2</AssemblyVersion>
-    <FileVersion>1.3.9.2</FileVersion>
-    <Version>1.3.2</Version>
+    <AssemblyVersion>1.4.10.0</AssemblyVersion>
+    <FileVersion>1.4.10.0</FileVersion>
+    <Version>1.4.0</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
