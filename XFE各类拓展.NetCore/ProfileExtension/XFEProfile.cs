@@ -1,5 +1,4 @@
 ﻿using XFE各类拓展.NetCore.FormatExtension;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace XFE各类拓展.NetCore.ProfileExtension;
 
@@ -12,6 +11,10 @@ public abstract class XFEProfile
     /// 配置文件清单
     /// </summary>
     public static List<ProfileInfo> Profiles { get; private set; } = [];
+    /// <summary>
+    /// 配置文件所在的根目录
+    /// </summary>
+    public static string ProfilesRootPath { get; set; } = $"{AppDomain.CurrentDomain.BaseDirectory}/Profiles";
     /// <summary>
     /// 加载配置文件
     /// </summary>
