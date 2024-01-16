@@ -113,10 +113,7 @@ public class XFEWaitTask<T>
     /// 获取等待器
     /// </summary>
     /// <returns></returns>
-    public TaskAwaiter<T> GetAwaiter()
-    {
-        return WaitTaskSource.Task.GetAwaiter();
-    }
+    public TaskAwaiter<T> GetAwaiter() => WaitTaskSource.Task.GetAwaiter();
     /// <summary>
     /// XFE等待器
     /// </summary>
@@ -152,10 +149,7 @@ public class TaskSynchronizer
     /// 添加任务
     /// </summary>
     /// <param name="task">待执行任务</param>
-    public void AddTask(Task task)
-    {
-        CurrentTask = task;
-    }
+    public void AddTask(Task task) => CurrentTask = task;
     /// <summary>
     /// 任务同步器
     /// </summary>

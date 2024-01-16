@@ -26,7 +26,7 @@ public class XFEDownloader : IDisposable
     /// <summary>
     /// 储存位置
     /// </summary>
-    public required string SavePath { get; init; }
+    public string SavePath { get; init; }
     /// <summary>
     /// 文件分段下载的数量（可加速下载）
     /// </summary>
