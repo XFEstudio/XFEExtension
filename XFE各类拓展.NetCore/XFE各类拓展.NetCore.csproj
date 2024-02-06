@@ -32,9 +32,9 @@ XFE配置文件新增配置文件根目录
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <AssemblyVersion>1.4.11.1</AssemblyVersion>
-    <FileVersion>1.4.11.1</FileVersion>
-    <Version>1.4.1</Version>
+    <AssemblyVersion>1.5.12.0</AssemblyVersion>
+    <FileVersion>1.5.12.0</FileVersion>
+    <Version>1.5.0</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
