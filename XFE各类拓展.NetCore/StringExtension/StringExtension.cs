@@ -68,6 +68,21 @@ public static partial class StringExtension
     {
         return IdCardRegex().IsMatch(idNumber);
     }
+
+    /// <summary>
+    /// 判断字符串是否为 null 或者是空字符串
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
+    public static bool IsNullOrEmpty(this string str) => string.IsNullOrEmpty(str);
+
+    /// <summary>
+    /// 判断字符串是否是 null 、空字符串和仅包含空格的字符串
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
+    public static bool IsNullOrWhiteSpace(this string str) => string.IsNullOrWhiteSpace(str);
+
     /// <summary>
     /// 判断字符串是否为邮箱地址
     /// </summary>
