@@ -692,7 +692,7 @@ public abstract class XFECode
     /// 断言：判断条件为真
     /// </summary>
     /// <param name="condition">判断条件</param>
-    protected static bool Assert(bool condition)
+    public static bool Assert(bool condition)
     {
         if (!condition)
         {
@@ -708,7 +708,7 @@ public abstract class XFECode
     /// </summary>
     /// <param name="condition">判断条件</param>
     /// <param name="message">消息</param>
-    protected static bool Assert(bool condition, string message)
+    public static bool Assert(bool condition, string message)
     {
         if (!condition)
         {
@@ -723,7 +723,7 @@ public abstract class XFECode
     /// 断言：判断条件为假
     /// </summary>
     /// <param name="condition">判断条件</param>
-    protected static bool AssertF(bool condition)
+    public static bool AssertF(bool condition)
     {
         if (condition)
         {
@@ -739,7 +739,7 @@ public abstract class XFECode
     /// </summary>
     /// <param name="condition">判断条件</param>
     /// <param name="message">消息</param>
-    protected static bool AssertF(bool condition, string message)
+    public static bool AssertF(bool condition, string message)
     {
         if (condition)
         {
@@ -756,7 +756,7 @@ public abstract class XFECode
     /// <typeparam name="T">值的类型</typeparam>
     /// <param name="expected">期望值</param>
     /// <param name="actual">实际值</param>
-    protected static bool AssertE<T>(T expected, T actual)
+    public static bool AssertE<T>(T expected, T actual)
     {
         var result = !EqualityComparer<T>.Default.Equals(expected, actual);
         if (result)
@@ -775,7 +775,7 @@ public abstract class XFECode
     /// <param name="expected">期望值</param>
     /// <param name="actual">实际值</param>
     /// <param name="message">消息</param>
-    protected static bool AssertE<T>(T expected, T actual, string message)
+    public static bool AssertE<T>(T expected, T actual, string message)
     {
         var result = !EqualityComparer<T>.Default.Equals(expected, actual);
         if (result)

@@ -14,7 +14,7 @@
     <Copyright>XFE工作室版权所有</Copyright>
     <PackageProjectUrl>https://github.com/XFEstudio/XFEExtension</PackageProjectUrl>
     <PackageIcon>logoIcon.png</PackageIcon>
-    <Description>XFE各类拓展提供Xunit测试框架，快速搭建服务器/客户端，免费ChatGPTAPI接口，免费通讯服务器，XFE下载器，新增格式等</Description>
+    <Description>XFE各类拓展提供XUnit测试框架，快速搭建服务器/客户端，免费ChatGPTAPI接口，免费通讯服务器，XFE下载器，新增格式等</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
