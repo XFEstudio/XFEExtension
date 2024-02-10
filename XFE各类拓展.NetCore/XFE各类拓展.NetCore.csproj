@@ -32,9 +32,9 @@ XUnit测试框架
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <AssemblyVersion>1.5.12.0</AssemblyVersion>
-    <FileVersion>1.5.12.0</FileVersion>
-    <Version>1.5.0</Version>
+    <AssemblyVersion>1.5.13.1</AssemblyVersion>
+    <FileVersion>1.5.13.1</FileVersion>
+    <Version>1.5.1</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
