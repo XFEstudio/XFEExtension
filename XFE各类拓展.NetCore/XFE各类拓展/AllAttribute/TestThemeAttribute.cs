@@ -1,4 +1,4 @@
-﻿namespace XFE各类拓展.NetCore;
+﻿namespace XFE各类拓展.NetCore.XUnit;
 
 /// <summary>
 /// 测试颜色主题

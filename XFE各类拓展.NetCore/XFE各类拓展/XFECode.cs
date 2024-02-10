@@ -6,14 +6,15 @@ using XFE各类拓展.NetCore.ReflectionExtension;
 using XFE各类拓展.NetCore.StringExtension;
 using XFE各类拓展.NetCore.TaskExtension;
 
-namespace XFE各类拓展.NetCore.XFECode;
+namespace XFE各类拓展.NetCore.XUnit;
 
 /// <summary>
-/// XFE各类拓展编写
+/// XFE各类拓展的XUnit框架依赖
 /// </summary>
 public abstract class XFECode
 {
     private static int cTimeCounter = 0;
+    private static bool initialized = false;
     private static bool currentMethodIsAsserted = false;
     private static string currentAssertMessage = string.Empty;
     #region 暂停
@@ -148,13 +149,16 @@ public abstract class XFECode
     /// </summary>
     /// <returns></returns>
     /// <exception cref="XFEExtensionException"></exception>
-    protected static async Task RunTest()
+    public static async Task RunTest()
     {
+        if (initialized)
+            return;
+        initialized = true;
         var isFirstClass = true;
-        var subClasses = Assembly.GetEntryAssembly()?.GetTypes()
-        .Where(type => type.IsSubclassOf(typeof(XFECode)));
-        if (subClasses is not null)
-            foreach (var subClass in subClasses)
+        //var subClasses = Assembly.GetEntryAssembly()?.GetTypes().Where(type => type.IsSubclassOf(typeof(XFECode)));
+        var allClasses = Assembly.GetEntryAssembly()?.GetTypes();
+        if (allClasses is not null)
+            foreach (var subClass in allClasses)
             {
                 var mainColor = ConsoleColor.Blue;
                 var classColor = ConsoleColor.Green;
@@ -373,10 +377,10 @@ public abstract class XFECode
                     {
                         classInstance = subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, classAttribute.Params.GetTypes()!, null)?.Invoke(classAttribute.Params);
                     }
-                    var setUpAttribute = subClass.GetAttribute<TSetUpAttribute>();
+                    var setUpAttribute = subClass.GetAttribute<SetUpAttribute>();
                     if (setUpAttribute is not null)
                     {
-                        var setUpMethod = subClass.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).Where(m => m.IsDefined(typeof(TSetUpAttribute))).FirstOrDefault();
+                        var setUpMethod = subClass.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).Where(m => m.IsDefined(typeof(SetUpAttribute))).FirstOrDefault();
                         setUpMethod?.Invoke(classInstance, setUpMethod.GetDefaultParameters());
                     }
                     string classOtherName = "类名：" + subClass.Name;

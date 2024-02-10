@@ -353,6 +353,10 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     #endregion
     #region 停止对话
     //TODO:
+    public void StopChat()
+    {
+
+    }
     #endregion
     #endregion
     #region 线程方法

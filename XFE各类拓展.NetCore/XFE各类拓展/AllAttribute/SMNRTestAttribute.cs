@@ -1,4 +1,4 @@
-﻿namespace XFE各类拓展.NetCore;
+﻿namespace XFE各类拓展.NetCore.XUnit;
 
 /// <summary>
 /// 用于计时的特性，可自定义名称和返回值

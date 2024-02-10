@@ -19,7 +19,7 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-XFE配置文件新增配置文件根目录
+XUnit测试框架
 
 ## 新增
 
@@ -32,10 +32,11 @@ XFE配置文件新增配置文件根目录
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <AssemblyVersion>1.4.11.1</AssemblyVersion>
-    <FileVersion>1.4.11.1</FileVersion>
-    <Version>1.4.1</Version>
+    <AssemblyVersion>1.4.12.2</AssemblyVersion>
+    <FileVersion>1.4.12.2</FileVersion>
+    <Version>1.4.2</Version>
     <Authors>XFEstudio</Authors>
+    <DelaySign>False</DelaySign>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
