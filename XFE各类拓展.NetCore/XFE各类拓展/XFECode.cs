@@ -528,6 +528,7 @@ public abstract class XFECode
                                 Console.ResetColor();
                                 selfTimeCounter.Start();
                                 selfTimeCounter.Stop();
+                                object? result = null;
                                 try
                                 {
                                     currentMethodIsAsserted = false;
@@ -540,7 +541,7 @@ public abstract class XFECode
                                     else
                                     {
                                         timeCounter.Start();
-                                        var result = method.Invoke(classInstance, paramsForMethod);
+                                        result = method.Invoke(classInstance, paramsForMethod);
                                         timeCounter.Stop();
                                         if (methodAttribute is MRTestAttribute resultAttribute2)
                                         {
@@ -584,15 +585,22 @@ public abstract class XFECode
                                 Console.Write("\t执行时间：");
                                 Console.ForegroundColor = timeColor;
                                 if (elapsedTime.TotalHours >= 1)
-                                    Console.WriteLine(elapsedTime);
+                                    Console.Write(elapsedTime);
                                 else if (elapsedTime.TotalMinutes >= 1)
-                                    Console.WriteLine($"{elapsedTime.Minutes} 分 {elapsedTime.Seconds} 秒 {elapsedTime.Milliseconds} 毫秒");
+                                    Console.Write($"{elapsedTime.Minutes} 分 {elapsedTime.Seconds} 秒 {elapsedTime.Milliseconds} 毫秒");
                                 else if (elapsedTime.TotalSeconds >= 1)
-                                    Console.WriteLine($"{elapsedTime.TotalSeconds:F3} 秒");
+                                    Console.Write($"{elapsedTime.TotalSeconds:F3} 秒");
                                 else if (elapsedTime.TotalMilliseconds >= 1)
-                                    Console.WriteLine($"{elapsedTime.TotalMilliseconds:F3} 毫秒");
+                                    Console.Write($"{elapsedTime.TotalMilliseconds:F3} 毫秒");
                                 else
-                                    Console.WriteLine($"{elapsedTime.TotalMilliseconds * 1000:F2} 纳秒");
+                                    Console.Write($"{elapsedTime.TotalMilliseconds * 1000:F2} 纳秒");
+                                Console.ForegroundColor = mainColor;
+                                if (result is not null)
+                                {
+                                    Console.Write("\t执行结果：");
+                                    Console.ForegroundColor = methodColor;
+                                    Console.WriteLine(result);
+                                }
                                 Console.ForegroundColor = ConsoleColor.Black;
                                 Console.WriteLine();
                                 if (isSuccessful && isResultEqual)
