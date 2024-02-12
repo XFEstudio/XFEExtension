@@ -103,6 +103,18 @@ memorableXFEChatGPT.AskChatGPT("新的对话ID", Guid.NewGuid().ToString(), askC
 
 ---
 
+## 自动生成实现类
+
+```csharp
+[CreateImpl]
+abstract class TestAbstractClass
+{
+	public abstract void TestMethod();
+}
+
+class 
+---
+
 ## IO流拓展操作示例
 
 ```csharp
