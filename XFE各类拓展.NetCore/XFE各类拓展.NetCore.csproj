@@ -19,11 +19,11 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-无
+移除测试代码，修复README文档的一处问题
 
 ## 新增
 
-现在可以自动生成类的默认实现类，加快编写速度
+无
 
 ## 严重
 
@@ -32,9 +32,9 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <AssemblyVersion>1.6.16.0</AssemblyVersion>
-    <FileVersion>1.6.16.0</FileVersion>
-    <Version>1.6.0</Version>
+    <AssemblyVersion>1.6.17.1</AssemblyVersion>
+    <FileVersion>1.6.17.1</FileVersion>
+    <Version>1.6.1</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
