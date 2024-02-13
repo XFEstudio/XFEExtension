@@ -107,12 +107,21 @@ memorableXFEChatGPT.AskChatGPT("新的对话ID", Guid.NewGuid().ToString(), askC
 
 ```csharp
 [CreateImpl]
-abstract class TestAbstractClass
+abstract class TestAbstractClass(int num)
 {
-	public abstract void TestMethod();
+    public int Num { get; set; } = num;
 }
 
-class 
+class Program
+{
+    static void Main(string[] args)
+    {
+        var testAbstractClass = new TestAbstractClassImpl(123);
+        Console.WriteLine(testAbstractClass.Num);
+    }
+}
+```
+
 ---
 
 ## IO流拓展操作示例

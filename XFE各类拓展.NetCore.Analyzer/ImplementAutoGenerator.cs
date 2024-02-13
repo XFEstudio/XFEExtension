@@ -24,15 +24,9 @@ namespace XFE各类拓展.NetCore.Analyzer
                 foreach (var classDeclaration in classDeclarations)
                 {
                     var className = classDeclaration.Identifier.ValueText;
-                    // 向类中添加一个空的Test方法
-                    var method = SyntaxFactory.MethodDeclaration(SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)), "Test")
-                        .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
-                        .WithBody(SyntaxFactory.Block())
-                        .NormalizeWhitespace();
-                    // 将方法添加到原来的类中
-                    var newClass = classDeclaration.AddMembers(method);
                     var implementationSyntaxTree = GenerateImplementationSyntaxTree(classDeclaration, usingDirectives);
                     context.AddSource($"{className}Impl.g.cs", implementationSyntaxTree.ToString());
+                    //添加一个
                 }
             }
         }
