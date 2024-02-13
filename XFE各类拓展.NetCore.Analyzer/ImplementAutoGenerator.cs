@@ -26,7 +26,6 @@ namespace XFE各类拓展.NetCore.Analyzer
                     var className = classDeclaration.Identifier.ValueText;
                     var implementationSyntaxTree = GenerateImplementationSyntaxTree(classDeclaration, usingDirectives);
                     context.AddSource($"{className}Impl.g.cs", implementationSyntaxTree.ToString());
-                    //添加一个
                 }
             }
         }
@@ -39,7 +38,6 @@ namespace XFE各类拓展.NetCore.Analyzer
             ClassDeclarationSyntax implementationClass;
             if (classDeclaration.ParameterList is null)
             {
-                // 添加summary注释
                 implementationClass = SyntaxFactory.ClassDeclaration($"{className}Impl")
                     .AddModifiers(SyntaxFactory.Token(SyntaxKind.InternalKeyword))
                     .AddBaseListTypes(SyntaxFactory.SimpleBaseType(SyntaxFactory.ParseTypeName(className)))
