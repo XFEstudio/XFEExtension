@@ -130,24 +130,34 @@ public class XFEFileWatcher
     {
         if (Path is not null && Path != string.Empty)
         {
-            if (File.Exists(Path) || Directory.Exists(Path))
+            FileSystemWatcher rootWatcher;
+            if (Directory.Exists(Path))
             {
-                if (WatchSubdirectories && Directory.Exists(Path))
+                if (WatchSubdirectories)
                 {
                     MonitorSubdirectories(Path);
                 }
-                FileSystemWatcher rootWatcher = new(Path);
-                watchers.Add(rootWatcher);
-                rootWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-                rootWatcher.Changed += OnFileChanged;
-                rootWatcher.Created += OnFileChanged;
-                rootWatcher.Deleted += OnFileChanged;
-                rootWatcher.Renamed += OnFileRenamed;
+                rootWatcher = new(Path);
+
+            }
+            else if (File.Exists(Path))
+            {
+                rootWatcher = new(System.IO.Path.GetDirectoryName(Path)!)
+                {
+                    Filter = System.IO.Path.GetFileName(Path)
+                };
             }
             else
             {
                 throw new XFEExtensionException("文件或文件夹不存在");
             }
+            watchers.Add(rootWatcher);
+            rootWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+            rootWatcher.Changed += OnFileChanged;
+            rootWatcher.Created += OnFileChanged;
+            rootWatcher.Deleted += OnFileChanged;
+            rootWatcher.Renamed += OnFileRenamed;
+            rootWatcher.EnableRaisingEvents = true;
         }
         else
         {
