@@ -19,7 +19,7 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-修复文件监视器的部分bug
+现在ImplementAutoGenerator能够正常生成文件范围声明的命名空间所包含的类
 
 ## 新增
 
@@ -32,9 +32,9 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <AssemblyVersion>1.6.18.2</AssemblyVersion>
-    <FileVersion>1.6.18.2</FileVersion>
-    <Version>1.6.2</Version>
+    <AssemblyVersion>1.6.19.3</AssemblyVersion>
+    <FileVersion>1.6.19.3</FileVersion>
+    <Version>1.6.3</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
