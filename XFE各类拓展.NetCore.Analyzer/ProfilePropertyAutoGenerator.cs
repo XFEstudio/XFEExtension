@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace XFE各类拓展.NetCore.Analyzer
@@ -19,7 +20,7 @@ namespace XFE各类拓展.NetCore.Analyzer
             {
                 var root = syntaxTree.GetRoot();
                 var classDeclarations = root.DescendantNodes().OfType<ClassDeclarationSyntax>()
-                    .Where(classDeclaration => classDeclaration.AttributeLists.Any(IsProfilePropertyAttribute));
+                    .Where(classDeclaration => classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword));
                 var usingDirectives = root.DescendantNodes().OfType<UsingDirectiveSyntax>().ToArray();
                 FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclarationSyntax = null;
                 var namespaceResults = root.DescendantNodes().OfType<FileScopedNamespaceDeclarationSyntax>();
@@ -27,72 +28,76 @@ namespace XFE各类拓展.NetCore.Analyzer
                     fileScopedNamespaceDeclarationSyntax = namespaceResults.First();
                 foreach (var classDeclaration in classDeclarations)
                 {
+                    var fieldDeclarationSyntaxes = classDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>()
+                        .Where(fieldDeclarationSyntax => fieldDeclarationSyntax.AttributeLists.Any(IsProfilePropertyAttribute) && fieldDeclarationSyntax.Modifiers.Any(SyntaxKind.StaticKeyword));
+                    if (fieldDeclarationSyntaxes is null || !fieldDeclarationSyntaxes.Any())
+                    {
+                        continue;
+                    }
                     var className = classDeclaration.Identifier.ValueText;
-                    var implementationSyntaxTree = GenerateImplementationSyntaxTree(classDeclaration, usingDirectives, fileScopedNamespaceDeclarationSyntax);
-                    context.AddSource($"{className}Impl.g.cs", implementationSyntaxTree.ToString());
+                    var properties = fieldDeclarationSyntaxes.Select(fieldDeclarationSyntax =>
+                    {
+                        var variableDeclaration = fieldDeclarationSyntax.Declaration.Variables.First();
+                        var fieldName = variableDeclaration.Identifier.Text;
+                        var propertyName = fieldName[0] == '_' ? fieldName[1].ToString().ToUpper() + fieldName.Substring(2) : fieldName[0].ToString().ToUpper() + fieldName.Substring(1);
+                        var propertyType = fieldDeclarationSyntax.Declaration.Type;
+                        var property = SyntaxFactory.PropertyDeclaration(propertyType, propertyName)
+                            .WithModifiers(SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.StaticKeyword)))
+                            .WithAccessorList(SyntaxFactory.AccessorList(
+                                SyntaxFactory.List(new[]
+                                {
+                                    SyntaxFactory.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
+                                        .WithBody(SyntaxFactory.Block(SyntaxFactory.ReturnStatement(SyntaxFactory.IdentifierName(fieldName)))),
+                                    SyntaxFactory.AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
+                                        .WithBody(
+                                        SyntaxFactory.Block(
+                                            SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"{fieldName} = value")),
+                                            SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"_ = global::XFE各类拓展.NetCore.ProfileExtension.XFEProfile.SaveProfile(typeof({className}))"))
+                                            ))
+                                })));
+                        return property;
+                    });
+                    var profileClassSyntaxTree = GenerateProfileClassSyntaxTree(classDeclaration, usingDirectives, properties, fileScopedNamespaceDeclarationSyntax);
+                    context.AddSource($"{className}.g.cs", profileClassSyntaxTree.ToString());
                 }
             }
         }
 
         private static bool IsProfilePropertyAttribute(AttributeListSyntax attributeList) => attributeList.Attributes.Any(attribute => attribute.Name.ToString() == "ProfileProperty");
 
-        private static SyntaxTree GenerateImplementationSyntaxTree(ClassDeclarationSyntax classDeclaration, UsingDirectiveSyntax[] usingDirectiveSyntaxes, FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclarationSyntax)
+        private static SyntaxTree GenerateProfileClassSyntaxTree(ClassDeclarationSyntax classDeclaration, UsingDirectiveSyntax[] usingDirectiveSyntaxes, IEnumerable<PropertyDeclarationSyntax> propertyDeclarationSyntaxes, FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclarationSyntax)
         {
             var className = classDeclaration.Identifier.ValueText;
-            ClassDeclarationSyntax implementationClass;
-            if (classDeclaration.ParameterList is null)
-            {
-                implementationClass = SyntaxFactory.ClassDeclaration($"{className}Impl")
-                    .AddModifiers(SyntaxFactory.Token(SyntaxKind.InternalKeyword))
-                    .AddBaseListTypes(SyntaxFactory.SimpleBaseType(SyntaxFactory.ParseTypeName(className)))
-                    .AddMembers(classDeclaration.Members.OfType<ConstructorDeclarationSyntax>().Select(constructor =>
-                    {
-                        return constructor.WithIdentifier(SyntaxFactory.Identifier($"{className}Impl"))
-                                          .WithInitializer(SyntaxFactory.ConstructorInitializer(SyntaxKind.BaseConstructorInitializer, SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(constructor.ParameterList.Parameters.Select(parameter =>
-                                SyntaxFactory.Argument(SyntaxFactory.IdentifierName(parameter.Identifier)))))));
-                    }).ToArray())
-                    .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia($@"/// <summary>
-/// <seealso cref=""{className}Impl""/> 是根据 <seealso cref=""{className}""/> 自动生成的实现类
-/// </summary>
-"))
-                    .NormalizeWhitespace();
-            }
-            else
-            {
-                implementationClass = SyntaxFactory.ClassDeclaration($"{className}Impl")
-                    .AddModifiers(SyntaxFactory.Token(SyntaxKind.InternalKeyword))
-                    .AddBaseListTypes(SyntaxFactory.SimpleBaseType(SyntaxFactory.ParseTypeName(className)))
-                    .AddMembers(SyntaxFactory.ConstructorDeclaration($"{className}Impl")
-                                             .AddModifiers(SyntaxFactory.Token(SyntaxKind.InternalKeyword))
-                                             .WithBody(SyntaxFactory.Block())
-                                             .WithParameterList(classDeclaration.ParameterList)
-                                             .WithInitializer(SyntaxFactory.ConstructorInitializer(SyntaxKind.BaseConstructorInitializer, SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(classDeclaration.ParameterList.Parameters.Select(parameter => SyntaxFactory.Argument(SyntaxFactory.IdentifierName(parameter.Identifier))))))))
-                    .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia($@"/// <summary>
-/// <seealso cref=""{className}Impl""/> 是根据 <seealso cref=""{className}""/> 自动生成的实现类
-/// </summary>
-"))
-                    .NormalizeWhitespace();
-            }
+            var summaryText = $@"/// <remarks>
+/// <code><seealso cref=""{className}""/> 已自动实现以下属性：</code><br/>
+/// <code>
+";
+            summaryText += string.Join("<br/>\n", propertyDeclarationSyntaxes.Select(propertyDeclarationSyntax => $"/// ○ <seealso cref=\"{propertyDeclarationSyntax.Identifier}\"/>")) + "\n/// </code><br/>\n/// <code>来自<seealso cref=\"global::XFE各类拓展.NetCore.ProfileExtension.XFEProfile\"/></code>\n/// </remarks>\n";
+            var profileClass = SyntaxFactory.ClassDeclaration(className)
+                .AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword))
+                .AddMembers(propertyDeclarationSyntaxes.ToArray())
+                .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia(summaryText))
+                .NormalizeWhitespace();
             MemberDeclarationSyntax memberDeclaration;
             if (fileScopedNamespaceDeclarationSyntax is null)
             {
                 var namespaceDeclaration = classDeclaration.FirstAncestorOrSelf<NamespaceDeclarationSyntax>();
                 if (namespaceDeclaration is null)
-                    memberDeclaration = implementationClass;
+                    memberDeclaration = profileClass;
                 else
                     memberDeclaration = SyntaxFactory.NamespaceDeclaration(namespaceDeclaration.Name)
-                        .AddMembers(implementationClass);
+                        .AddMembers(profileClass);
             }
             else
             {
                 memberDeclaration = SyntaxFactory.FileScopedNamespaceDeclaration(fileScopedNamespaceDeclarationSyntax.Name)
-                    .AddMembers(implementationClass);
+                    .AddMembers(profileClass);
             }
-            var implementationCompilationUnit = SyntaxFactory.CompilationUnit()
+            var profileClassCompilationUnit = SyntaxFactory.CompilationUnit()
                 .AddUsings(usingDirectiveSyntaxes)
                 .AddMembers(memberDeclaration)
                 .NormalizeWhitespace();
-            return SyntaxFactory.SyntaxTree(implementationCompilationUnit);
+            return SyntaxFactory.SyntaxTree(profileClassCompilationUnit);
         }
     }
 }
