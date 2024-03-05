@@ -4,10 +4,10 @@ using System.Security.Principal;
 namespace XFE各类拓展.NetCore.PermissionExtension;
 
 #if WINDOWS
-#pragma warning disable CA1416 // 验证平台兼容性
 /// <summary>
 /// UAC权限（管理员权限）
 /// </summary>
+[System.Runtime.Versioning.SupportedOSPlatform("windows")]
 public static partial class AdministratorPermission
 {
     /// <summary>
@@ -56,5 +56,4 @@ public static partial class AdministratorPermission
             PermissionState = CurrentPermissionState.Normal;
     }
 }
-#pragma warning restore CA1416 // 验证平台兼容性
 #endif

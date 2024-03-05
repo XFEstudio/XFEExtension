@@ -112,13 +112,12 @@ public static class ThreadExtension
     /// <param name="parameter">传递的参数</param>
     /// <param name="apartmentState">线程的状态</param>
     /// <returns></returns>
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     public static Thread StartNewThread(ParameterizedThreadStart method, object parameter, ApartmentState apartmentState)
     {
         Thread thread = new(method);
 #if WINDOWS
-#pragma warning disable CA1416 // 验证平台兼容性
         thread.SetApartmentState(apartmentState);
-#pragma warning restore CA1416 // 验证平台兼容性
 #endif
         thread.Start(parameter);
         return thread;
@@ -129,13 +128,12 @@ public static class ThreadExtension
     /// <param name="method">线程方法</param>
     /// <param name="apartmentState">线程的状态</param>
     /// <returns></returns>
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     public static Thread StartNewThread(ThreadStart method, ApartmentState apartmentState)
     {
         Thread thread = new(method);
 #if WINDOWS
-#pragma warning disable CA1416 // 验证平台兼容性
         thread.SetApartmentState(apartmentState);
-#pragma warning restore CA1416 // 验证平台兼容性
 #endif
         thread.Start();
         return thread;
