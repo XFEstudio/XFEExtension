@@ -63,7 +63,7 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <None Include="C:\Users\XFEstudio\Desktop\work\C#\GitHub\XFEstudio\XFE各类拓展\XFE各类拓展.NetCore.Analyzer\bin\Release\netstandard2.0\XFE各类拓展.NetCore.Analyzer.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="..\XFE各类拓展.NetCore.Analyzer\bin\Release\netstandard2.0\XFE各类拓展.NetCore.Analyzer.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>

@@ -21,10 +21,14 @@ namespace XFE各类拓展.NetCore.Analyzer
                 var classDeclarations = root.DescendantNodes().OfType<ClassDeclarationSyntax>()
                     .Where(classDeclaration => classDeclaration.AttributeLists.Any(IsCreateImplAttribute));
                 var usingDirectives = root.DescendantNodes().OfType<UsingDirectiveSyntax>().ToArray();
+                FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclarationSyntax = null;
+                var namespaceResults = root.DescendantNodes().OfType<FileScopedNamespaceDeclarationSyntax>();
+                if (namespaceResults != null && namespaceResults.Count() > 0)
+                    fileScopedNamespaceDeclarationSyntax = namespaceResults.First();
                 foreach (var classDeclaration in classDeclarations)
                 {
                     var className = classDeclaration.Identifier.ValueText;
-                    var implementationSyntaxTree = GenerateImplementationSyntaxTree(classDeclaration, usingDirectives);
+                    var implementationSyntaxTree = GenerateImplementationSyntaxTree(classDeclaration, usingDirectives, fileScopedNamespaceDeclarationSyntax);
                     context.AddSource($"{className}Impl.g.cs", implementationSyntaxTree.ToString());
                 }
             }
@@ -32,7 +36,7 @@ namespace XFE各类拓展.NetCore.Analyzer
 
         private static bool IsCreateImplAttribute(AttributeListSyntax attributeList) => attributeList.Attributes.Any(attribute => attribute.Name.ToString() == "CreateImpl");
 
-        private static SyntaxTree GenerateImplementationSyntaxTree(ClassDeclarationSyntax classDeclaration, UsingDirectiveSyntax[] usingDirectiveSyntaxes)
+        private static SyntaxTree GenerateImplementationSyntaxTree(ClassDeclarationSyntax classDeclaration, UsingDirectiveSyntax[] usingDirectiveSyntaxes, FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclarationSyntax)
         {
             var className = classDeclaration.Identifier.ValueText;
             ClassDeclarationSyntax implementationClass;
@@ -69,13 +73,21 @@ namespace XFE各类拓展.NetCore.Analyzer
 "))
                     .NormalizeWhitespace();
             }
-            var namespaceDeclaration = classDeclaration.FirstAncestorOrSelf<NamespaceDeclarationSyntax>();
             MemberDeclarationSyntax memberDeclaration;
-            if (namespaceDeclaration is null)
-                memberDeclaration = implementationClass;
+            if (fileScopedNamespaceDeclarationSyntax is null)
+            {
+                var namespaceDeclaration = classDeclaration.FirstAncestorOrSelf<NamespaceDeclarationSyntax>();
+                if (namespaceDeclaration is null)
+                    memberDeclaration = implementationClass;
+                else
+                    memberDeclaration = SyntaxFactory.NamespaceDeclaration(namespaceDeclaration.Name)
+                        .AddMembers(implementationClass);
+            }
             else
-                memberDeclaration = SyntaxFactory.NamespaceDeclaration(namespaceDeclaration.Name)
+            {
+                memberDeclaration = SyntaxFactory.FileScopedNamespaceDeclaration(fileScopedNamespaceDeclarationSyntax.Name)
                     .AddMembers(implementationClass);
+            }
             var implementationCompilationUnit = SyntaxFactory.CompilationUnit()
                 .AddUsings(usingDirectiveSyntaxes)
                 .AddMembers(memberDeclaration)
