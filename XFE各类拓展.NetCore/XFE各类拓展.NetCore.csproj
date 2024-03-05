@@ -19,11 +19,11 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-现在ImplementAutoGenerator能够正常生成文件范围声明的命名空间所包含的类
+无
 
 ## 新增
 
-无
+现在，可以自动生成配置文件类中的字段对应的属性
 
 ## 严重
 
@@ -32,9 +32,9 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <AssemblyVersion>1.6.19.3</AssemblyVersion>
-    <FileVersion>1.6.19.3</FileVersion>
-    <Version>1.6.3</Version>
+    <AssemblyVersion>1.7.20.0</AssemblyVersion>
+    <FileVersion>1.7.20.0</FileVersion>
+    <Version>1.7.0</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
