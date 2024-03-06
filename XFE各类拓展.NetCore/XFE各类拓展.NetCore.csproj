@@ -19,8 +19,7 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-现在配置文件可以自动加载并设置是否自动加载
-字段上的注释可在属性生成的时候自动添加至属性上
+现在静态函数可以正常等待
 
 ## 新增
 
@@ -33,9 +32,9 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <AssemblyVersion>1.7.22.2</AssemblyVersion>
-    <FileVersion>1.7.22.2</FileVersion>
-    <Version>1.7.2</Version>
+    <AssemblyVersion>1.7.23.3</AssemblyVersion>
+    <FileVersion>1.7.23.3</FileVersion>
+    <Version>1.7.3</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
