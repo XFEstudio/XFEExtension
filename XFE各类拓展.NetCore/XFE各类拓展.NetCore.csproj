@@ -19,7 +19,7 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-现在静态函数可以正常等待
+修复了加载配置与存储配置混乱的问题
 
 ## 新增
 
@@ -32,9 +32,9 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <AssemblyVersion>1.7.23.3</AssemblyVersion>
-    <FileVersion>1.7.23.3</FileVersion>
-    <Version>1.7.3</Version>
+    <AssemblyVersion>1.7.24.4</AssemblyVersion>
+    <FileVersion>1.7.24.4</FileVersion>
+    <Version>1.7.4</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
