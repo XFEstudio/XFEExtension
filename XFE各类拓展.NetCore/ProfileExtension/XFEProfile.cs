@@ -1,4 +1,5 @@
-﻿using XFE各类拓展.NetCore.FormatExtension;
+﻿using System.Reflection;
+using XFE各类拓展.NetCore.FormatExtension;
 
 namespace XFE各类拓展.NetCore.ProfileExtension;
 
@@ -7,14 +8,19 @@ namespace XFE各类拓展.NetCore.ProfileExtension;
 /// </summary>
 public abstract class XFEProfile
 {
+    private static Func<ProfileEntryInfo, string> SaveProfilesFunc { get; set; } = x => x.Value is null ? string.Empty : x.Value;
+    private static Func<string, ProfileEntryInfo, object?> LoadProfilesFunc { get; set; } = (x, p) => Convert.ChangeType(x, p.Property.PropertyType);
+
     /// <summary>
     /// 配置文件清单
     /// </summary>
     public static List<ProfileInfo> Profiles { get; private set; } = [];
+
     /// <summary>
     /// 配置文件所在的根目录
     /// </summary>
     public static string ProfilesRootPath { get; set; } = $"{AppDomain.CurrentDomain.BaseDirectory}/Profiles";
+
     /// <summary>
     /// 加载配置文件
     /// </summary>
@@ -38,14 +44,14 @@ public abstract class XFEProfile
                         var property = propertyFileContent.ElementAt(j);
                         if (property.Header == propertyInfo.Name)
                         {
-                            profile.PropertiesInfo[i].Property.SetValue(null, Convert.ChangeType(property.Content, propertyInfo.Property.PropertyType));
+                            profile.PropertiesInfo[i].Property.SetValue(null, LoadProfilesFunc(property.Content, propertyInfo));
                             continue;
                         }
                         foreach (var propertySecFind in propertyFileContent)
                         {
                             if (propertySecFind.Header == propertyInfo.Name)
                             {
-                                profile.PropertiesInfo[i].Property.SetValue(null, Convert.ChangeType(propertySecFind.Content, propertyInfo.Property.PropertyType));
+                                profile.PropertiesInfo[i].Property.SetValue(null, LoadProfilesFunc(propertySecFind.Content, propertyInfo));
                                 break;
                             }
                         }
@@ -54,6 +60,7 @@ public abstract class XFEProfile
             }
         });
     }
+
     /// <summary>
     /// 储存指定的配置文件
     /// </summary>
@@ -66,12 +73,13 @@ public abstract class XFEProfile
             return;
         var saveProfileDictionary = new XFEDictionary();
         foreach (var property in waitSaveProfile.PropertiesInfo)
-            saveProfileDictionary.Add(property.Name, property.Value is null ? string.Empty : property.Value);
+            saveProfileDictionary.Add(property.Name, SaveProfilesFunc(property));
         var fileSavePath = Path.GetDirectoryName(waitSaveProfile.Path);
         if (!Directory.Exists(fileSavePath) && fileSavePath is not null && fileSavePath != string.Empty)
             Directory.CreateDirectory(fileSavePath);
         await File.WriteAllTextAsync(waitSaveProfile.Path, saveProfileDictionary);
     }
+
     /// <summary>
     /// 储存配置文件
     /// </summary>
@@ -81,6 +89,19 @@ public abstract class XFEProfile
         foreach (var profile in Profiles)
             await SaveProfile(profile);
     }
+
+    /// <summary>
+    /// 设置储存配置文件的方法
+    /// </summary>
+    /// <param name="saveProfilesFunc">储存方法</param>
+    public static void SetSaveProfilesFunction(Func<ProfileEntryInfo, string> saveProfilesFunc) => SaveProfilesFunc = saveProfilesFunc;
+
+    /// <summary>
+    /// 设置加载配置文件的方法
+    /// </summary>
+    /// <param name="loadProfilesFunc">加载方法</param>
+    public static void SetLoadProfilesFunction(Func<string, ProfileEntryInfo, object?> loadProfilesFunc) => LoadProfilesFunc = loadProfilesFunc;
+
     /// <summary>
     /// 可写在属性的set访问器后，用于自动储存
     /// </summary>

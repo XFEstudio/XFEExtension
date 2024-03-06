@@ -35,6 +35,9 @@ namespace XFE各类拓展.NetCore.Analyzer
                         continue;
                     }
                     var className = classDeclaration.Identifier.ValueText;
+                    var attributeSyntax = SyntaxFactory.AttributeList(
+                        SyntaxFactory.SingletonSeparatedList(
+                            SyntaxFactory.Attribute(SyntaxFactory.ParseName("global::XFE各类拓展.NetCore.ProfileExtension.ProfileProperty"))));
                     var properties = fieldDeclarationSyntaxes.Select(fieldDeclarationSyntax =>
                     {
                         var variableDeclaration = fieldDeclarationSyntax.Declaration.Variables.First();
