@@ -26,39 +26,72 @@ public abstract class XFEProfile
     /// </summary>
     /// <param name="profileInfo"></param>
     /// <returns></returns>
-    public static async Task LoadProfiles(params ProfileInfo[] profileInfo)
+    public static void LoadProfiles(params ProfileInfo[] profileInfo)
     {
-        await Task.Run(() =>
+        Profiles.AddRange(profileInfo);
+        foreach (var profile in Profiles)
         {
-            Profiles.AddRange(profileInfo);
-            foreach (var profile in Profiles)
+            if (!File.Exists(profile.Path))
+                continue;
+            XFEDictionary propertyFileContent = File.ReadAllText(profile.Path);
+            for (int i = 0; i < profile.PropertiesInfo.Count; i++)
             {
-                if (!File.Exists(profile.Path))
-                    continue;
-                XFEDictionary propertyFileContent = File.ReadAllText(profile.Path);
-                for (int i = 0; i < profile.PropertiesInfo.Count; i++)
+                for (int j = 0; j < propertyFileContent.Count; j++)
                 {
-                    for (int j = 0; j < propertyFileContent.Count; j++)
+                    var propertyInfo = profile.PropertiesInfo[i];
+                    var property = propertyFileContent.ElementAt(j);
+                    if (property.Header == propertyInfo.Name)
                     {
-                        var propertyInfo = profile.PropertiesInfo[i];
-                        var property = propertyFileContent.ElementAt(j);
-                        if (property.Header == propertyInfo.Name)
+                        profile.PropertiesInfo[i].Property.SetValue(null, LoadProfilesFunc(property.Content, propertyInfo));
+                        continue;
+                    }
+                    foreach (var propertySecFind in propertyFileContent)
+                    {
+                        if (propertySecFind.Header == propertyInfo.Name)
                         {
-                            profile.PropertiesInfo[i].Property.SetValue(null, LoadProfilesFunc(property.Content, propertyInfo));
-                            continue;
-                        }
-                        foreach (var propertySecFind in propertyFileContent)
-                        {
-                            if (propertySecFind.Header == propertyInfo.Name)
-                            {
-                                profile.PropertiesInfo[i].Property.SetValue(null, LoadProfilesFunc(propertySecFind.Content, propertyInfo));
-                                break;
-                            }
+                            profile.PropertiesInfo[i].Property.SetValue(null, LoadProfilesFunc(propertySecFind.Content, propertyInfo));
+                            break;
                         }
                     }
                 }
             }
-        });
+        }
+    }
+
+    /// <summary>
+    /// 加载配置文件
+    /// </summary>
+    /// <param name="profileInfo"></param>
+    /// <returns></returns>
+    public static async Task LoadProfilesAsync(params ProfileInfo[] profileInfo) => await Task.Run(() => LoadProfiles(profileInfo));
+
+    /// <summary>
+    /// 储存指定的配置文件
+    /// </summary>
+    /// <param name="profileInfo">配置文件</param>
+    /// <returns></returns>
+    public static void SaveProfile(ProfileInfo profileInfo)
+    {
+        var waitSaveProfile = Profiles.Find(x => x.Profile == profileInfo.Profile);
+        if (waitSaveProfile is null)
+            return;
+        var saveProfileDictionary = new XFEDictionary();
+        foreach (var property in waitSaveProfile.PropertiesInfo)
+            saveProfileDictionary.Add(property.Name, SaveProfilesFunc(property));
+        var fileSavePath = Path.GetDirectoryName(waitSaveProfile.Path);
+        if (!Directory.Exists(fileSavePath) && fileSavePath is not null && fileSavePath != string.Empty)
+            Directory.CreateDirectory(fileSavePath);
+        File.WriteAllText(waitSaveProfile.Path, saveProfileDictionary);
+    }
+
+    /// <summary>
+    /// 储存配置文件
+    /// </summary>
+    /// <returns></returns>
+    public static void SaveProfiles()
+    {
+        foreach (var profile in Profiles)
+            SaveProfile(profile);
     }
 
     /// <summary>
@@ -66,7 +99,7 @@ public abstract class XFEProfile
     /// </summary>
     /// <param name="profileInfo">配置文件</param>
     /// <returns></returns>
-    public static async Task SaveProfile(ProfileInfo profileInfo)
+    public static async Task SaveProfileAsync(ProfileInfo profileInfo)
     {
         var waitSaveProfile = Profiles.Find(x => x.Profile == profileInfo.Profile);
         if (waitSaveProfile is null)
@@ -84,10 +117,10 @@ public abstract class XFEProfile
     /// 储存配置文件
     /// </summary>
     /// <returns></returns>
-    public static async Task SaveProfiles()
+    public static async Task SaveProfilesAsync()
     {
         foreach (var profile in Profiles)
-            await SaveProfile(profile);
+            await SaveProfileAsync(profile);
     }
 
     /// <summary>
@@ -107,5 +140,12 @@ public abstract class XFEProfile
     /// </summary>
     /// <param name="profileInfo"></param>
     /// <returns></returns>
-    protected static async Task AutoSave(ProfileInfo profileInfo) => await SaveProfile(profileInfo);
+    protected static void AutoSave(ProfileInfo profileInfo) => SaveProfile(profileInfo);
+
+    /// <summary>
+    /// 可写在属性的set访问器后，用于自动储存
+    /// </summary>
+    /// <param name="profileInfo"></param>
+    /// <returns></returns>
+    protected static async Task AutoSaveAsync(ProfileInfo profileInfo) => await SaveProfileAsync(profileInfo);
 }

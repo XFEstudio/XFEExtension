@@ -96,7 +96,7 @@ namespace XFE各类拓展.NetCore.Analyzer
                         {
                             setExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"{fieldName} = value")));
                         }
-                        setExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"_ = global::XFE各类拓展.NetCore.ProfileExtension.XFEProfile.SaveProfile(typeof({className}))")));
+                        setExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"global::XFE各类拓展.NetCore.ProfileExtension.XFEProfile.SaveProfile(typeof({className}))")));
                         var property = SyntaxFactory.PropertyDeclaration(propertyType, propertyName)
                             .WithModifiers(SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.StaticKeyword)))
                             .AddAttributeLists(attributeSyntax)
@@ -135,7 +135,7 @@ namespace XFE各类拓展.NetCore.Analyzer
             var staticConstructorSyntax = SyntaxFactory.ConstructorDeclaration(className)
                     .AddModifiers(SyntaxFactory.Token(SyntaxKind.StaticKeyword))
                     .WithBody(SyntaxFactory.Block(
-                        SyntaxFactory.ParseStatement($"global::XFE各类拓展.NetCore.ProfileExtension.XFEProfile.LoadProfiles(typeof({className})).Wait();")));
+                        SyntaxFactory.ParseStatement($"global::XFE各类拓展.NetCore.ProfileExtension.XFEProfile.LoadProfiles(typeof({className}));")));
             if (classDeclaration.AttributeLists.Any(IsAutoLoadProfileAttribute))
             {
                 var autoLoadProfileAttribute = classDeclaration.AttributeLists.First(attributeList => IsAutoLoadProfileAttribute(attributeList)).Attributes.First();
