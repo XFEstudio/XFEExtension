@@ -107,7 +107,8 @@ namespace XFE各类拓展.NetCore.Analyzer
                                         .WithBody(SyntaxFactory.Block(getExpressionStatements)),
                                     SyntaxFactory.AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
                                         .WithBody(SyntaxFactory.Block(setExpressionStatements))
-                                })));
+                                })))
+                            .WithLeadingTrivia(fieldDeclarationSyntax.GetLeadingTrivia());
                         return property.NormalizeWhitespace();
                     });
                     var profileClassSyntaxTree = GenerateProfileClassSyntaxTree(classDeclaration, usingDirectives, properties, fileScopedNamespaceDeclarationSyntax);
@@ -134,8 +135,7 @@ namespace XFE各类拓展.NetCore.Analyzer
             var staticConstructorSyntax = SyntaxFactory.ConstructorDeclaration(className)
                     .AddModifiers(SyntaxFactory.Token(SyntaxKind.StaticKeyword))
                     .WithBody(SyntaxFactory.Block(
-                        SyntaxFactory.ParseStatement($"_ = global::XFE各类拓展.NetCore.ProfileExtension.XFEProfile.LoadProfiles(typeof({className}));")))
-                    .NormalizeWhitespace();
+                        SyntaxFactory.ParseStatement($"_ = global::XFE各类拓展.NetCore.ProfileExtension.XFEProfile.LoadProfiles(typeof({className}));")));
             if (classDeclaration.AttributeLists.Any(IsAutoLoadProfileAttribute))
             {
                 var autoLoadProfileAttribute = classDeclaration.AttributeLists.First(attributeList => IsAutoLoadProfileAttribute(attributeList)).Attributes.First();

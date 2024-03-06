@@ -10,5 +10,5 @@ public class AutoLoadProfileAttribute(bool autoLoad = true) : Attribute
     /// <summary>
     /// 是否自动加载
     /// </summary>
-    public bool AutoLoad { get; set; } = autoLoad;
+    internal bool AutoLoad { get; set; } = autoLoad;
 }

@@ -10,5 +10,5 @@ public class ProfilePropertyAddGetAttribute(string funcString) : Attribute
     /// <summary>
     /// 需要添加的代码
     /// </summary>
-    public string FuncString { get; set; } = funcString;
+    internal string FuncString { get; set; } = funcString;
 }
