@@ -2,6 +2,7 @@
 
 namespace XFE各类拓展.NetCore.Analyzer.Test;
 
+[AutoLoadProfile]
 public static partial class SystemProfile
 {
     [ProfileProperty]

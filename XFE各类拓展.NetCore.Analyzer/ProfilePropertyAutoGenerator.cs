@@ -43,12 +43,23 @@ namespace XFE各类拓展.NetCore.Analyzer
                         var variableDeclaration = fieldDeclarationSyntax.Declaration.Variables.First();
                         var fieldName = variableDeclaration.Identifier.Text;
                         var propertyName = fieldName[0] == '_' ? fieldName[1].ToString().ToUpper() + fieldName.Substring(2) : fieldName[0].ToString().ToUpper() + fieldName.Substring(1);
+                        fieldDeclarationSyntax.AttributeLists.Where(IsProfilePropertyAttribute).SelectMany(attributeList => attributeList.Attributes).ToList().ForEach(attribute =>
+                        {
+                            if (attribute.ArgumentList is null)
+                            {
+                                return;
+                            }
+                            var argument = attribute.ArgumentList.Arguments.First();
+                            if (argument.Expression is LiteralExpressionSyntax literalExpressionSyntax)
+                            {
+                                propertyName = literalExpressionSyntax.Token.ValueText;
+                            }
+                        });
                         var propertyType = fieldDeclarationSyntax.Declaration.Type;
                         var getExpressionStatements = new List<StatementSyntax>();
                         if (fieldDeclarationSyntax.AttributeLists.Any(IsProfilePropertyAddGetAttribute))
                         {
-                            //获取每个特性的传参，并将其作为表达式添加到getExpressionStatements中
-                            fieldDeclarationSyntax.AttributeLists.Where(IsProfilePropertyAttribute).SelectMany(attributeList => attributeList.Attributes).ToList().ForEach(attribute =>
+                            fieldDeclarationSyntax.AttributeLists.Where(IsProfilePropertyAddGetAttribute).SelectMany(attributeList => attributeList.Attributes).ToList().ForEach(attribute =>
                             {
                                 if (attribute.ArgumentList is null)
                                 {
@@ -57,7 +68,7 @@ namespace XFE各类拓展.NetCore.Analyzer
                                 var argument = attribute.ArgumentList.Arguments.First();
                                 if (argument.Expression is LiteralExpressionSyntax literalExpressionSyntax)
                                 {
-                                    getExpressionStatements.Add(SyntaxFactory.ParseStatement(literalExpressionSyntax.Token.ValueText));
+                                    getExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression(literalExpressionSyntax.Token.ValueText)));
                                 }
                             });
                         }
@@ -68,8 +79,7 @@ namespace XFE各类拓展.NetCore.Analyzer
                         var setExpressionStatements = new List<StatementSyntax>();
                         if (fieldDeclarationSyntax.AttributeLists.Any(IsProfilePropertyAddSetAttribute))
                         {
-                            //获取每个特性的传参，并将其作为表达式添加到setExpressionStatements中
-                            fieldDeclarationSyntax.AttributeLists.Where(IsProfilePropertyAttribute).SelectMany(attributeList => attributeList.Attributes).ToList().ForEach(attribute =>
+                            fieldDeclarationSyntax.AttributeLists.Where(IsProfilePropertyAddSetAttribute).SelectMany(attributeList => attributeList.Attributes).ToList().ForEach(attribute =>
                             {
                                 if (attribute.ArgumentList is null)
                                 {
@@ -78,15 +88,15 @@ namespace XFE各类拓展.NetCore.Analyzer
                                 var argument = attribute.ArgumentList.Arguments.First();
                                 if (argument.Expression is LiteralExpressionSyntax literalExpressionSyntax)
                                 {
-                                    setExpressionStatements.Add(SyntaxFactory.ParseStatement(literalExpressionSyntax.Token.ValueText));
+                                    setExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression(literalExpressionSyntax.Token.ValueText)));
                                 }
                             });
                         }
                         else
                         {
                             setExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"{fieldName} = value")));
-                            setExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"_ = global::XFE各类拓展.NetCore.ProfileExtension.XFEProfile.LoadProfile(typeof({className}))")));
                         }
+                        setExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"_ = global::XFE各类拓展.NetCore.ProfileExtension.XFEProfile.LoadProfiles(typeof({className}))")));
                         var property = SyntaxFactory.PropertyDeclaration(propertyType, propertyName)
                             .WithModifiers(SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.StaticKeyword)))
                             .AddAttributeLists(attributeSyntax)
@@ -98,7 +108,7 @@ namespace XFE各类拓展.NetCore.Analyzer
                                     SyntaxFactory.AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
                                         .WithBody(SyntaxFactory.Block(setExpressionStatements))
                                 })));
-                        return property;
+                        return property.NormalizeWhitespace();
                     });
                     var profileClassSyntaxTree = GenerateProfileClassSyntaxTree(classDeclaration, usingDirectives, properties, fileScopedNamespaceDeclarationSyntax);
                     context.AddSource($"{className}.g.cs", profileClassSyntaxTree.ToString());
@@ -124,7 +134,8 @@ namespace XFE各类拓展.NetCore.Analyzer
             var staticConstructorSyntax = SyntaxFactory.ConstructorDeclaration(className)
                     .AddModifiers(SyntaxFactory.Token(SyntaxKind.StaticKeyword))
                     .WithBody(SyntaxFactory.Block(
-                        SyntaxFactory.ParseStatement($"global::XFE各类拓展.NetCore.ProfileExtension.XFEProfile.LoadProfile(typeof({className}))")));
+                        SyntaxFactory.ParseStatement($"_ = global::XFE各类拓展.NetCore.ProfileExtension.XFEProfile.LoadProfiles(typeof({className}));")))
+                    .NormalizeWhitespace();
             if (classDeclaration.AttributeLists.Any(IsAutoLoadProfileAttribute))
             {
                 var autoLoadProfileAttribute = classDeclaration.AttributeLists.First(attributeList => IsAutoLoadProfileAttribute(attributeList)).Attributes.First();
@@ -135,6 +146,10 @@ namespace XFE各类拓展.NetCore.Analyzer
                     {
                         memberDeclarations.Add(staticConstructorSyntax);
                     }
+                }
+                else
+                {
+                    memberDeclarations.Add(staticConstructorSyntax);
                 }
             }
             else
