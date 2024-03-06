@@ -46,6 +46,7 @@ namespace XFE各类拓展.NetCore.Analyzer
                         var propertyType = fieldDeclarationSyntax.Declaration.Type;
                         var property = SyntaxFactory.PropertyDeclaration(propertyType, propertyName)
                             .WithModifiers(SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.StaticKeyword)))
+                            .AddAttributeLists(attributeSyntax)
                             .WithAccessorList(SyntaxFactory.AccessorList(
                                 SyntaxFactory.List(new[]
                                 {
