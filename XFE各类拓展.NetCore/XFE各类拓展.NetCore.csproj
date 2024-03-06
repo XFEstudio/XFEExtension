@@ -19,7 +19,7 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-修复了加载配置与存储配置混乱的问题
+分离了同步和异步方法，不再合并
 
 ## 新增
 
@@ -32,9 +32,9 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <AssemblyVersion>1.7.24.4</AssemblyVersion>
-    <FileVersion>1.7.24.4</FileVersion>
-    <Version>1.7.4</Version>
+    <AssemblyVersion>1.7.25.5</AssemblyVersion>
+    <FileVersion>1.7.25.5</FileVersion>
+    <Version>1.7.5</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
