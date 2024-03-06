@@ -19,11 +19,11 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-无
+修复了配置文件不能正常储存的bug
 
 ## 新增
 
-现在，可以自动生成配置文件类中的字段对应的属性
+无
 
 ## 严重
 
@@ -32,9 +32,9 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <AssemblyVersion>1.7.20.0</AssemblyVersion>
-    <FileVersion>1.7.20.0</FileVersion>
-    <Version>1.7.0</Version>
+    <AssemblyVersion>1.7.21.1</AssemblyVersion>
+    <FileVersion>1.7.21.1</FileVersion>
+    <Version>1.7.1</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
