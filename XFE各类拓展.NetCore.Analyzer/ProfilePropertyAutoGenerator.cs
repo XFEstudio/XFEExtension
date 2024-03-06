@@ -96,7 +96,7 @@ namespace XFE各类拓展.NetCore.Analyzer
                         {
                             setExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"{fieldName} = value")));
                         }
-                        setExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"_ = global::XFE各类拓展.NetCore.ProfileExtension.XFEProfile.LoadProfiles(typeof({className}))")));
+                        setExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"_ = global::XFE各类拓展.NetCore.ProfileExtension.XFEProfile.SaveProfile(typeof({className}))")));
                         var property = SyntaxFactory.PropertyDeclaration(propertyType, propertyName)
                             .WithModifiers(SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.StaticKeyword)))
                             .AddAttributeLists(attributeSyntax)
