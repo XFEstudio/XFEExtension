@@ -1,4 +1,5 @@
-﻿using XFE各类拓展.NetCore.FormatExtension;
+﻿using System.Text.Json;
+using XFE各类拓展.NetCore.FormatExtension;
 
 namespace XFE各类拓展.NetCore.ProfileExtension;
 
@@ -7,8 +8,8 @@ namespace XFE各类拓展.NetCore.ProfileExtension;
 /// </summary>
 public abstract class XFEProfile
 {
-    private static Func<ProfileEntryInfo, string> SaveProfilesFunc { get; set; } = x => x.Value is null ? string.Empty : x.Value;
-    private static Func<string, ProfileEntryInfo, object?> LoadProfilesFunc { get; set; } = (x, p) => Convert.ChangeType(x, p.Property.PropertyType);
+    private static Func<ProfileEntryInfo, string> SaveProfilesFunc { get; set; } = p => JsonSerializer.Serialize(p.Property.GetValue(null));
+    private static Func<string, ProfileEntryInfo, object?> LoadProfilesFunc { get; set; } = (x, p) => JsonSerializer.Deserialize(x, p.Property.PropertyType);
 
     /// <summary>
     /// 配置文件清单

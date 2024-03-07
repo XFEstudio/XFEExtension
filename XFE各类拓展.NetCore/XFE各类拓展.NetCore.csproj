@@ -19,7 +19,7 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-分离了同步和异步方法，不再合并
+为配置文件属性添加代码分析器及快速操作的实现
 
 ## 新增
 
@@ -32,9 +32,9 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <AssemblyVersion>1.7.25.5</AssemblyVersion>
-    <FileVersion>1.7.25.5</FileVersion>
-    <Version>1.7.5</Version>
+    <AssemblyVersion>1.7.26.6</AssemblyVersion>
+    <FileVersion>1.7.26.6</FileVersion>
+    <Version>1.7.6</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 

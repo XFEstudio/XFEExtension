@@ -1,33 +1,47 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using System.Collections.Immutable;
+using System.Diagnostics;
+using System.Linq;
 using System.Text.RegularExpressions;
 using XFE各类拓展.NetCore.Analyzer.Generator;
 
 namespace XFE各类拓展.NetCore.Analyzer.Diagnostics
 {
-    [Generator]
-    public class ProfileExtensionDiagnostics : ISourceGenerator
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    public class ProfileExtensionDiagnostics : DiagnosticAnalyzer
     {
-        public static readonly DiagnosticDescriptor AddGetNoResultError = new DiagnosticDescriptor("XFE0002",
+        public const string AddGetNoResultErrorId = "XFE0002";
+        public const string AddSetNoSetResultWarningId = "XFW0001";
+        public static readonly DiagnosticDescriptor AddGetNoResultError = new DiagnosticDescriptor(AddGetNoResultErrorId,
                                                                                                    "Get方法没有返回值",
                                                                                                    "设置了自定义的Get方法但是没有返回值：'{0}'",
                                                                                                    "XFE各类拓展.NetCore.Analyzer.Diagnostics",
                                                                                                    DiagnosticSeverity.Error,
                                                                                                    true,
                                                                                                    "设置了自定义的Get方法但是没有返回值.",
-                                                                                                   null);
-        public static readonly DiagnosticDescriptor AddSetNoSetResultWarning = new DiagnosticDescriptor("XFW0003",
+                                                                                                   "https://www.xfegzs.com/codespace/diagnostics/XFE0002.html");
+        public static readonly DiagnosticDescriptor AddSetNoSetResultWarning = new DiagnosticDescriptor(AddSetNoSetResultWarningId,
                                                                                                         "Set方法没有设置值",
-                                                                                                        "设置了自定义的Set方法但是没有设置实际的字段对应的值：'{0}'",
+                                                                                                        "设置了自定义的Set方法但是没有对实际字段进行操作：'{0}'",
                                                                                                         "XFE各类拓展.NetCore.Analyzer.Diagnostics",
                                                                                                         DiagnosticSeverity.Warning,
                                                                                                         true,
-                                                                                                        "设置了自定义的Set方法但是没有设置实际的字段对应的值.",
-                                                                                                        );
-        public void Initialize(GeneratorInitializationContext context)
+                                                                                                        "设置了自定义的Set方法但是没有对实际字段进行操作.",
+                                                                                                        "https://www.xfegzs.com/codespace/diagnostics/XFW0001.html");
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(AddGetNoResultError, AddSetNoSetResultWarning);
+
+
+        public override void Initialize(AnalysisContext context)
         {
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
+            context.EnableConcurrentExecution();
+            context.RegisterSyntaxNodeAction(ProfileExtensionAnalyzer, SyntaxKind.Attribute);
         }
-        public void Execute(GeneratorExecutionContext context)
+        public void ProfileExtensionAnalyzer(SyntaxNodeAnalysisContext context)
         {
             foreach (var syntaxTree in context.Compilation.SyntaxTrees)
             {
@@ -36,41 +50,49 @@ namespace XFE各类拓展.NetCore.Analyzer.Diagnostics
                 {
                     foreach (var fieldDeclaration in ProfilePropertyAutoGenerator.GetFieldDeclarations(classDeclaration))
                     {
-                        var getAttributeHasResult = false;
-                        var setAttributeSetResult = false;
-                        foreach (var attributeSyntax in ProfilePropertyAutoGenerator.GetProfilePropertyAddGetAttributeList(fieldDeclaration))
+                        if (fieldDeclaration.AttributeLists.Any(ProfilePropertyAutoGenerator.IsProfilePropertyAddGetAttribute))
                         {
-                            if (attributeSyntax.ArgumentList is null)
+                            var getAttributeHasResult = false;
+                            var attributeSyntaxList = ProfilePropertyAutoGenerator.GetProfilePropertyAddGetAttributeList(fieldDeclaration);
+                            foreach (var attributeSyntax in attributeSyntaxList)
                             {
-                                continue;
+                                if (attributeSyntax.ArgumentList is null)
+                                {
+                                    continue;
+                                }
+                                var argument = attributeSyntax.ArgumentList.Arguments.First();
+                                if (argument.Expression is LiteralExpressionSyntax literalExpressionSyntax && literalExpressionSyntax.Token.ValueText.Contains("return"))
+                                {
+                                    getAttributeHasResult = true;
+                                }
                             }
-                            var argument = attributeSyntax.ArgumentList.Arguments.First();
-                            if (argument.Expression is LiteralExpressionSyntax literalExpressionSyntax && literalExpressionSyntax.Token.ValueText.Contains("return"))
+                            if (!getAttributeHasResult)
                             {
-                                getAttributeHasResult = true;
-                            }
-                        }
-                        foreach (var attributeSyntax in ProfilePropertyAutoGenerator.GetProfilePropertyAddSetAttributeList(fieldDeclaration))
-                        {
-                            if (attributeSyntax.ArgumentList is null)
-                            {
-                                continue;
-                            }
-                            var argument = attributeSyntax.ArgumentList.Arguments.First();
-                            if (argument.Expression is LiteralExpressionSyntax literalExpressionSyntax && Regex.IsMatch(literalExpressionSyntax.Token.ValueText, $@"{fieldDeclaration.Declaration.Variables.First().Identifier.ValueText}\s*=\s*value"))
-                            {
-                                setAttributeSetResult = true;
+                                var diagnostic = Diagnostic.Create(AddGetNoResultError, attributeSyntaxList.Last().GetLocation(), fieldDeclaration.Declaration.Variables.First().Identifier.ValueText);
+                                context.ReportDiagnostic(diagnostic);
                             }
                         }
-                        if (!getAttributeHasResult)
+                        if (fieldDeclaration.AttributeLists.Any(ProfilePropertyAutoGenerator.IsProfilePropertyAddSetAttribute))
                         {
-                            var diagnostic = Diagnostic.Create(AddGetNoResultError, fieldDeclaration.GetLocation(), fieldDeclaration.Declaration.Variables.First().Identifier.ValueText);
-                            context.ReportDiagnostic(diagnostic);
-                        }
-                        if (!setAttributeSetResult)
-                        {
-                            var diagnostic = Diagnostic.Create(AddSetNoSetResultWarning, fieldDeclaration.GetLocation(), fieldDeclaration.Declaration.Variables.First().Identifier.ValueText);
-                            context.ReportDiagnostic(diagnostic);
+                            var setAttributeSetResult = false;
+                            var attributeSyntaxList = ProfilePropertyAutoGenerator.GetProfilePropertyAddSetAttributeList(fieldDeclaration);
+                            foreach (var attributeSyntax in attributeSyntaxList)
+                            {
+                                if (attributeSyntax.ArgumentList is null)
+                                {
+                                    continue;
+                                }
+                                var argument = attributeSyntax.ArgumentList.Arguments.First();
+                                if (argument.Expression is LiteralExpressionSyntax literalExpressionSyntax && Regex.IsMatch(literalExpressionSyntax.Token.ValueText, $@"{fieldDeclaration.Declaration.Variables.First().Identifier.ValueText}\s*=\s*value"))
+                                {
+                                    setAttributeSetResult = true;
+                                }
+                            }
+                            if (!setAttributeSetResult)
+                            {
+                                var diagnostic = Diagnostic.Create(AddSetNoSetResultWarning, attributeSyntaxList.Last().GetLocation(), fieldDeclaration.Declaration.Variables.First().Identifier.ValueText);
+                                context.ReportDiagnostic(diagnostic);
+                            }
                         }
                     }
                 }
