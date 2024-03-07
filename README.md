@@ -1,18 +1,18 @@
-# XFEExtension (XFE各类拓展)
+# XFEExtension (XFEExtension)
 
 ## 描述
 
-XFE各类拓展是一个C#的DLL库，旨在优化C#代码中常用语句的使用，并提供更简洁的访问方式，同时提供Xunit测试框架，快速搭建服务器/客户端，免费ChatGPTAPI接口，免费通讯服务器，XFE下载器，新增格式等
+XFEExtension是一个C#的DLL库，旨在优化C#代码中常用语句的使用，并提供更简洁的访问方式，同时提供Xunit测试框架，快速搭建服务器/客户端，免费ChatGPTAPI接口，免费通讯服务器，XFE下载器，新增格式等
 
 ## 用途
 
-XFE各类拓展库适用于各种C#项目，特别适合在需要提高代码可读性的情况下使用。它包含了许多常见操作的拓展方法，使得代码编写更加高效和简便。以下是一些XFEExtension的用途示例：
+XFEExtension库适用于各种C#项目，特别适合在需要提高代码可读性的情况下使用。它包含了许多常见操作的拓展方法，使得代码编写更加高效和简便。以下是一些XFEExtension的用途示例：
 
-- **简化代码访问：** XFE各类拓展提供了更简洁的语法，使得代码中的访问操作更加清晰和易读。
+- **简化代码访问：** XFEExtension提供了更简洁的语法，使得代码中的访问操作更加清晰和易读。
 
-- **优化性能：** 通过使用XFE各类拓展，您可以执行各种性能优化操作，提高应用程序的效率。
+- **优化性能：** 通过使用XFEExtension，您可以执行各种性能优化操作，提高应用程序的效率。
 
-- **加速开发：** 通过减少样板代码，XFE各类拓展可以加速项目的开发过程，同时提高代码的可维护性。
+- **加速开发：** 通过减少样板代码，XFEExtension可以加速项目的开发过程，同时提高代码的可维护性。
 
 # 示例（使用前记得进行相应的引用）
 
@@ -137,7 +137,7 @@ string txt = "test.txt".ReadOut();
 ## XEA加密算法示例
 
 ```csharp
-// 使用XFE各类拓展来进行加密操作
+// 使用XFEExtension来进行加密操作
 string text = "这是一段将要加密的文本";
 $"未加密内容：{text}".CW();
 string password = "这是一个秘钥";
@@ -151,7 +151,7 @@ Console.WriteLine("解密内容：" + encrypt.XEADecrypt(password));//解密
 ## 特性操作示例
 
 ```csharp
-// 使用XFE各类拓展来简化特性读取操作
+// 使用XFEExtension来简化特性读取操作
 string str = testObject.GetAttribute<string>();
 ```
 
@@ -287,7 +287,7 @@ await group.StartXCC();//启动该群组的网络通讯
 XFEDownloader xFEDownloader = new()
 {
     DownloadUrl = "https://www.nuget.org/api/v2/package/XFE%E5%90%84%E7%B1%BB%E6%8B%93%E5%B1%95.NetCore/1.2.2",
-    SavePath = "XFE各类拓展.NetCore.nuget"
+    SavePath = "XFEExtension.NetCore.nuget"
 };
 xFEDownloader.BufferDownloaded += (sender, e) =>
 {
