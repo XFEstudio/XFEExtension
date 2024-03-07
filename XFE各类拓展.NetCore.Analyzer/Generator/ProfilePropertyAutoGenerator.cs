@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace XFE各类拓展.NetCore.Analyzer
+namespace XFE各类拓展.NetCore.Analyzer.Generator
 {
     [Generator]
     public class ProfilePropertyAutoGenerator : ISourceGenerator
@@ -19,17 +19,12 @@ namespace XFE各类拓展.NetCore.Analyzer
             foreach (var syntaxTree in syntaxTrees)
             {
                 var root = syntaxTree.GetRoot();
-                var classDeclarations = root.DescendantNodes().OfType<ClassDeclarationSyntax>()
-                    .Where(classDeclaration => classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword));
+                var classDeclarations = GetClassDeclarations(root);
                 var usingDirectives = root.DescendantNodes().OfType<UsingDirectiveSyntax>().ToArray();
-                FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclarationSyntax = null;
-                var namespaceResults = root.DescendantNodes().OfType<FileScopedNamespaceDeclarationSyntax>();
-                if (namespaceResults != null && namespaceResults.Count() > 0)
-                    fileScopedNamespaceDeclarationSyntax = namespaceResults.First();
+                var fileScopedNamespaceDeclarationSyntax = GetFileScopedNamespaceDeclaration(root);
                 foreach (var classDeclaration in classDeclarations)
                 {
-                    var fieldDeclarationSyntaxes = classDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>()
-                        .Where(fieldDeclarationSyntax => fieldDeclarationSyntax.AttributeLists.Any(IsProfilePropertyAttribute) && fieldDeclarationSyntax.Modifiers.Any(SyntaxKind.StaticKeyword));
+                    var fieldDeclarationSyntaxes = GetFieldDeclarations(classDeclaration);
                     if (fieldDeclarationSyntaxes is null || !fieldDeclarationSyntaxes.Any())
                     {
                         continue;
@@ -43,7 +38,7 @@ namespace XFE各类拓展.NetCore.Analyzer
                         var variableDeclaration = fieldDeclarationSyntax.Declaration.Variables.First();
                         var fieldName = variableDeclaration.Identifier.Text;
                         var propertyName = fieldName[0] == '_' ? fieldName[1].ToString().ToUpper() + fieldName.Substring(2) : fieldName[0].ToString().ToUpper() + fieldName.Substring(1);
-                        fieldDeclarationSyntax.AttributeLists.Where(IsProfilePropertyAttribute).SelectMany(attributeList => attributeList.Attributes).ToList().ForEach(attribute =>
+                        GetProfilePropertyAttributeList(fieldDeclarationSyntax).ForEach(attribute =>
                         {
                             if (attribute.ArgumentList is null)
                             {
@@ -59,7 +54,7 @@ namespace XFE各类拓展.NetCore.Analyzer
                         var getExpressionStatements = new List<StatementSyntax>();
                         if (fieldDeclarationSyntax.AttributeLists.Any(IsProfilePropertyAddGetAttribute))
                         {
-                            fieldDeclarationSyntax.AttributeLists.Where(IsProfilePropertyAddGetAttribute).SelectMany(attributeList => attributeList.Attributes).ToList().ForEach(attribute =>
+                            GetProfilePropertyAddGetAttributeList(fieldDeclarationSyntax).ForEach(attribute =>
                             {
                                 if (attribute.ArgumentList is null)
                                 {
@@ -79,7 +74,7 @@ namespace XFE各类拓展.NetCore.Analyzer
                         var setExpressionStatements = new List<StatementSyntax>();
                         if (fieldDeclarationSyntax.AttributeLists.Any(IsProfilePropertyAddSetAttribute))
                         {
-                            fieldDeclarationSyntax.AttributeLists.Where(IsProfilePropertyAddSetAttribute).SelectMany(attributeList => attributeList.Attributes).ToList().ForEach(attribute =>
+                            GetProfilePropertyAddSetAttributeList(fieldDeclarationSyntax).ForEach(attribute =>
                             {
                                 if (attribute.ArgumentList is null)
                                 {
@@ -117,10 +112,53 @@ namespace XFE各类拓展.NetCore.Analyzer
             }
         }
 
-        private static bool IsProfilePropertyAttribute(AttributeListSyntax attributeList) => attributeList.Attributes.Any(attribute => attribute.Name.ToString() == "ProfileProperty");
-        private static bool IsAutoLoadProfileAttribute(AttributeListSyntax attributeList) => attributeList.Attributes.Any(attribute => attribute.Name.ToString() == "AutoLoadProfile");
-        private static bool IsProfilePropertyAddGetAttribute(AttributeListSyntax attributeList) => attributeList.Attributes.Any(attribute => attribute.Name.ToString() == "ProfilePropertyAddGet");
-        private static bool IsProfilePropertyAddSetAttribute(AttributeListSyntax attributeList) => attributeList.Attributes.Any(attribute => attribute.Name.ToString() == "ProfilePropertyAddSet");
+        public static bool IsProfilePropertyAttribute(AttributeListSyntax attributeList) => attributeList.Attributes.Any(attribute => attribute.Name.ToString() == "ProfileProperty");
+
+        public static List<AttributeSyntax> GetProfilePropertyAttributeList(FieldDeclarationSyntax fieldDeclaration)
+        {
+            return fieldDeclaration.AttributeLists.Where(IsProfilePropertyAttribute).SelectMany(attributeList => attributeList.Attributes).ToList();
+        }
+
+        public static bool IsAutoLoadProfileAttribute(AttributeListSyntax attributeList) => attributeList.Attributes.Any(attribute => attribute.Name.ToString() == "AutoLoadProfile");
+
+        public static List<AttributeSyntax> GetAutoLoadProfileAttribute(FieldDeclarationSyntax fieldDeclaration)
+        {
+            return fieldDeclaration.AttributeLists.Where(IsAutoLoadProfileAttribute).SelectMany(attributeList => attributeList.Attributes).ToList();
+        }
+
+        public static bool IsProfilePropertyAddGetAttribute(AttributeListSyntax attributeList) => attributeList.Attributes.Any(attribute => attribute.Name.ToString() == "ProfilePropertyAddGet");
+
+        public static List<AttributeSyntax> GetProfilePropertyAddGetAttributeList(FieldDeclarationSyntax fieldDeclaration)
+        {
+            return fieldDeclaration.AttributeLists.Where(IsProfilePropertyAddGetAttribute).SelectMany(attributeList => attributeList.Attributes).ToList();
+        }
+
+        public static bool IsProfilePropertyAddSetAttribute(AttributeListSyntax attributeList) => attributeList.Attributes.Any(attribute => attribute.Name.ToString() == "ProfilePropertyAddSet");
+
+        public static List<AttributeSyntax> GetProfilePropertyAddSetAttributeList(FieldDeclarationSyntax fieldDeclaration)
+        {
+            return fieldDeclaration.AttributeLists.Where(IsProfilePropertyAddSetAttribute).SelectMany(attributeList => attributeList.Attributes).ToList();
+        }
+
+        public static FileScopedNamespaceDeclarationSyntax GetFileScopedNamespaceDeclaration(SyntaxNode rootNode)
+        {
+            var namespaceResults = rootNode.DescendantNodes().OfType<FileScopedNamespaceDeclarationSyntax>();
+            if (namespaceResults != null && namespaceResults.Count() > 0)
+                return namespaceResults.First();
+            return null;
+        }
+
+        public static IEnumerable<FieldDeclarationSyntax> GetFieldDeclarations(ClassDeclarationSyntax classDeclaration)
+        {
+            return classDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>()
+                        .Where(fieldDeclarationSyntax => fieldDeclarationSyntax.AttributeLists.Any(IsProfilePropertyAttribute) && fieldDeclarationSyntax.Modifiers.Any(SyntaxKind.StaticKeyword));
+        }
+
+        public static IEnumerable<ClassDeclarationSyntax> GetClassDeclarations(SyntaxNode rootNode)
+        {
+            return rootNode.DescendantNodes().OfType<ClassDeclarationSyntax>()
+                    .Where(classDeclaration => classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword));
+        }
 
         private static SyntaxTree GenerateProfileClassSyntaxTree(ClassDeclarationSyntax classDeclaration, UsingDirectiveSyntax[] usingDirectiveSyntaxes, IEnumerable<PropertyDeclarationSyntax> propertyDeclarationSyntaxes, FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclarationSyntax)
         {

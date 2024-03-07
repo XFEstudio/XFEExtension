@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
 
-namespace XFE各类拓展.NetCore.Analyzer
+namespace XFE各类拓展.NetCore.Analyzer.Generator
 {
     [Generator]
     public class ImplementAutoGenerator : ISourceGenerator

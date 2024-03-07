@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using XFE各类拓展.NetCore.FormatExtension;
+﻿using XFE各类拓展.NetCore.FormatExtension;
 
 namespace XFE各类拓展.NetCore.ProfileExtension;
 
