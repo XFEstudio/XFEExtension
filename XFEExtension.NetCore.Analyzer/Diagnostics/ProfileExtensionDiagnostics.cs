@@ -3,10 +3,11 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using XFEExtension.NetCore.Analyzer.CodeFix;
 using XFEExtension.NetCore.Analyzer.Generator;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace XFEExtension.NetCore.Analyzer.Diagnostics
 {
@@ -61,7 +62,20 @@ namespace XFEExtension.NetCore.Analyzer.Diagnostics
                                     continue;
                                 }
                                 var argument = attributeSyntax.ArgumentList.Arguments.First();
-                                if (argument.Expression is LiteralExpressionSyntax literalExpressionSyntax && literalExpressionSyntax.Token.ValueText.Contains("return"))
+                                var funcText = string.Empty;
+                                if (argument.Expression is LiteralExpressionSyntax)
+                                {
+                                    funcText = argument.Expression.GetText().ToString();
+                                }
+                                else if (argument.Expression is InterpolatedStringExpressionSyntax)
+                                {
+                                    funcText = argument.Expression.GetText().ToString();
+                                }
+                                else if (argument.Expression is InvocationExpressionSyntax)
+                                {
+                                    funcText = argument.Expression.GetText().ToString();
+                                }
+                                if (funcText.Contains("return"))
                                 {
                                     getAttributeHasResult = true;
                                 }
@@ -83,7 +97,20 @@ namespace XFEExtension.NetCore.Analyzer.Diagnostics
                                     continue;
                                 }
                                 var argument = attributeSyntax.ArgumentList.Arguments.First();
-                                if (argument.Expression is LiteralExpressionSyntax literalExpressionSyntax && Regex.IsMatch(literalExpressionSyntax.Token.ValueText, $@"{fieldDeclaration.Declaration.Variables.First().Identifier.ValueText}\s*=\s*value"))
+                                var funcText = string.Empty;
+                                if (argument.Expression is LiteralExpressionSyntax)
+                                {
+                                    funcText = argument.Expression.GetText().ToString();
+                                }
+                                else if (argument.Expression is InterpolatedStringExpressionSyntax)
+                                {
+                                    funcText = argument.Expression.GetText().ToString();
+                                }
+                                else if (argument.Expression is InvocationExpressionSyntax)
+                                {
+                                    funcText = argument.Expression.GetText().ToString();
+                                }
+                                if (Regex.IsMatch(funcText, $@"{fieldDeclaration.Declaration.Variables.First().Identifier.ValueText}\s*=\s*value"))
                                 {
                                     setAttributeSetResult = true;
                                 }

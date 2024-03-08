@@ -4,9 +4,7 @@ internal class TestClass
 {
     static void Main(string[] args)
     {
-        var task = new Task(() =>
-        {
-            Console.WriteLine("Hello World");
-        });
+        Console.WriteLine(SystemProfile.Name);
+        Console.WriteLine(SystemProfile.Age);
     }
 }

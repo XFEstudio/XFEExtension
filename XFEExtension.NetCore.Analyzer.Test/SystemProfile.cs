@@ -4,15 +4,18 @@ namespace XFEExtension.NetCore.Analyzer.Test;
 
 public static partial class SystemProfile
 {
+    #region Name
+    /// <summary>
+    /// 名称
+    /// </summary>
     [ProfileProperty]
-    [ProfilePropertyAddGet(@"Console.WriteLine(""123"")")]
-    [ProfilePropertyAddSet(@"Console.WriteLine(value)")]
-    [ProfilePropertyAddGet(@"Console.WriteLine(""456"")")]
-    [ProfilePropertyAddSet(@"Console.WriteLine()")]
+    [ProfilePropertyAddGet("Console.WriteLine()")]
+    [ProfilePropertyAddGet("Console.WriteLine()")]
+    [ProfilePropertyAddGet($@"return name")]
+    [ProfilePropertyAddSet("Console.WriteLine(value)")]
+    [ProfilePropertyAddSet("name = value")]
     private static string name = string.Empty;
+    #endregion
     [ProfileProperty]
-    [ProfilePropertyAddSet(@"_age = 1")]
-    [ProfilePropertyAddSet(@"_age = 2")]
-    [ProfilePropertyAddSet(@"_age = value")]
     private static int _age;
 }
