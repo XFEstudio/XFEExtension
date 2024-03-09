@@ -818,9 +818,4 @@ public abstract class XFECode
         }
         return true;
     }
-
-    static XFECode()
-    {
-        new Action(async () => await RunTest()).StartNewTask();
-    }
 }
