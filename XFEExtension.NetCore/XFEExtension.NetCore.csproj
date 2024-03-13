@@ -19,11 +19,11 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-现在配置文件生成的属性会显示get和set方法
+无
 
 ## 新增
 
-无
+添加了X方法，可以分析对象
 
 ## 严重
 
@@ -32,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.0.1</Version>
+    <Version>2.1.0</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
