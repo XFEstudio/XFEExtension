@@ -22,7 +22,7 @@ internal abstract class SubObjects : SubObjectsBase
             }
             outString += obj.OutPut();
         }
-        if (outString[^1] == '\n')
+        if (outString.Length > 0 && outString[^1] == '\n')
         {
             outString = outString[..^1];
         }
