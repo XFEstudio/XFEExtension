@@ -5,17 +5,16 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text.RegularExpressions;
-using XFEExtension.NetCore.Analyzer.CodeFix;
 using XFEExtension.NetCore.Analyzer.Generator;
-using static System.Net.Mime.MediaTypeNames;
-
 namespace XFEExtension.NetCore.Analyzer.Diagnostics
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ProfileExtensionDiagnostics : DiagnosticAnalyzer
     {
         public const string AddGetNoResultErrorId = "XFE0002";
+        public const string PropertyOrFieldNotStaticId = "XFE0003";
         public const string AddSetNoSetResultWarningId = "XFW0001";
+
         public static readonly DiagnosticDescriptor AddGetNoResultError = new DiagnosticDescriptor(AddGetNoResultErrorId,
                                                                                                    "Get方法没有返回值",
                                                                                                    "设置了自定义的Get方法但是没有返回值：'{0}'",
@@ -24,6 +23,7 @@ namespace XFEExtension.NetCore.Analyzer.Diagnostics
                                                                                                    true,
                                                                                                    "设置了自定义的Get方法但是没有返回值.",
                                                                                                    "https://www.xfegzs.com/codespace/diagnostics/XFE0002.html");
+
         public static readonly DiagnosticDescriptor AddSetNoSetResultWarning = new DiagnosticDescriptor(AddSetNoSetResultWarningId,
                                                                                                         "Set方法没有设置值",
                                                                                                         "设置了自定义的Set方法但是没有对实际字段进行操作：'{0}'",
@@ -33,8 +33,16 @@ namespace XFEExtension.NetCore.Analyzer.Diagnostics
                                                                                                         "设置了自定义的Set方法但是没有对实际字段进行操作.",
                                                                                                         "https://www.xfegzs.com/codespace/diagnostics/XFW0001.html");
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(AddGetNoResultError, AddSetNoSetResultWarning);
+        public static readonly DiagnosticDescriptor PropertyOrFieldNotStatic = new DiagnosticDescriptor(PropertyOrFieldNotStaticId,
+                                                                                                        "配置属性或字段不是静态的",
+                                                                                                        "配置类的{0}不是静态的：'{1}'",
+                                                                                                        "XFEExtension.NetCore.Analyzer.Diagnostics",
+                                                                                                        DiagnosticSeverity.Error,
+                                                                                                        true,
+                                                                                                        "配置类的属性或字段不是静态的.",
+                                                                                                        "https://www.xfegzs.com/codespace/diagnostics/XFE0003.html");
 
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(AddGetNoResultError, AddSetNoSetResultWarning, PropertyOrFieldNotStatic);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -47,7 +55,7 @@ namespace XFEExtension.NetCore.Analyzer.Diagnostics
             foreach (var syntaxTree in context.Compilation.SyntaxTrees)
             {
                 var root = syntaxTree.GetRoot();
-                foreach (var classDeclaration in ProfilePropertyAutoGenerator.GetClassDeclarations(root))
+                foreach (var classDeclaration in root.DescendantNodes().OfType<ClassDeclarationSyntax>())
                 {
                     foreach (var fieldDeclaration in ProfilePropertyAutoGenerator.GetFieldDeclarations(classDeclaration))
                     {
