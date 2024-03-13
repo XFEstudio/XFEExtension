@@ -65,27 +65,29 @@ public class XFEConverter
         var isBasicType = IsBasicType(type);
         if (isBasicType)
             return new ObjectInfoImpl(name, objectPlace, layer, type, true, value);
-        else if (value is null)
-            return new ObjectInfoImpl(name, objectPlace, layer, type, false, false);
         else
         {
-            if (type.IsAssignableTo(typeof(IEnumerable)))
-            {
-                var enumerableObjects = new SubObjectsImpl();
-                foreach (var item in (IEnumerable)value)
-                {
-                    enumerableObjects.Add(GetObjectInfo("", ObjectPlace.Other, layer + 1, item.GetType(), item, onlyProperty, onlyPublic));
-                }
-                return new ObjectInfoImpl(name, ObjectPlace.Other, layer, type, false, true, value, enumerableObjects);
-            }
             if (type.IsAssignableTo(typeof(Array)))
             {
                 var arrayObjects = new SubObjectsImpl();
                 foreach (var item in (Array)value)
                 {
-                    arrayObjects.Add(GetObjectInfo("", ObjectPlace.Other, layer + 1, item.GetType(), item, onlyProperty, onlyPublic));
+                    arrayObjects.Add(GetObjectInfo("数组成员", ObjectPlace.Array, layer + 1, item.GetType(), item, onlyProperty, onlyPublic));
                 }
-                return new ObjectInfoImpl(name, ObjectPlace.Other, layer, type, false, true, value, arrayObjects);
+                return new ObjectInfoImpl(name, objectPlace, layer, type, false, true, value, arrayObjects);
+            }
+            if (type.IsAssignableTo(typeof(IEnumerable)))
+            {
+                var enumerableObjects = new SubObjectsImpl();
+                foreach (var item in (IEnumerable)value)
+                {
+                    enumerableObjects.Add(GetObjectInfo("列表成员", ObjectPlace.List, layer + 1, item.GetType(), item, onlyProperty, onlyPublic));
+                }
+                return new ObjectInfoImpl(name, objectPlace, layer, type, false, true, value, enumerableObjects);
+            }
+            if (type.IsValueType)
+            {
+                return new ObjectInfoImpl(name, objectPlace, layer, type, false, value);
             }
             var subObjects = new SubObjectsImpl();
             foreach (var memberInfo in type.GetMembers((onlyPublic ? BindingFlags.Public : BindingFlags.NonPublic | BindingFlags.Public) | BindingFlags.Instance | BindingFlags.Static))

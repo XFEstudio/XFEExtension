@@ -61,7 +61,10 @@ internal abstract class ObjectInfo : IObjectInfo
         ObjectPlace.Property => "[属性]",
         ObjectPlace.Field => "[字段]",
         ObjectPlace.Main => "[主体]",
-        ObjectPlace.Other => "[无]",
+        ObjectPlace.Array => "[数组]",
+        ObjectPlace.List => "[列表]",
+        ObjectPlace.Enum => "[枚举]",
+        ObjectPlace.Other => "[其他]",
         _ => string.Empty,
     };
 

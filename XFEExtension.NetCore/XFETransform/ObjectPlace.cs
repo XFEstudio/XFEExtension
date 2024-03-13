@@ -18,6 +18,18 @@ public enum ObjectPlace
     /// </summary>
     Main,
     /// <summary>
+    /// 枚举
+    /// </summary>
+    Enum,
+    /// <summary>
+    /// 列表
+    /// </summary>
+    List,
+    /// <summary>
+    /// 数组
+    /// </summary>
+    Array,
+    /// <summary>
     /// 其他
     /// </summary>
     Other
