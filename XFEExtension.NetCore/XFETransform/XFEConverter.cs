@@ -37,7 +37,7 @@ public class XFEConverter
         var genericArguments = type.GetGenericArguments();
         if (genericArguments.Length == 0)
             return type.Name;
-        return $"{type.Name}<{string.Join(", ", genericArguments.Select(x =>
+        return $"{type.Name.Replace($"`{genericArguments.Length}", string.Empty)}<{string.Join(", ", genericArguments.Select(x =>
         {
             if (IsBasicType(x))
                 return ConvertBasicTypeToCodeType(x.Name);
