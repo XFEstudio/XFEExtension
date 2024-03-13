@@ -19,7 +19,7 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-优化输出对象的结构，X和XL现在今天添加别名
+修复获取对象的对象信息时可能导致的数组越界的bug
 
 ## 新增
 
@@ -32,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.2.1</Version>
+    <Version>2.2.2</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
