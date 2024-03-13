@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using XFEExtension.NetCore.XFETransform;
@@ -261,6 +262,13 @@ public static partial class StringExtension
     /// <param name="onlyProperty"></param>
     /// <param name="onlyPublic"></param>
     public static void X(this object? obj, bool onlyProperty = true, bool onlyPublic = true) => Console.WriteLine(XFEConverter.GetObjectInfo(obj?.GetType().Name, ObjectPlace.Main, 0, obj?.GetType(), obj, onlyProperty, onlyPublic).OutPut());
+    /// <summary>
+    /// 分析对象并输出到跟踪输出
+    /// </summary>
+    /// <param name="obj">待分析的对象</param>
+    /// <param name="onlyProperty"></param>
+    /// <param name="onlyPublic"></param>
+    public static void XL(this object? obj, bool onlyProperty = true, bool onlyPublic = true) => Trace.WriteLine(XFEConverter.GetObjectInfo(obj?.GetType().Name, ObjectPlace.Main, 0, obj?.GetType(), obj, onlyProperty, onlyPublic).OutPut());
     /// <summary>
     /// 字符串实际显示的长度
     /// </summary>
