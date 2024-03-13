@@ -18,11 +18,11 @@ internal abstract class ObjectInfo : IObjectInfo
         {
             if (Value is null)
             {
-                outPutString += $"{AddObjectPlace()} {XFEConverter.OutPutTypeName(Type)} {Name} : null\n";
+                outPutString += $"{AddObjectPlace()} {XFEConverter.OutPutTypeName(Type)} {Name}：null\n";
             }
             else
             {
-                outPutString += $"{AddObjectPlace()} {XFEConverter.OutPutTypeName(Type)} {Name} : {Value}\n";
+                outPutString += $"{AddObjectPlace()} {XFEConverter.OutPutTypeName(Type)} {Name}：{Value}\n";
             }
         }
         else
@@ -35,7 +35,7 @@ internal abstract class ObjectInfo : IObjectInfo
             if (Layer == 0)
             {
                 outPutString += $"""
-                {AddObjectPlace()} {XFEConverter.OutPutTypeName(Type)} {Name} :
+                {AddObjectPlace()} {XFEConverter.OutPutTypeName(Type)} {Name}
                 ┌────┬────────────────────────────
                 {SubObjects?.OutPutSubObjects()}
                 └─────────────────────────────────
@@ -45,7 +45,7 @@ internal abstract class ObjectInfo : IObjectInfo
             else
             {
                 outPutString += $"""
-                {AddObjectPlace()} {XFEConverter.OutPutTypeName(Type)} {Name} :
+                {AddObjectPlace()} {XFEConverter.OutPutTypeName(Type)} {Name}
                 {tabString}├────┬────────────────────────────
                 {SubObjects?.OutPutSubObjects()}
                 {tabString}└─────────────────────────────────
