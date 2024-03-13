@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Reflection;
 
-namespace XFEExtension.NetCore.XFEJsonTransform;
+namespace XFEExtension.NetCore.XFETransform;
 
 /// <summary>
 /// XFEJson转换器

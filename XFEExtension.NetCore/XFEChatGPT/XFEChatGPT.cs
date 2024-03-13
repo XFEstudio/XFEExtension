@@ -3,7 +3,7 @@ using System.Text;
 using XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.DefaultClass;
 using XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass;
 using XFEExtension.NetCore.XFEChatGPT.OtherInnerClass;
-using XFEExtension.NetCore.XFEJsonTransform;
+using XFEExtension.NetCore.XFETransform;
 
 namespace XFEExtension.NetCore.XFEChatGPT;
 
