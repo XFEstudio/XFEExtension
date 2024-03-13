@@ -19,11 +19,11 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-优化获取对象信息的结构
+优化输出对象的结构，X和XL现在今天添加别名
 
 ## 新增
 
-添加了XL方法，可以分析对象并输出到堆栈追踪输出中
+无
 
 ## 严重
 
@@ -32,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.2.0</Version>
+    <Version>2.2.1</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
