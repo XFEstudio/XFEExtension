@@ -25,13 +25,14 @@ public class ProfileInfo(Type profileType, string path = "", string description 
     /// <summary>
     /// 配置文件属性列表
     /// </summary>
-    public List<ProfileEntryInfo> PropertiesInfo { get; init; } = GetPropertiesWithProfileAttribute(profileType);
-    internal static List<ProfileEntryInfo> GetPropertiesWithProfileAttribute(Type type)
+    public List<ProfileEntryInfo> MemberInfo { get; init; } = GetMemberWithProfileAttribute(profileType);
+    internal static List<ProfileEntryInfo> GetMemberWithProfileAttribute(Type type)
     {
         var profileEntryList = new List<ProfileEntryInfo>();
-        foreach (var propertyInfo in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
-            if (propertyInfo.GetCustomAttribute<ProfilePropertyAttribute>() is not null)
-                profileEntryList.Add(new ProfileEntryInfo(propertyInfo.Name, propertyInfo));
+        foreach (var memberInfo in type.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+            if (memberInfo is not MethodInfo)
+                if (memberInfo.GetCustomAttribute<ProfilePropertyAttribute>() is not null)
+                    profileEntryList.Add(new ProfileEntryInfo(memberInfo.Name, memberInfo));
         return profileEntryList;
     }
     /// <summary>

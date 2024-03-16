@@ -35,7 +35,7 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                     var className = classDeclaration.Identifier.ValueText;
                     var attributeSyntax = SyntaxFactory.AttributeList(
                         SyntaxFactory.SingletonSeparatedList(
-                            SyntaxFactory.Attribute(SyntaxFactory.ParseName("global::XFEExtension.NetCore.ProfileExtension.ProfileProperty"))));
+                            SyntaxFactory.Attribute(SyntaxFactory.ParseName("global::XFEExtension.NetCore.ProfileExtension.ProfileFieldAutoGenerateAttribute"))));
                     var properties = fieldDeclarationSyntaxes.Select(fieldDeclarationSyntax =>
                     {
                         var variableDeclaration = fieldDeclarationSyntax.Declaration.Variables.First();
@@ -192,31 +192,19 @@ namespace XFEExtension.NetCore.Analyzer.Generator
 
         public static bool IsProfilePropertyAttribute(AttributeListSyntax attributeList) => attributeList.Attributes.Any(attribute => attribute.Name.ToString() == "ProfileProperty");
 
-        public static List<AttributeSyntax> GetProfilePropertyAttributeList(FieldDeclarationSyntax fieldDeclaration)
-        {
-            return fieldDeclaration.AttributeLists.Where(IsProfilePropertyAttribute).SelectMany(attributeList => attributeList.Attributes).ToList();
-        }
+        public static List<AttributeSyntax> GetProfilePropertyAttributeList(FieldDeclarationSyntax fieldDeclaration) => fieldDeclaration.AttributeLists.Where(IsProfilePropertyAttribute).SelectMany(attributeList => attributeList.Attributes).ToList();
 
         public static bool IsAutoLoadProfileAttribute(AttributeListSyntax attributeList) => attributeList.Attributes.Any(attribute => attribute.Name.ToString() == "AutoLoadProfile");
 
-        public static List<AttributeSyntax> GetAutoLoadProfileAttribute(FieldDeclarationSyntax fieldDeclaration)
-        {
-            return fieldDeclaration.AttributeLists.Where(IsAutoLoadProfileAttribute).SelectMany(attributeList => attributeList.Attributes).ToList();
-        }
+        public static List<AttributeSyntax> GetAutoLoadProfileAttribute(FieldDeclarationSyntax fieldDeclaration) => fieldDeclaration.AttributeLists.Where(IsAutoLoadProfileAttribute).SelectMany(attributeList => attributeList.Attributes).ToList();
 
         public static bool IsProfilePropertyAddGetAttribute(AttributeListSyntax attributeList) => attributeList.Attributes.Any(attribute => attribute.Name.ToString() == "ProfilePropertyAddGet");
 
-        public static List<AttributeSyntax> GetProfilePropertyAddGetAttributeList(FieldDeclarationSyntax fieldDeclaration)
-        {
-            return fieldDeclaration.AttributeLists.Where(IsProfilePropertyAddGetAttribute).SelectMany(attributeList => attributeList.Attributes).ToList();
-        }
+        public static List<AttributeSyntax> GetProfilePropertyAddGetAttributeList(FieldDeclarationSyntax fieldDeclaration) => fieldDeclaration.AttributeLists.Where(IsProfilePropertyAddGetAttribute).SelectMany(attributeList => attributeList.Attributes).ToList();
 
         public static bool IsProfilePropertyAddSetAttribute(AttributeListSyntax attributeList) => attributeList.Attributes.Any(attribute => attribute.Name.ToString() == "ProfilePropertyAddSet");
 
-        public static List<AttributeSyntax> GetProfilePropertyAddSetAttributeList(FieldDeclarationSyntax fieldDeclaration)
-        {
-            return fieldDeclaration.AttributeLists.Where(IsProfilePropertyAddSetAttribute).SelectMany(attributeList => attributeList.Attributes).ToList();
-        }
+        public static List<AttributeSyntax> GetProfilePropertyAddSetAttributeList(FieldDeclarationSyntax fieldDeclaration) => fieldDeclaration.AttributeLists.Where(IsProfilePropertyAddSetAttribute).SelectMany(attributeList => attributeList.Attributes).ToList();
 
         public static FileScopedNamespaceDeclarationSyntax GetFileScopedNamespaceDeclaration(SyntaxNode rootNode)
         {
@@ -226,17 +214,13 @@ namespace XFEExtension.NetCore.Analyzer.Generator
             return null;
         }
 
-        public static IEnumerable<FieldDeclarationSyntax> GetFieldDeclarations(ClassDeclarationSyntax classDeclaration)
-        {
-            return classDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>()
-                        .Where(fieldDeclarationSyntax => fieldDeclarationSyntax.AttributeLists.Any(IsProfilePropertyAttribute) && fieldDeclarationSyntax.Modifiers.Any(SyntaxKind.StaticKeyword));
-        }
+        public static IEnumerable<FieldDeclarationSyntax> GetFieldDeclarations(ClassDeclarationSyntax classDeclaration) => classDeclaration.DescendantNodes()
+                                                                                                                                           .OfType<FieldDeclarationSyntax>()
+                                                                                                                                           .Where(fieldDeclarationSyntax => fieldDeclarationSyntax.AttributeLists.Any(IsProfilePropertyAttribute) && fieldDeclarationSyntax.Modifiers.Any(SyntaxKind.StaticKeyword));
 
-        public static IEnumerable<ClassDeclarationSyntax> GetClassDeclarations(SyntaxNode rootNode)
-        {
-            return rootNode.DescendantNodes().OfType<ClassDeclarationSyntax>()
-                    .Where(classDeclaration => classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword));
-        }
+        public static IEnumerable<ClassDeclarationSyntax> GetClassDeclarations(SyntaxNode rootNode) => rootNode.DescendantNodes()
+                                                                                                               .OfType<ClassDeclarationSyntax>()
+                                                                                                               .Where(classDeclaration => classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword));
 
         private static SyntaxTree GenerateProfileClassSyntaxTree(ClassDeclarationSyntax classDeclaration, UsingDirectiveSyntax[] usingDirectiveSyntaxes, IEnumerable<PropertyDeclarationSyntax> propertyDeclarationSyntaxes, FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclarationSyntax)
         {
@@ -297,61 +281,6 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                 .AddMembers(memberDeclaration)
                 .NormalizeWhitespace();
             return SyntaxFactory.SyntaxTree(profileClassCompilationUnit);
-        }
-        // 定义Windows API
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool OpenClipboard(IntPtr hWndNewOwner);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool EmptyClipboard();
-
-        [DllImport("user32.dll")]
-        public static extern IntPtr SetClipboardData(uint uFormat, IntPtr data);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool CloseClipboard();
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr GlobalAlloc(uint uFlags, UIntPtr dwBytes);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr GlobalLock(IntPtr hMem);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool GlobalUnlock(IntPtr hMem);
-        public static bool SetClipboardText(string text)
-        {
-            // 打开剪切板
-            if (!OpenClipboard(IntPtr.Zero))
-                return false;
-
-            // 清空剪切板
-            EmptyClipboard();
-
-            // 分配内存
-            IntPtr hGlobal = GlobalAlloc(0x2000, (UIntPtr)((text.Length + 1) * 2)); // 0x2000 是GMEM_MOVEABLE
-
-            // 锁定内存
-            IntPtr pGlobal = GlobalLock(hGlobal);
-
-            // 将文本复制到内存
-            byte[] bytes = Encoding.Unicode.GetBytes(text);
-            Marshal.Copy(bytes, 0, pGlobal, bytes.Length);
-
-            // 解锁内存
-            GlobalUnlock(hGlobal);
-
-            // 将内存设置到剪切板
-            SetClipboardData(13, hGlobal);
-
-            // 关闭剪切板
-            CloseClipboard();
-
-            return true;
         }
     }
 }

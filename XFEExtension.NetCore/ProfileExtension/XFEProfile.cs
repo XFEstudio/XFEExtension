@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Reflection;
+using System.Text.Json;
 using XFEExtension.NetCore.FormatExtension;
 
 namespace XFEExtension.NetCore.ProfileExtension;
@@ -8,8 +9,24 @@ namespace XFEExtension.NetCore.ProfileExtension;
 /// </summary>
 public abstract class XFEProfile
 {
-    private static Func<ProfileEntryInfo, string> SaveProfilesFunc { get; set; } = p => JsonSerializer.Serialize(p.Property.GetValue(null));
-    private static Func<string, ProfileEntryInfo, object?> LoadProfilesFunc { get; set; } = (x, p) => JsonSerializer.Deserialize(x, p.Property.PropertyType);
+    private static Func<ProfileEntryInfo, string> SaveProfilesFunc { get; set; } = p =>
+    {
+        if (p.MemberInfo is FieldInfo fieldInfo)
+            return JsonSerializer.Serialize(fieldInfo.GetValue(null));
+        else if (p.MemberInfo is PropertyInfo propertyInfo)
+            return JsonSerializer.Serialize(propertyInfo.GetValue(null));
+        else
+            return string.Empty;
+    };
+    private static Func<string, ProfileEntryInfo, object?> LoadProfilesFunc { get; set; } = (x, p) =>
+    {
+        if (p.MemberInfo is FieldInfo fieldInfo)
+            return JsonSerializer.Deserialize(x, fieldInfo.FieldType);
+        else if (p.MemberInfo is PropertyInfo propertyInfo)
+            return JsonSerializer.Deserialize(x, propertyInfo.PropertyType);
+        else
+            return null;
+    };
 
     /// <summary>
     /// 配置文件清单
@@ -34,22 +51,28 @@ public abstract class XFEProfile
             if (!File.Exists(profile.Path))
                 continue;
             XFEDictionary propertyFileContent = File.ReadAllText(profile.Path);
-            for (int i = 0; i < profile.PropertiesInfo.Count; i++)
+            for (int i = 0; i < profile.MemberInfo.Count; i++)
             {
                 for (int j = 0; j < propertyFileContent.Count; j++)
                 {
-                    var propertyInfo = profile.PropertiesInfo[i];
+                    var memberInfo = profile.MemberInfo[i];
                     var property = propertyFileContent.ElementAt(j);
-                    if (property.Header == propertyInfo.Name)
+                    if (property.Header == memberInfo.Name)
                     {
-                        profile.PropertiesInfo[i].Property.SetValue(null, LoadProfilesFunc(property.Content, propertyInfo));
+                        if (memberInfo.MemberInfo is FieldInfo fieldInfo)
+                            fieldInfo.SetValue(null, LoadProfilesFunc(property.Content, memberInfo));
+                        else if (memberInfo.MemberInfo is PropertyInfo propertyInfo)
+                            propertyInfo.SetValue(null, LoadProfilesFunc(property.Content, memberInfo));
                         continue;
                     }
                     foreach (var propertySecFind in propertyFileContent)
                     {
-                        if (propertySecFind.Header == propertyInfo.Name)
+                        if (propertySecFind.Header == memberInfo.Name)
                         {
-                            profile.PropertiesInfo[i].Property.SetValue(null, LoadProfilesFunc(propertySecFind.Content, propertyInfo));
+                            if (profile.MemberInfo[i].MemberInfo is FieldInfo fieldInfo)
+                                fieldInfo.SetValue(null, LoadProfilesFunc(propertySecFind.Content, memberInfo));
+                            else if (profile.MemberInfo[i].MemberInfo is PropertyInfo propertyInfo)
+                                propertyInfo.SetValue(null, LoadProfilesFunc(propertySecFind.Content, memberInfo));
                             break;
                         }
                     }
@@ -76,7 +99,7 @@ public abstract class XFEProfile
         if (waitSaveProfile is null)
             return;
         var saveProfileDictionary = new XFEDictionary();
-        foreach (var property in waitSaveProfile.PropertiesInfo)
+        foreach (var property in waitSaveProfile.MemberInfo)
             saveProfileDictionary.Add(property.Name, SaveProfilesFunc(property));
         var fileSavePath = Path.GetDirectoryName(waitSaveProfile.Path);
         if (!Directory.Exists(fileSavePath) && fileSavePath is not null && fileSavePath != string.Empty)
@@ -105,7 +128,7 @@ public abstract class XFEProfile
         if (waitSaveProfile is null)
             return;
         var saveProfileDictionary = new XFEDictionary();
-        foreach (var property in waitSaveProfile.PropertiesInfo)
+        foreach (var property in waitSaveProfile.MemberInfo)
             saveProfileDictionary.Add(property.Name, SaveProfilesFunc(property));
         var fileSavePath = Path.GetDirectoryName(waitSaveProfile.Path);
         if (!Directory.Exists(fileSavePath) && fileSavePath is not null && fileSavePath != string.Empty)
@@ -160,7 +183,7 @@ public abstract class XFEProfile
         if (waitSaveProfile is null)
             return string.Empty;
         var saveProfileDictionary = new XFEDictionary();
-        foreach (var property in waitSaveProfile.PropertiesInfo)
+        foreach (var property in waitSaveProfile.MemberInfo)
             saveProfileDictionary.Add(property.Name, SaveProfilesFunc(property));
         return saveProfileDictionary.ToString();
     }
@@ -178,25 +201,47 @@ public abstract class XFEProfile
     }
 
     /// <summary>
-    /// 导入配置文件
+    /// 导入指定的配置文件<br/>
+    /// 本方法仅支持导入由<seealso cref="ExportProfile(ProfileInfo)"/>导出的配置文件<br/><br/>
+    /// 如需导入由<seealso cref="ExportProfiles"/>导出的配置文件，请使用<seealso cref="ImportProfiles(string,bool)"/>
+    /// </summary>
+    /// <param name="profileInfo">指定的配置文件</param>
+    /// <param name="profileString">配置文件字符串</param>
+    /// <param name="autoSave">导入后是否自动储存</param>
+    public static void ImportProfile(ProfileInfo profileInfo, string profileString, bool autoSave = true)
+    {
+        var waitSaveProfile = Profiles.Find(x => x.Profile == profileInfo.Profile);
+        if (waitSaveProfile is null)
+            return;
+        var importProfileDictionary = new XFEDictionary(profileString);
+        foreach (var property in waitSaveProfile.MemberInfo)
+        {
+            if (importProfileDictionary[property.Name] is not null)
+            {
+                if (property.MemberInfo is FieldInfo fieldInfo)
+                    fieldInfo.SetValue(null, LoadProfilesFunc(importProfileDictionary[property.Name]!, property));
+                else if (property.MemberInfo is PropertyInfo propertyInfo)
+                    propertyInfo.SetValue(null, LoadProfilesFunc(importProfileDictionary[property.Name]!, property));
+            }
+        }
+        if (autoSave)
+            SaveProfile(profileInfo);
+    }
+
+    /// <summary>
+    /// 导入所有配置文件<br/>
+    /// 本方法仅支持导入由<seealso cref="ExportProfiles"/>导出的配置文件<br/><br/>
+    /// 如需导入由<seealso cref="ExportProfile(ProfileInfo)"/>导出的配置文件，请使用<seealso cref="ImportProfile(ProfileInfo, string,bool)"/>
     /// </summary>
     /// <param name="profileString">配置文件字符串</param>
-    public static void ImportProfile(string profileString)
+    /// <param name="autoSave">导入后是否自动储存</param>
+    public static void ImportProfiles(string profileString, bool autoSave = true)
     {
-        var importProfile = new XFEDictionary(profileString);
+        var importProfiles = new XFEDictionary(profileString);
         foreach (var profile in Profiles)
         {
-            if (importProfile[profile.Profile.Name] is not null)
-            {
-                var profileContent = importProfile[profile.Profile.Name];
-                var profileContentDictionary = new XFEDictionary(profileContent!);
-                for (int i = 0; i < profile.PropertiesInfo.Count; i++)
-                {
-                    var propertyInfo = profile.PropertiesInfo[i];
-                    if (profileContentDictionary[propertyInfo.Name] is not null)
-                        profile.PropertiesInfo[i].Property.SetValue(null, LoadProfilesFunc(profileContentDictionary[propertyInfo.Name]!, propertyInfo));
-                }
-            }
+            if (importProfiles[profile.Profile.Name] is not null)
+                ImportProfile(profile, importProfiles[profile.Profile.Name]!, autoSave);
         }
     }
 }

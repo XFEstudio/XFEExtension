@@ -9,11 +9,8 @@ public static partial class SystemProfile
     /// 名称
     /// </summary>
     [ProfileProperty]
-    [ProfilePropertyAddGet("Console.WriteLine()")]
-    [ProfilePropertyAddGet("Console.WriteLine()")]
-    [ProfilePropertyAddGet($@"return name")]
-    [ProfilePropertyAddSet("Console.WriteLine(value)")]
-    [ProfilePropertyAddSet("name = value")]
+    [ProfilePropertyAddGet(@"Console.WriteLine(""获取了Name"")")]
+    [ProfilePropertyAddGet("return name")]
     private static string name = string.Empty;
     #endregion
     [ProfileProperty]
