@@ -19,11 +19,11 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-修复获取对象的对象信息时可能导致的数组越界的bug
+无
 
 ## 新增
 
-无
+添加导入和导出配置文件的方法
 
 ## 严重
 
@@ -32,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.2.2</Version>
+    <Version>2.3.0</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
