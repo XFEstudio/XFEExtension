@@ -94,7 +94,14 @@ public class XFEConverter
             {
                 if (memberInfo is PropertyInfo propertyInfo)
                 {
-                    subObjects.Add(GetObjectInfo(propertyInfo.Name, ObjectPlace.Property, layer + 1, propertyInfo.PropertyType, propertyInfo.GetValue(value), onlyProperty, onlyPublic));
+                    try
+                    {
+                        subObjects.Add(GetObjectInfo(propertyInfo.Name, ObjectPlace.Property, layer + 1, propertyInfo.PropertyType, propertyInfo.GetValue(value), onlyProperty, onlyPublic));
+                    }
+                    catch (Exception ex)
+                    {
+                        subObjects.Add(GetObjectInfo(propertyInfo.Name, ObjectPlace.Property, layer + 1, propertyInfo.PropertyType, $"[获取失败：{ex.Message}]", onlyProperty, onlyPublic));
+                    }
                     continue;
                 }
                 if (!onlyProperty && memberInfo is FieldInfo field)
