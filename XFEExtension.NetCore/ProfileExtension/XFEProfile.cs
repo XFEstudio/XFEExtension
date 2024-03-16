@@ -148,4 +148,55 @@ public abstract class XFEProfile
     /// <param name="profileInfo"></param>
     /// <returns></returns>
     protected static async Task AutoSaveAsync(ProfileInfo profileInfo) => await SaveProfileAsync(profileInfo);
+
+    /// <summary>
+    /// 导出指定的配置文件
+    /// </summary>
+    /// <param name="profileInfo">指定的配置文件</param>
+    /// <returns></returns>
+    public static string ExportProfile(ProfileInfo profileInfo)
+    {
+        var waitSaveProfile = Profiles.Find(x => x.Profile == profileInfo.Profile);
+        if (waitSaveProfile is null)
+            return string.Empty;
+        var saveProfileDictionary = new XFEDictionary();
+        foreach (var property in waitSaveProfile.PropertiesInfo)
+            saveProfileDictionary.Add(property.Name, SaveProfilesFunc(property));
+        return saveProfileDictionary.ToString();
+    }
+
+    /// <summary>
+    /// 导出所有配置文件
+    /// </summary>
+    /// <returns></returns>
+    public static string ExportProfiles()
+    {
+        var exportProfiles = new XFEDictionary();
+        foreach (var profile in Profiles)
+            exportProfiles.Add(profile.Profile.Name, ExportProfile(profile));
+        return exportProfiles.ToString();
+    }
+
+    /// <summary>
+    /// 导入配置文件
+    /// </summary>
+    /// <param name="profileString">配置文件字符串</param>
+    public static void ImportProfile(string profileString)
+    {
+        var importProfile = new XFEDictionary(profileString);
+        foreach (var profile in Profiles)
+        {
+            if (importProfile[profile.Profile.Name] is not null)
+            {
+                var profileContent = importProfile[profile.Profile.Name];
+                var profileContentDictionary = new XFEDictionary(profileContent!);
+                for (int i = 0; i < profile.PropertiesInfo.Count; i++)
+                {
+                    var propertyInfo = profile.PropertiesInfo[i];
+                    if (profileContentDictionary[propertyInfo.Name] is not null)
+                        profile.PropertiesInfo[i].Property.SetValue(null, LoadProfilesFunc(profileContentDictionary[propertyInfo.Name]!, propertyInfo));
+                }
+            }
+        }
+    }
 }
