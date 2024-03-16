@@ -19,11 +19,11 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-无
+修复解析ObjectInfo的时候可能出现的错误
 
 ## 新增
 
-添加导入和导出配置文件的方法
+无
 
 ## 严重
 
@@ -32,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.3.0</Version>
+    <Version>2.3.1</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
