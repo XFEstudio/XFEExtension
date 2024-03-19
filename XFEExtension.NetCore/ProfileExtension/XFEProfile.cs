@@ -147,6 +147,55 @@ public abstract class XFEProfile
     }
 
     /// <summary>
+    /// 删除指定的配置文件
+    /// </summary>
+    /// <param name="profileInfo">指定的配置文件</param>
+    public static void DeleteProfile(ProfileInfo profileInfo)
+    {
+        var waitSaveProfile = Profiles.Find(x => x.Profile == profileInfo.Profile);
+        if (waitSaveProfile is null)
+            return;
+        if (File.Exists(waitSaveProfile.Path))
+            File.Delete(waitSaveProfile.Path);
+    }
+
+    /// <summary>
+    /// 删除指定的配置文件
+    /// </summary>
+    /// <param name="profileInfo">指定的配置文件</param>
+    /// <returns></returns>
+    public static async Task DeleteProfileAsync(ProfileInfo profileInfo)
+    {
+        await Task.Run(() =>
+        {
+            var waitSaveProfile = Profiles.Find(x => x.Profile == profileInfo.Profile);
+            if (waitSaveProfile is null)
+                return;
+            if (File.Exists(waitSaveProfile.Path))
+                File.Delete(waitSaveProfile.Path);
+        });
+    }
+
+    /// <summary>
+    /// 删除所有配置文件
+    /// </summary>
+    public static void DeleteProfiles()
+    {
+        foreach (var profile in Profiles)
+            DeleteProfile(profile);
+    }
+
+    /// <summary>
+    /// 删除所有配置文件
+    /// </summary>
+    /// <returns></returns>
+    public static async Task DeleteProfilesAsync()
+    {
+        foreach (var profile in Profiles)
+            await DeleteProfileAsync(profile);
+    }
+
+    /// <summary>
     /// 设置储存配置文件的方法
     /// </summary>
     /// <param name="saveProfilesFunc">储存方法</param>
