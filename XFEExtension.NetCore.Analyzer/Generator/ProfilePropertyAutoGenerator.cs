@@ -55,7 +55,8 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                         });
                         var propertyType = fieldDeclarationSyntax.Declaration.Type;
                         #region Trivia头
-                        var triviaText = $@"/// <remarks>
+                        var triviaText = $@"/// <inheritdoc cref=""{fieldName}""/>
+/// <remarks>
 /// <seealso cref=""{propertyName}""/> 是根据 <seealso cref=""{fieldName}""/> 自动生成的属性<br/><br/>
 /// <code><seealso langword=""get""/>方法已生成以下代码:";
                         #endregion
@@ -168,8 +169,6 @@ namespace XFEExtension.NetCore.Analyzer.Generator
 /// </remarks>
 ";
                         #endregion
-                        var leadingTrivia = fieldDeclarationSyntax.DescendantTrivia().ToList();
-                        leadingTrivia.AddRange(SyntaxFactory.ParseLeadingTrivia(triviaText));
                         var property = SyntaxFactory.PropertyDeclaration(propertyType, propertyName)
                             .WithModifiers(SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.StaticKeyword)))
                             .AddAttributeLists(attributeSyntax)
@@ -181,7 +180,7 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                                     SyntaxFactory.AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
                                         .WithBody(SyntaxFactory.Block(setExpressionStatements))
                                 })))
-                            .WithLeadingTrivia(leadingTrivia);
+                            .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia(triviaText));
                         return property.NormalizeWhitespace();
                     });
                     var profileClassSyntaxTree = GenerateProfileClassSyntaxTree(classDeclaration, usingDirectives, properties, fileScopedNamespaceDeclarationSyntax);
