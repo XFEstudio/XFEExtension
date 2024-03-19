@@ -19,7 +19,7 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-修复了导入和导出配置文件的bug
+修复了使用自动生成配置文件时会添加多余注释的bug
 
 ## 新增
 
@@ -32,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.3.2</Version>
+    <Version>2.3.3</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
