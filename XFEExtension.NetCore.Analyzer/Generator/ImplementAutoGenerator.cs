@@ -43,7 +43,7 @@ namespace XFEExtension.NetCore.Analyzer.Generator
             if (classDeclaration.ParameterList is null)
             {
                 implementationClass = SyntaxFactory.ClassDeclaration($"{className}Impl")
-                    .AddModifiers(SyntaxFactory.Token(SyntaxKind.InternalKeyword))
+                    .AddModifiers(SyntaxFactory.Token(SyntaxKind.InternalKeyword), SyntaxFactory.Token(SyntaxKind.SealedKeyword))
                     .AddBaseListTypes(SyntaxFactory.SimpleBaseType(SyntaxFactory.ParseTypeName(className)))
                     .AddMembers(classDeclaration.Members.OfType<ConstructorDeclarationSyntax>().Select(constructor =>
                     {
