@@ -19,11 +19,11 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-现在自动生成实现类的类为不可继承的密封类型
+无
 
 ## 新增
 
-无
+局域网探测器
 
 ## 严重
 
@@ -32,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.4.1</Version>
+    <Version>2.5.0</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
