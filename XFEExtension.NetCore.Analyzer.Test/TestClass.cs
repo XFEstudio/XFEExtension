@@ -1,15 +1,18 @@
-﻿using XFEExtension.NetCore.ProfileExtension;
+﻿using XFEExtension.NetCore.WebExtension.LANDeviceDetector;
 
 namespace XFEExtension.NetCore.Analyzer.Test;
 
 internal class TestClass
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
-        Console.WriteLine(SystemProfile.Name);
-        Console.WriteLine(SystemProfile.Age);
-        XFEProfile.ImportProfiles("|{+-[+-SystemProfile-+][+-|{++-[++-name-++][++-\"New Name\"-++]-++}||{++-[++-_age-++][++-33-++]-++}|-+]-+}|");
-        Console.WriteLine(SystemProfile.Name);
-        Console.WriteLine(SystemProfile.Age);
+        var lANDeviceDetector = new LANDeviceDetector();
+        lANDeviceDetector.DeviceFind += LANDeviceDetector_DeviceFind;
+        await lANDeviceDetector.StartDetecting();
+    }
+
+    private static void LANDeviceDetector_DeviceFind(LANDevice sender)
+    {
+        Console.WriteLine($"IP:{sender.IPAddress}\tHost:{sender.DeviceName}");
     }
 }
