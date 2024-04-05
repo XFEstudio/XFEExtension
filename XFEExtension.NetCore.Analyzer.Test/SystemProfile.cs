@@ -11,6 +11,8 @@ public static partial class SystemProfile
     [ProfileProperty]
     [ProfilePropertyAddGet(@"Console.WriteLine(""获取了Name"")")]
     [ProfilePropertyAddGet("return name")]
+    [ProfilePropertyAddSet(@"Console.WriteLine(""设置了Name"")")]
+    [ProfilePropertyAddSet("name = value")]
     private static string name = string.Empty;
     #endregion
     [ProfileProperty]

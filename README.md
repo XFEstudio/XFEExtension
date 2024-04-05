@@ -18,6 +18,124 @@ XFEExtension库适用于各种C#项目，特别适合在需要提高代码可读
 
 ---
 
+## 自动实现配置文件的存储
+
+#### 基础用法
+
+```csharp
+//创建配置文件类
+static partial class SystemProfile
+{
+    [ProfileProperty]
+    static string name;
+
+    [ProfileProperty]
+    static int _age;
+}
+
+//使用配置文件
+class Program
+{
+    static void Main(string[] args)
+    {
+        SystemProfile.Name = "Test";//在设置值的时候会自动记录并储存
+        //SystemProfile.Age = 1;
+        Console.WriteLine(SystemProfile.Name);
+        Console.WriteLine(SystemProfile.Age);//下次打开程序会自动读取上次程序退出时储存的值
+    }
+}
+```
+
+#### 设置get和set方法
+
+```csharp
+static partial class SystemProfile
+{
+    [ProfileProperty]
+    [ProfilePropertyAddGet(@"Console.WriteLine(""获取了Name"")")]
+    [ProfilePropertyAddGet("return name")]
+    [ProfilePropertyAddSet(@"Console.WriteLine(""设置了Name"")")]
+    [ProfilePropertyAddSet("name = value")]
+    private static string name = string.Empty;
+
+    [ProfileProperty]
+    [ProfilePropertyAddGet(@"Console.WriteLine(""获取了Age"")")]
+    [ProfilePropertyAddGet("return _age")]
+    [ProfilePropertyAddSet(@"Console.WriteLine(""设置了Age"")")]
+    [ProfilePropertyAddSet("_age = value")]
+    private static int _age;
+}
+```
+
+#### 设置初始值
+
+```csharp
+static partial class SystemProfile
+{
+    [ProfileProperty]
+    private static string name = "John Wick";
+
+    [ProfileProperty]
+    private static int _age = 59;
+}
+```
+
+#### 为属性添加注释
+
+```csharp
+static partial class SystemProfile
+{
+    /// <summary>
+    /// 名称
+    /// 这段注释会自动添加至自动生成的Name属性上
+    /// </summary>
+    [ProfileProperty]
+    private static string name;
+
+    [ProfileProperty]
+    private static int _age;
+}
+```
+
+---
+
+## 使用LANDeviceDetector来检测本地局域网内的所有设备
+
+#### 基础用法
+
+```csharp
+var lANDeviceDetector = new LANDeviceDetector();
+lANDeviceDetector.DeviceFind += (sender) =>
+{
+    Console.WriteLine($"IP地址:{sender.IPAddress}\t设备名称:{sender.DeviceName}");
+};
+await lANDeviceDetector.StartDetecting();
+```
+
+#### 自定义扫描频段
+
+```csharp
+var lANDeviceDetector = new LANDeviceDetector("100.73.121.*");//这将扫描100.73.121.1到100.73.121.255的IP地址
+lANDeviceDetector.DeviceFind += (sender) =>
+{
+    Console.WriteLine($"IP地址:{sender.IPAddress}\t设备名称:{sender.DeviceName}");
+};
+await lANDeviceDetector.StartDetecting();
+```
+
+#### 自定义超时
+
+```csharp
+var lANDeviceDetector = new LANDeviceDetector("100.73.121.*", 2000);//这将会设置超时为2000ms
+lANDeviceDetector.DeviceFind += (sender) =>
+{
+    Console.WriteLine($"IP地址:{sender.IPAddress}\t设备名称:{sender.DeviceName}");
+};
+await lANDeviceDetector.StartDetecting();
+```
+
+---
+
 ## XFE的ChatGPT使用示例
 
 #### 最简单的用法
@@ -281,13 +399,14 @@ await group.StartXCC();//启动该群组的网络通讯
 
 ---
 
-## 使用XFE下载器下载文件（支持继续上次下载等操作）
+## 使用XFE下载器来加速下载文件（支持继续上次下载、多线程加速下载等操作）
 
 ```csharp
 XFEDownloader xFEDownloader = new()
 {
     DownloadUrl = "https://www.nuget.org/api/v2/package/XFE%E5%90%84%E7%B1%BB%E6%8B%93%E5%B1%95.NetCore/1.2.2",
-    SavePath = "XFEExtension.NetCore.nuget"
+    SavePath = "XFEExtension.NetCore.nuget",
+    FileSegmentCount = 9 //设置9个线程来加速下载，建议数量不超过15个
 };
 xFEDownloader.BufferDownloaded += (sender, e) =>
 {
