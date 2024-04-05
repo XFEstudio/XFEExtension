@@ -1,15 +1,14 @@
 ﻿using System.Net;
 using System.Net.NetworkInformation;
 using XFEExtension.NetCore.DelegateExtension;
+using XFEExtension.NetCore.WebExtension;
 
 namespace XFEExtension.NetCore.WebExtension.LANDeviceDetector;
 
 /// <summary>
 /// 局域网设备探测器
 /// </summary>
-/// <param name="iPStart">网络地址搜索的起始位置</param>
-/// <param name="timeOut">超时</param>
-public class LANDeviceDetector(string iPStart = "192.168.1.*", int timeOut = 100)
+public class LANDeviceDetector
 {
     /// <summary>
     /// 找到设备
@@ -19,12 +18,12 @@ public class LANDeviceDetector(string iPStart = "192.168.1.*", int timeOut = 100
     /// <summary>
     /// 网络地址搜索的起始位置
     /// </summary>
-    public string IPStart { get; set; } = iPStart;
+    public string IPStart { get; set; }
 
     /// <summary>
     /// 每个设备检测超时
     /// </summary>
-    public int TimeOut { get; set; } = timeOut;
+    public int TimeOut { get; set; }
 
     /// <summary>
     /// 是否正在检测
@@ -35,6 +34,28 @@ public class LANDeviceDetector(string iPStart = "192.168.1.*", int timeOut = 100
     /// 已找到的设备
     /// </summary>
     public List<LANDevice> FindDevices { get; set; } = [];
+
+    /// <summary>
+    /// 局域网设备探测器
+    /// </summary>
+    /// <param name="iPStart">网络地址搜索起始位置，default默认为本机设备所在网络频段</param>
+    /// <param name="timeOut">超时</param>
+    public LANDeviceDetector(string iPStart = "default", int timeOut = 100)
+    {
+        if(iPStart == "default")
+        {
+            var localIPAddress = WebExtension.GetLocalIPAddress();
+            if (localIPAddress is not null)
+                IPStart = $"{string.Join(".", localIPAddress.ToString().Split('.')[..3])}.*";
+            else
+                IPStart = "192.168.1.*";
+        }
+        else
+        {
+            IPStart = "192.168.1.*";
+        }
+        TimeOut = timeOut;
+    }
 
     /// <summary>
     /// 开始探测设备

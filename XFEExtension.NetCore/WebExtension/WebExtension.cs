@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Text;
 using XFEExtension.NetCore.TaskExtension;
 
@@ -32,6 +34,7 @@ public static class WebExtension
             return null;
         }
     }
+
     /// <summary>
     /// 从URL获取字符串内容
     /// </summary>
@@ -55,6 +58,7 @@ public static class WebExtension
             return null;
         }
     }
+
     /// <summary>
     /// 从URL获取字符串内容
     /// </summary>
@@ -79,6 +83,7 @@ public static class WebExtension
             return null;
         }
     }
+
     /// <summary>
     /// 从URL获取字符串内容
     /// </summary>
@@ -103,6 +108,7 @@ public static class WebExtension
             return null;
         }
     }
+
     /// <summary>
     /// 从URL获取字符串内容
     /// </summary>
@@ -128,6 +134,7 @@ public static class WebExtension
             return null;
         }
     }
+
     /// <summary>
     /// 从URL获取字符串内容
     /// </summary>
@@ -153,6 +160,7 @@ public static class WebExtension
             return null;
         }
     }
+
     /// <summary>
     /// 通过给定的URL获取其文件名
     /// </summary>
@@ -166,5 +174,25 @@ public static class WebExtension
             return Path.GetFileName(response.RequestMessage?.RequestUri?.AbsolutePath);
         else
             return response.Content.Headers.ContentDisposition.FileNameStar;
+    }
+
+    /// <summary>
+    /// 获取当前正在使用的本机IP地址
+    /// </summary>
+    /// <returns>IP地址</returns>
+    public static IPAddress? GetLocalIPAddress()
+    {
+        foreach (var networkInterface in NetworkInterface.GetAllNetworkInterfaces())
+        {
+            if (networkInterface.NetworkInterfaceType == NetworkInterfaceType.Loopback ||
+                networkInterface.OperationalStatus != OperationalStatus.Up)
+                continue;
+            var ipProperties = networkInterface.GetIPProperties();
+            if (ipProperties.GatewayAddresses.Count > 0)
+                foreach (var ip in ipProperties.UnicastAddresses)
+                    if (ip.Address.AddressFamily == AddressFamily.InterNetwork)
+                        return ip.Address;
+        }
+        return null;
     }
 }
