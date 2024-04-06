@@ -19,11 +19,12 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-无
+修复X方法输出以及XL方法输出的部分已知问题
+在md文档上添加X方法的使用实例
 
 ## 新增
 
-局域网探测器
+无
 
 ## 严重
 
@@ -32,7 +33,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.6.0</Version>
+    <Version>2.6.1</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 

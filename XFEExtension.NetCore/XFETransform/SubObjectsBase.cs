@@ -2,15 +2,17 @@
 
 namespace XFEExtension.NetCore.XFETransform;
 
-internal abstract class SubObjectsBase : ISubObjects
+internal abstract class SubObjectsBase(List<IObjectInfo>? objectInfoList) : ISubObjects
 {
-    protected readonly List<IObjectInfo> objectInfoList = [];
+    protected readonly List<IObjectInfo> objectInfoList = objectInfoList ?? [];
 
-    public IObjectInfo this[int index] { get => objectInfoList[index]; set => objectInfoList[index] = value;}
+    public IObjectInfo this[int index] { get => objectInfoList[index]; set => objectInfoList[index] = value; }
 
     public int Count => objectInfoList.Count;
 
     public bool IsReadOnly => false;
+
+    protected abstract ObjectInfo Parent { get; init; }
 
     public void Add(IObjectInfo item) => objectInfoList.Add(item);
 

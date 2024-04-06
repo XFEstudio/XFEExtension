@@ -1,18 +1,11 @@
-﻿using XFEExtension.NetCore.WebExtension.LANDeviceDetector;
+﻿namespace XFEExtension.NetCore.Analyzer.Test;
 
-namespace XFEExtension.NetCore.Analyzer.Test;
-
-internal class TestClass
+internal class TestClass(string name, string description, int age)
 {
-    static async Task Main(string[] args)
-    {
-        var lANDeviceDetector = new LANDeviceDetector();
-        lANDeviceDetector.DeviceFind += LANDeviceDetector_DeviceFind;
-        await lANDeviceDetector.StartDetecting();
-    }
-
-    private static void LANDeviceDetector_DeviceFind(LANDevice sender)
-    {
-        Console.WriteLine($"IP:{sender.IPAddress}\tHost:{sender.DeviceName}");
-    }
+    public int id;
+    private int data;
+    public string Name { get; set; } = name;
+    public string Description { get; set; } = description;
+    public int Age { get; set; } = age;
+    public List<List<string>> Tags { get; set; }
 }

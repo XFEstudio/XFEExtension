@@ -136,6 +136,24 @@ await lANDeviceDetector.StartDetecting();
 
 ---
 
+## 使用X方法分析对象信息，简化调试流程
+
+#### 在控制台输出（仅适用于C#的控制台应用程序）
+
+```csharp
+var testClass = new TestClass("测试名称", "测试描述", 15);//假如这是你需要分析的某个对象
+testClass.X();//这会将该对象的所有信息输出到控制台
+```
+
+#### 在调试信息中输出（使用与所有类型的C#程序）
+
+```csharp
+var testClass = new TestClass("测试名称", "测试描述", 15);//假如这是你需要分析的某个对象
+testClass.XL();//这会将该对象的所有信息输出到调试信息输出中
+```
+
+---
+
 ## XFE的ChatGPT使用示例
 
 #### 最简单的用法

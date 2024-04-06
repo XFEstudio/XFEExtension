@@ -18,7 +18,7 @@ internal abstract class ObjectInfo : IObjectInfo
         {
             if (Value is null)
             {
-                outPutString += $"{AddObjectPlace()} {XFEConverter.OutPutTypeName(Type)} {Name}：null\n";
+                outPutString += $"{AddObjectPlace()} 空对象 {Name}：null\n";
             }
             else
             {
@@ -27,11 +27,6 @@ internal abstract class ObjectInfo : IObjectInfo
         }
         else
         {
-            var tabString = string.Empty;
-            for (int i = 0; i < Layer; i++)
-            {
-                tabString += "│    ";
-            }
             if (Layer == 0)
             {
                 outPutString += $"""
@@ -44,19 +39,13 @@ internal abstract class ObjectInfo : IObjectInfo
             }
             else
             {
-                outPutString += $"""
-                {AddObjectPlace()} {XFEConverter.OutPutTypeName(Type)} {Name}
-                {tabString}├────┬────────────────────────────
-                {SubObjects?.OutPutSubObjects()}
-                {tabString}└─────────────────────────────────
-
-                """;
+                outPutString += SubObjects?.OutPutSubObjects();
             }
         }
         return outPutString;
     }
 
-    private string AddObjectPlace() => ObjectPlace switch
+    internal string AddObjectPlace() => ObjectPlace switch
     {
         ObjectPlace.Property => "[属性]",
         ObjectPlace.Field => "[字段]",
@@ -78,7 +67,7 @@ internal abstract class ObjectInfo : IObjectInfo
         IsArray = false;
         Value = value;
     }
-    public ObjectInfo(string? name, ObjectPlace objectPlace, int layer, Type type, bool isBasicType, bool isArray, object? value = null, ISubObjects? subObjects = null)
+    public ObjectInfo(string? name, ObjectPlace objectPlace, int layer, Type type, bool isBasicType, bool isArray, object? value = null, List<IObjectInfo>? objectInfoList = null)
     {
         Name = name;
         ObjectPlace = objectPlace;
@@ -87,6 +76,6 @@ internal abstract class ObjectInfo : IObjectInfo
         IsBasicType = isBasicType;
         IsArray = isArray;
         Value = value;
-        SubObjects = subObjects;
+        SubObjects = new SubObjectsImpl(this, objectInfoList);
     }
 }

@@ -41,7 +41,7 @@ public class XFEConverter
         {
             if (IsBasicType(x))
                 return ConvertBasicTypeToCodeType(x.Name);
-            return x.Name;
+            return OutPutTypeName(x);
         }))}>";
     }
 
@@ -69,7 +69,7 @@ public class XFEConverter
         {
             if (type.IsAssignableTo(typeof(Array)))
             {
-                var arrayObjects = new SubObjectsImpl();
+                var arrayObjects = new List<IObjectInfo>();
                 foreach (var item in (Array)value)
                 {
                     arrayObjects.Add(GetObjectInfo("数组成员", ObjectPlace.Array, layer + 1, item.GetType(), item, onlyProperty, onlyPublic));
@@ -78,7 +78,7 @@ public class XFEConverter
             }
             if (type.IsAssignableTo(typeof(IEnumerable)))
             {
-                var enumerableObjects = new SubObjectsImpl();
+                var enumerableObjects = new List<IObjectInfo>();
                 foreach (var item in (IEnumerable)value)
                 {
                     enumerableObjects.Add(GetObjectInfo("列表成员", ObjectPlace.List, layer + 1, item.GetType(), item, onlyProperty, onlyPublic));
@@ -89,7 +89,7 @@ public class XFEConverter
             {
                 return new ObjectInfoImpl(name, objectPlace, layer, type, false, value);
             }
-            var subObjects = new SubObjectsImpl();
+            var subObjects = new List<IObjectInfo>();
             foreach (var memberInfo in type.GetMembers((onlyPublic ? BindingFlags.Public : BindingFlags.NonPublic | BindingFlags.Public) | BindingFlags.Instance | BindingFlags.Static))
             {
                 if (memberInfo is PropertyInfo propertyInfo)
