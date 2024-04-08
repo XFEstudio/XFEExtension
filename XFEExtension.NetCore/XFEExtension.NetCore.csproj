@@ -19,8 +19,8 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-修复X方法输出以及XL方法输出的部分已知问题
-在md文档上添加X方法的使用实例
+修复XFE下载器不能暂停的bug
+对象分析器输出时，子对象的ObjectPlace显示问题
 
 ## 新增
 
@@ -33,7 +33,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.6.1</Version>
+    <Version>2.6.2</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
