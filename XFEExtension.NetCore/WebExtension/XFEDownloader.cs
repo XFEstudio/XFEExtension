@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using XFEExtension.NetCore.DelegateExtension;
 using XFEExtension.NetCore.FileExtension;
 using XFEExtension.NetCore.TaskExtension;
@@ -26,7 +27,7 @@ public class XFEDownloader : IDisposable
     /// <summary>
     /// 储存位置
     /// </summary>
-    public string SavePath { get; init; }
+    public required string SavePath { get; init; }
     /// <summary>
     /// 文件分段下载的数量（可加速下载）
     /// </summary>
@@ -35,10 +36,16 @@ public class XFEDownloader : IDisposable
     /// 已下载
     /// </summary>
     public bool Downloaded { get; private set; }
+    private bool isPaused;
     /// <summary>
     /// 暂停
     /// </summary>
-    public bool IsPaused { get; set; }
+    public bool IsPaused
+    {
+        get { return isPaused; }
+        set { isPaused = value; }
+    }
+
     /// <summary>
     /// 开始下载
     /// </summary>
@@ -49,7 +56,7 @@ public class XFEDownloader : IDisposable
         var continueDownload = continueFromLastDownload && File.Exists(SavePath);
         long totalRead = 0;
         var getInfoClient = new HttpClient();
-        responseMessage ??= await GetHttpResponseMessage(getInfoClient);
+        responseMessage ??= await GetHttpResponseMessage(getInfoClient, CancellationToken.None);
         long? totalFileSize = responseMessage.Content.Headers.ContentLength;
         using var createFileStream = new FileStream(SavePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite, 8192, true);
         if (totalFileSize is not null)
@@ -71,13 +78,18 @@ public class XFEDownloader : IDisposable
                 httpClient.DefaultRequestHeaders.Range = new System.Net.Http.Headers.RangeHeaderValue(startPosition, endPosition);
                 if (continueDownload)
                     totalRead += currentSegmentDownloadedBuffeSize;
-                using var contentStream = await (await GetHttpResponseMessage(httpClient)).Content.ReadAsStreamAsync();
+                var cancellationTokenSource = new CancellationTokenSource();
+                var cancellationToken = cancellationTokenSource.Token;
+                using var contentStream = await (await GetHttpResponseMessage(httpClient, cancellationToken)).Content.ReadAsStreamAsync(cancellationToken);
                 byte[] buffer = new byte[8192];
                 int currentRead;
                 while ((currentRead = await contentStream.ReadAsync(buffer)) > 0 && !disposedValue)
                 {
                     if (IsPaused)
-                        while (IsPaused && !disposedValue) { }
+                    {
+                        await cancellationTokenSource.CancelAsync();
+                        break;
+                    }
                     await fileStream.WriteAsync(buffer.AsMemory(0, currentRead));
                     totalRead += currentRead;
                     currentSegmentDownloadedBuffeSize += currentRead;
@@ -101,7 +113,12 @@ public class XFEDownloader : IDisposable
     /// 继续下载
     /// </summary>
     /// <returns></returns>
-    public async Task Continue() => await Download();
+    public async Task Continue()
+    {
+        IsPaused = false;
+        await Download();
+    }
+
     /// <summary>
     /// 获取下载信息
     /// </summary>
@@ -109,12 +126,12 @@ public class XFEDownloader : IDisposable
     public async Task<(string? fileName, long? fileSize)> GetDownloadInfo()
     {
         using var httpClient = new HttpClient();
-        responseMessage ??= await GetHttpResponseMessage(httpClient);
+        responseMessage ??= await GetHttpResponseMessage(httpClient, CancellationToken.None);
         return (Path.GetFileName(responseMessage.RequestMessage?.RequestUri?.AbsolutePath), responseMessage.Content.Headers.ContentLength);
     }
-    private async Task<HttpResponseMessage> GetHttpResponseMessage(HttpClient httpClient)
+    private async Task<HttpResponseMessage> GetHttpResponseMessage(HttpClient httpClient, CancellationToken cancellationToken)
     {
-        var response = await httpClient.GetAsync(DownloadUrl, HttpCompletionOption.ResponseHeadersRead);
+        var response = await httpClient.GetAsync(DownloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         response.EnsureSuccessStatusCode();
         return response;
     }

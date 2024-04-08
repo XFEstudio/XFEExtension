@@ -45,7 +45,7 @@ internal abstract class ObjectInfo : IObjectInfo
         return outPutString;
     }
 
-    internal string AddObjectPlace() => ObjectPlace switch
+    public string AddObjectPlace() => ObjectPlace switch
     {
         ObjectPlace.Property => "[属性]",
         ObjectPlace.Field => "[字段]",

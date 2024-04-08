@@ -38,6 +38,8 @@ public interface IObjectInfo
     /// </summary>
     int Layer { get; init; }
 
+    string AddObjectPlace();
+
     /// <summary>
     /// 输出对象信息
     /// </summary>

@@ -31,7 +31,7 @@ internal abstract class SubObjects(List<IObjectInfo>? objectInfoList) : SubObjec
             else
             {
                 outString += $"""
-                     ├─{Parent.AddObjectPlace()} {XFEConverter.OutPutTypeName(obj.Type)} {obj.Name}
+                     ├─{obj.AddObjectPlace()} {XFEConverter.OutPutTypeName(obj.Type)} {obj.Name}
                      {tabString}├────┬────────────────────────────
                      {obj.OutPut()}
                      {tabString}{currentConnectString}────────────────────────────────
