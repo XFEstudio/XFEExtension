@@ -86,7 +86,7 @@ public class XFEConverter
                 }
                 return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, type, false, true, value, arrayObjects);
             }
-            if (type.IsAssignableTo(typeof(IEnumerable)))
+            else if (type.IsAssignableTo(typeof(IEnumerable)))
             {
                 var enumerableObjects = new List<IObjectInfo>();
                 foreach (var item in (IEnumerable)value)
@@ -102,7 +102,11 @@ public class XFEConverter
                 }
                 return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, type, false, true, value, enumerableObjects);
             }
-            if (type.IsValueType)
+            else if (type.IsAssignableTo(typeof(Enum)))
+            {
+                return new ObjectInfoImpl(stringConverter, name, ObjectPlace.Enum, layer, type, false, value);
+            }
+            else if (type.IsValueType)
             {
                 return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, type, false, value);
             }

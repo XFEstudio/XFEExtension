@@ -15,11 +15,15 @@ public class ObjectAnalyzer : StringConverter
     public override string OutPutObject(IObjectInfo objectInfo)
     {
         var outPutString = string.Empty;
-        if (objectInfo.IsBasicType)
+        if (objectInfo.IsBasicType || objectInfo.ObjectPlace == ObjectPlace.Enum)
         {
             if (objectInfo.Value is null)
             {
                 outPutString += $"{AddObjectPlace(objectInfo)} 空对象 {objectInfo.Name}：null\n";
+            }
+            else if(objectInfo.ObjectPlace == ObjectPlace.Enum)
+            {
+                outPutString += $"{AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}：{objectInfo.Value}[{(int)objectInfo.Value}]\n";
             }
             else
             {
@@ -73,7 +77,7 @@ public class ObjectAnalyzer : StringConverter
             {
                 currentConnectString = "├─";
             }
-            if (obj.IsBasicType)
+            if (obj.IsBasicType || obj.ObjectPlace == ObjectPlace.Enum)
             {
                 outString += currentConnectString;
                 outString += obj.OutPutObject();

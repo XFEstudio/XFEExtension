@@ -21,37 +21,33 @@ public class JsonTransformer : StringConverter
         {
             tabString += " ";
         }
-        if (objectInfo.IsBasicType)
+        if (objectInfo.IsBasicType || objectInfo.ObjectPlace == ObjectPlace.Enum)
         {
             if (IsEnumerableMember(objectInfo))
             {
                 if (objectInfo.Value is null)
-                {
                     outPutString += $"{tabString}null";
-                }
                 else if (objectInfo.Value is string)
-                {
                     outPutString += $"{tabString}\"{objectInfo.Value}\"";
-                }
+                else if (objectInfo.ObjectPlace == ObjectPlace.Enum)
+                    outPutString += $"{tabString}{(int)objectInfo.Value}";
+                else if (objectInfo.Value is bool)
+                    outPutString += $"{tabString}{objectInfo.Value.ToString()?.ToLower()}";
                 else
-                {
                     outPutString += $"{tabString}{objectInfo.Value}";
-                }
             }
             else
             {
                 if (objectInfo.Value is null)
-                {
                     outPutString += $"{tabString}\"{objectInfo.Name}\": null";
-                }
                 else if (objectInfo.Value is string)
-                {
                     outPutString += $"{tabString}\"{objectInfo.Name}\": \"{objectInfo.Value}\"";
-                }
+                else if (objectInfo.ObjectPlace == ObjectPlace.Enum)
+                    outPutString += $"{tabString}\"{objectInfo.Name}\": {(int)objectInfo.Value}";
+                else if (objectInfo.Value is bool)
+                    outPutString += $"{tabString}\"{objectInfo.Name}\": {objectInfo.Value.ToString()?.ToLower()}";
                 else
-                {
                     outPutString += $"{tabString}\"{objectInfo.Name}\": {objectInfo.Value}";
-                }
             }
         }
         else
@@ -97,7 +93,7 @@ public class JsonTransformer : StringConverter
             {
                 currentConnectString = ",";
             }
-            if (obj.IsBasicType)
+            if (obj.IsBasicType || obj.ObjectPlace == ObjectPlace.Enum)
             {
                 outString += obj.OutPutObject();
                 outString += currentConnectString;
@@ -110,7 +106,6 @@ public class JsonTransformer : StringConverter
                       {{tabString}}]{{currentConnectString}}
                      """ : "null";
                 else if (IsEnumerableMember(obj))
-                {
                     if (obj.Value is not null && (obj.Type!.IsAssignableTo(typeof(IEnumerable)) || obj.Type.IsAssignableTo(typeof(Array))))
                         outString += obj.Value is not null ? $$"""
                      {{tabString}}[{{OutPutObject(obj)}}
@@ -121,7 +116,6 @@ public class JsonTransformer : StringConverter
                      {{tabString}}{{{OutPutObject(obj)}}
                        {{tabString}}}{{currentConnectString}}
                      """ : "null";
-                }
                 else
                     outString += obj.Value is not null ? $$"""
                      {{tabString}}"{{obj.Name}}": {{{tabString}}{{OutPutObject(obj)}}
