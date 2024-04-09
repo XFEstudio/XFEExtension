@@ -5,14 +5,14 @@ namespace XFEExtension.NetCore.XFETransform.StringConverter;
 /// <summary>
 /// 对象分析类
 /// </summary>
-public class ObjectAnalyzer : IStringConverter
+public class ObjectAnalyzer : StringConverter
 {
     /// <summary>
     /// 分析对象
     /// </summary>
     /// <param name="objectInfo"></param>
     /// <returns></returns>
-    public string OutPutObject(IObjectInfo objectInfo)
+    public override string OutPutObject(IObjectInfo objectInfo)
     {
         var outPutString = string.Empty;
         if (objectInfo.IsBasicType)
@@ -47,7 +47,7 @@ public class ObjectAnalyzer : IStringConverter
         return outPutString;
     }
 
-    internal static string OutPutSubObjects(ISubObjects subObjects)
+    internal override string OutPutSubObjects(ISubObjects subObjects)
     {
         var outString = string.Empty;
         for (int i = 0; i < subObjects.Count; i++)
@@ -97,7 +97,9 @@ public class ObjectAnalyzer : IStringConverter
         ObjectPlace.Field => "[字段]",
         ObjectPlace.Main => "[主体]",
         ObjectPlace.Array => "[数组]",
+        ObjectPlace.ArrayMember => "[数组成员]",
         ObjectPlace.List => "[列表]",
+        ObjectPlace.ListMember => "[列表成员]",
         ObjectPlace.Enum => "[枚举]",
         ObjectPlace.Other => "[其他]",
         _ => string.Empty,

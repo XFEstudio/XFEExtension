@@ -26,9 +26,17 @@ public enum ObjectPlace
     /// </summary>
     List,
     /// <summary>
+    /// 列表成员
+    /// </summary>
+    ListMember,
+    /// <summary>
     /// 数组
     /// </summary>
     Array,
+    /// <summary>
+    /// 数组成员
+    /// </summary>
+    ArrayMember,
     /// <summary>
     /// 其他
     /// </summary>
