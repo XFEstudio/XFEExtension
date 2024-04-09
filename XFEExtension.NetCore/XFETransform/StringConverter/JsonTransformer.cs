@@ -5,7 +5,7 @@ namespace XFEExtension.NetCore.XFETransform.StringConverter;
 /// <summary>
 /// Json转换器
 /// </summary>
-public class JsonTransformer : StringConverter
+internal class JsonTransformer : StringConverter
 {
     /// <summary>
     /// 输出Json对象信息

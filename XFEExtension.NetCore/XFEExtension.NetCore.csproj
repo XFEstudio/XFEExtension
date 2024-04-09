@@ -19,8 +19,7 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-修复XFE下载器不能暂停的bug
-对象分析器输出时，子对象的ObjectPlace显示问题
+对象分析将使用依赖注入，用户现在可以自己编写输出逻辑
 
 ## 新增
 
@@ -33,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.6.2</Version>
+    <Version>2.6.3</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
