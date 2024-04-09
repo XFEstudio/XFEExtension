@@ -48,6 +48,7 @@ public class XFEConverter
     /// <summary>
     /// 获取对象信息
     /// </summary>
+    /// <param name="stringConverter">字符串转换器</param>
     /// <param name="name">对象名称</param>
     /// <param name="objectPlace">对象位置</param>
     /// <param name="layer">嵌套层数</param>
@@ -56,15 +57,15 @@ public class XFEConverter
     /// <param name="onlyProperty">是否只获取属性</param>
     /// <param name="onlyPublic">是否只获取公共成员</param>
     /// <returns></returns>
-    public static IObjectInfo GetObjectInfo(string? name, ObjectPlace objectPlace, int layer, Type? type, object? value = null, bool onlyProperty = true, bool onlyPublic = true)
+    public static IObjectInfo GetObjectInfo(IStringConverter? stringConverter, string? name, ObjectPlace objectPlace, int layer, Type? type, object? value = null, bool onlyProperty = true, bool onlyPublic = true)
     {
         if (value is null || type is null)
         {
-            return new ObjectInfoImpl(name, objectPlace, layer, typeof(Nullable), true);
+            return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, null, true);
         }
         var isBasicType = IsBasicType(type);
         if (isBasicType)
-            return new ObjectInfoImpl(name, objectPlace, layer, type, true, value);
+            return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, type, true, value);
         else
         {
             if (type.IsAssignableTo(typeof(Array)))
@@ -72,22 +73,29 @@ public class XFEConverter
                 var arrayObjects = new List<IObjectInfo>();
                 foreach (var item in (Array)value)
                 {
-                    arrayObjects.Add(GetObjectInfo("数组成员", ObjectPlace.Array, layer + 1, item.GetType(), item, onlyProperty, onlyPublic));
+                    arrayObjects.Add(GetObjectInfo(stringConverter, "数组成员", ObjectPlace.Array, layer + 1, item.GetType(), item, onlyProperty, onlyPublic));
                 }
-                return new ObjectInfoImpl(name, objectPlace, layer, type, false, true, value, arrayObjects);
+                return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, type, false, true, value, arrayObjects);
             }
             if (type.IsAssignableTo(typeof(IEnumerable)))
             {
                 var enumerableObjects = new List<IObjectInfo>();
                 foreach (var item in (IEnumerable)value)
                 {
-                    enumerableObjects.Add(GetObjectInfo("列表成员", ObjectPlace.List, layer + 1, item.GetType(), item, onlyProperty, onlyPublic));
+                    try
+                    {
+                        enumerableObjects.Add(GetObjectInfo(stringConverter, "列表成员", ObjectPlace.List, layer + 1, item.GetType(), item, onlyProperty, onlyPublic));
+                    }
+                    catch (Exception ex)
+                    {
+                        enumerableObjects.Add(GetObjectInfo(stringConverter, "列表成员", ObjectPlace.List, layer + 1, item.GetType(), $"[获取失败：{ex.Message}]", onlyProperty, onlyPublic));
+                    }
                 }
-                return new ObjectInfoImpl(name, objectPlace, layer, type, false, true, value, enumerableObjects);
+                return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, type, false, true, value, enumerableObjects);
             }
             if (type.IsValueType)
             {
-                return new ObjectInfoImpl(name, objectPlace, layer, type, false, value);
+                return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, type, false, value);
             }
             var subObjects = new List<IObjectInfo>();
             foreach (var memberInfo in type.GetMembers((onlyPublic ? BindingFlags.Public : BindingFlags.NonPublic | BindingFlags.Public) | BindingFlags.Instance | BindingFlags.Static))
@@ -96,20 +104,20 @@ public class XFEConverter
                 {
                     try
                     {
-                        subObjects.Add(GetObjectInfo(propertyInfo.Name, ObjectPlace.Property, layer + 1, propertyInfo.PropertyType, propertyInfo.GetValue(value), onlyProperty, onlyPublic));
+                        subObjects.Add(GetObjectInfo(stringConverter, propertyInfo.Name, ObjectPlace.Property, layer + 1, propertyInfo.PropertyType, propertyInfo.GetValue(value), onlyProperty, onlyPublic));
                     }
                     catch (Exception ex)
                     {
-                        subObjects.Add(GetObjectInfo(propertyInfo.Name, ObjectPlace.Property, layer + 1, propertyInfo.PropertyType, $"[获取失败：{ex.Message}]", onlyProperty, onlyPublic));
+                        subObjects.Add(GetObjectInfo(stringConverter, propertyInfo.Name, ObjectPlace.Property, layer + 1, propertyInfo.PropertyType, $"[获取失败：{ex.Message}]", onlyProperty, onlyPublic));
                     }
                     continue;
                 }
                 if (!onlyProperty && memberInfo is FieldInfo field)
                 {
-                    subObjects.Add(GetObjectInfo(field.Name, ObjectPlace.Field, layer + 1, field.FieldType, field.GetValue(value), onlyProperty, onlyPublic));
+                    subObjects.Add(GetObjectInfo(stringConverter, field.Name, ObjectPlace.Field, layer + 1, field.FieldType, field.GetValue(value), onlyProperty, onlyPublic));
                 }
             }
-            return new ObjectInfoImpl(name, objectPlace, layer, type, false, false, value, subObjects);
+            return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, type, false, false, value, subObjects);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿namespace XFEExtension.NetCore.XFETransform;
 
-internal class SubObjectsImpl(ObjectInfo parent, List<IObjectInfo>? objectInfoList = null) : SubObjects(objectInfoList)
+internal class SubObjectsImpl(IObjectInfo parent, List<IObjectInfo>? objectInfoList = null) : SubObjects(objectInfoList, parent)
 {
-    protected override ObjectInfo Parent { get; init; } = parent;
 }

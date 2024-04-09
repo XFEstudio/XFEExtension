@@ -22,9 +22,13 @@ public interface IObjectInfo
     /// </summary>
     ISubObjects? SubObjects { get; init; }
     /// <summary>
+    /// 字符串转换器
+    /// </summary>
+    IStringConverter? StringConverter { get; init; }
+    /// <summary>
     /// 对象类型
     /// </summary>
-    Type Type { get; init; }
+    Type? Type { get; init; }
     /// <summary>
     /// 对象值
     /// </summary>
@@ -37,12 +41,9 @@ public interface IObjectInfo
     /// 对象层级
     /// </summary>
     int Layer { get; init; }
-
-    string AddObjectPlace();
-
     /// <summary>
     /// 输出对象信息
     /// </summary>
     /// <returns></returns>
-    string OutPut();
+    string OutPutObject();
 }

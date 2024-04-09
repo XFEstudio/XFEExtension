@@ -6,8 +6,7 @@
 public interface ISubObjects : IList<IObjectInfo>
 {
     /// <summary>
-    /// 输出子对象信息
+    /// 父类
     /// </summary>
-    /// <returns></returns>
-    string OutPutSubObjects();
+    IObjectInfo Parent { get; init; }
 }

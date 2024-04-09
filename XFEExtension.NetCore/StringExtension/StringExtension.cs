@@ -262,7 +262,7 @@ public static partial class StringExtension
     /// <param name="remarkName">对象别名</param>
     /// <param name="onlyProperty"></param>
     /// <param name="onlyPublic"></param>
-    public static void X(this object? obj, string remarkName = "分析对象", bool onlyProperty = true, bool onlyPublic = true) => Console.WriteLine(XFEConverter.GetObjectInfo(remarkName, ObjectPlace.Main, 0, obj?.GetType(), obj, onlyProperty, onlyPublic).OutPut());
+    public static void X(this object? obj, string remarkName = "分析对象", bool onlyProperty = true, bool onlyPublic = true) => Console.WriteLine(XFEConverter.GetObjectInfo(new ObjectAnalyzer(), remarkName, ObjectPlace.Main, 0, obj?.GetType(), obj, onlyProperty, onlyPublic).OutPutObject());
     /// <summary>
     /// 分析对象并输出到跟踪输出
     /// </summary>
@@ -270,7 +270,7 @@ public static partial class StringExtension
     /// <param name="remarkName">对象别名</param>
     /// <param name="onlyProperty"></param>
     /// <param name="onlyPublic"></param>
-    public static void XL(this object? obj, string remarkName = "分析对象", bool onlyProperty = true, bool onlyPublic = true) => Trace.WriteLine(XFEConverter.GetObjectInfo(remarkName, ObjectPlace.Main, 0, obj?.GetType(), obj, onlyProperty, onlyPublic).OutPut());
+    public static void XL(this object? obj, string remarkName = "分析对象", bool onlyProperty = true, bool onlyPublic = true) => Trace.WriteLine(XFEConverter.GetObjectInfo(new ObjectAnalyzer(), remarkName, ObjectPlace.Main, 0, obj?.GetType(), obj, onlyProperty, onlyPublic).OutPutObject());
     /// <summary>
     /// 字符串实际显示的长度
     /// </summary>
