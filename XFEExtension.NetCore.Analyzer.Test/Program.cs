@@ -1,8 +1,4 @@
-﻿using XFEExtension.NetCore.StringExtension;
-using XFEExtension.NetCore.XFETransform;
-using XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
-
-namespace XFEExtension.NetCore.Analyzer.Test;
+﻿namespace XFEExtension.NetCore.Analyzer.Test;
 
 internal class Program
 {
@@ -12,6 +8,5 @@ internal class Program
         {
             Tags = [["123", "321"], ["1234567", "7654321"]]
         };
-        XFEConverter.GetObjectInfo(new JsonTransformer(), "Json序列化对象", ObjectPlace.Main, 0, typeof(TestClass), testClass).OutPutObject().CW();
     }
 }

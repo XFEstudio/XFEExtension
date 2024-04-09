@@ -111,5 +111,5 @@ internal class JsonTransformer : StringConverter
         return outString;
     }
 
-    internal bool IsEnumerable(IObjectInfo objectInfo) => objectInfo.ObjectPlace == ObjectPlace.Array || objectInfo.ObjectPlace == ObjectPlace.List || objectInfo.ObjectPlace == ObjectPlace.ArrayMember || objectInfo.ObjectPlace == ObjectPlace.ListMember;
+    internal static bool IsEnumerable(IObjectInfo objectInfo) => objectInfo.ObjectPlace == ObjectPlace.Array || objectInfo.ObjectPlace == ObjectPlace.List || objectInfo.ObjectPlace == ObjectPlace.ArrayMember || objectInfo.ObjectPlace == ObjectPlace.ListMember;
 }
