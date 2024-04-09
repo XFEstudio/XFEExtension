@@ -19,7 +19,7 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-对象分析将使用依赖注入，用户现在可以自己编写输出逻辑
+修复部分对象分析的已知问题，细分了属性和字段类型
 
 ## 新增
 
@@ -32,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.6.3</Version>
+    <Version>2.6.4</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 

@@ -47,7 +47,12 @@ public class ObjectAnalyzer : StringConverter
         return outPutString;
     }
 
-    internal override string OutPutSubObjects(ISubObjects subObjects)
+    /// <summary>
+    /// 分析子对象信息
+    /// </summary>
+    /// <param name="subObjects"></param>
+    /// <returns></returns>
+    public override string OutPutSubObjects(ISubObjects subObjects)
     {
         var outString = string.Empty;
         for (int i = 0; i < subObjects.Count; i++)
@@ -93,8 +98,14 @@ public class ObjectAnalyzer : StringConverter
 
     internal static string AddObjectPlace(IObjectInfo objectInfo) => objectInfo.ObjectPlace switch
     {
-        ObjectPlace.Property => "[属性]",
-        ObjectPlace.Field => "[字段]",
+        ObjectPlace.NormalProperty => "[属性]",
+        ObjectPlace.ListProperty => "[属性]",
+        ObjectPlace.ArrayProperty => "[属性]",
+        ObjectPlace.EnumProperty => "[属性]",
+        ObjectPlace.NormalField => "[字段]",
+        ObjectPlace.ListField => "[字段]",
+        ObjectPlace.ArrayField => "[字段]",
+        ObjectPlace.EnumField => "[字段]",
         ObjectPlace.Main => "[主体]",
         ObjectPlace.Array => "[数组]",
         ObjectPlace.ArrayMember => "[数组成员]",

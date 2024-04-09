@@ -13,5 +13,10 @@ public abstract class StringConverter : IStringConverter
     /// <param name="objectInfo"></param>
     /// <returns></returns>
     public abstract string OutPutObject(IObjectInfo objectInfo);
-    internal abstract string OutPutSubObjects(ISubObjects subObjects);
+    /// <summary>
+    /// 输出子对象信息
+    /// </summary>
+    /// <param name="subObjects"></param>
+    /// <returns></returns>
+    public abstract string OutPutSubObjects(ISubObjects subObjects);
 }

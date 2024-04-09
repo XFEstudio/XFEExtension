@@ -75,7 +75,14 @@ public class XFEConverter
                 var arrayObjects = new List<IObjectInfo>();
                 foreach (var item in (Array)value)
                 {
-                    arrayObjects.Add(GetObjectInfo(stringConverter, "数组成员", ObjectPlace.Array, layer + 1, item.GetType(), item, onlyProperty, onlyPublic));
+                    try
+                    {
+                        arrayObjects.Add(GetObjectInfo(stringConverter, "数组成员", ObjectPlace.ArrayMember, layer + 1, item.GetType(), item, onlyProperty, onlyPublic));
+                    }
+                    catch (Exception ex)
+                    {
+                        arrayObjects.Add(GetObjectInfo(stringConverter, "数组成员", ObjectPlace.ArrayMember, layer + 1, item.GetType(), $"[获取失败：{ex.Message}]", onlyProperty, onlyPublic));
+                    }
                 }
                 return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, type, false, true, value, arrayObjects);
             }
@@ -86,11 +93,11 @@ public class XFEConverter
                 {
                     try
                     {
-                        enumerableObjects.Add(GetObjectInfo(stringConverter, "列表成员", ObjectPlace.List, layer + 1, item.GetType(), item, onlyProperty, onlyPublic));
+                        enumerableObjects.Add(GetObjectInfo(stringConverter, "列表成员", ObjectPlace.ListMember, layer + 1, item.GetType(), item, onlyProperty, onlyPublic));
                     }
                     catch (Exception ex)
                     {
-                        enumerableObjects.Add(GetObjectInfo(stringConverter, "列表成员", ObjectPlace.List, layer + 1, item.GetType(), $"[获取失败：{ex.Message}]", onlyProperty, onlyPublic));
+                        enumerableObjects.Add(GetObjectInfo(stringConverter, "列表成员", ObjectPlace.ListMember, layer + 1, item.GetType(), $"[获取失败：{ex.Message}]", onlyProperty, onlyPublic));
                     }
                 }
                 return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, type, false, true, value, enumerableObjects);
@@ -106,11 +113,11 @@ public class XFEConverter
                 {
                     try
                     {
-                        subObjects.Add(GetObjectInfo(stringConverter, propertyInfo.Name, ObjectPlace.Property, layer + 1, propertyInfo.PropertyType, propertyInfo.GetValue(value), onlyProperty, onlyPublic));
+                        subObjects.Add(GetObjectInfo(stringConverter, propertyInfo.Name, ObjectPlace.NormalProperty, layer + 1, propertyInfo.PropertyType, propertyInfo.GetValue(value), onlyProperty, onlyPublic));
                     }
                     catch (Exception ex)
                     {
-                        subObjects.Add(GetObjectInfo(stringConverter, propertyInfo.Name, ObjectPlace.Property, layer + 1, propertyInfo.PropertyType, $"[获取失败：{ex.Message}]", onlyProperty, onlyPublic));
+                        subObjects.Add(GetObjectInfo(stringConverter, propertyInfo.Name, ObjectPlace.NormalProperty, layer + 1, propertyInfo.PropertyType, $"[获取失败：{ex.Message}]", onlyProperty, onlyPublic));
                     }
                     continue;
                 }

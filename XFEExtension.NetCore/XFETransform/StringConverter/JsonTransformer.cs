@@ -64,7 +64,7 @@ internal class JsonTransformer : StringConverter
         return outPutString;
     }
 
-    internal override string OutPutSubObjects(ISubObjects subObjects)
+    public override string OutPutSubObjects(ISubObjects subObjects)
     {
         var outString = string.Empty;
         for (int i = 0; i < subObjects.Count; i++)
