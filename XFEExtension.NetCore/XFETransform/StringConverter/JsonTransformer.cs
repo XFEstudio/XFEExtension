@@ -1,11 +1,12 @@
-﻿using XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
+﻿using System.Collections;
+using XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
 
 namespace XFEExtension.NetCore.XFETransform.StringConverter;
 
 /// <summary>
 /// Json转换器
 /// </summary>
-internal class JsonTransformer : StringConverter
+public class JsonTransformer : StringConverter
 {
     /// <summary>
     /// 输出Json对象信息
@@ -22,15 +23,19 @@ internal class JsonTransformer : StringConverter
         }
         if (objectInfo.IsBasicType)
         {
-            if (IsEnumerable(objectInfo))
+            if (IsEnumerableMember(objectInfo))
             {
                 if (objectInfo.Value is null)
                 {
-                    outPutString += "null";
+                    outPutString += $"{tabString}null";
+                }
+                else if (objectInfo.Value is string)
+                {
+                    outPutString += $"{tabString}\"{objectInfo.Value}\"";
                 }
                 else
                 {
-                    outPutString += objectInfo.Value;
+                    outPutString += $"{tabString}{objectInfo.Value}";
                 }
             }
             else
@@ -38,6 +43,10 @@ internal class JsonTransformer : StringConverter
                 if (objectInfo.Value is null)
                 {
                     outPutString += $"{tabString}\"{objectInfo.Name}\": null";
+                }
+                else if (objectInfo.Value is string)
+                {
+                    outPutString += $"{tabString}\"{objectInfo.Name}\": \"{objectInfo.Value}\"";
                 }
                 else
                 {
@@ -50,8 +59,7 @@ internal class JsonTransformer : StringConverter
             if (objectInfo.Layer == 0)
             {
                 outPutString += objectInfo.SubObjects is not null ? $$"""
-                    {
-                    {{OutPutSubObjects(objectInfo.SubObjects)}}
+                    {{{OutPutSubObjects(objectInfo.SubObjects)}}
                     }
                     """ : "null";
             }
@@ -63,7 +71,11 @@ internal class JsonTransformer : StringConverter
         }
         return outPutString;
     }
-
+    /// <summary>
+    /// 输出子对象的Json信息
+    /// </summary>
+    /// <param name="subObjects"></param>
+    /// <returns></returns>
     public override string OutPutSubObjects(ISubObjects subObjects)
     {
         var outString = string.Empty;
@@ -75,15 +87,15 @@ internal class JsonTransformer : StringConverter
             {
                 tabString += " ";
             }
-            outString += tabString;
+            outString += "\n" + tabString;
             string? currentConnectString;
             if (i == subObjects.Count - 1)
             {
-                currentConnectString = "\n";
+                currentConnectString = "";
             }
             else
             {
-                currentConnectString = ",\n";
+                currentConnectString = ",";
             }
             if (obj.IsBasicType)
             {
@@ -92,15 +104,28 @@ internal class JsonTransformer : StringConverter
             }
             else
             {
-                if (IsEnumerable(obj))
-                    outString += obj is not null ? $$"""
-                     [{{OutPutObject(obj)}}]{{currentConnectString}}
+                if (IsEnumerableClassMember(obj))
+                    outString += obj.Value is not null ? $$"""
+                     {{tabString}}"{{obj.Name}}": [{{OutPutObject(obj)}}
+                      {{tabString}}]{{currentConnectString}}
                      """ : "null";
+                else if (IsEnumerableMember(obj))
+                {
+                    if (obj.Value is not null && (obj.Type!.IsAssignableTo(typeof(IEnumerable)) || obj.Type.IsAssignableTo(typeof(Array))))
+                        outString += obj.Value is not null ? $$"""
+                     {{tabString}}[{{OutPutObject(obj)}}
+                       {{tabString}}]{{currentConnectString}}
+                     """ : "null";
+                    else
+                        outString += obj.Value is not null ? $$"""
+                     {{tabString}}{{{OutPutObject(obj)}}
+                       {{tabString}}}{{currentConnectString}}
+                     """ : "null";
+                }
                 else
-                    outString += obj is not null ? $$"""
-                     {{tabString}}{
-                     {{tabString}}{{OutPutObject(obj)}}
-                      {{tabString}}}
+                    outString += obj.Value is not null ? $$"""
+                     {{tabString}}"{{obj.Name}}": {{{tabString}}{{OutPutObject(obj)}}
+                      {{tabString}}}{{currentConnectString}}
                      """ : "null";
             }
         }
@@ -111,5 +136,7 @@ internal class JsonTransformer : StringConverter
         return outString;
     }
 
-    internal static bool IsEnumerable(IObjectInfo objectInfo) => objectInfo.ObjectPlace == ObjectPlace.Array || objectInfo.ObjectPlace == ObjectPlace.List || objectInfo.ObjectPlace == ObjectPlace.ArrayMember || objectInfo.ObjectPlace == ObjectPlace.ListMember;
+    internal static bool IsEnumerable(IObjectInfo objectInfo) => objectInfo.ObjectPlace == ObjectPlace.Array || objectInfo.ObjectPlace == ObjectPlace.List;
+    internal static bool IsEnumerableMember(IObjectInfo objectInfo) => objectInfo.ObjectPlace == ObjectPlace.ArrayMember || objectInfo.ObjectPlace == ObjectPlace.ListMember;
+    internal static bool IsEnumerableClassMember(IObjectInfo objectInfo) => objectInfo.Value is not null && objectInfo.ObjectPlace == ObjectPlace.Property && (objectInfo.Type!.IsAssignableTo(typeof(IEnumerable)) || objectInfo.Type.IsAssignableTo(typeof(Array)));
 }
