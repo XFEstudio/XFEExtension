@@ -6,37 +6,13 @@
 public enum ObjectPlace
 {
     /// <summary>
-    /// 一般类型属性
+    /// 属性
     /// </summary>
-    NormalProperty,
+    Property,
     /// <summary>
-    /// 列表类型属性
+    /// 字段
     /// </summary>
-    ListProperty,
-    /// <summary>
-    /// 数组类型属性
-    /// </summary>
-    ArrayProperty,
-    /// <summary>
-    /// 枚举类型属性
-    /// </summary>
-    EnumProperty,
-    /// <summary>
-    /// 一般类型字段
-    /// </summary>
-    NormalField,
-    /// <summary>
-    /// 列表类型字段
-    /// </summary>
-    ListField,
-    /// <summary>
-    /// 数组类型字段
-    /// </summary>
-    ArrayField,
-    /// <summary>
-    /// 枚举类型字段
-    /// </summary>
-    EnumField,
+    Field,
     /// <summary>
     /// 主对象
     /// </summary>

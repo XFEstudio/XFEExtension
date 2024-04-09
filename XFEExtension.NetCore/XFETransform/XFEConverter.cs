@@ -79,9 +79,9 @@ public class XFEConverter
                     {
                         arrayObjects.Add(GetObjectInfo(stringConverter, "数组成员", ObjectPlace.ArrayMember, layer + 1, item.GetType(), item, onlyProperty, onlyPublic));
                     }
-                    catch (Exception ex)
+                    catch
                     {
-                        arrayObjects.Add(GetObjectInfo(stringConverter, "数组成员", ObjectPlace.ArrayMember, layer + 1, item.GetType(), $"[获取失败：{ex.Message}]", onlyProperty, onlyPublic));
+                        arrayObjects.Add(GetObjectInfo(stringConverter, "数组成员", ObjectPlace.ArrayMember, layer + 1, null, null, onlyProperty, onlyPublic));
                     }
                 }
                 return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, type, false, true, value, arrayObjects);
@@ -95,9 +95,9 @@ public class XFEConverter
                     {
                         enumerableObjects.Add(GetObjectInfo(stringConverter, "列表成员", ObjectPlace.ListMember, layer + 1, item.GetType(), item, onlyProperty, onlyPublic));
                     }
-                    catch (Exception ex)
+                    catch
                     {
-                        enumerableObjects.Add(GetObjectInfo(stringConverter, "列表成员", ObjectPlace.ListMember, layer + 1, item.GetType(), $"[获取失败：{ex.Message}]", onlyProperty, onlyPublic));
+                        enumerableObjects.Add(GetObjectInfo(stringConverter, "列表成员", ObjectPlace.ListMember, layer + 1, null, null, onlyProperty, onlyPublic));
                     }
                 }
                 return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, type, false, true, value, enumerableObjects);
@@ -109,44 +109,27 @@ public class XFEConverter
             var subObjects = new List<IObjectInfo>();
             foreach (var memberInfo in type.GetMembers((onlyPublic ? BindingFlags.Public : BindingFlags.NonPublic | BindingFlags.Public) | BindingFlags.Instance | BindingFlags.Static))
             {
-                ObjectPlace currentObjectPlace;
                 if (memberInfo is PropertyInfo propertyInfo)
                 {
-                    if (propertyInfo.PropertyType.IsAssignableTo(typeof(Array)))
-                        currentObjectPlace = ObjectPlace.ArrayProperty;
-                    else if (propertyInfo.PropertyType.IsAssignableTo(typeof(IEnumerable)))
-                        currentObjectPlace = ObjectPlace.ListProperty;
-                    else if (propertyInfo.PropertyType.IsAssignableTo(typeof(Enum)))
-                        currentObjectPlace = ObjectPlace.EnumProperty;
-                    else
-                        currentObjectPlace = ObjectPlace.NormalProperty;
                     try
                     {
-                        subObjects.Add(GetObjectInfo(stringConverter, propertyInfo.Name, currentObjectPlace, layer + 1, propertyInfo.PropertyType, propertyInfo.GetValue(value), onlyProperty, onlyPublic));
+                        subObjects.Add(GetObjectInfo(stringConverter, propertyInfo.Name, ObjectPlace.Property, layer + 1, propertyInfo.PropertyType, propertyInfo.GetValue(value), onlyProperty, onlyPublic));
                     }
-                    catch (Exception ex)
+                    catch
                     {
-                        subObjects.Add(GetObjectInfo(stringConverter, propertyInfo.Name, currentObjectPlace, layer + 1, propertyInfo.PropertyType, $"[获取失败：{ex.Message}]", onlyProperty, onlyPublic));
+                        subObjects.Add(GetObjectInfo(stringConverter, propertyInfo.Name, ObjectPlace.Property, layer + 1, propertyInfo.PropertyType, null, onlyProperty, onlyPublic));
                     }
                     continue;
                 }
                 if (!onlyProperty && memberInfo is FieldInfo fieldInfo)
                 {
-                    if (fieldInfo.FieldType.IsAssignableTo(typeof(Array)))
-                        currentObjectPlace = ObjectPlace.ArrayProperty;
-                    else if (fieldInfo.FieldType.IsAssignableTo(typeof(IEnumerable)))
-                        currentObjectPlace = ObjectPlace.ListProperty;
-                    else if (fieldInfo.FieldType.IsAssignableTo(typeof(Enum)))
-                        currentObjectPlace = ObjectPlace.EnumProperty;
-                    else
-                        currentObjectPlace = ObjectPlace.NormalProperty;
                     try
                     {
-                        subObjects.Add(GetObjectInfo(stringConverter, fieldInfo.Name, currentObjectPlace, layer + 1, fieldInfo.FieldType, fieldInfo.GetValue(value), onlyProperty, onlyPublic));
+                        subObjects.Add(GetObjectInfo(stringConverter, fieldInfo.Name, ObjectPlace.Field, layer + 1, fieldInfo.FieldType, fieldInfo.GetValue(value), onlyProperty, onlyPublic));
                     }
-                    catch (Exception ex)
+                    catch
                     {
-                        subObjects.Add(GetObjectInfo(stringConverter, fieldInfo.Name, currentObjectPlace, layer + 1, fieldInfo.FieldType, $"[获取失败：{ex.Message}]", onlyProperty, onlyPublic));
+                        subObjects.Add(GetObjectInfo(stringConverter, fieldInfo.Name, ObjectPlace.Property, layer + 1, fieldInfo.FieldType, null, onlyProperty, onlyPublic));
                     }
                 }
             }
