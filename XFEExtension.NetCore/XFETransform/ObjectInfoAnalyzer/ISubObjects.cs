@@ -1,4 +1,4 @@
-﻿namespace XFEExtension.NetCore.XFETransform;
+﻿namespace XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
 
 /// <summary>
 /// 子对象接口

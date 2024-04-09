@@ -1,4 +1,6 @@
-﻿namespace XFEExtension.NetCore.XFETransform;
+﻿using XFEExtension.NetCore.XFETransform.StringConverter;
+
+namespace XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
 
 internal abstract class ObjectInfo : IObjectInfo
 {

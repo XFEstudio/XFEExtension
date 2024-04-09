@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace XFEExtension.NetCore.XFETransform;
+namespace XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
 
 internal abstract class SubObjectsBase(List<IObjectInfo>? objectInfoList, IObjectInfo parent) : ISubObjects
 {

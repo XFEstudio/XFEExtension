@@ -1,4 +1,6 @@
-﻿namespace XFEExtension.NetCore.XFETransform;
+﻿using XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
+
+namespace XFEExtension.NetCore.XFETransform.StringConverter;
 
 /// <summary>
 /// 字符串转换接口

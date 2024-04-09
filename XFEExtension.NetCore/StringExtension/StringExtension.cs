@@ -3,6 +3,8 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using XFEExtension.NetCore.XFETransform;
+using XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
+using XFEExtension.NetCore.XFETransform.StringConverter;
 
 namespace XFEExtension.NetCore.StringExtension;
 
