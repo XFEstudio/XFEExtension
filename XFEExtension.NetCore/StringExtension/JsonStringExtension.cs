@@ -1,4 +1,8 @@
-﻿namespace XFEExtension.NetCore.StringExtension.Json;
+﻿using XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
+using XFEExtension.NetCore.XFETransform;
+using XFEExtension.NetCore.XFETransform.StringConverter;
+
+namespace XFEExtension.NetCore.StringExtension.Json;
 
 /// <summary>
 /// 对string类进行Json操作的扩展
@@ -43,4 +47,10 @@ public static class JsonStringExtension
     {
         return GetStringBetweenTwoString(str, form + ":", ",");
     }
+    /// <summary>
+    /// 转化为Json字符串文本
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public static string ToJson(this object obj) => XFEConverter.GetObjectInfo(StringConverter.JsonTransformer, string.Empty, ObjectPlace.Main, 0, obj?.GetType(), obj).OutPutObject();
 }
