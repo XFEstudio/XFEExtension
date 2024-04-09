@@ -19,11 +19,11 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-删除对象位置细分
+修复部分已知问题
 
 ## 新增
 
-无
+添加对象转为Json字符串拓展
 
 ## 严重
 
@@ -32,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.6.5</Version>
+    <Version>2.7.0</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
