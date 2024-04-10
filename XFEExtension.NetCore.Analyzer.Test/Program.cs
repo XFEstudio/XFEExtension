@@ -16,8 +16,8 @@ internal class Program
         var json = testClass.ToJson();
         //var json = JsonSerializer.Serialize(testClass);
         //testClass.Enum.ToString().CW();
-        Console.WriteLine(json);
-        JsonSerializer.Deserialize<TestClass>(json).X();
+        //Console.WriteLine(json);
+        //JsonSerializer.Deserialize<TestClass>(json).X();
     }
 }
 enum MyEnum
