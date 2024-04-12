@@ -112,8 +112,10 @@ public abstract class XFECode
                 Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalSeconds:F3} 秒");
             else if (elapsedTime.TotalMilliseconds >= 1)
                 Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds:F3} 毫秒");
+            else if (elapsedTime.TotalMicroseconds >= 1)
+                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMicroseconds:F3} 微秒");
             else
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds * 1000:F3} 纳秒");
+                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalNanoseconds:F3} 纳秒");
         return elapsedTime;
     }
     /// <summary>
@@ -140,8 +142,10 @@ public abstract class XFECode
                 Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalSeconds:F3} 秒");
             else if (elapsedTime.TotalMilliseconds >= 1)
                 Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds:F3} 毫秒");
+            else if (elapsedTime.TotalMicroseconds >= 1)
+                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMicroseconds:F3} 微秒");
             else
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds * 1000:F3} 纳秒");
+                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalNanoseconds:F3} 纳秒");
         return elapsedTime;
     }
     /// <summary>
@@ -338,8 +342,10 @@ public abstract class XFECode
                                 Console.Write($"{elapsedTime.TotalSeconds:F3} 秒");
                             else if (elapsedTime.TotalMilliseconds >= 1)
                                 Console.Write($"{elapsedTime.TotalMilliseconds:F3} 毫秒");
+                            else if (elapsedTime.TotalMicroseconds >= 1)
+                                Console.Write($"{elapsedTime.TotalMicroseconds:F2} 微秒");
                             else
-                                Console.Write($"{elapsedTime.TotalMilliseconds * 1000:F2} 纳秒");
+                                Console.Write($"{elapsedTime.TotalMicroseconds:F2} 纳秒");
                             if (result is not null)
                             {
                                 Console.ForegroundColor = mainColor;
@@ -615,8 +621,10 @@ public abstract class XFECode
                                     Console.Write($"{elapsedTime.TotalSeconds:F3} 秒");
                                 else if (elapsedTime.TotalMilliseconds >= 1)
                                     Console.Write($"{elapsedTime.TotalMilliseconds:F3} 毫秒");
+                                else if (elapsedTime.TotalMicroseconds >= 1)
+                                    Console.Write($"{elapsedTime.TotalMicroseconds:F2} 微秒");
                                 else
-                                    Console.Write($"{elapsedTime.TotalMilliseconds * 1000:F2} 纳秒");
+                                    Console.Write($"{elapsedTime.TotalMicroseconds:F2} 纳秒");
                                 if (result is not null)
                                 {
                                     Console.ForegroundColor = mainColor;
@@ -675,8 +683,10 @@ public abstract class XFECode
                         Console.WriteLine($"{classTimeCounter.Elapsed.TotalSeconds:F3} 秒");
                     else if (classTimeCounter.Elapsed.TotalMilliseconds >= 1)
                         Console.WriteLine($"{classTimeCounter.Elapsed.TotalMilliseconds:F3} 毫秒");
+                    else if (classTimeCounter.Elapsed.TotalMicroseconds >= 1)
+                        Console.Write($"{classTimeCounter.Elapsed.TotalMicroseconds:F2} 微秒");
                     else
-                        Console.WriteLine($"{classTimeCounter.Elapsed.TotalMilliseconds * 1000:F2} 纳秒");
+                        Console.Write($"{classTimeCounter.Elapsed.TotalMicroseconds:F2} 纳秒");
                     Console.ForegroundColor = ConsoleColor.Black;
                     Console.WriteLine();
                     if (failedList.Count == 0)

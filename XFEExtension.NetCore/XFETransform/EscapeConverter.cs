@@ -3,16 +3,16 @@
 /// <summary>
 /// 转义器
 /// </summary>
-public class EscapeConverter(string escapeSymbol = "/", params string[] escapes)
+public class EscapeConverter
 {
     /// <summary>
     /// 转义用符号
     /// </summary>
-    public string EscapeSymbol { get; set; } = escapeSymbol;
+    public string EscapeSymbol { get; set; } = "/";
     /// <summary>
     /// 待转义的符号
     /// </summary>
-    public string[] Escapes { get; set; } = escapes;
+    public string[] Escapes { get; set; }
     /// <summary>
     /// 转义（生成转义后文本）
     /// </summary>
@@ -43,4 +43,22 @@ public class EscapeConverter(string escapeSymbol = "/", params string[] escapes)
     }
     private string ConvertEscapeSymbol(string str) => str.Replace(EscapeSymbol, $"{EscapeSymbol}{EscapeSymbol}");
     private string InverseEscapeSymbol(string str) => str.Replace($"{EscapeSymbol}{EscapeSymbol}", EscapeSymbol);
+    /// <summary>
+    /// 转义器
+    /// </summary>
+    /// <param name="escapes">待转义字符</param>
+    public EscapeConverter(params string[] escapes)
+    {
+        Escapes = escapes;
+    }
+    /// <summary>
+    /// 转义器
+    /// </summary>
+    /// <param name="escapeSymbol">转义用符号</param>
+    /// <param name="escapes">待转义字符</param>
+    public EscapeConverter(string escapeSymbol, params string[] escapes)
+    {
+        EscapeSymbol = escapeSymbol;
+        Escapes = escapes;
+    }
 }

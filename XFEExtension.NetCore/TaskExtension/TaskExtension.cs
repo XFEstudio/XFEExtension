@@ -76,8 +76,10 @@ public static class TaskExtension
                 Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalSeconds:F3} 秒");
             else if (elapsedTime.TotalMilliseconds >= 1)
                 Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds:F3} 毫秒");
+            else if (elapsedTime.TotalMicroseconds >= 1)
+                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMicroseconds:F3} 微秒");
             else
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds * 1000:F3} 纳秒");
+                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalNanoseconds:F3} 纳秒");
         return elapsedTime;
     }
 }

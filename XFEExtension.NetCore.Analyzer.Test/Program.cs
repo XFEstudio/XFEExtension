@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using XFEExtension.NetCore.StringExtension;
 using XFEExtension.NetCore.StringExtension.Json;
+using XFEExtension.NetCore.XFETransform;
 
 namespace XFEExtension.NetCore.Analyzer.Test;
 
@@ -18,11 +19,16 @@ internal class Program
         //testClass.Enum.ToString().CW();
         //Console.WriteLine(json);
         //JsonSerializer.Deserialize<TestClass>(json).X();
+        var testString = "this is a t//e/st #//# /# divide : string";
+        var escapeConverter = new EscapeConverter("/", "#", ":");
+        var convertedString = escapeConverter.Convert(testString);
+        Console.WriteLine(convertedString);
+        escapeConverter.Inverse(convertedString).CW();
     }
 }
 enum MyEnum
 {
     Test1 = 3,
     Test2 = 12,
-    Test3 =1
+    Test3 = 1
 }

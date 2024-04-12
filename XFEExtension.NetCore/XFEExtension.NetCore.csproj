@@ -19,12 +19,11 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-修复Json转换对布尔值和枚举类型的转换问题
-添加分析对象对枚举类型的进一步支持，现在可以显示其转为int后的序号
+修复单元测试计时器显示问题
 
 ## 新增
 
-无
+添加转义类
 
 ## 严重
 
@@ -33,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.7.1</Version>
+    <Version>2.8.0</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
