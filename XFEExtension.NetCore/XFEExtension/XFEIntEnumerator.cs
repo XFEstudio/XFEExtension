@@ -1,4 +1,4 @@
-﻿namespace XFEExtension.NetCore.XFECode;
+﻿namespace XFEExtension.NetCore.CodeExtension;
 
 /// <summary>
 /// XFE枚举器

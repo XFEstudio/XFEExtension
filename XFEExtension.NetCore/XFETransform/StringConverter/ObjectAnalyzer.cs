@@ -45,7 +45,6 @@ public class ObjectAnalyzer : StringConverter
                         ┌────┬────────────────────────────
                         {OutPutSubObjects(objectInfo.SubObjects)}
                         └─────────────────────────────────
-                        
                         """;
                 }
                 else

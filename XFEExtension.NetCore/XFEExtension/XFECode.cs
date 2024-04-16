@@ -349,9 +349,12 @@ public abstract class XFECode
                             if (result is not null)
                             {
                                 Console.ForegroundColor = mainColor;
-                                Console.Write("\t执行结果：");
-                                Console.ForegroundColor = methodColor;
-                                Console.Write(result);
+                                Console.Write("\n\n执行结果：");
+                                Console.ForegroundColor = ConsoleColor.Gray;
+                                if (result.GetType().IsValueType)
+                                    Console.WriteLine($"{result}\n");
+                                else
+                                    result.X(true, true, "执行结果");
                             }
                             Console.WriteLine();
                             Console.ForegroundColor = ConsoleColor.Black;
@@ -628,9 +631,12 @@ public abstract class XFECode
                                 if (result is not null)
                                 {
                                     Console.ForegroundColor = mainColor;
-                                    Console.Write("\t执行结果：");
-                                    Console.ForegroundColor = methodColor;
-                                    Console.Write(result);
+                                    Console.Write("\n\n执行结果：");
+                                    Console.ForegroundColor = ConsoleColor.Gray;
+                                    if (result.GetType().IsValueType)
+                                        Console.WriteLine($"{result}\n");
+                                    else
+                                        result.X(true, true, "执行结果");
                                 }
                                 Console.WriteLine();
                                 Console.ForegroundColor = ConsoleColor.Black;

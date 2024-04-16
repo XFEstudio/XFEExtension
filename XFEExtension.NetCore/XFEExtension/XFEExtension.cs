@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace XFEExtension.NetCore.XFECode;
+namespace XFEExtension.NetCore.CodeExtension;
 
 /// <summary>
 /// 对代码整体书写习惯的拓展
