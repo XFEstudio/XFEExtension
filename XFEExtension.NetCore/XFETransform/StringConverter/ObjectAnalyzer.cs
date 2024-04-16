@@ -21,7 +21,7 @@ public class ObjectAnalyzer : StringConverter
             {
                 outPutString += $"{AddObjectPlace(objectInfo)} 空对象 {objectInfo.Name}：null\n";
             }
-            else if(objectInfo.ObjectPlace == ObjectPlace.Enum)
+            else if (objectInfo.ObjectPlace == ObjectPlace.Enum)
             {
                 outPutString += $"{AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}：{objectInfo.Value}[{(int)objectInfo.Value}]\n";
             }
@@ -37,15 +37,26 @@ public class ObjectAnalyzer : StringConverter
                 outPutString += $"""
                 {AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}
                 ┌────┬────────────────────────────
-                {(objectInfo.SubObjects is not null ? OutPutSubObjects(objectInfo.SubObjects) : "|    └─空对象")}
+                {(objectInfo.SubObjects?.Count > 0 ? OutPutSubObjects(objectInfo.SubObjects) : "│    └─空对象")}
                 └─────────────────────────────────
 
                 """;
             }
             else
             {
+                var tabString = string.Empty;
+                for (int k = 0; k < objectInfo.Layer; k++)
+                {
+                    tabString += "│    ";
+                }
                 if (objectInfo.SubObjects is not null)
-                    outPutString += OutPutSubObjects(objectInfo.SubObjects);
+                {
+                    if (objectInfo.SubObjects.Count > 0)
+                        outPutString += OutPutSubObjects(objectInfo.SubObjects);
+                    else
+                        outPutString += $"{tabString}│    └─无内容";
+
+                }
             }
         }
         return outPutString;
@@ -84,13 +95,20 @@ public class ObjectAnalyzer : StringConverter
             }
             else
             {
-                outString += $"""
+                if (obj.SubObjects is null)
+                {
+                    outString += $"├─{AddObjectPlace(obj)} {XFEConverter.OutPutTypeName(obj.Type!)} {obj.Name}: null\n";
+                }
+                else
+                {
+                    outString += $"""
                      ├─{AddObjectPlace(obj)} {XFEConverter.OutPutTypeName(obj.Type!)} {obj.Name}
                      {tabString}├────┬────────────────────────────
                      {obj.OutPutObject()}
                      {tabString}{currentConnectString}────────────────────────────────
 
                      """;
+                }
             }
         }
         if (outString.Length > 0 && outString[^1] == '\n')

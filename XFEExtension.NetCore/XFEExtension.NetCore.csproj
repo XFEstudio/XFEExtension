@@ -19,11 +19,11 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-修复单元测试计时器显示问题
+修复对象分析解析空对象的bug[2]
 
 ## 新增
 
-添加转义类
+无
 
 ## 严重
 
@@ -32,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.8.0</Version>
+    <Version>2.8.2</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 

@@ -4,6 +4,7 @@ internal class TestClass(string name, string description, int age)
 {
     public int id;
     private int data;
+    public EmptyClass EPClass { get; } = new();
     public string Name { get; set; } = name;
     public List<List<string>> Tags { get; set; }
     public bool MyProperty { get; set; }
@@ -11,3 +12,5 @@ internal class TestClass(string name, string description, int age)
     public string Description { get; set; } = description;
     public int Age { get; set; } = age;
 }
+
+internal class EmptyClass { }
