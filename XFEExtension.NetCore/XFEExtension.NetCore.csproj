@@ -19,7 +19,7 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-优化XUnit依赖框架的XFECode.RunTest方法，现可以配合X方法自动输出分析对象
+修复对象分析的部分bug
 
 ## 新增
 
@@ -32,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.8.4</Version>
+    <Version>2.8.5</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 

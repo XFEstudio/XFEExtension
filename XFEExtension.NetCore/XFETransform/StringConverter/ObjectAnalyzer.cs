@@ -38,7 +38,11 @@ public class ObjectAnalyzer : StringConverter
         {
             if (objectInfo.Layer == 0)
             {
-                if (objectInfo.SubObjects?.Count > 0)
+                if(objectInfo.SubObjects == null)
+                {
+                    outPutString += $"{AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}: null";
+                }
+                else if (objectInfo.SubObjects?.Count > 0)
                 {
                     outPutString += $"""
                         {AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}
@@ -49,7 +53,12 @@ public class ObjectAnalyzer : StringConverter
                 }
                 else
                 {
-                    outPutString += $"{AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}: null";
+                    outPutString += $"""
+                        {AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}
+                        ┌────┬────────────────────────────
+                        │    └─无内容"
+                        └─────────────────────────────────
+                        """;
                 }
             }
             else
