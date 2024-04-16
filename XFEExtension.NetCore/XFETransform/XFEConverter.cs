@@ -17,7 +17,7 @@ public class XFEConverter
     /// <returns></returns>
     public static bool IsBasicType(Type type)
     {
-        return type == typeof(string) || type == typeof(int) || type == typeof(double) || type == typeof(float) || type == typeof(decimal) || type == typeof(long) || type == typeof(short) || type == typeof(byte) || type == typeof(bool) || type == typeof(char) || type == typeof(DateTime);
+        return type == typeof(string) || type == typeof(int) || type == typeof(double) || type == typeof(float) || type == typeof(decimal) || type == typeof(long) || type == typeof(short) || type == typeof(byte) || type == typeof(bool) || type == typeof(char) || type == typeof(nint) || type == typeof(uint) || type == typeof(ulong) || type == typeof(ushort) || type == typeof(sbyte) || type == typeof(DateTime);
     }
 
     /// <summary>
@@ -25,7 +25,7 @@ public class XFEConverter
     /// </summary>
     /// <param name="originString">原文本</param>
     /// <returns></returns>
-    public static string ConvertBasicTypeToCodeType(string originString) => originString.ToLower().Replace("int32", "int").Replace("int64", "long").Replace("int16", "short").Replace("boolean", "bool").Replace("datetime", "DateTime");
+    public static string ConvertBasicTypeToCodeType(string originString) => originString.ToLower().Replace("int32", "int").Replace("intptr", "nint").Replace("int64", "long").Replace("int16", "short").Replace("boolean", "bool").Replace("datetime", "DateTime");
 
     /// <summary>
     /// 输出类型名称
@@ -63,7 +63,7 @@ public class XFEConverter
     {
         if (value is null || type is null)
         {
-            return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, null, true);
+            return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, type, true);
         }
         var isBasicType = IsBasicType(type);
         if (isBasicType)

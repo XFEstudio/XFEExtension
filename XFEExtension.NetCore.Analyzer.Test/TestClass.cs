@@ -5,6 +5,7 @@ internal class TestClass(string name, string description, int age)
     public int id;
     private int data;
     public EmptyClass EPClass { get; } = new();
+    public ushort OS { get; set; }
     public string Name { get; set; } = name;
     public List<List<string>> Tags { get; set; }
     public bool MyProperty { get; set; }

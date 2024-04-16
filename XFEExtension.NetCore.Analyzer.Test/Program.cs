@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using XFEExtension.NetCore.FileExtension;
 using XFEExtension.NetCore.StringExtension;
 
 namespace XFEExtension.NetCore.Analyzer.Test;
@@ -13,9 +12,8 @@ internal class Program
             Tags = [["123", "321"], ["1234567", "7654321"]],
             Enum = MyEnum.Test1
         };
-        var process = Process.GetProcessesByName("QQ");
-        process.X()?.WriteIn("QQAnalyze.txt");
-        testClass.X()?.WriteIn("TestClassAnalyze.txt");
+        var process = Process.GetProcessById(13880);
+        process.X();
     }
 }
 enum MyEnum

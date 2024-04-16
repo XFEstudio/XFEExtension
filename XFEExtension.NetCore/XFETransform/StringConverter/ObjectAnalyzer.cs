@@ -19,11 +19,15 @@ public class ObjectAnalyzer : StringConverter
         {
             if (objectInfo.Value is null)
             {
-                outPutString += $"{AddObjectPlace(objectInfo)} 空对象 {objectInfo.Name}：null\n";
+                outPutString += $"{AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}：null\n";
             }
             else if (objectInfo.ObjectPlace == ObjectPlace.Enum)
             {
                 outPutString += $"{AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}：{objectInfo.Value}[{(int)objectInfo.Value}]\n";
+            }
+            else if (objectInfo.Value is string str && str == string.Empty)
+            {
+                outPutString += $"{AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}：string.Empty\n";
             }
             else
             {
@@ -34,13 +38,20 @@ public class ObjectAnalyzer : StringConverter
         {
             if (objectInfo.Layer == 0)
             {
-                outPutString += $"""
-                {AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}
-                ┌────┬────────────────────────────
-                {(objectInfo.SubObjects?.Count > 0 ? OutPutSubObjects(objectInfo.SubObjects) : "│    └─空对象")}
-                └─────────────────────────────────
-
-                """;
+                if (objectInfo.SubObjects?.Count > 0)
+                {
+                    outPutString += $"""
+                        {AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}
+                        ┌────┬────────────────────────────
+                        {OutPutSubObjects(objectInfo.SubObjects)}
+                        └─────────────────────────────────
+                        
+                        """;
+                }
+                else
+                {
+                    outPutString += $"{AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}: null";
+                }
             }
             else
             {
@@ -97,7 +108,7 @@ public class ObjectAnalyzer : StringConverter
             {
                 if (obj.SubObjects is null)
                 {
-                    outString += $"├─{AddObjectPlace(obj)} {XFEConverter.OutPutTypeName(obj.Type!)} {obj.Name}: null\n";
+                    outString += $"{currentConnectString}{AddObjectPlace(obj)} {XFEConverter.OutPutTypeName(obj.Type!)} {obj.Name}: null\n";
                 }
                 else
                 {
