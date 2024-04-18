@@ -10,7 +10,7 @@ namespace XFEExtension.NetCore.CyberComm;
 /// </summary>
 public class CyberCommServer
 {
-    private readonly string serverURL;
+    private readonly string[] serverURLs;
     #region 公共属性
     /// <summary>
     /// 是否自动接收完整消息
@@ -33,9 +33,13 @@ public class CyberCommServer
     /// </summary>
     public event EventHandler<CyberCommServerEventArgs>? ConnectionClosed;
     /// <summary>
-    /// WebSocket服务器
+    /// Http请求接收时触发
     /// </summary>
-    public HttpListener WebSocketServer { get; } = new HttpListener();
+    public event EventHandler<CyberCommRequestEventArgs>? RequestReceived;
+    /// <summary>
+    /// 服务器端
+    /// </summary>
+    public HttpListener Server { get; } = new();
     #endregion
     #region 公有方法
     /// <summary>
@@ -46,20 +50,45 @@ public class CyberCommServer
     {
         try
         {
-            WebSocketServer.Prefixes.Add(serverURL);
-            WebSocketServer.Start();
+            foreach (var url in serverURLs)
+            {
+                Server.Prefixes.Add(url);
+            }
+            Server.Start();
             ServerStarted?.Invoke(this, EventArgs.Empty);
             while (true)
             {
-                HttpListenerContext httpListenerContext = await WebSocketServer.GetContextAsync();
+                var httpListenerContext = await Server.GetContextAsync();
+                var requestURL = httpListenerContext.Request.Url;
+                var clientIP = httpListenerContext.Request.RemoteEndPoint.Address.ToString();
                 if (httpListenerContext.Request.IsWebSocketRequest)
                 {
-                    HttpListenerWebSocketContext httpListenerWebSocketContext = await httpListenerContext.AcceptWebSocketAsync(null);
-                    string clientIP = httpListenerContext.Request.RemoteEndPoint.Address.ToString();
-                    WebSocket webSocket = httpListenerWebSocketContext.WebSocket;
-                    NameValueCollection wsHeader = httpListenerWebSocketContext.Headers;
-                    ClientConnected?.Invoke(this, new CyberCommServerEventArgsImpl(webSocket, string.Empty, clientIP, wsHeader));
-                    CyberCommClientConnected(webSocket, wsHeader, clientIP);
+                    var httpListenerWebSocketContext = await httpListenerContext.AcceptWebSocketAsync(null);
+                    var webSocket = httpListenerWebSocketContext.WebSocket;
+                    var wsHeader = httpListenerWebSocketContext.Headers;
+                    ClientConnected?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, string.Empty, clientIP, wsHeader));
+                    CyberCommClientConnected(requestURL, webSocket, wsHeader, clientIP);
+                }
+                else
+                {
+                    var request = httpListenerContext.Request;
+                    var response = httpListenerContext.Response;
+                    var requestMethod = request.HttpMethod;
+                    var headers = request.Headers;
+                    var queryString = request.QueryString;
+                    if (requestMethod == "POST" && AutoReceiveCompletedMessage)
+                    {
+                        _ = Task.Run(() =>
+                        {
+                            using var reader = new StreamReader(request.InputStream, request.ContentEncoding);
+                            string postData = reader.ReadToEnd();
+                            RequestReceived?.Invoke(this, new CyberCommRequestEventArgsImpl(requestURL, requestMethod, postData, headers, queryString, request, response, clientIP));
+                        });
+                    }
+                    else
+                    {
+                        RequestReceived?.Invoke(this, new CyberCommRequestEventArgsImpl(requestURL, requestMethod, null, headers, queryString, request, response, clientIP));
+                    }
                 }
             }
         }
@@ -68,7 +97,7 @@ public class CyberCommServer
             throw new XFECyberCommException("启动服务器时发生异常", ex);
         }
     }
-    private async void CyberCommClientConnected(WebSocket webSocket, NameValueCollection wsHeader, string clientIP)
+    private async void CyberCommClientConnected(Uri? requestURL, WebSocket webSocket, NameValueCollection wsHeader, string clientIP)
     {
         while (webSocket.State == WebSocketState.Open)
         {
@@ -91,11 +120,11 @@ public class CyberCommServer
                 if (receiveResult.MessageType == WebSocketMessageType.Text)
                 {
                     string receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
-                    MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(webSocket, receivedMessage, clientIP, wsHeader));
+                    MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, receivedMessage, clientIP, wsHeader));
                 }
                 if (receiveResult.MessageType == WebSocketMessageType.Binary)
                 {
-                    MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(webSocket, receivedBinaryBuffer, clientIP, wsHeader));
+                    MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, receivedBinaryBuffer, clientIP, wsHeader));
                 }
                 if (receiveResult.MessageType == WebSocketMessageType.Close)
                 {
@@ -105,11 +134,11 @@ public class CyberCommServer
             }
             catch (Exception ex)
             {
-                MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(webSocket, new XFECyberCommException("与客户端端通讯期间发生异常", ex), clientIP, wsHeader));
+                MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, new XFECyberCommException("与客户端端通讯期间发生异常", ex), clientIP, wsHeader));
                 break;
             }
         }
-        ConnectionClosed?.Invoke(this, new CyberCommServerEventArgsImpl(webSocket, string.Empty, clientIP, wsHeader));
+        ConnectionClosed?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, string.Empty, clientIP, wsHeader));
         webSocket.Dispose();
     }
     #endregion
@@ -117,21 +146,26 @@ public class CyberCommServer
     /// <summary>
     /// CyberComm服务器，使用端口创建
     /// </summary>
-    /// <param name="listenPort">监听端口</param>
     /// <param name="autoReceiveCompletedMessage">是否自动接收完整消息</param>
-    public CyberCommServer(int listenPort, bool autoReceiveCompletedMessage = true)
+    /// <param name="listenPorts">监听端口</param>
+    public CyberCommServer(bool autoReceiveCompletedMessage = true, params int[] listenPorts)
     {
-        serverURL = $"http://*:{listenPort}/";
+        var serverURLs = new List<string>();
+        foreach (var port in listenPorts)
+        {
+            serverURLs.Add($"http://*:{port}/");
+        }
+        this.serverURLs = [.. serverURLs];
         AutoReceiveCompletedMessage = autoReceiveCompletedMessage;
     }
     /// <summary>
     /// CyberComm服务器，使用URL创建
     /// </summary>
-    /// <param name="serverURL">服务器URL</param>
     /// <param name="autoReceiveCompletedMessage">是否自动接收完整消息</param>
-    public CyberCommServer(string serverURL, bool autoReceiveCompletedMessage = true)
+    /// <param name="serverURLs">服务器URL</param>
+    public CyberCommServer(bool autoReceiveCompletedMessage = true, params string[] serverURLs)
     {
-        this.serverURL = serverURL;
+        this.serverURLs = serverURLs;
         AutoReceiveCompletedMessage = autoReceiveCompletedMessage;
     }
     #endregion
