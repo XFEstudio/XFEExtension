@@ -19,11 +19,11 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-修复对象分析的部分bug
+修复原本的CyberCommServer中的一些错误
 
 ## 新增
 
-无
+CyberCommServer现支持Http请求
 
 ## 严重
 
@@ -32,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.8.5</Version>
+    <Version>2.9.0</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
