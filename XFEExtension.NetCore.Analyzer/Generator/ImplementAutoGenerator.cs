@@ -45,11 +45,19 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                 implementationClass = SyntaxFactory.ClassDeclaration($"{className}Impl")
                     .AddModifiers(SyntaxFactory.Token(SyntaxKind.InternalKeyword), SyntaxFactory.Token(SyntaxKind.SealedKeyword))
                     .AddBaseListTypes(SyntaxFactory.SimpleBaseType(SyntaxFactory.ParseTypeName(className)))
+                    //.AddMembers(classDeclaration.Members.OfType<ConstructorDeclarationSyntax>().Select(constructor =>
+                    //{
+                    //    return constructor.WithIdentifier(SyntaxFactory.Identifier($"{className}Impl"))
+                    //                      .WithInitializer(SyntaxFactory.ConstructorInitializer(SyntaxKind.BaseConstructorInitializer, SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(constructor.ParameterList.Parameters.Select(parameter =>
+                    //            SyntaxFactory.Argument(SyntaxFactory.IdentifierName(parameter.Identifier)))))));
+                    //}).ToArray())
                     .AddMembers(classDeclaration.Members.OfType<ConstructorDeclarationSyntax>().Select(constructor =>
                     {
-                        return constructor.WithIdentifier(SyntaxFactory.Identifier($"{className}Impl"))
-                                          .WithInitializer(SyntaxFactory.ConstructorInitializer(SyntaxKind.BaseConstructorInitializer, SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(constructor.ParameterList.Parameters.Select(parameter =>
-                                SyntaxFactory.Argument(SyntaxFactory.IdentifierName(parameter.Identifier)))))));
+                        return SyntaxFactory.ConstructorDeclaration($"{className}Impl")
+                                             .AddModifiers(SyntaxFactory.Token(SyntaxKind.InternalKeyword))
+                                             .WithBody(SyntaxFactory.Block())
+                                             .WithParameterList(constructor.ParameterList)
+                                             .WithInitializer(SyntaxFactory.ConstructorInitializer(SyntaxKind.BaseConstructorInitializer, SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(constructor.ParameterList.Parameters.Select(parameter => SyntaxFactory.Argument(SyntaxFactory.IdentifierName(parameter.Identifier)))))));
                     }).ToArray())
                     .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia($@"/// <summary>
 /// <seealso cref=""{className}Impl""/> 是根据 <seealso cref=""{className}""/> 自动生成的实现类
