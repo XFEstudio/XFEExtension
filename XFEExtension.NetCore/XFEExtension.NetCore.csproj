@@ -19,11 +19,11 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-修复原本的CyberCommServer中的一些错误
+修复自动生成实现类的构造函数带有其父类构造函数体的bug
 
 ## 新增
 
-CyberCommServer现支持Http请求
+无
 
 ## 严重
 
@@ -32,7 +32,7 @@ CyberCommServer现支持Http请求
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.9.0</Version>
+    <Version>2.9.1</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 
