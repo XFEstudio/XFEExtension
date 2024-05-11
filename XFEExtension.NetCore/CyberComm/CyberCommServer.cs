@@ -146,9 +146,8 @@ public class CyberCommServer
     /// <summary>
     /// CyberComm服务器，使用端口创建
     /// </summary>
-    /// <param name="autoReceiveCompletedMessage">是否自动接收完整消息</param>
     /// <param name="listenPorts">监听端口</param>
-    public CyberCommServer(bool autoReceiveCompletedMessage = true, params int[] listenPorts)
+    public CyberCommServer(params int[] listenPorts)
     {
         var serverURLs = new List<string>();
         foreach (var port in listenPorts)
@@ -156,7 +155,16 @@ public class CyberCommServer
             serverURLs.Add($"http://*:{port}/");
         }
         this.serverURLs = [.. serverURLs];
-        AutoReceiveCompletedMessage = autoReceiveCompletedMessage;
+        AutoReceiveCompletedMessage = true;
+    }
+    /// <summary>
+    /// CyberComm服务器，使用URL创建
+    /// </summary>
+    /// <param name="serverURLs">服务器URL</param>
+    public CyberCommServer(params string[] serverURLs)
+    {
+        this.serverURLs = serverURLs;
+        AutoReceiveCompletedMessage = true;
     }
     /// <summary>
     /// CyberComm服务器，使用URL创建

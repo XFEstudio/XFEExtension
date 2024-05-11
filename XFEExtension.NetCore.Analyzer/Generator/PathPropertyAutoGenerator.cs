@@ -30,6 +30,7 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                     }
                     var className = classDeclaration.Identifier.ValueText;
                     var properties = new List<PropertyDeclarationSyntax>();
+                    var enableCheckProperties = new List<PropertyDeclarationSyntax>();
                     foreach (var fieldDeclarationSyntax in fieldDeclarationSyntaxes)
                     {
                         var variableDeclaration = fieldDeclarationSyntax.Declaration.Variables.First();
@@ -65,8 +66,8 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                                 {
                                     SyntaxFactory.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
                                         .WithBody(SyntaxFactory.Block(
-                                            SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"global::XFEExtension.NetCore.PathExtension.XFEAutoPath.CheckPathExistAndCreate(Options.{fieldName}, Options.{enableCheckPropertyName})")),
-                                            SyntaxFactory.ReturnStatement(SyntaxFactory.ParseExpression($"Options.{fieldName}"))))
+                                            SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"global::XFEExtension.NetCore.PathExtension.XFEAutoPath.CheckPathExistAndCreate({fieldName}, Options.{enableCheckPropertyName})")),
+                                            SyntaxFactory.ReturnStatement(SyntaxFactory.ParseExpression($"{fieldName}"))))
                                 })))
                             .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia(triviaText));
                         var enableCheckProperty = SyntaxFactory.PropertyDeclaration(SyntaxFactory.ParseTypeName("bool"), enableCheckPropertyName)
@@ -81,9 +82,9 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                             .WithInitializer(SyntaxFactory.EqualsValueClause(SyntaxFactory.ParseExpression("true")))
                             .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken));
                         properties.Add(property.NormalizeWhitespace());
-                        properties.Add(enableCheckProperty.NormalizeWhitespace());
+                        enableCheckProperties.Add(enableCheckProperty.NormalizeWhitespace());
                     }
-                    var profileClassSyntaxTree = GeneratePathClassSyntaxTree(classDeclaration, properties, fileScopedNamespaceDeclarationSyntax);
+                    var profileClassSyntaxTree = GeneratePathClassSyntaxTree(classDeclaration, properties, enableCheckProperties, fileScopedNamespaceDeclarationSyntax);
                     context.AddSource($"{className}.g.cs", profileClassSyntaxTree.ToString());
                 }
             }
@@ -103,20 +104,20 @@ namespace XFEExtension.NetCore.Analyzer.Generator
 
         public static IEnumerable<FieldDeclarationSyntax> GetFieldDeclarations(ClassDeclarationSyntax classDeclaration) => classDeclaration.DescendantNodes()
                                                                                                                                            .OfType<FieldDeclarationSyntax>()
-                                                                                                                                           .Where(fieldDeclarationSyntax => fieldDeclarationSyntax.AttributeLists.Any(IsAutoPathAttribute) && !fieldDeclarationSyntax.Modifiers.Any(SyntaxKind.StaticKeyword));
+                                                                                                                                           .Where(fieldDeclarationSyntax => fieldDeclarationSyntax.AttributeLists.Any(IsAutoPathAttribute) && fieldDeclarationSyntax.Modifiers.Any(SyntaxKind.StaticKeyword));
 
         public static IEnumerable<ClassDeclarationSyntax> GetClassDeclarations(SyntaxNode rootNode) => rootNode.DescendantNodes()
                                                                                                                .OfType<ClassDeclarationSyntax>()
                                                                                                                .Where(classDeclaration => classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword));
 
-        private static SyntaxTree GeneratePathClassSyntaxTree(ClassDeclarationSyntax classDeclaration, IEnumerable<PropertyDeclarationSyntax> propertyDeclarationSyntaxes, FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclarationSyntax)
+        private static SyntaxTree GeneratePathClassSyntaxTree(ClassDeclarationSyntax classDeclaration, List<PropertyDeclarationSyntax> propertyDeclarationSyntaxes, List<PropertyDeclarationSyntax> enableCheckDeclarationSyntaxes, FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclarationSyntax)
         {
             var className = classDeclaration.Identifier.ValueText;
             var triviaText = $@"/// <remarks>
 /// <code><seealso cref=""{className}""/> 已生成以下路径：</code><br/>
 /// <code>
 ";
-            triviaText += string.Join("<br/>\n", propertyDeclarationSyntaxes.Select(propertyDeclarationSyntax => $"/// ○ <seealso cref=\"{propertyDeclarationSyntax.Identifier}\"/>")) + "\n/// </code><br/>\n/// <code>来自<seealso cref=\"global::XFEExtension.NetCore.ProfileExtension.XFEProfile\"/></code>\n/// </remarks>\n";
+            triviaText += string.Join("<br/>\n", propertyDeclarationSyntaxes.Select(propertyDeclarationSyntax => $"/// ○ <seealso cref=\"{propertyDeclarationSyntax.Identifier}\"/>")) + "\n/// </code><br/>\n/// <code>来自<seealso cref=\"global::XFEExtension.NetCore.PathExtension\"/></code>\n/// </remarks>\n";
             var memberDeclarations = new List<MemberDeclarationSyntax>()
             {
                 SyntaxFactory.PropertyDeclaration(SyntaxFactory.ParseTypeName(className), "Options")
@@ -134,11 +135,12 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                 .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
                 .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia($@"/// <summary>
 /// 配置选项<br/>
-/// <seealso cref=""Current""/> 是 <seealso cref=""{className}""/> 类的配置选项
+/// <seealso cref=""Options""/> 是 <seealso cref=""{className}""/> 类的配置选项
 /// </summary>
 "))
             };
             memberDeclarations.AddRange(propertyDeclarationSyntaxes);
+            memberDeclarations.AddRange(enableCheckDeclarationSyntaxes);
             var pathClass = SyntaxFactory.ClassDeclaration(className)
                 .AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword))
                 .AddMembers(memberDeclarations.ToArray())

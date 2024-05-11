@@ -24,13 +24,13 @@ XFEExtension库适用于各种C#项目，特别适合在需要提高代码可读
 
 ```csharp
 //创建配置文件类
-static partial class SystemProfile
+partial class SystemProfile
 {
     [ProfileProperty]
-    static string name;
+    string name;
 
     [ProfileProperty]
-    static int _age;
+    int _age;
 }
 
 //使用配置文件
@@ -49,51 +49,84 @@ class Program
 #### 设置get和set方法
 
 ```csharp
-static partial class SystemProfile
+partial class SystemProfile
 {
     [ProfileProperty]
     [ProfilePropertyAddGet(@"Console.WriteLine(""获取了Name"")")]
-    [ProfilePropertyAddGet("return name")]
+    [ProfilePropertyAddGet("return Current.name")]
     [ProfilePropertyAddSet(@"Console.WriteLine(""设置了Name"")")]
-    [ProfilePropertyAddSet("name = value")]
-    private static string name = string.Empty;
+    [ProfilePropertyAddSet("Current.name = value")]
+    string name = string.Empty;
 
     [ProfileProperty]
     [ProfilePropertyAddGet(@"Console.WriteLine(""获取了Age"")")]
-    [ProfilePropertyAddGet("return _age")]
+    [ProfilePropertyAddGet("return Current._age")]
     [ProfilePropertyAddSet(@"Console.WriteLine(""设置了Age"")")]
-    [ProfilePropertyAddSet("_age = value")]
-    private static int _age;
+    [ProfilePropertyAddSet("Current._age = value")]
+    int _age;
 }
 ```
 
 #### 设置初始值
 
 ```csharp
-static partial class SystemProfile
+partial class SystemProfile
 {
     [ProfileProperty]
-    private static string name = "John Wick";
+    string name = "John Wick";
 
     [ProfileProperty]
-    private static int _age = 59;
+    int _age = 59;
 }
 ```
 
 #### 为属性添加注释
 
 ```csharp
-static partial class SystemProfile
+partial class SystemProfile
 {
     /// <summary>
     /// 名称
     /// 这段注释会自动添加至自动生成的Name属性上
     /// </summary>
     [ProfileProperty]
-    private static string name;
+    string name;
 
     [ProfileProperty]
-    private static int _age;
+    int _age;
+}
+```
+
+#### 使用部分方法来设置get和set方法
+
+```csharp
+partial class SystemProfile
+{
+    [ProfileProperty]
+    string name;
+
+    [ProfileProperty]
+    int _age;
+
+    static partial void GetNameProperty()
+    {
+        Console.WriteLine("获取了Name");
+    }
+
+    static partial void SetNameProperty(string value)
+    {
+        Console.WriteLine($"设置了Name：从{Name}变为了{value}");
+    }
+
+    static partial void GetAgeProperty()
+    {
+        Console.WriteLine("获取了Age");
+    }
+
+    static partial void SetAgeProperty(int value)
+    {
+        Console.WriteLine($"设置了Age：从{Age}变为了{value}");
+    }
 }
 ```
 
