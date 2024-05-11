@@ -19,11 +19,11 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-修复自动生成实现类的构造函数带有其父类构造函数体的bug
+配置文件自动实现：现在配置文件有实例了，外部静态访问内部实例数据，添加了属性Get、Set通知的部分声明方法
 
 ## 新增
 
-无
+新增文件路径管理自动实现：现在，不必为了担心文件夹路径不存在而烦恼了，现在管理器会自动创建文件夹
 
 ## 严重
 
@@ -32,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.9.1</Version>
+    <Version>2.10.0</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 

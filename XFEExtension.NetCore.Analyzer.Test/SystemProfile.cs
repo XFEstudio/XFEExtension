@@ -2,8 +2,10 @@
 
 namespace XFEExtension.NetCore.Analyzer.Test;
 
-public static partial class SystemProfile
+public partial class SystemProfile
 {
     [ProfileProperty]
-    private static int _age;
+    int _age = 1;
+    [ProfileProperty]
+    string name  = "12";
 }

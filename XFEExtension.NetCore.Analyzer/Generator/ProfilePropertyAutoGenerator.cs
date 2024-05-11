@@ -4,8 +4,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace XFEExtension.NetCore.Analyzer.Generator
 {
@@ -36,11 +34,15 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                     var attributeSyntax = SyntaxFactory.AttributeList(
                         SyntaxFactory.SingletonSeparatedList(
                             SyntaxFactory.Attribute(SyntaxFactory.ParseName("global::XFEExtension.NetCore.ProfileExtension.ProfileFieldAutoGenerateAttribute"))));
-                    var properties = fieldDeclarationSyntaxes.Select(fieldDeclarationSyntax =>
+                    var properties = new List<PropertyDeclarationSyntax>();
+                    var methods = new List<MethodDeclarationSyntax>();
+                    foreach (var fieldDeclarationSyntax in fieldDeclarationSyntaxes)
                     {
                         var variableDeclaration = fieldDeclarationSyntax.Declaration.Variables.First();
                         var fieldName = variableDeclaration.Identifier.Text;
                         var propertyName = fieldName[0] == '_' ? fieldName[1].ToString().ToUpper() + fieldName.Substring(2) : fieldName[0].ToString().ToUpper() + fieldName.Substring(1);
+                        var getMethodName = $"Get{propertyName}Property";
+                        var setMethodName = $"Set{propertyName}Property";
                         GetProfilePropertyAttributeList(fieldDeclarationSyntax).ForEach(attribute =>
                         {
                             if (attribute.ArgumentList is null)
@@ -58,11 +60,12 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                         var triviaText = $@"/// <inheritdoc cref=""{fieldName}""/>
 /// <remarks>
 /// <seealso cref=""{propertyName}""/> 是根据 <seealso cref=""{fieldName}""/> 自动生成的属性<br/><br/>
-/// <code><seealso langword=""get""/>方法已生成以下代码:";
+/// <code><seealso langword=""get""/>方法已生成以下代码:	○ <seealso cref=""{className}.{getMethodName}()""/>;<br/>";
                         #endregion
-                        var getExpressionStatements = new List<StatementSyntax>();
-                        var getIndex = 0;
-                        var setIndex = 0;
+                        var getExpressionStatements = new List<StatementSyntax>()
+                        {
+                            SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"{getMethodName}()")).WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
+                        };
                         if (fieldDeclarationSyntax.AttributeLists.Any(IsProfilePropertyAddGetAttribute))
                         {
                             GetProfilePropertyAddGetAttributeList(fieldDeclarationSyntax).ForEach(attribute =>
@@ -79,37 +82,30 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                                     funcText = interpolatedStringExpressionSyntax.Contents.ToString();
                                 if (argument.Expression is InvocationExpressionSyntax invocationExpressionSyntax)
                                     funcText = invocationExpressionSyntax.GetText().ToString();
-                                getExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression(funcText)));
-                                if (getIndex == 0)
-                                {
-                                    #region Get方法首个注释
-                                    triviaText += $"\t○ {funcText.Replace("\n", "<br/>").Replace("return", "<seealso langword=\"return\"/>").Replace(fieldName, $"<seealso langword=\"{fieldName}\"/>")};<br/>";
-                                    #endregion
-                                }
-                                else
-                                {
-                                    #region Get剩余方法注释
-                                    triviaText += $"\n///\t\t\t\t○ {funcText.Replace("\n", "<br/>").Replace("return", "<seealso langword=\"return\"/>").Replace(fieldName, $"<seealso langword=\"{fieldName}\"/>")};<br/>";
-                                    #endregion
-                                }
-                                getIndex++;
+                                getExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression(funcText)).WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken)));
+                                #region Get方法注释
+                                triviaText += $"\n///\t\t\t\t○ {funcText.Replace("\n", "<br/>").Replace("return", "<seealso langword=\"return\"/>").Replace(fieldName, $"<seealso langword=\"{fieldName}\"/>")};<br/>";
+                                #endregion
                             });
                         }
                         else
                         {
-                            getExpressionStatements.Add(SyntaxFactory.ReturnStatement(SyntaxFactory.IdentifierName(fieldName)));
+                            getExpressionStatements.Add(SyntaxFactory.ReturnStatement(SyntaxFactory.ParseExpression($"Current.{fieldName}")));
                             #region Get方默认注释
-                            triviaText += $@"	○ <seealso langword=""return""/> <seealso langword=""{fieldName}""/>;";
+                            triviaText += $@"
+///				○ <seealso langword=""return""/> <seealso langword=""{fieldName}""/>;";
                             #endregion
-                            getIndex++;
                         }
                         #region Get方法尾及Set方法头注释
-                        triviaText += @"
+                        triviaText += $@"
 /// </code>
 /// <br/>
-/// <code><seealso langword=""set""/>方法已生成以下代码:";
+/// <code><seealso langword=""set""/>方法已生成以下代码:	○ <seealso cref=""{className}.{setMethodName}({propertyType})""/>;<br/>";
                         #endregion
-                        var setExpressionStatements = new List<StatementSyntax>();
+                        var setExpressionStatements = new List<StatementSyntax>()
+                        {
+                            SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"{setMethodName}(value)")).WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
+                        };
                         if (fieldDeclarationSyntax.AttributeLists.Any(IsProfilePropertyAddSetAttribute))
                         {
                             GetProfilePropertyAddSetAttributeList(fieldDeclarationSyntax).ForEach(attribute =>
@@ -126,43 +122,25 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                                     funcText = interpolatedStringExpressionSyntax.Contents.ToString();
                                 else if (argument.Expression is InvocationExpressionSyntax invocationExpressionSyntax)
                                     funcText = invocationExpressionSyntax.GetText().ToString();
-                                setExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression(funcText)));
-                                if (setIndex == 0)
-                                {
-                                    #region Set方法首个注释
-                                    triviaText += $"\t○ {funcText.Replace("\n", "<br/>").Replace(fieldName, $"<seealso langword=\"{fieldName}\"/>").Replace("value", "<seealso langword=\"value\"/>")};<br/>";
-                                    #endregion
-                                }
-                                else
-                                {
-                                    #region Set剩余方法注释
-                                    triviaText += $"\n///\t\t\t\t○ {funcText.Replace("\n", "<br/>").Replace(fieldName, $"<seealso langword=\"{fieldName}\"/>").Replace("value", "<seealso langword=\"value\"/>")};<br/>";
-                                    #endregion
-                                }
-                                setIndex++;
+                                setExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression(funcText)).WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken)));
+                                #region Set方法注释
+                                triviaText += $"\n///\t\t\t\t○ {funcText.Replace("\n", "<br/>").Replace(fieldName, $"<seealso langword=\"{fieldName}\"/>").Replace("value", "<seealso langword=\"value\"/>")};<br/>";
+                                #endregion
                             });
                         }
                         else
                         {
-                            setExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"{fieldName} = value")));
+                            setExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"Current.{fieldName} = value")));
                             #region Set方法默认注释
-                            triviaText += $@"	○ <seealso langword=""{fieldName}""/> = <seealso langword=""value""/>;<br/>";
+                            triviaText += $@"
+///				○ <seealso langword=""{fieldName}""/> = <seealso langword=""value""/>;<br/>";
                             #endregion
-                            setIndex++;
                         }
                         setExpressionStatements.Add(SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"global::XFEExtension.NetCore.ProfileExtension.XFEProfile.SaveProfile(typeof({className}))")));
-                        if (setIndex == 0)
-                        {
-                            #region Set方法中的保存方法在第一位情况的注释
-                            triviaText += $@"	○ <seealso cref=""global::XFEExtension.NetCore.ProfileExtension.XFEProfile.SaveProfile(ProfileInfo)""/>";
-                            #endregion
-                        }
-                        else
-                        {
-                            #region Set方法中的保存方法在非第一位情况的注释
-                            triviaText += $"\n///\t\t\t\t○ <seealso cref=\"global::XFEExtension.NetCore.ProfileExtension.XFEProfile.SaveProfile(ProfileInfo)\"/>;";
-                            #endregion
-                        }
+                        #region Set方法中的保存方法的注释
+                        triviaText += $@"
+///				○ <seealso cref=""global::XFEExtension.NetCore.ProfileExtension.XFEProfile.SaveProfile(ProfileInfo)""/>";
+                        #endregion
                         #region Trivia尾
                         triviaText += @"
 /// </code>
@@ -181,9 +159,18 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                                         .WithBody(SyntaxFactory.Block(setExpressionStatements))
                                 })))
                             .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia(triviaText));
-                        return property.NormalizeWhitespace();
-                    });
-                    var profileClassSyntaxTree = GenerateProfileClassSyntaxTree(classDeclaration, usingDirectives, properties, fileScopedNamespaceDeclarationSyntax);
+                        var getMethod = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("void"), getMethodName)
+                            .WithModifiers(SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.StaticKeyword), SyntaxFactory.Token(SyntaxKind.PartialKeyword)))
+                            .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken));
+                        var setMethod = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("void"), setMethodName)
+                            .WithModifiers(SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.StaticKeyword), SyntaxFactory.Token(SyntaxKind.PartialKeyword)))
+                            .AddParameterListParameters(SyntaxFactory.Parameter(SyntaxFactory.Identifier("value")).WithType(propertyType))
+                            .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken));
+                        methods.Add(getMethod);
+                        methods.Add(setMethod);
+                        properties.Add(property.NormalizeWhitespace());
+                    }
+                    var profileClassSyntaxTree = GenerateProfileClassSyntaxTree(classDeclaration, usingDirectives, properties, methods, fileScopedNamespaceDeclarationSyntax);
                     context.AddSource($"{className}.g.cs", profileClassSyntaxTree.ToString());
                 }
             }
@@ -215,13 +202,13 @@ namespace XFEExtension.NetCore.Analyzer.Generator
 
         public static IEnumerable<FieldDeclarationSyntax> GetFieldDeclarations(ClassDeclarationSyntax classDeclaration) => classDeclaration.DescendantNodes()
                                                                                                                                            .OfType<FieldDeclarationSyntax>()
-                                                                                                                                           .Where(fieldDeclarationSyntax => fieldDeclarationSyntax.AttributeLists.Any(IsProfilePropertyAttribute) && fieldDeclarationSyntax.Modifiers.Any(SyntaxKind.StaticKeyword));
+                                                                                                                                           .Where(fieldDeclarationSyntax => fieldDeclarationSyntax.AttributeLists.Any(IsProfilePropertyAttribute) && !fieldDeclarationSyntax.Modifiers.Any(SyntaxKind.StaticKeyword));
 
         public static IEnumerable<ClassDeclarationSyntax> GetClassDeclarations(SyntaxNode rootNode) => rootNode.DescendantNodes()
                                                                                                                .OfType<ClassDeclarationSyntax>()
-                                                                                                               .Where(classDeclaration => classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword));
+                                                                                                               .Where(classDeclaration => classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword) && !classDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword));
 
-        private static SyntaxTree GenerateProfileClassSyntaxTree(ClassDeclarationSyntax classDeclaration, UsingDirectiveSyntax[] usingDirectiveSyntaxes, IEnumerable<PropertyDeclarationSyntax> propertyDeclarationSyntaxes, FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclarationSyntax)
+        private static SyntaxTree GenerateProfileClassSyntaxTree(ClassDeclarationSyntax classDeclaration, UsingDirectiveSyntax[] usingDirectiveSyntaxes, List<PropertyDeclarationSyntax> propertyDeclarationSyntaxes, List<MethodDeclarationSyntax> methodDeclarationSyntaxes, FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclarationSyntax)
         {
             var className = classDeclaration.Identifier.ValueText;
             var triviaText = $@"/// <remarks>
@@ -229,8 +216,29 @@ namespace XFEExtension.NetCore.Analyzer.Generator
 /// <code>
 ";
             triviaText += string.Join("<br/>\n", propertyDeclarationSyntaxes.Select(propertyDeclarationSyntax => $"/// ○ <seealso cref=\"{propertyDeclarationSyntax.Identifier}\"/>")) + "\n/// </code><br/>\n/// <code>来自<seealso cref=\"global::XFEExtension.NetCore.ProfileExtension.XFEProfile\"/></code>\n/// </remarks>\n";
-            var memberDeclarations = new List<MemberDeclarationSyntax>();
+            var memberDeclarations = new List<MemberDeclarationSyntax>
+            {
+                SyntaxFactory.PropertyDeclaration(SyntaxFactory.ParseTypeName(className), "Current")
+                .WithModifiers(SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.StaticKeyword)))
+                .AddAttributeLists(SyntaxFactory.AttributeList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Attribute(SyntaxFactory.ParseName("global::XFEExtension.NetCore.ProfileExtension.ProfileInstanceAttribute")))))
+                .WithAccessorList(SyntaxFactory.AccessorList(SyntaxFactory.List(
+                    new[]
+                    {
+                        SyntaxFactory.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
+                                     .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken)),
+                        SyntaxFactory.AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
+                                     .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
+                    })))
+                .WithInitializer(SyntaxFactory.EqualsValueClause(SyntaxFactory.ParseExpression($"new {className}()")))
+                .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
+                .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia($@"/// <summary>
+/// 该配置文件的实例<br/>
+/// <seealso cref=""Current""/> 是 <seealso cref=""{className}""/> 配置文件类的实例数据
+/// </summary>
+"))
+            };
             memberDeclarations.AddRange(propertyDeclarationSyntaxes);
+            memberDeclarations.AddRange(methodDeclarationSyntaxes);
             var staticConstructorSyntax = SyntaxFactory.ConstructorDeclaration(className)
                     .AddModifiers(SyntaxFactory.Token(SyntaxKind.StaticKeyword))
                     .WithBody(SyntaxFactory.Block(

@@ -5,36 +5,55 @@ namespace XFEExtension.NetCore.ProfileExtension;
 /// <summary>
 /// 配置文件信息
 /// </summary>
-/// <param name="profileType">配置文件类型</param>
-/// <param name="path">配置文件储存位置</param>
-/// <param name="description">配置文件描述</param>
-public class ProfileInfo(Type profileType, string path = "", string description = "")
+public class ProfileInfo
 {
     /// <summary>
     /// 配置文件类型
     /// </summary>
-    public Type Profile { get; init; } = profileType;
+    public Type Profile { get; init; }
     /// <summary>
     /// 配置文件储存位置
     /// </summary>
-    public string Path { get; init; } = path == "" ? $"{((XFEProfile.ProfilesRootPath[^1] == '/' || XFEProfile.ProfilesRootPath[^1] == '\\') ? $"{XFEProfile.ProfilesRootPath}{profileType.Name}.xfe" : $"{XFEProfile.ProfilesRootPath}/{profileType.Name}.xfe")}" : path;
+    public string Path { get; init; }
     /// <summary>
     /// 配置文件描述
     /// </summary>
-    public string? Description { get; set; } = description;
+    public string? Description { get; set; }
+    /// <summary>
+    /// 实例成员信息
+    /// </summary>
+    public PropertyInfo? InstancePropertyInfo { get; private set; }
     /// <summary>
     /// 配置文件属性列表
     /// </summary>
-    public List<ProfileEntryInfo> MemberInfo { get; init; } = GetMemberWithProfileAttribute(profileType);
-    internal static List<ProfileEntryInfo> GetMemberWithProfileAttribute(Type type)
+    public List<ProfileEntryInfo> MemberInfo { get; private set; }
+    /// <summary>
+    /// 配置文件信息
+    /// </summary>
+    /// <param name="profileType">配置文件类型</param>
+    /// <param name="path">配置文件储存位置</param>
+    /// <param name="description">配置文件描述</param>
+    public ProfileInfo(Type profileType, string path = "", string description = "")
     {
+        Profile = profileType;
+        Path = path == "" ? $"{((XFEProfile.ProfilesRootPath[^1] == '/' || XFEProfile.ProfilesRootPath[^1] == '\\') ? $"{XFEProfile.ProfilesRootPath}{profileType.Name}.xfe" : $"{XFEProfile.ProfilesRootPath}/{profileType.Name}.xfe")}" : path;
+        Description = description;
         var profileEntryList = new List<ProfileEntryInfo>();
-        foreach (var memberInfo in type.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+        foreach (var memberInfo in profileType.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
             if (memberInfo is not MethodInfo)
+            {
                 if (memberInfo.GetCustomAttribute<ProfilePropertyAttribute>() is not null)
                     profileEntryList.Add(new ProfileEntryInfo(memberInfo.Name, memberInfo));
-        return profileEntryList;
+                if (memberInfo.GetCustomAttribute<ProfileInstanceAttribute>() is not null)
+                    InstancePropertyInfo = memberInfo as PropertyInfo;
+            }
+        MemberInfo = profileEntryList;
     }
+    /// <summary>
+    /// 获取当前配置文件的数据实例
+    /// </summary>
+    /// <returns></returns>
+    public object? GetProfileInstance() => InstancePropertyInfo?.GetValue(null);
     /// <summary>
     /// 配置文件类型生成
     /// </summary>

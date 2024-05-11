@@ -49,7 +49,7 @@ namespace XFEExtension.NetCore.Analyzer.CodeFix
             var root = await document.GetSyntaxRootAsync(c);
             var fieldDeclaration = root.FindToken(sourceSpan.Start).Parent.AncestorsAndSelf().OfType<FieldDeclarationSyntax>().First();
             var fieldName = fieldDeclaration.Declaration.Variables.First().Identifier.ValueText;
-            var newAttribute = SyntaxFactory.Attribute(SyntaxFactory.ParseName("ProfilePropertyAddGet")).AddArgumentListArguments(SyntaxFactory.AttributeArgument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal($"return {fieldName}"))));
+            var newAttribute = SyntaxFactory.Attribute(SyntaxFactory.ParseName("ProfilePropertyAddGet")).AddArgumentListArguments(SyntaxFactory.AttributeArgument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal($"return Current.{fieldName}"))));
             var newRoot = root.ReplaceNode(fieldDeclaration, fieldDeclaration.AddAttributeLists(SyntaxFactory.AttributeList(SyntaxFactory.SingletonSeparatedList(newAttribute))));
             return document.WithSyntaxRoot(newRoot);
         }
@@ -59,7 +59,7 @@ namespace XFEExtension.NetCore.Analyzer.CodeFix
             var root = await document.GetSyntaxRootAsync(c);
             var fieldDeclaration = root.FindToken(sourceSpan.Start).Parent.AncestorsAndSelf().OfType<FieldDeclarationSyntax>().First();
             var fieldName = fieldDeclaration.Declaration.Variables.First().Identifier.ValueText;
-            var newAttribute = SyntaxFactory.Attribute(SyntaxFactory.ParseName("ProfilePropertyAddSet")).AddArgumentListArguments(SyntaxFactory.AttributeArgument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal($"{fieldName} = value"))));
+            var newAttribute = SyntaxFactory.Attribute(SyntaxFactory.ParseName("ProfilePropertyAddSet")).AddArgumentListArguments(SyntaxFactory.AttributeArgument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal($"Current.{fieldName} = value"))));
             var newRoot = root.ReplaceNode(fieldDeclaration, fieldDeclaration.AddAttributeLists(SyntaxFactory.AttributeList(SyntaxFactory.SingletonSeparatedList(newAttribute))));
             return document.WithSyntaxRoot(newRoot);
         }

@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Text.Json;
 using XFEExtension.NetCore.FormatExtension;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace XFEExtension.NetCore.ProfileExtension;
 
@@ -9,12 +10,12 @@ namespace XFEExtension.NetCore.ProfileExtension;
 /// </summary>
 public abstract class XFEProfile
 {
-    private static Func<ProfileEntryInfo, string> SaveProfilesFunc { get; set; } = p =>
+    private static Func<object?, ProfileEntryInfo, string> SaveProfilesFunc { get; set; } = (i, p) =>
     {
         if (p.MemberInfo is FieldInfo fieldInfo)
-            return JsonSerializer.Serialize(fieldInfo.GetValue(null));
+            return JsonSerializer.Serialize(fieldInfo.GetValue(i));
         else if (p.MemberInfo is PropertyInfo propertyInfo)
-            return JsonSerializer.Serialize(propertyInfo.GetValue(null));
+            return JsonSerializer.Serialize(propertyInfo.GetValue(i));
         else
             return string.Empty;
     };
@@ -41,13 +42,14 @@ public abstract class XFEProfile
     /// <summary>
     /// 加载配置文件
     /// </summary>
-    /// <param name="profileInfo"></param>
+    /// <param name="profileInfo">配置文件信息</param>
     /// <returns></returns>
     public static void LoadProfiles(params ProfileInfo[] profileInfo)
     {
         Profiles.AddRange(profileInfo);
         foreach (var profile in Profiles)
         {
+            var instance = profile.GetProfileInstance();
             if (!File.Exists(profile.Path))
                 continue;
             XFEDictionary propertyFileContent = File.ReadAllText(profile.Path);
@@ -60,9 +62,9 @@ public abstract class XFEProfile
                     if (property.Header == memberInfo.Name)
                     {
                         if (memberInfo.MemberInfo is FieldInfo fieldInfo)
-                            fieldInfo.SetValue(null, LoadProfilesFunc(property.Content, memberInfo));
+                            fieldInfo.SetValue(instance, LoadProfilesFunc(property.Content, memberInfo));
                         else if (memberInfo.MemberInfo is PropertyInfo propertyInfo)
-                            propertyInfo.SetValue(null, LoadProfilesFunc(property.Content, memberInfo));
+                            propertyInfo.SetValue(instance, LoadProfilesFunc(property.Content, memberInfo));
                         continue;
                     }
                     foreach (var propertySecFind in propertyFileContent)
@@ -70,9 +72,9 @@ public abstract class XFEProfile
                         if (propertySecFind.Header == memberInfo.Name)
                         {
                             if (profile.MemberInfo[i].MemberInfo is FieldInfo fieldInfo)
-                                fieldInfo.SetValue(null, LoadProfilesFunc(propertySecFind.Content, memberInfo));
+                                fieldInfo.SetValue(instance, LoadProfilesFunc(propertySecFind.Content, memberInfo));
                             else if (profile.MemberInfo[i].MemberInfo is PropertyInfo propertyInfo)
-                                propertyInfo.SetValue(null, LoadProfilesFunc(propertySecFind.Content, memberInfo));
+                                propertyInfo.SetValue(instance, LoadProfilesFunc(propertySecFind.Content, memberInfo));
                             break;
                         }
                     }
@@ -84,7 +86,7 @@ public abstract class XFEProfile
     /// <summary>
     /// 加载配置文件
     /// </summary>
-    /// <param name="profileInfo"></param>
+    /// <param name="profileInfo">配置文件信息</param>
     /// <returns></returns>
     public static async Task LoadProfilesAsync(params ProfileInfo[] profileInfo) => await Task.Run(() => LoadProfiles(profileInfo));
 
@@ -99,8 +101,11 @@ public abstract class XFEProfile
         if (waitSaveProfile is null)
             return;
         var saveProfileDictionary = new XFEDictionary();
+        var instance = profileInfo.GetProfileInstance();
         foreach (var property in waitSaveProfile.MemberInfo)
-            saveProfileDictionary.Add(property.Name, SaveProfilesFunc(property));
+        {
+            saveProfileDictionary.Add(property.Name, SaveProfilesFunc(instance, property));
+        }
         var fileSavePath = Path.GetDirectoryName(waitSaveProfile.Path);
         if (!Directory.Exists(fileSavePath) && fileSavePath is not null && fileSavePath != string.Empty)
             Directory.CreateDirectory(fileSavePath);
@@ -128,8 +133,9 @@ public abstract class XFEProfile
         if (waitSaveProfile is null)
             return;
         var saveProfileDictionary = new XFEDictionary();
+        var instance = profileInfo.GetProfileInstance();
         foreach (var property in waitSaveProfile.MemberInfo)
-            saveProfileDictionary.Add(property.Name, SaveProfilesFunc(property));
+            saveProfileDictionary.Add(property.Name, SaveProfilesFunc(instance, property));
         var fileSavePath = Path.GetDirectoryName(waitSaveProfile.Path);
         if (!Directory.Exists(fileSavePath) && fileSavePath is not null && fileSavePath != string.Empty)
             Directory.CreateDirectory(fileSavePath);
@@ -199,7 +205,7 @@ public abstract class XFEProfile
     /// 设置储存配置文件的方法
     /// </summary>
     /// <param name="saveProfilesFunc">储存方法</param>
-    public static void SetSaveProfilesFunction(Func<ProfileEntryInfo, string> saveProfilesFunc) => SaveProfilesFunc = saveProfilesFunc;
+    public static void SetSaveProfilesFunction(Func<object?, ProfileEntryInfo, string> saveProfilesFunc) => SaveProfilesFunc = saveProfilesFunc;
 
     /// <summary>
     /// 设置加载配置文件的方法
@@ -232,8 +238,9 @@ public abstract class XFEProfile
         if (waitSaveProfile is null)
             return string.Empty;
         var saveProfileDictionary = new XFEDictionary();
+        var instance = profileInfo.GetProfileInstance();
         foreach (var property in waitSaveProfile.MemberInfo)
-            saveProfileDictionary.Add(property.Name, SaveProfilesFunc(property));
+            saveProfileDictionary.Add(property.Name, SaveProfilesFunc(instance, property));
         return saveProfileDictionary.ToString();
     }
 
@@ -259,6 +266,7 @@ public abstract class XFEProfile
     /// <param name="autoSave">导入后是否自动储存</param>
     public static void ImportProfile(ProfileInfo profileInfo, string profileString, bool autoSave = true)
     {
+        var instance = profileInfo.GetProfileInstance();
         var waitSaveProfile = Profiles.Find(x => x.Profile == profileInfo.Profile);
         if (waitSaveProfile is null)
             return;
@@ -268,9 +276,9 @@ public abstract class XFEProfile
             if (importProfileDictionary[property.Name] is not null)
             {
                 if (property.MemberInfo is FieldInfo fieldInfo)
-                    fieldInfo.SetValue(null, LoadProfilesFunc(importProfileDictionary[property.Name]!, property));
+                    fieldInfo.SetValue(instance, LoadProfilesFunc(importProfileDictionary[property.Name]!, property));
                 else if (property.MemberInfo is PropertyInfo propertyInfo)
-                    propertyInfo.SetValue(null, LoadProfilesFunc(importProfileDictionary[property.Name]!, property));
+                    propertyInfo.SetValue(instance, LoadProfilesFunc(importProfileDictionary[property.Name]!, property));
             }
         }
         if (autoSave)
