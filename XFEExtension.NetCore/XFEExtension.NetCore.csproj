@@ -19,9 +19,7 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-修复了路径自动实现的部分bug
-调整了CyberCommServer的构造函数，使得其更加合理
-更新了md文档API说明
+修复了路径自动实现中，路径引用路径自动生成的属性时，无法初始化的bug
 
 ## 新增
 
@@ -34,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.10.1</Version>
+    <Version>2.10.2</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 

@@ -6,4 +6,6 @@ public partial class AppPath
 {
     [AutoPath]
     readonly static string myTestPath = "MyTestPath/Test";
+    [AutoPath]
+    readonly static string mySecTestPath = $"{MyTestPath}/Sec";
 }

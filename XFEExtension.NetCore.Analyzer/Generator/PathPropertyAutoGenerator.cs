@@ -66,6 +66,7 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                                 {
                                     SyntaxFactory.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
                                         .WithBody(SyntaxFactory.Block(
+                                            SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"Options ??= new {className}()")),
                                             SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"global::XFEExtension.NetCore.PathExtension.XFEAutoPath.CheckPathExistAndCreate({fieldName}, Options.{enableCheckPropertyName})")),
                                             SyntaxFactory.ReturnStatement(SyntaxFactory.ParseExpression($"{fieldName}"))))
                                 })))

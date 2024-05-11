@@ -13,7 +13,7 @@ internal class Program
         };
         Console.WriteLine(SystemProfile.Age);
         Console.WriteLine(SystemProfile.Name);
-        SystemProfile.Name.WriteIn(AppPath.MyTestPath + "/test1.txt");
+        SystemProfile.Name.WriteIn(AppPath.MySecTestPath + "/test1.txt");
     }
 }
 enum MyEnum
