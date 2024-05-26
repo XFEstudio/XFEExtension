@@ -26,6 +26,10 @@ public enum ChatGPTModel
     /// </summary>
     gpt432k,
     /// <summary>
+    /// GPT-4o，OpenAI最新的模型，比GPT4-Turbo快
+    /// </summary>
+    gpt4o,
+    /// <summary>
     /// 13 年 2023 月 3 日的快照。与GPT-4-32K不同，此模型不会收到更新，并将在新版本发布 3 个月后弃用。基于gpt-4-32k
     /// </summary>
     gpt432k0613,

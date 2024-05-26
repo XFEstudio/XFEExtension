@@ -19,7 +19,7 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-修复了路径自动实现中，路径引用路径自动生成的属性时，无法初始化的bug
+更新了GPT的模型，现在新增GPT-4o模型
 
 ## 新增
 
@@ -32,7 +32,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.10.2</Version>
+    <Version>2.10.3</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 

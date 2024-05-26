@@ -16,6 +16,7 @@ public static class ChatGPTModelExtension
         return chatGPTModel switch
         {
             ChatGPTModel.gpt4 => "gpt-4",
+            ChatGPTModel.gpt4o => "gpt-4o",
             ChatGPTModel.gpt4turbo => "gpt-4-1106-preview",
             ChatGPTModel.gpt4turbovision => "gpt-4-vision-preview",
             ChatGPTModel.gpt40613 => "gpt-4-0613",
