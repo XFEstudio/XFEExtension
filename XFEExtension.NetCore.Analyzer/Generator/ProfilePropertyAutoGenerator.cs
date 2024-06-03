@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,10 +11,14 @@ namespace XFEExtension.NetCore.Analyzer.Generator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
+            context.RegisterForSyntaxNotifications(() => new ProfilePropertySyntaxReceiver());
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
+            GeneratorOptions.GetOptions(context);
+            if (!GeneratorOptions.AutoProfile)
+                return;
             var syntaxTrees = context.Compilation.SyntaxTrees;
             foreach (var syntaxTree in syntaxTrees)
             {

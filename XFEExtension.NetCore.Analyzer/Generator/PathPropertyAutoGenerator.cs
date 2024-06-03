@@ -11,10 +11,15 @@ namespace XFEExtension.NetCore.Analyzer.Generator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
+            context.RegisterForSyntaxNotifications(() => new AutoPathSyntaxReceiver());
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
+            if(!GeneratorOptions.AutoPath)
+                return;
+            if (!(context.SyntaxReceiver is AutoPathSyntaxReceiver receiver))
+                return;
             var syntaxTrees = context.Compilation.SyntaxTrees;
             foreach (var syntaxTree in syntaxTrees)
             {
@@ -30,12 +35,14 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                     }
                     var className = classDeclaration.Identifier.ValueText;
                     var properties = new List<PropertyDeclarationSyntax>();
+                    var methods = new List<MethodDeclarationSyntax>();
                     var enableCheckProperties = new List<PropertyDeclarationSyntax>();
                     foreach (var fieldDeclarationSyntax in fieldDeclarationSyntaxes)
                     {
                         var variableDeclaration = fieldDeclarationSyntax.Declaration.Variables.First();
                         var fieldName = variableDeclaration.Identifier.Text;
                         var propertyName = fieldName[0] == '_' ? fieldName[1].ToString().ToUpper() + fieldName.Substring(2) : fieldName[0].ToString().ToUpper() + fieldName.Substring(1);
+                        var getMethodName = $"Get{propertyName}Property";
                         var enableCheckPropertyName = $"{propertyName}EnableCheck";
                         GetAutoPathAttributeList(fieldDeclarationSyntax).ForEach(attribute =>
                         {
@@ -68,6 +75,7 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                                         .WithBody(SyntaxFactory.Block(
                                             SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"Options ??= new {className}()")),
                                             SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"global::XFEExtension.NetCore.PathExtension.XFEAutoPath.CheckPathExistAndCreate({fieldName}, Options.{enableCheckPropertyName})")),
+                                            SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression($"{getMethodName}()")),
                                             SyntaxFactory.ReturnStatement(SyntaxFactory.ParseExpression($"{fieldName}"))))
                                 })))
                             .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia(triviaText));
@@ -82,10 +90,14 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                             .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia(checkEnableTriviaText))
                             .WithInitializer(SyntaxFactory.EqualsValueClause(SyntaxFactory.ParseExpression("true")))
                             .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken));
+                        var getMethod = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("void"), getMethodName)
+                            .WithModifiers(SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.StaticKeyword), SyntaxFactory.Token(SyntaxKind.PartialKeyword)))
+                            .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken));
                         properties.Add(property.NormalizeWhitespace());
+                        methods.Add(getMethod);
                         enableCheckProperties.Add(enableCheckProperty.NormalizeWhitespace());
                     }
-                    var profileClassSyntaxTree = GeneratePathClassSyntaxTree(classDeclaration, properties, enableCheckProperties, fileScopedNamespaceDeclarationSyntax);
+                    var profileClassSyntaxTree = GeneratePathClassSyntaxTree(classDeclaration, properties, enableCheckProperties, methods, fileScopedNamespaceDeclarationSyntax);
                     context.AddSource($"{className}.g.cs", profileClassSyntaxTree.ToString());
                 }
             }
@@ -111,7 +123,7 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                                                                                                                .OfType<ClassDeclarationSyntax>()
                                                                                                                .Where(classDeclaration => classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword));
 
-        private static SyntaxTree GeneratePathClassSyntaxTree(ClassDeclarationSyntax classDeclaration, List<PropertyDeclarationSyntax> propertyDeclarationSyntaxes, List<PropertyDeclarationSyntax> enableCheckDeclarationSyntaxes, FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclarationSyntax)
+        private static SyntaxTree GeneratePathClassSyntaxTree(ClassDeclarationSyntax classDeclaration, List<PropertyDeclarationSyntax> propertyDeclarationSyntaxes, List<PropertyDeclarationSyntax> enableCheckDeclarationSyntaxes, List<MethodDeclarationSyntax> methodDeclarationSyntaxes, FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclarationSyntax)
         {
             var className = classDeclaration.Identifier.ValueText;
             var triviaText = $@"/// <remarks>
@@ -132,8 +144,6 @@ namespace XFEExtension.NetCore.Analyzer.Generator
                         SyntaxFactory.AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
                                      .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
                     })))
-                .WithInitializer(SyntaxFactory.EqualsValueClause(SyntaxFactory.ParseExpression($"new {className}()")))
-                .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
                 .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia($@"/// <summary>
 /// 配置选项<br/>
 /// <seealso cref=""Options""/> 是 <seealso cref=""{className}""/> 类的配置选项
@@ -141,6 +151,7 @@ namespace XFEExtension.NetCore.Analyzer.Generator
 "))
             };
             memberDeclarations.AddRange(propertyDeclarationSyntaxes);
+            memberDeclarations.AddRange(methodDeclarationSyntaxes);
             memberDeclarations.AddRange(enableCheckDeclarationSyntaxes);
             var pathClass = SyntaxFactory.ClassDeclaration(className)
                 .AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword))

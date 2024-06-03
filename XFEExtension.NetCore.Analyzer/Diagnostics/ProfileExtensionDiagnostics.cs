@@ -12,7 +12,6 @@ namespace XFEExtension.NetCore.Analyzer.Diagnostics
     public class ProfileExtensionDiagnostics : DiagnosticAnalyzer
     {
         public const string AddGetNoResultErrorId = "XFE0002";
-        public const string PropertyOrFieldNotStaticId = "XFE0003";
         public const string AddSetNoSetResultWarningId = "XFW0001";
 
         public static readonly DiagnosticDescriptor AddGetNoResultError = new DiagnosticDescriptor(AddGetNoResultErrorId,
@@ -33,16 +32,7 @@ namespace XFEExtension.NetCore.Analyzer.Diagnostics
                                                                                                         "设置了自定义的Set方法但是没有对实际字段进行操作.",
                                                                                                         "https://www.xfegzs.com/codespace/diagnostics/XFW0001.html");
 
-        public static readonly DiagnosticDescriptor PropertyOrFieldNotStatic = new DiagnosticDescriptor(PropertyOrFieldNotStaticId,
-                                                                                                        "配置属性或字段不是静态的",
-                                                                                                        "配置类的{0}不是静态的：'{1}'",
-                                                                                                        "XFEExtension.NetCore.Analyzer.Diagnostics",
-                                                                                                        DiagnosticSeverity.Error,
-                                                                                                        true,
-                                                                                                        "配置类的属性或字段不是静态的.",
-                                                                                                        "https://www.xfegzs.com/codespace/diagnostics/XFE0003.html");
-
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(AddGetNoResultError, AddSetNoSetResultWarning, PropertyOrFieldNotStatic);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(AddGetNoResultError, AddSetNoSetResultWarning);
 
         public override void Initialize(AnalysisContext context)
         {

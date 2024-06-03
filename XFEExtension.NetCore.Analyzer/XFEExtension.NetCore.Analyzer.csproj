@@ -17,4 +17,12 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.9.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <CompilerVisibleProperty Include="AutoProfile" />
+    <CompilerVisibleProperty Include="AutoPath" />
+    <CompilerVisibleProperty Include="AutoImplement" />
+    <CompilerVisibleProperty Include="EnableTodoList" />
+    <CompilerVisibleProperty Include="TodoListWarningLevel" />
+  </ItemGroup>
+
 </Project>

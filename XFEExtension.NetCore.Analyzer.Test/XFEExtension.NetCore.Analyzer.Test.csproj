@@ -5,6 +5,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
+    <AutoPath>false</AutoPath>
+    <TodoListWarningLevel>1</TodoListWarningLevel>
+    <TodoList>false</TodoList>
+    <AutoProfile>false</AutoProfile>
   </PropertyGroup>
 
   <ItemGroup>
