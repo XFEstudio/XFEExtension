@@ -20,13 +20,13 @@ XFEExtension库适用于各种C#项目，特别适合在需要提高代码可读
 
 ```xml
 <PropertyGroup>
-    //设置是否启用自动配置文件
+    <!--设置是否启用自动配置文件-->
     <AutoProfile>true</AutoProfile>
-    //设置是否启用自动路径
+    <!--设置是否启用自动路径-->
     <AutoPath>true</AutoPath>
-    //设置是否启用TODO待办任务提醒
+    <!--设置是否启用TODO待办任务提醒-->
     <TodoList>true</TodoList>
-    //设置待办任务的提示级别
+    <!--设置待办任务的提示级别-->
     <TodoListWarningLevel>3</TodoListWarningLevel>
 </PropertyGroup>
 ```
