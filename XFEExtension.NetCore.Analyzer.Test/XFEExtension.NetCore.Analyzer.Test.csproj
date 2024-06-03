@@ -6,7 +6,8 @@
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
     <AutoPath>false</AutoPath>
-    <TodoListWarningLevel>Info</TodoListWarningLevel>
+    <TodoListWarningLevel>1</TodoListWarningLevel>
+    <TodoList>false</TodoList>
     <AutoProfile>false</AutoProfile>
   </PropertyGroup>
 

@@ -7,8 +7,8 @@ namespace XFEExtension.NetCore.Analyzer
         public static bool AutoProfile { get; set; } = true;
         public static bool AutoPath { get; set; } = true;
         public static bool AutoImplement { get; set; } = true;
-        public static bool EnableTodoList { get; set; } = true;
-        public static string TodoListWarningLevel { get; set; } = "Warning";
+        public static bool TodoList { get; set; } = true;
+        public static int TodoListWarningLevel { get; set; } = 2;
         public static void GetOptions(GeneratorExecutionContext context)
         {
             if (context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.AutoProfile", out var autoProfile))
@@ -17,10 +17,11 @@ namespace XFEExtension.NetCore.Analyzer
                 AutoPath = autoPath.ToLower() == "true";
             if (context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.AutoImplement", out var autoImplement))
                 AutoImplement = autoImplement.ToLower() == "true";
-            if (context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.EnableTodoList", out var enableTodoList))
-                EnableTodoList = enableTodoList.ToLower() == "true";
+            if (context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.TodoList", out var todoList))
+                TodoList = todoList.ToLower() == "true";
             if (context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.TodoListWarningLevel", out var todoListWarningLevel))
-                TodoListWarningLevel = todoListWarningLevel;
+                if (int.TryParse(todoListWarningLevel, out var warningLevel))
+                    TodoListWarningLevel = warningLevel;
         }
     }
 }

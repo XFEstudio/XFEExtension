@@ -2,7 +2,7 @@
 
 ## 描述
 
-XFEExtension是一个C#的DLL库，旨在优化C#代码中常用语句的使用，并提供更简洁的访问方式，同时提供Xunit测试框架，快速搭建服务器/客户端，免费ChatGPTAPI接口，免费通讯服务器，XFE下载器，新增格式等
+XFEExtension是一个C#的DLL库，旨在优化C#代码中常用语句的使用，并提供更简洁的访问方式，同时提供XUnit测试框架，快速搭建服务器/客户端，免费ChatGPTAPI接口，免费通讯服务器，XFE下载器，新增格式等
 
 ## 用途
 
@@ -14,7 +14,40 @@ XFEExtension库适用于各种C#项目，特别适合在需要提高代码可读
 
 - **加速开发：** 通过减少样板代码，XFEExtension可以加速项目的开发过程，同时提高代码的可维护性。
 
+---
+
+## 设置csproj文件配置
+
+```xml
+<PropertyGroup>
+    //设置是否启用自动配置文件
+    <AutoProfile>true</AutoProfile>
+    //设置是否启用自动路径
+    <AutoPath>true</AutoPath>
+    //设置是否启用TODO待办任务提醒
+    <TodoList>true</TodoList>
+    //设置待办任务的提示级别
+    <TodoListWarningLevel>3</TodoListWarningLevel>
+</PropertyGroup>
+```
+
+---
+
 # 示例（使用前记得进行相应的引用）
+
+---
+
+## TODO待办任务提醒
+
+```csharp
+//TODO: 这是一个待办任务，使用默认提示级别
+
+//TODO:1 这是一个待办任务，使用提示级别
+
+//TODO:3 这是一个待办任务，使用错误提示级别
+
+//提示级别：0-隐藏，1-提示，2-警告，3-错误
+```
 
 ---
 

@@ -19,11 +19,22 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-更新了GPT的模型，现在新增GPT-4o模型
+无
 
 ## 新增
 
-无
+现在TODO任务可以单独提醒，并可以让用户自己设置警告等级
+
+在README.md文件中，增加了对XFEExtension库和XUnit测试框架的描述，以及如何在csproj文件中设置配置和使用TODO待办任务提醒的示例代码。
+
+在AnalyzerReleases.Shipped.md和AnalyzerReleases.Unshipped.md文件中，添加了新的规则，用于处理TODO待办任务提醒的诊断。
+
+在ProfileExtensionDiagnostics.cs文件中，移除了PropertyOrFieldNotStaticId相关的代码，并在SupportedDiagnostics中移除了对应的引用。
+
+在TodoCommentAnalyzerDiagnostics.cs文件中，添加了对正则表达式的引用，修改了对TODO待办任务提醒的处理方式，现在可以根据TODO后的数字来设置警告等级，并对应修改了警告等级的获取方式。
+
+在GeneratorOptions.cs文件中，修改了EnableTodoList和TodoListWarningLevel的名称和类型，并对应修改了在GetOptions方法中的处理方式。在XFEExtension.NetCore.csproj文件中，更新了包的版本号，并在发布说明中添加了对新功能的描述。
+
 
 ## 严重
 
@@ -32,7 +43,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>2.10.3</Version>
+    <Version>2.10.4</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 

@@ -7,5 +7,4 @@ Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 TODO | XFEExtension.NetCore.Analyzer.Diagnostics | `Dynamic` | TodoCommentAnalyzerDiagnostics, [Documentation](https://www.xfegzs.com/codespace/diagnostics/TODO.html)
 XFE0002 | XFEExtension.NetCore.Analyzer.Diagnostics | Error | ProfileExtensionDiagnostics, [Documentation](https://www.xfegzs.com/codespace/diagnostics/XFE0002.html)
-XFE0003 | XFEExtension.NetCore.Analyzer.Diagnostics | Error | ProfileExtensionDiagnostics, [Documentation](https://www.xfegzs.com/codespace/diagnostics/XFE0003.html)
 XFW0001 | XFEExtension.NetCore.Analyzer.Diagnostics | Warning | ProfileExtensionDiagnostics, [Documentation](https://www.xfegzs.com/codespace/diagnostics/XFW0001.html)
