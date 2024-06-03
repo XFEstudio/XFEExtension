@@ -14,6 +14,8 @@ namespace XFEExtension.NetCore.Analyzer.Generator
 
         public void Execute(GeneratorExecutionContext context)
         {
+            if (!GeneratorOptions.AutoImplement)
+                return;
             var syntaxTrees = context.Compilation.SyntaxTrees;
             foreach (var syntaxTree in syntaxTrees)
             {
