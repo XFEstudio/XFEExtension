@@ -18,11 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <CompilerVisibleProperty Include="AutoProfile" />
-    <CompilerVisibleProperty Include="AutoPath" />
-    <CompilerVisibleProperty Include="AutoImplement" />
-    <CompilerVisibleProperty Include="EnableTodoList" />
-    <CompilerVisibleProperty Include="TodoListWarningLevel" />
+    <Folder Include="CodeFix\" />
+    <Folder Include="Diagnostics\" />
   </ItemGroup>
-
+  
 </Project>

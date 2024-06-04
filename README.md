@@ -2,7 +2,7 @@
 
 ## 描述
 
-XFEExtension是一个C#的DLL库，旨在优化C#代码中常用语句的使用，并提供更简洁的访问方式，同时提供XUnit测试框架，快速搭建服务器/客户端，免费ChatGPTAPI接口，免费通讯服务器，XFE下载器，新增格式等
+XFEExtension是一个C#的DLL库，旨在优化C#代码中常用语句的使用，并提供更简洁的访问方式，快速搭建服务器/客户端，免费ChatGPTAPI接口，免费通讯服务器，XFE下载器，新增格式等
 
 ## 用途
 
@@ -14,154 +14,7 @@ XFEExtension库适用于各种C#项目，特别适合在需要提高代码可读
 
 - **加速开发：** 通过减少样板代码，XFEExtension可以加速项目的开发过程，同时提高代码的可维护性。
 
----
-
-## 设置csproj文件配置
-
-```xml
-<PropertyGroup>
-    <!--设置是否启用自动配置文件-->
-    <AutoProfile>true</AutoProfile>
-    <!--设置是否启用自动路径-->
-    <AutoPath>true</AutoPath>
-    <!--设置是否启用TODO待办任务提醒-->
-    <TodoList>true</TodoList>
-    <!--设置待办任务的提示级别-->
-    <TodoListWarningLevel>3</TodoListWarningLevel>
-</PropertyGroup>
-```
-
----
-
 # 示例（使用前记得进行相应的引用）
-
----
-
-## TODO待办任务提醒
-
-```csharp
-//TODO: 这是一个待办任务，使用默认提示级别
-
-//TODO:1 这是一个待办任务，使用提示级别
-
-//TODO:3 这是一个待办任务，使用错误提示级别
-
-//提示级别：0-隐藏，1-提示，2-警告，3-错误
-```
-
----
-
-## 自动实现配置文件的存储
-
-#### 基础用法
-
-```csharp
-//创建配置文件类
-partial class SystemProfile
-{
-    [ProfileProperty]
-    string name;
-
-    [ProfileProperty]
-    int _age;
-}
-
-//使用配置文件
-class Program
-{
-    static void Main(string[] args)
-    {
-        SystemProfile.Name = "Test";//在设置值的时候会自动记录并储存
-        //SystemProfile.Age = 1;
-        Console.WriteLine(SystemProfile.Name);
-        Console.WriteLine(SystemProfile.Age);//下次打开程序会自动读取上次程序退出时储存的值
-    }
-}
-```
-
-#### 设置get和set方法
-
-```csharp
-partial class SystemProfile
-{
-    [ProfileProperty]
-    [ProfilePropertyAddGet(@"Console.WriteLine(""获取了Name"")")]
-    [ProfilePropertyAddGet("return Current.name")]
-    [ProfilePropertyAddSet(@"Console.WriteLine(""设置了Name"")")]
-    [ProfilePropertyAddSet("Current.name = value")]
-    string name = string.Empty;
-
-    [ProfileProperty]
-    [ProfilePropertyAddGet(@"Console.WriteLine(""获取了Age"")")]
-    [ProfilePropertyAddGet("return Current._age")]
-    [ProfilePropertyAddSet(@"Console.WriteLine(""设置了Age"")")]
-    [ProfilePropertyAddSet("Current._age = value")]
-    int _age;
-}
-```
-
-#### 设置初始值
-
-```csharp
-partial class SystemProfile
-{
-    [ProfileProperty]
-    string name = "John Wick";
-
-    [ProfileProperty]
-    int _age = 59;
-}
-```
-
-#### 为属性添加注释
-
-```csharp
-partial class SystemProfile
-{
-    /// <summary>
-    /// 名称
-    /// 这段注释会自动添加至自动生成的Name属性上
-    /// </summary>
-    [ProfileProperty]
-    string name;
-
-    [ProfileProperty]
-    int _age;
-}
-```
-
-#### 使用部分方法来设置get和set方法
-
-```csharp
-partial class SystemProfile
-{
-    [ProfileProperty]
-    string name;
-
-    [ProfileProperty]
-    int _age;
-
-    static partial void GetNameProperty()
-    {
-        Console.WriteLine("获取了Name");
-    }
-
-    static partial void SetNameProperty(string value)
-    {
-        Console.WriteLine($"设置了Name：从{Name}变为了{value}");
-    }
-
-    static partial void GetAgeProperty()
-    {
-        Console.WriteLine("获取了Age");
-    }
-
-    static partial void SetAgeProperty(int value)
-    {
-        Console.WriteLine($"设置了Age：从{Age}变为了{value}");
-    }
-}
-```
 
 ---
 
@@ -301,27 +154,6 @@ var askContent = Console.ReadLine();
 
 //填写之前创建的对话ID，生成随机的消息ID，并输入刚刚读取的询问内容
 memorableXFEChatGPT.AskChatGPT("新的对话ID", Guid.NewGuid().ToString(), askContent);
-```
-
----
-
-## 自动生成实现类
-
-```csharp
-[CreateImpl]
-abstract class TestAbstractClass(int num)
-{
-    public int Num { get; set; } = num;
-}
-
-class Program
-{
-    static void Main(string[] args)
-    {
-        var testAbstractClass = new TestAbstractClassImpl(123);
-        Console.WriteLine(testAbstractClass.Num);
-    }
-}
 ```
 
 ---
