@@ -1,20 +1,14 @@
-﻿using XFEExtension.NetCore.FileExtension;
-
-namespace XFEExtension.NetCore.Analyzer.Test;
+﻿namespace XFEExtension.NetCore.Analyzer.Test;
 
 internal class Program
 {
     public static void Main(string[] args)
     {
-        //TODO: 编写测试代码
         var testClass = new TestClass("测试名称", "测试描述哈哈", 59)
         {
             Tags = [["123", "321"], ["1234567", "7654321"]],
             Enum = MyEnum.Test1
         };
-        Console.WriteLine(SystemProfile.Age);
-        Console.WriteLine(SystemProfile.Name);
-        SystemProfile.Name.WriteIn(AppPath.MySecTestPath + "/test1.txt");
     }
 }
 enum MyEnum
