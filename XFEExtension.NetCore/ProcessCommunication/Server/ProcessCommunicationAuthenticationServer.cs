@@ -1,5 +1,6 @@
 ﻿using System.IO.Pipes;
 using XFEExtension.NetCore.DelegateExtension;
+using XFEExtension.NetCore.FormatExtension;
 using XFEExtension.NetCore.ProcessCommunication.Client;
 
 namespace XFEExtension.NetCore.ProcessCommunication.Server;
@@ -26,15 +27,33 @@ public class ProcessCommunicationAuthenticationServer(string serverName, string 
     /// <summary>
     /// 认证管道服务器
     /// </summary>
-    public NamedPipeServerStream AuthenticationPipeServer { get; set; } = new NamedPipeServerStream(serverName);
+    public Dictionary<int, NamedPipeServerStream> AuthenticationPipeServerDictionary { get; set; } = [];
     public void Start(bool autoAuthenticationWithClient, int perClientTimeOut = 500)
     {
         Task.Run(async () =>
         {
             while (true)
             {
-                await AuthenticationPipeServer.WaitForConnectionAsync();
-
+                var currentServerIndex = AuthenticationPipeServerDictionary.Last().Key + 1;
+                using var authenticationPipeServer = new NamedPipeServerStream($"{ServerName}-{currentServerIndex}");
+                var tokenSource = new CancellationTokenSource(perClientTimeOut);
+                AuthenticationPipeServerDictionary.Add(currentServerIndex, authenticationPipeServer);
+                await authenticationPipeServer.WaitForConnectionAsync();
+                using var streamReader = new StreamReader(authenticationPipeServer);
+                using var streamWriter = new StreamWriter(authenticationPipeServer);
+                var clientInfoString = await streamReader.ReadLineAsync(tokenSource.Token);
+                if (clientInfoString is not null)
+                {
+                    var clientInfoDictionary = new XFEDictionary(clientInfoString);
+                    if (clientInfoDictionary is not null)
+                    {
+                        if (clientInfoDictionary.Contains("ServerName") && clientInfoDictionary.Contains("ClientName") && clientInfoDictionary.Contains("ClientID") && clientInfoDictionary.Contains("Password"))
+                        {
+                            var clientInfo = new ProcessCommunicationClientInfo(clientInfoDictionary["ClientName"]!, clientInfoDictionary["ClientID"]!, clientInfoDictionary["Password"]!);
+                            ClientConnected?.Invoke(this, clientInfo);
+                        }
+                    }
+                }
             }
         });
     }

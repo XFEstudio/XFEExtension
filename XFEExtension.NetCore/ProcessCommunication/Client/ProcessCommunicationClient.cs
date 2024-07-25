@@ -1,4 +1,5 @@
-﻿using System.IO.Pipes;
+﻿using System.Diagnostics;
+using System.IO.Pipes;
 using XFEExtension.NetCore.FormatExtension;
 using XFEExtension.NetCore.ProcessCommunication.Server;
 
@@ -42,16 +43,46 @@ public class ProcessCommunicationClient
     /// <param name="password">密码</param>
     /// <param name="computerName">目标计算机名称</param>
     /// <param name="timeOut">超时(ms)</param>
-    /// <returns>是否成功</returns>
-    public async Task<bool> Connect(string serverName, string password = "", string computerName = ".", int timeOut = 500)
+    /// <returns>连接结果</returns>
+    public async Task<ConnectResult> Connect(string serverName, string password = "", string computerName = ".", int timeOut = 500)
     {
-        using var authenticationClient = new NamedPipeClientStream(computerName, $"{serverName}-Authentication");
-        await authenticationClient.ConnectAsync(timeOut);
+        var stopWatch = new Stopwatch();
+        var tokenSource = new CancellationTokenSource(timeOut);
+        int retryTime = 0;
+        stopWatch.Start();
+        var authenticationClient = new NamedPipeClientStream(computerName, $"{serverName}-Authentication-{retryTime}");
+        while (true)
+        {
+            try
+            {
+                await authenticationClient.ConnectAsync(timeOut);
+                break;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                if (stopWatch.ElapsedMilliseconds < timeOut)
+                {
+                    retryTime++;
+                    await authenticationClient.DisposeAsync();
+                    authenticationClient = new NamedPipeClientStream($"{serverName}-Authentication-{retryTime}");
+                }
+                else
+                {
+                    return new ConnectResult()
+                    {
+                        IsSuccessful = false,
+                        FailReason = ConnectFailReason.ConnectToServerTimeOut,
+                        Message = "连接至认证服务器超时"
+                    };
+                }
+            }
+        }
         using var reader = new StreamReader(authenticationClient);
         using var writer = new StreamWriter(authenticationClient);
         await writer.WriteLineAsync(new XFEDictionary("ServerName", serverName, "ClientName", ClientName, "ClientID", ClientID, "Password", password));
         await writer.FlushAsync();
-        var result = await reader.ReadLineAsync();
+        var result = await reader.ReadLineAsync(tokenSource.Token);
         await authenticationClient.DisposeAsync();
         if (result is not null)
         {
@@ -61,14 +92,14 @@ public class ProcessCommunicationClient
                 ServerInfo = new ProcessCommunicationServerInfo(resultDictionary["ServerName"]!, resultDictionary["TextPipeID"]!, resultDictionary["BinaryPipeID"]!);
                 TextPipeClient = new NamedPipeClientStream(computerName, ServerInfo.CurrentTextServerPipeName);
                 BinaryPipeClient = new NamedPipeClientStream(computerName, ServerInfo.CurrentBinaryServerPipeName);
-                await TextPipeClient.ConnectAsync();
-                await BinaryPipeClient.ConnectAsync();
+                await TextPipeClient.ConnectAsync(tokenSource.Token);
+                await BinaryPipeClient.ConnectAsync(tokenSource.Token);
                 streamReader = new StreamReader(TextPipeClient);
                 streamWriter = new StreamWriter(TextPipeClient);
-                return true;
+                return ConnectResult.Successful;
             }
         }
-        return false;
+        return ConnectResult.Successful;
     }
     /// <summary>
     /// 发送明文信息

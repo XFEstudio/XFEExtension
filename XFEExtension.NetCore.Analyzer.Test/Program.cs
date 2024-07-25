@@ -1,4 +1,5 @@
-﻿using System.IO.Pipes;
+﻿using System.Diagnostics;
+using System.IO.Pipes;
 
 namespace XFEExtension.NetCore.Analyzer.Test;
 
