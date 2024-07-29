@@ -50,7 +50,7 @@ public class ProcessCommunicationClient
         var tokenSource = new CancellationTokenSource(timeOut);
         int retryTime = 0;
         stopWatch.Start();
-        var authenticationClient = new NamedPipeClientStream(computerName, $"{serverName}-Authentication-{retryTime}");
+        var authenticationClient = new NamedPipeClientStream(computerName, $"{serverName}-{retryTime}");
         while (true)
         {
             try
@@ -65,7 +65,7 @@ public class ProcessCommunicationClient
                 {
                     retryTime++;
                     await authenticationClient.DisposeAsync();
-                    authenticationClient = new NamedPipeClientStream($"{serverName}-Authentication-{retryTime}");
+                    authenticationClient = new NamedPipeClientStream($"{serverName}-{retryTime}");
                 }
                 else
                 {
