@@ -12,6 +12,10 @@ public abstract class StringConverter : IStringConverter
     /// </summary>
     public static ObjectAnalyzer ObjectAnalyzer { get; } = new();
     /// <summary>
+    /// 带颜色的对象分析注入
+    /// </summary>
+    public static ColoredObjectAnalyzer ColoredObjectAnalyzer { get; } = new();
+    /// <summary>
     /// Json转换注入
     /// </summary>
     public static JsonTransformer JsonTransformer { get; } = new();
