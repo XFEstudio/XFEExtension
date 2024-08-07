@@ -19,14 +19,12 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-无
+修复CyberComm中的部分问题
+优化网址匹配正则
 
 ## 新增
 
-删除了多个类和文件，更新了项目版本
-
-删除了关于`XFEExtension`的多个类和文件，包括`ProfileExtensionCodeFixProvider.cs`，`ProfileExtensionDiagnostics.cs`，`TodoCommentAnalyzerDiagnostics.cs`，`AutoPathSyntaxReceiver.cs`，`PathPropertyAutoGenerator.cs`等。同时，`README.md`文件中关于`XFEExtension`的`XUnit测试框架`部分也被删除。此外，`XFEExtension.NetCore.csproj`文件的`Version`值已从`2.11.0`更新为`3.0.0`。这些更改可能意味着这些类的功能已经被移除或者被其他方式实现，以及项目版本的升级。
-
+无
 
 ## 严重
 
@@ -35,7 +33,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyOriginatorKeyFile>..\XFEstudio.pfx</AssemblyOriginatorKeyFile>
-    <Version>3.0.0</Version>
+    <Version>3.0.1</Version>
     <Authors>XFEstudio</Authors>
   </PropertyGroup>
 

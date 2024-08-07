@@ -24,7 +24,7 @@ public static partial class StringExtension
     private static partial Regex NumberRegex();
     [GeneratedRegex(@"(^\d{18}$)|(^\d{15}$)")]
     private static partial Regex IdCardRegex();
-    [GeneratedRegex(@"(?:https?|www)\:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z]{2,})+(?:\/[^\s]*)?")]
+    [GeneratedRegex(@"(?:https?\:\/\/|[wW]{3}\.)(?:[a-zA-Z0-9\-]+(?:\.[a-zA-Z]{2,})+|localhost)(\:[0-9]{2,})?(?:\/[^\s]*)?")]
     private static partial Regex UrlRegex();
     #endregion
     /// <summary>

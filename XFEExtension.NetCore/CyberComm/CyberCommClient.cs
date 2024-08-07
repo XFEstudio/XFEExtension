@@ -49,7 +49,7 @@ public class CyberCommClient
     /// <summary>
     /// WebSocket客户端
     /// </summary>
-    public ClientWebSocket? ClientWebSocket { get; private set; }
+    public ClientWebSocket ClientWebSocket { get; set; } = new ClientWebSocket();
     #endregion
     #region 公有方法
     /// <summary>
@@ -59,7 +59,6 @@ public class CyberCommClient
     public async Task StartCyberCommClient()
     {
     StartConnect:
-        ClientWebSocket = new ClientWebSocket();
         reconnectTimes++;
         try
         {
@@ -87,6 +86,7 @@ public class CyberCommClient
                 return;
             }
         }
+        IsConnected = true;
         Connected?.Invoke(this, EventArgs.Empty);
         reconnectTimes = 0;
         while (ClientWebSocket.State == WebSocketState.Open)
