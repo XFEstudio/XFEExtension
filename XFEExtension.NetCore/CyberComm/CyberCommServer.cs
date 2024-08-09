@@ -13,6 +13,10 @@ public class CyberCommServer
     private readonly string[] serverURLs;
     #region 公共属性
     /// <summary>
+    /// 服务器正在运行
+    /// </summary>
+    public bool ServerRunning { get; set; }
+    /// <summary>
     /// 是否自动接收完整消息
     /// </summary>
     public bool AutoReceiveCompletedMessage { get; set; }
@@ -55,8 +59,9 @@ public class CyberCommServer
                 Server.Prefixes.Add(url);
             }
             Server.Start();
+            ServerRunning = true;
             ServerStarted?.Invoke(this, EventArgs.Empty);
-            while (true)
+            while (ServerRunning)
             {
                 var httpListenerContext = await Server.GetContextAsync();
                 var requestURL = httpListenerContext.Request.Url;
@@ -96,6 +101,14 @@ public class CyberCommServer
         {
             throw new XFECyberCommException("启动服务器时发生异常", ex);
         }
+    }
+    /// <summary>
+    /// 停止CyberComm服务器
+    /// </summary>
+    public void StopCyberCommServer()
+    {
+        ServerRunning = false;
+        Server.Close();
     }
     private async void CyberCommClientConnected(Uri? requestURL, WebSocket webSocket, NameValueCollection wsHeader, string clientIP)
     {

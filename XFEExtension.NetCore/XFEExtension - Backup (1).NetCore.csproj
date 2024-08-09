@@ -19,8 +19,8 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-修复分析中的部分bug
-为CyberComm添加终止服务器功能
+修复CyberComm中的部分问题
+优化网址匹配正则
 
 ## 新增
 

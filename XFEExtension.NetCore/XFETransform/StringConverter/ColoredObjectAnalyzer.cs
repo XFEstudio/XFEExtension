@@ -23,17 +23,19 @@ public class ColoredObjectAnalyzer : StringConverter
             }
             else if (objectInfo.ObjectPlace == ObjectPlace.Enum)
             {
-                outPutString += $"{AddObjectPlace(objectInfo)} [color #b5cea8]{XFEConverter.OutPutTypeName(objectInfo.Type!)} [color white]{objectInfo.Name}：[color #d69d85]{objectInfo.Value}[color #569cd6][[color #b5cea8]{(int)objectInfo.Value}[color #569cd6]][color white]\n";
+                string enumValue = "[color red]无法获取[color white]";
+                try { enumValue = ((int)objectInfo.Value).ToString(); } catch { }
+                outPutString += $"{AddObjectPlace(objectInfo)} [color #b5cea8]{XFEConverter.OutPutTypeName(objectInfo.Type!)} [color white]{objectInfo.Name}：[color #d69d85]{objectInfo.Value}[color #569cd6][[color #b5cea8]{enumValue}[color #569cd6]][color white]\n";
             }
             else if (objectInfo.Value is string str && str == string.Empty)
             {
                 outPutString += $"{AddObjectPlace(objectInfo)} [color #569cd6]{XFEConverter.OutPutTypeName(objectInfo.Type!)}[color white] {AddObjectPlaceColor(objectInfo)}{objectInfo.Name}[color white]：[color #569cd6]string[color white].Empty\n";
             }
-            else if(objectInfo.Value is string)
+            else if (objectInfo.Value is string)
             {
                 outPutString += $"{AddObjectPlace(objectInfo)} [color #569cd6]{XFEConverter.OutPutTypeName(objectInfo.Type!)}[color white] {AddObjectPlaceColor(objectInfo)}{objectInfo.Name}[color white]：[color #d69d85]{objectInfo.Value}[color white]\n";
             }
-            else if(objectInfo.Value is float || objectInfo.Value is int || objectInfo.Value is double || objectInfo.Value is long || objectInfo.Value is short || objectInfo.Value is byte || objectInfo.Value is uint || objectInfo.Value is ulong || objectInfo.Value is ushort || objectInfo.Value is decimal)
+            else if (objectInfo.Value is float || objectInfo.Value is int || objectInfo.Value is double || objectInfo.Value is long || objectInfo.Value is short || objectInfo.Value is byte || objectInfo.Value is uint || objectInfo.Value is ulong || objectInfo.Value is ushort || objectInfo.Value is decimal)
             {
                 outPutString += $"{AddObjectPlace(objectInfo)} [color #569cd6]{XFEConverter.OutPutTypeName(objectInfo.Type!)}[color white] {AddObjectPlaceColor(objectInfo)}{objectInfo.Name}[color white]：[color #b5cea8]{objectInfo.Value}[color white]\n";
             }
@@ -46,14 +48,17 @@ public class ColoredObjectAnalyzer : StringConverter
         {
             if (objectInfo.Layer == 0)
             {
-                if(objectInfo.SubObjects == null)
+                if (objectInfo.SubObjects == null)
                 {
-                    outPutString += $"{AddObjectPlace(objectInfo)} [color #4ec9b0]{XFEConverter.OutPutTypeName(objectInfo.Type!)} {AddObjectPlaceColor(objectInfo)}{objectInfo.Name}: [color #569cd6]null[color white]";
+                    if (objectInfo.Value is null)
+                        outPutString += $"{AddObjectPlace(objectInfo)} [color #4ec9b0]{XFEConverter.OutPutTypeName(objectInfo.Type!)} {AddObjectPlaceColor(objectInfo)}{objectInfo.Name}[color white]: [color #569cd6]null[color white]";
+                    else
+                        outPutString += $"{AddObjectPlace(objectInfo)} [color #4ec9b0]{XFEConverter.OutPutTypeName(objectInfo.Type!)} {AddObjectPlaceColor(objectInfo)}{objectInfo.Name}[color white]: {objectInfo.Value}[color white]";
                 }
                 else if (objectInfo.SubObjects?.Count > 0)
                 {
                     outPutString += $"""
-                        {AddObjectPlace(objectInfo)} [color #4ec9b0]{XFEConverter.OutPutTypeName(objectInfo.Type!)} {AddObjectPlaceColor(objectInfo)}{objectInfo.Name}
+                        {AddObjectPlace(objectInfo)} [color #4ec9b0]{XFEConverter.OutPutTypeName(objectInfo.Type!)} {AddObjectPlaceColor(objectInfo)}{objectInfo.Name}[color white]
                         ┌────┬────────────────────────────
                         {OutPutSubObjects(objectInfo.SubObjects)}
                         └─────────────────────────────────
@@ -62,7 +67,7 @@ public class ColoredObjectAnalyzer : StringConverter
                 else
                 {
                     outPutString += $"""
-                        {AddObjectPlace(objectInfo)} [color #4ec9b0]{XFEConverter.OutPutTypeName(objectInfo.Type!)} {AddObjectPlaceColor(objectInfo)}{objectInfo.Name}
+                        {AddObjectPlace(objectInfo)} [color #4ec9b0]{XFEConverter.OutPutTypeName(objectInfo.Type!)} {AddObjectPlaceColor(objectInfo)}{objectInfo.Name}[color white]
                         ┌────┬────────────────────────────
                         │    └─[color #569cd6][无内容][color white]"
                         └─────────────────────────────────
@@ -129,7 +134,7 @@ public class ColoredObjectAnalyzer : StringConverter
                 else
                 {
                     outString += $"""
-                     ├─{AddObjectPlace(obj)} [color #4ec9b0]{XFEConverter.OutPutTypeName(obj.Type!)} {AddObjectPlaceColor(obj)}{obj.Name}
+                     ├─{AddObjectPlace(obj)} [color #4ec9b0]{XFEConverter.OutPutTypeName(obj.Type!)} {AddObjectPlaceColor(obj)}{obj.Name}[color white]
                      {tabString}├────┬────────────────────────────
                      {obj.OutPutObject()}
                      {tabString}{currentConnectString}────────────────────────────────
