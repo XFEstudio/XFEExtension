@@ -52,5 +52,5 @@ public static class JsonStringExtension
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public static string ToJson(this object obj) => XFEConverter.GetObjectInfo(StringConverter.JsonTransformer, string.Empty, ObjectPlace.Main, 0, obj?.GetType(), obj).OutPutObject();
+    public static string ToJson(this object obj) => XFEConverter.GetObjectInfo(StringConverter.JsonTransformer, string.Empty, ObjectPlace.Main, 0, [obj], obj?.GetType(), obj).OutPutObject();
 }

@@ -266,7 +266,7 @@ public static partial class StringExtension
     /// <param name="onlyPublic"></param>
     public static string? X(this object? obj, bool onlyProperty = true, bool onlyPublic = true, string remarkName = "分析对象")
     {
-        var result = XFEConverter.GetObjectInfo(StringConverter.ObjectAnalyzer, remarkName, ObjectPlace.Main, 0, obj?.GetType(), obj, onlyProperty, onlyPublic).OutPutObject();
+        var result = XFEConverter.GetObjectInfo(StringConverter.ObjectAnalyzer, remarkName, ObjectPlace.Main, 0, [obj], obj?.GetType(), obj, onlyProperty, onlyPublic).OutPutObject();
         Console.WriteLine(result);
         return result;
     }
@@ -280,7 +280,7 @@ public static partial class StringExtension
     /// <param name="onlyPublic"></param>
     public static string XL(this object? obj, string remarkName = "分析对象", bool onlyProperty = true, bool onlyPublic = true)
     {
-        var result = XFEConverter.GetObjectInfo(StringConverter.ObjectAnalyzer, remarkName, ObjectPlace.Main, 0, obj?.GetType(), obj, onlyProperty, onlyPublic).OutPutObject();
+        var result = XFEConverter.GetObjectInfo(StringConverter.ObjectAnalyzer, remarkName, ObjectPlace.Main, 0, [obj], obj?.GetType(), obj, onlyProperty, onlyPublic).OutPutObject();
         Trace.WriteLine(result);
         return result;
     }

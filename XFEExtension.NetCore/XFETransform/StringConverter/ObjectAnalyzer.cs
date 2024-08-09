@@ -38,9 +38,12 @@ public class ObjectAnalyzer : StringConverter
         {
             if (objectInfo.Layer == 0)
             {
-                if(objectInfo.SubObjects == null)
+                if (objectInfo.SubObjects == null)
                 {
-                    outPutString += $"{AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}: null";
+                    if (objectInfo.Value is null)
+                        outPutString += $"{AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}: null";
+                    else
+                        outPutString += $"{AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}: {objectInfo.Value}";
                 }
                 else if (objectInfo.SubObjects?.Count > 0)
                 {
