@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="XFEExtension.NetCore.XFEConsole" Version="1.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\XFEExtension.NetCore\XFEExtension.NetCore.csproj" />
   </ItemGroup>
   

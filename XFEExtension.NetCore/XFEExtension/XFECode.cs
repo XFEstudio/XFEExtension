@@ -190,7 +190,21 @@ public abstract class XFECode
                 var isFirstStaticMethod = true;
                 foreach (var method in singleRunMethods)
                 {
-                    var attributes = method.GetCustomAttributes(typeof(SMTestAttribute));
+                    var attributes = method.GetCustomAttributes<SMTestAttribute>();
+                    bool useXFEConsole = false;
+                    int consolePort = 3280;
+                    foreach (var customAttribute in method.CustomAttributes)
+                    {
+                        if (customAttribute is not null && customAttribute.AttributeType.Name == "UseXFEConsoleAttribute")
+                        {
+                            useXFEConsole = true;
+                            foreach (var arg in customAttribute.ConstructorArguments)
+                            {
+                                if (arg.ArgumentType == typeof(int))
+                                    consolePort = (int)arg.Value!;
+                            }
+                        }
+                    }
                     foreach (var likeAttribute in attributes)
                     {
                         if (likeAttribute is SMTestAttribute attribute)
@@ -274,6 +288,18 @@ public abstract class XFECode
                             object? result = null;
                             try
                             {
+                                if (useXFEConsole)
+                                {
+                                    if (Type.GetType("XFEExtension.NetCore.XFEConsole.XFEConsole, XFEExtension.NetCore.XFEConsole") is Type type)
+                                    {
+                                        if (type.GetMethod("UseXFEConsole", BindingFlags.Static | BindingFlags.Public, [typeof(int), typeof(string)]) is MethodInfo useXFEConsoleMethodInfo)
+                                        {
+                                            var connectSuccessful = await (Task<bool>)useXFEConsoleMethodInfo.Invoke(null, [consolePort, ""])!;
+                                            if (!connectSuccessful)
+                                                Console.WriteLine("XFE控制台连接失败！");
+                                        }
+                                    }
+                                }
                                 currentMethodIsAsserted = false;
                                 if (method.ReturnType == typeof(Task))
                                 {
@@ -383,11 +409,18 @@ public abstract class XFECode
                             Console.ResetColor();
                             Console.WriteLine("\n");
                             Console.WriteLine("\n");
+                            if (useXFEConsole)
+                            {
+                                if (Type.GetType("XFEExtension.NetCore.XFEConsole.XFEConsole") is Type type && type.GetMethod("StopXFEConsole", BindingFlags.Static | BindingFlags.Public) is MethodInfo stopXFEConsoleMethodInfo)
+                                {
+                                    await (Task)stopXFEConsoleMethodInfo.Invoke(null, null)!;
+                                }
+                            }
                         }
                     }
                 }
                 #endregion
-                var classAttributes = subClass.GetCustomAttributes(typeof(CTestAttribute));
+                var classAttributes = subClass.GetCustomAttributes<CTestAttribute>();
                 var classRunMethods = subClass.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).Where(m => m.IsDefined(typeof(MTestAttribute)));
                 foreach (var classAttribute in classAttributes.Cast<CTestAttribute>())
                 {
@@ -472,7 +505,21 @@ public abstract class XFECode
                     classTimeCounter.Start();
                     foreach (var method in classRunMethods)
                     {
-                        var attributes = method.GetCustomAttributes(typeof(MTestAttribute));
+                        var attributes = method.GetCustomAttributes<MTestAttribute>();
+                        bool useXFEConsole = false;
+                        int consolePort = 3280;
+                        foreach (var customAttribute in method.CustomAttributes)
+                        {
+                            if (customAttribute is not null && customAttribute.AttributeType.Name == "UseXFEConsoleAttribute")
+                            {
+                                useXFEConsole = true;
+                                foreach (var arg in customAttribute.ConstructorArguments)
+                                {
+                                    if (arg.ArgumentType == typeof(int))
+                                        consolePort = (int)arg.Value!;
+                                }
+                            }
+                        }
                         foreach (MTestAttribute attribute in attributes.Cast<MTestAttribute>())
                         {
                             if (attribute is MTestAttribute methodAttribute)
@@ -557,6 +604,18 @@ public abstract class XFECode
                                 try
                                 {
                                     currentMethodIsAsserted = false;
+                                    if (useXFEConsole)
+                                    {
+                                        if (Type.GetType("XFEExtension.NetCore.XFEConsole.XFEConsole, XFEExtension.NetCore.XFEConsole") is Type type)
+                                        {
+                                            if (type.GetMethod("UseXFEConsole", BindingFlags.Static | BindingFlags.Public, [typeof(int), typeof(string)]) is MethodInfo useXFEConsoleMethodInfo)
+                                            {
+                                                var connectSuccessful = await (Task<bool>)useXFEConsoleMethodInfo.Invoke(null, [consolePort, ""])!;
+                                                if (!connectSuccessful)
+                                                    Console.WriteLine("XFE控制台连接失败！");
+                                            }
+                                        }
+                                    }
                                     if (method.ReturnType == typeof(Task))
                                     {
                                         timeCounter.Start();
@@ -664,6 +723,13 @@ public abstract class XFECode
                                     Console.Write("=");
                                 }
                                 Console.ResetColor();
+                                if (useXFEConsole)
+                                {
+                                    if (Type.GetType("XFEExtension.NetCore.XFEConsole.XFEConsole") is Type type && type.GetMethod("StopXFEConsole", BindingFlags.Static | BindingFlags.Public) is MethodInfo stopXFEConsoleMethodInfo)
+                                    {
+                                        await (Task)stopXFEConsoleMethodInfo.Invoke(null, null)!;
+                                    }
+                                }
                             }
                         }
                     }

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace XFEExtension.NetCore.Test;
+﻿namespace XFEExtension.NetCore.Test;
 
 internal class TestClass(string name, string description, int age)
 {
