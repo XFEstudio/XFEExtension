@@ -49,7 +49,7 @@ public static class ArrayExtension
     /// <returns>T类型的数组</returns>
     public static T[] ToXFEArray<T>(this string str)
     {
-        string[] strings = str.Split(separator, StringSplitOptions.None);
+        string[] strings = str.Split(separator, StringSplitOptions.RemoveEmptyEntries);
         for (int i = 0; i < strings.Length; i++)
         {
             strings[i] = strings[i].Replace("[++", "[+").Replace("++]", "+]");
