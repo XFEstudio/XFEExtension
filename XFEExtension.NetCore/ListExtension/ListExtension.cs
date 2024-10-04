@@ -46,7 +46,7 @@ public static class ListExtension
     /// <returns>T类型的List列表</returns>
     public static List<T> ToXFEList<T>(this string str)
     {
-        string[] strings = str.Split(new string[] { "[+-", "-+]" }, StringSplitOptions.None);
+        string[] strings = str.Split(new string[] { "[+-", "-+]" }, StringSplitOptions.RemoveEmptyEntries);
         List<T> list = new List<T>();
         for (int j = 1; j < strings.Length - 1; j += 2)
         {
