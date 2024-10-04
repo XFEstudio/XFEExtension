@@ -53,7 +53,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <param name="streamMode">是否为流式输出</param>
     public void CreateDialog(string dialogId, string system, bool hasMemory, bool streamMode)
     {
-        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], streamMode, ChatGPTModel.gpt3point5turbo, XFEComProtocol.XFEFAST, hasMemory, 0.7));
+        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], hasMemory, ChatGPTModel.gpt3point5turbo, XFEComProtocol.XFEFAST, streamMode, 0.7));
     }
     /// <summary>
     /// 创建一个新的对话，使用默认通信协议（快速响应通讯协议）
@@ -65,7 +65,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <param name="chatGPTModel">所用的ChatGPT模型</param>
     public void CreateDialog(string dialogId, string system, bool hasMemory, bool streamMode, ChatGPTModel chatGPTModel)
     {
-        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], streamMode, chatGPTModel, XFEComProtocol.XFEFAST, hasMemory, 0.7));
+        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], hasMemory, chatGPTModel, XFEComProtocol.XFEFAST, streamMode, 0.7));
     }
     /// <summary>
     /// 创建一个新的对话，使用默认通信协议（快速响应通讯协议）
@@ -78,7 +78,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <param name="temperature">系统的Temperature</param>
     public void CreateDialog(string dialogId, string system, bool hasMemory, bool streamMode, ChatGPTModel chatGPTModel, double temperature)
     {
-        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], streamMode, chatGPTModel, XFEComProtocol.XFEFAST, hasMemory, temperature));
+        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], hasMemory, chatGPTModel, XFEComProtocol.XFEFAST, streamMode, temperature));
     }
     /// <summary>
     /// 创建一个新的对话，自定义通讯协议
@@ -91,7 +91,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <param name="comProtocol">通信协议</param>
     public void CreateDialog(string dialogId, string system, bool hasMemory, bool streamMode, ChatGPTModel chatGPTModel, XFEComProtocol comProtocol)
     {
-        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], streamMode, chatGPTModel, comProtocol, hasMemory, 0.7));
+        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], hasMemory, chatGPTModel, comProtocol, streamMode, 0.7));
     }
     /// <summary>
     /// 创建一个新的对话，自定义通讯协议
@@ -105,7 +105,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <param name="comProtocol">通信协议</param>
     public void CreateDialog(string dialogId, string system, bool hasMemory, bool streamMode, ChatGPTModel chatGPTModel, double temperature, XFEComProtocol comProtocol)
     {
-        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], streamMode, chatGPTModel, comProtocol, hasMemory, temperature));
+        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], hasMemory, chatGPTModel, comProtocol, streamMode, temperature));
     }
     #endregion
     #region 插入对话
