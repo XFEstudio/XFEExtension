@@ -1,13 +1,39 @@
-﻿using XFEExtension.NetCore.ListExtension;
+﻿using XFEExtension.NetCore.XFEChatGPT;
 
 internal class Program
 {
-    private static void Main(string[] args)
+    public static MemorableXFEChatGPT XFEChatGPT { get; set; } = new MemorableXFEChatGPT();
+    public static string CurrentDialogID { get; set; } = Guid.NewGuid().ToString();
+    private static async Task Main(string[] args)
     {
-        var rumorsString = "[+-RumorEntry { TimeLine = 2022/03/21, Content = 东航MU5735客机坠毁事故发生后，网络上流传多条谣言，包括坠机引发山火的视频不实、假冒失联者家属、篡改预言等。 }-+][+-RumorEntry { TimeLine = 2022/03/23, Content = 知情人称东航失事客机机长是“飞二代”，但关于机长或副驾驶故意坠机的谣言被辟谣。 }-+][+-RumorEntry { TimeLine = 2024/05/14, Content = 博主“摆烂兔兔”发布消息称东航MU742次航班因机长失踪导致延误，实则因天气原因备降金边，东航已辟谣。 }-+][+-RumorEntry { TimeLine = 2024/06/07, Content = 关于东航客机事件的谣言称副驾驶因待遇降级报复乘客，官方辟谣并指出谣言干扰调查工作，呼吁不传谣、不信谣。 }-+][+-RumorEntry { TimeLine = 2024/08/15, Content = 东航客机坠毁后，出现多种谣言，包括虚假的事故现场视频、假冒家属发声以及篡改后的预言等。 }-+]";
-        rumorsString.ToXFEList<RumorsSearcher.Model.RumorEntry>();
+        XFEChatGPT.XFEChatGPTMessageReceived += XFEChatGPT_XFEChatGPTMessageReceived;
+        XFEChatGPT.CreateDialog(CurrentDialogID, "你是一个专门负责整理谣言的人工智能，我会提供给你一些带有时间线的谣言，这其中可能会有很多不相干的信息和没有时间线的信息，你需要自己辨别判断有用信息并将其排序从最早的到最新的日期来排序，除此之外不要说任何多余的内容，格式是：[+-RumorEntry { TimeLine = 2017/2/4, Content = 你整理的第一条谣言内容 }-+][+-RumorEntry { TimeLine = 2019/8/12, Content = 你整理的第二条谣言内容 }-+][+-RumorEntry { TimeLine = 2022/10/4, Content = 你整理的第三条谣言内容 }-+][+-RumorEntry { TimeLine = 2023/1/23, Content = 你整理的第四条谣言内容 }-+]...以此类推", true, true, ChatGPTModel.gpt4o);
+        //await XFEConsole.WriteObject(XFEChatGPT, false, false);
+        //Console.WriteLine(XFEChatGPT);
+        XFEChatGPT.AskChatGPT(CurrentDialogID, Guid.NewGuid().ToString(), "测试谣言");
+        Console.ReadLine();
     }
 
+    private static void XFEChatGPT_XFEChatGPTMessageReceived(object? sender, XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass.MemorableGPTMessageReceivedEventArgs e)
+    {
+        switch (e.GenerateState)
+        {
+            case GenerateState.Start:
+                Console.Write(e.Message);
+                break;
+            case GenerateState.Continue:
+                Console.Write(e.Message);
+                break;
+            case GenerateState.End:
+                Console.WriteLine(e.Message);
+                break;
+            case GenerateState.Error:
+                Console.WriteLine(e.Message);
+                break;
+            default:
+                break;
+        }
+    }
     //[SMTest]
     //[UseXFEConsole]
     //public static async Task TestMethod()
