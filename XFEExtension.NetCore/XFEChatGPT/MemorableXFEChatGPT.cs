@@ -523,9 +523,17 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                 }
                 #endregion
                 #region 读取消息
-                byte[] buffer = new byte[1024];
-                WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);//接收消息
-                string nowReceivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);//将消息转换为字符串
+                byte[] receiveBuffer = new byte[1024];
+                WebSocketReceiveResult receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                var bufferList = new List<byte>();
+                bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
+                while (!receiveResult.EndOfMessage)
+                {
+                    receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                    bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
+                }
+                var receivedBinaryBuffer = bufferList.ToArray();
+                var nowReceivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
                 #endregion
                 if (nowReceivedMessage.Contains("[XFE]"))
                 {

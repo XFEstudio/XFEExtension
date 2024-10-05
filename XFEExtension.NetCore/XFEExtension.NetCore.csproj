@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.0.6</Version>
+    <Version>3.0.7</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
