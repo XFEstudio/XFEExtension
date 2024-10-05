@@ -114,7 +114,6 @@ public class CyberCommClient
                 }
                 if (receiveResult.MessageType == WebSocketMessageType.Binary)
                 {
-
                     MessageReceived?.Invoke(this, new CyberCommClientEventArgsImpl(ClientWebSocket, receivedBinaryBuffer));
                 }
                 if (receiveResult.MessageType == WebSocketMessageType.Close)
