@@ -1,4 +1,4 @@
-﻿namespace XUnitConsole;
+﻿namespace XFEExtension.NetCore.XFETransform.JsonConverter;
 
 /// <summary>
 /// Json复杂节点
