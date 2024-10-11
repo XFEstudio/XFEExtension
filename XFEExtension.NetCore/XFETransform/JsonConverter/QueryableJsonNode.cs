@@ -88,4 +88,9 @@ public class QueryableJsonNode(JsonNode jsonNode) : INodeBase, IQueryableJsonNod
     /// </summary>
     /// <param name="jsonString"></param>
     public static implicit operator QueryableJsonNode(string jsonString) => new(new JsonNodeConverter(jsonString).ConvertToJsonNode());
+    /// <summary>
+    /// 隐式将Json字符串转换为节点值
+    /// </summary>
+    /// <param name="queryableJsonNode"></param>
+    public static implicit operator string(QueryableJsonNode queryableJsonNode) => $"{queryableJsonNode.Value}";
 }

@@ -18,6 +18,45 @@ XFEExtension库适用于各种C#项目，特别适合在需要提高代码可读
 
 ---
 
+## 使用Json自动解析，无需创建Json对象
+
+#### 基础用法
+
+```csharp
+using XFEExtension.NetCore.XFETransform.JsonConverter;
+
+var jsonString = """
+                 {
+                     "status": 500,
+                     "message": "没有找到"
+                 }
+                 """;
+QueryableJsonNode jsonNode = jsonString;
+if(jsonNode["status"] == "500")
+{
+    Console.WriteLine(jsonNode["message"]);
+}
+```
+
+#### 查询并打包
+
+```csharp
+var jsonString = """
+                 {"code":0,"message":"0","data":{"archives":[{"id":0,"text":"这是Json的使用教程文档","trash":"垃圾文本1"},{"id":1,"text":"在这里，你将了解JsonNode的查询方式","trash":"垃圾文本2"},{"id":2,"text":"Hello World！","trash":"垃圾文本3"}]}}
+                 """;
+var jsonNode = (QueryableJsonNode)targetJsonString;
+var packageList = jsonNode["data"]["archives"]["package:list", "id", "text"].PackageInListObject();
+foreach (var node in packageList)
+{
+    Console.WriteLine($"ID：{node.ElementAt(0).Value}\tDocument：{node.ElementAt(1).Value}");
+}
+var packageObject = jsonNode["package:object", "code", "message"].PackageInListObject();
+foreach (var node in packageObject)
+{
+    Console.WriteLine($"PropertyName：{node.Key}\tValue：{node.Value}");
+}
+```
+
 ## 使用LANDeviceDetector来检测本地局域网内的所有设备
 
 #### 基础用法
