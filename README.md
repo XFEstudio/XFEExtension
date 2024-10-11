@@ -48,12 +48,12 @@ var jsonNode = (QueryableJsonNode)targetJsonString;
 var packageList = jsonNode["data"]["archives"]["package:list", "id", "text"].PackageInListObject();
 foreach (var node in packageList)
 {
-    Console.WriteLine($"ID：{node.ElementAt(0).Value}\tDocument：{node.ElementAt(1).Value}");
+    Console.WriteLine($"ID：{node.ElementAt(0).Value.Value}\tDocument：{node.ElementAt(1).Value.Value}");
 }
 var packageObject = jsonNode["package:object", "code", "message"].PackageInListObject();
 foreach (var node in packageObject)
 {
-    Console.WriteLine($"PropertyName：{node.Key}\tValue：{node.Value}");
+    Console.WriteLine($"PropertyName：{node.Key}\tValue：{node.Value.Value}\tValueType：{node.Value.ValueType}");
 }
 ```
 

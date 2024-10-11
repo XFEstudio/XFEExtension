@@ -30,6 +30,11 @@ public class QueryableJsonNode(JsonNode jsonNode) : INodeBase, IQueryableJsonNod
     ///<inheritdoc/>
     public string PropertyName { get => OriginalNode.PropertyName; set => OriginalNode.PropertyName = value; }
     /// <summary>
+    /// 节点值的字符串形式
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString() => $"{Value}";
+    /// <summary>
     /// 获取当前节点值
     /// </summary>
     /// <returns>节点值</returns>
@@ -92,5 +97,5 @@ public class QueryableJsonNode(JsonNode jsonNode) : INodeBase, IQueryableJsonNod
     /// 隐式将Json字符串转换为节点值
     /// </summary>
     /// <param name="queryableJsonNode"></param>
-    public static implicit operator string(QueryableJsonNode queryableJsonNode) => $"{queryableJsonNode.Value}";
+    public static implicit operator string(QueryableJsonNode queryableJsonNode) => queryableJsonNode.ToString();
 }

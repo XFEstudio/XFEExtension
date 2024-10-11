@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.1.1</Version>
+    <Version>3.1.2</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -20,7 +20,7 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-现在可以隐式将Json字符串转换为节点值
+重写可查询节点的ToString方法，简化内插
 
 ## 新增
 
