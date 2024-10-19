@@ -7,22 +7,14 @@ internal class Program
     public static string CurrentDialogID { get; set; } = Guid.NewGuid().ToString();
     private static async Task Main(string[] args)
     {
-        //XFEChatGPT.XFEChatGPTMessageReceived += XFEChatGPT_XFEChatGPTMessageReceived;
-        //XFEChatGPT.CreateDialog(CurrentDialogID, "你是一个专门负责整理谣言的人工智能，我会提供给你一些带有时间线的谣言，这其中可能会有很多不相干的信息和没有时间线的信息，你需要自己辨别判断有用信息并将其排序从最早的到最新的日期来排序，除此之外不要说任何多余的内容，格式是：[+-RumorEntry { TimeLine = 2017/2/4, Content = 你整理的第一条谣言内容 }-+][+-RumorEntry { TimeLine = 2019/8/12, Content = 你整理的第二条谣言内容 }-+][+-RumorEntry { TimeLine = 2022/10/4, Content = 你整理的第三条谣言内容 }-+][+-RumorEntry { TimeLine = 2023/1/23, Content = 你整理的第四条谣言内容 }-+]...以此类推", true, true, ChatGPTModel.gpt4o);
-        ////await XFEConsole.WriteObject(XFEChatGPT, false, false);
-        ////Console.WriteLine(XFEChatGPT);
-        //XFEChatGPT.AskChatGPT(CurrentDialogID, Guid.NewGuid().ToString(), "测试谣言");
-        //Console.ReadLine();
         using var client = new HttpClient();
         client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0");
-        QueryableJsonNode jsonNode = await client.GetStringAsync("https://zy.xywlapi.cc/qqapi?qq=64482927");
-        if (jsonNode["status"] == "500")
+        client.DefaultRequestHeaders.Add("Origin", "https://www.piyao.org.cn");
+        client.DefaultRequestHeaders.Add("Referer", "https://www.piyao.org.cn/");
+        QueryableJsonNode jsonNode = await client.GetStringAsync($"https://so.news.cn/xhtvapp/rumourSearch?title={Uri.EscapeDataString(Console.ReadLine())}&pageNum=1&timeInterval=&startTime=&endTime=&typeName=&pageSize=100&sort=-2&callback=?");
+        foreach (var nodes in jsonNode["content"]["resultList"]["package:list", "title", "thirdCheckTime", "url"].PackageInListObject())
         {
-            Console.WriteLine(jsonNode["message"]);
-        }
-        else
-        {
-            Console.WriteLine("成功");
+            Console.WriteLine($"标题：{nodes["title"].Value}\t发布时间：{nodes["thirdCheckTime"].Value}\t网址：{nodes["url"].Value}");
         }
     }
 

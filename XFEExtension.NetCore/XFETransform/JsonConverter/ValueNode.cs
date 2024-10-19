@@ -11,4 +11,9 @@ public class ValueNode(string value, ValueType valueType) : IValueNode
     public string Value { get; set; } = value;
     ///<inheritdoc/>
     public ValueType ValueType { get; set; } = valueType;
+    /// <summary>
+    /// 字符串值
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString() => Value;
 }

@@ -32,5 +32,9 @@ public enum ValueType
     /// <summary>
     /// 浮点类型
     /// </summary>
-    Float
+    Float,
+    /// <summary>
+    /// 空类型
+    /// </summary>
+    Null
 }
