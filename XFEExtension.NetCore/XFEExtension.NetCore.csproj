@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.1.3</Version>
+    <Version>3.1.4</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -20,8 +20,8 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>## 调整
 
-增加ValueNode的ToString重写方法
-现在Json解析不会被无关的空格换行等任何字符串干扰
+修复了Json解析时，连续出现对象的bug
+现在JsonNode查询可以使用GetChildNodes方法获取枚举列表
 
 ## 新增
 

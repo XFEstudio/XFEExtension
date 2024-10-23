@@ -41,7 +41,7 @@ public class JsonNodeConverter(string jsonString)
                     {
                         currentSymbol = JsonSymbol.Brace;
                         currentState = CurrentState.BeforeProperty;
-                        if (jsonNode.DescendingNodes.Count == 0)
+                        if (jsonNode.DescendingNodes.Count == 0 && lastSymbol != JsonSymbol.Colon)
                             break;
                         currentLayer++;
                         if (currentPosition.Count < currentLayer + 2)
@@ -271,7 +271,7 @@ public class JsonNodeConverter(string jsonString)
             currentPropertyValue = currentPropertyValue.Replace("\"", "");
             return ValueType.Text;
         }
-        else if(currentPropertyValue.Equals("null", StringComparison.CurrentCultureIgnoreCase))
+        else if (currentPropertyValue.Equals("null", StringComparison.CurrentCultureIgnoreCase))
         {
             return ValueType.Null;
         }

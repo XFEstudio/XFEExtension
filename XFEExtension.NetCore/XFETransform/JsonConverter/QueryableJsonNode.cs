@@ -89,6 +89,12 @@ public class QueryableJsonNode(JsonNode jsonNode) : INodeBase, IQueryableJsonNod
     /// <exception cref="NullReferenceException"></exception>
     public Dictionary<string, ValueNode> PackageObject() => InnerValue is Dictionary<string, ValueNode> innerValue ? innerValue : throw new NullReferenceException();
     /// <summary>
+    /// 获取所有子节点
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public IEnumerable<QueryableJsonNode> GetChildNodes() => OriginalNode is JsonComplexPropertyNode jsonComplexPropertyNode ? jsonComplexPropertyNode.DescendingNodes.Select(node => new QueryableJsonNode(node)) : throw new InvalidOperationException("无法将非复杂节点转为节点列表");
+    /// <summary>
     /// 隐式将Json字符串转换为可查询节点
     /// </summary>
     /// <param name="jsonString"></param>

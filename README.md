@@ -45,15 +45,16 @@ var jsonString = """
                  {"code":0,"message":"0","data":{"archives":[{"id":0,"text":"这是Json的使用教程文档","trash":"垃圾文本1"},{"id":1,"text":"在这里，你将了解JsonNode的查询方式","trash":"垃圾文本2"},{"id":2,"text":"Hello World！","trash":"垃圾文本3"}]}}
                  """;
 var jsonNode = (QueryableJsonNode)targetJsonString;
-var packageList = jsonNode["data"]["archives"]["package:list", "id", "text"].PackageInListObject();
+var packageList = jsonNode["data"]["archives"]["package:list", "id", "text"].PackageInListObject();//打包列表
 foreach (var node in packageList)
 {
-    Console.WriteLine($"ID：{node.ElementAt(0).Value.Value}\tDocument：{node.ElementAt(1).Value.Value}");
+    Console.WriteLine($"ID：{node["id"]}\tDocument：{node["text"]}");//直接提取属性
 }
-var packageObject = jsonNode["package:object", "code", "message"].PackageInListObject();
+
+var packageObject = jsonNode["package:object", "code", "message"].PackageInListObject();//打包对象
 foreach (var node in packageObject)
 {
-    Console.WriteLine($"PropertyName：{node.Key}\tValue：{node.Value.Value}\tValueType：{node.Value.ValueType}");
+    Console.WriteLine($"PropertyName：{node.Key}\tValue：{node.Value}\tValueType：{node.Value.ValueType}");//遍历属性
 }
 ```
 

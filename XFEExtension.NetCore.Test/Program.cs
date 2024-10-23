@@ -1,20 +1,25 @@
-﻿using XFEExtension.NetCore.XFEChatGPT;
+﻿using XFEExtension.NetCore.FileExtension;
+using XFEExtension.NetCore.XFEChatGPT;
 using XFEExtension.NetCore.XFETransform.JsonConverter;
 
 internal class Program
 {
     public static MemorableXFEChatGPT XFEChatGPT { get; set; } = new MemorableXFEChatGPT();
     public static string CurrentDialogID { get; set; } = Guid.NewGuid().ToString();
-    private static async Task Main(string[] args)
+    private static void Main(string[] args)
     {
         using var client = new HttpClient();
         client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0");
         client.DefaultRequestHeaders.Add("Origin", "https://www.piyao.org.cn");
         client.DefaultRequestHeaders.Add("Referer", "https://www.piyao.org.cn/");
-        QueryableJsonNode jsonNode = await client.GetStringAsync($"https://so.news.cn/xhtvapp/rumourSearch?title={Uri.EscapeDataString(Console.ReadLine())}&pageNum=1&timeInterval=&startTime=&endTime=&typeName=&pageSize=100&sort=-2&callback=?");
-        foreach (var nodes in jsonNode["content"]["resultList"]["package:list", "title", "thirdCheckTime", "url"].PackageInListObject())
+        QueryableJsonNode jsonNode = @"C:\Users\XFEstudio\Desktop\work\C#\GitHub\XFEstudio\XUnitConsole\XUnitConsole\bin\Debug\net8.0\Json存储.txt".ReadOut()!;
+        //foreach (var node in jsonNode["data"]["package:list","name", "avatar_url_template"].PackageInListObject())
+        //{
+        //    Console.WriteLine($"名称：{node["name"]}\tID：{node["avatar_url_template"]}");
+        //}
+        foreach (var node in jsonNode["data"].GetChildNodes())
         {
-            Console.WriteLine($"标题：{nodes["title"].Value}\t发布时间：{nodes["thirdCheckTime"].Value}\t网址：{nodes["url"].Value}");
+            Console.WriteLine($"名称：{node["name"]}");
         }
     }
 
