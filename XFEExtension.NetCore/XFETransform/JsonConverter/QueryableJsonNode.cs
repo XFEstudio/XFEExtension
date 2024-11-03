@@ -15,7 +15,7 @@ public class QueryableJsonNode(JsonNode jsonNode) : INodeBase, IQueryableJsonNod
     /// <summary>
     /// 节点值
     /// </summary>
-    public object? Value { get => GetValue(); }
+    public string Value { get => $"{(OriginalNode is IValueNode valueNode ? valueNode.Value : string.Empty)}"; }
     internal object? InnerValue { get; set; }
     /// <summary>
     /// 节点列表
@@ -33,7 +33,7 @@ public class QueryableJsonNode(JsonNode jsonNode) : INodeBase, IQueryableJsonNod
     /// 节点值的字符串形式
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"{Value}";
+    public override string ToString() => Value;
     /// <summary>
     /// 获取当前节点值
     /// </summary>
@@ -62,7 +62,7 @@ public class QueryableJsonNode(JsonNode jsonNode) : INodeBase, IQueryableJsonNod
     /// </summary>
     /// <typeparam name="T">目标类型</typeparam>
     /// <returns></returns>
-    public T GetValue<T>() => (T)Value!;
+    public T GetValue<T>() => (T)GetValue()!;
     /// <summary>
     /// 获取列表
     /// </summary>
