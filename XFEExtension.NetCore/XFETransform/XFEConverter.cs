@@ -17,7 +17,7 @@ public class XFEConverter
     /// <returns></returns>
     public static bool IsBasicType(Type type)
     {
-        return type == typeof(string) || type == typeof(int) || type == typeof(double) || type == typeof(float) || type == typeof(decimal) || type == typeof(long) || type == typeof(short) || type == typeof(byte) || type == typeof(bool) || type == typeof(char) || type == typeof(nint) || type == typeof(uint) || type == typeof(ulong) || type == typeof(ushort) || type == typeof(sbyte) || type == typeof(DateTime);
+        return type == typeof(string) || type == typeof(int) || type == typeof(double) || type == typeof(float) || type == typeof(decimal) || type == typeof(long) || type == typeof(short) || type == typeof(byte) || type == typeof(bool) || type == typeof(char) || type == typeof(nint) || type == typeof(uint) || type == typeof(ulong) || type == typeof(ushort) || type == typeof(sbyte) || type == typeof(DateTime) || type == typeof(TimeSpan);
     }
 
     /// <summary>
@@ -99,14 +99,9 @@ public class XFEConverter
                 return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, type, true, value);
             else
             {
-
                 if (type.IsAssignableTo(typeof(Enum)))
                 {
                     return new ObjectInfoImpl(stringConverter, name, ObjectPlace.Enum, layer, type, false, value);
-                }
-                else if (type.IsValueType)
-                {
-                    return new ObjectInfoImpl(stringConverter, name, objectPlace, layer, type, false, value);
                 }
                 else if (value is Exception exception)
                 {
