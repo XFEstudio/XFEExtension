@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.1.6</Version>
+    <Version>3.2.0</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -18,17 +18,19 @@
     <Description>XFEExtension提供，免费ChatGPTAPI接口，快速搭建服务器/客户端，免费通讯服务器，XFE下载器，新增格式等</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
-    <PackageReleaseNotes>## 调整
+    <PackageReleaseNotes>
+      ## 调整
 
-对象解析现在不会对ValueType进行误处理
+      无
 
-## 新增
+      ## 新增
 
-无
+      新增流程控制语句，现在，你可以通过抛出StopAction异常来执行方法并抛出异常，从而穿插在代码中
 
-## 严重
+      ## 严重
 
-无</PackageReleaseNotes>
+      无
+    </PackageReleaseNotes>
     <NeutralLanguage>zh-CN</NeutralLanguage>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
