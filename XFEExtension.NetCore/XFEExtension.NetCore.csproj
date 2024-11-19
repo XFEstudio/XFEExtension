@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.2.0</Version>
+    <Version>3.2.1</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -21,11 +21,11 @@
     <PackageReleaseNotes>
       ## 调整
 
-      无
+      XFEConverter：ObjectInfo中，添加原始的PropertyInfo和FieldInfo信息以及Parent对象
 
       ## 新增
 
-      新增流程控制语句，现在，你可以通过抛出StopAction异常来执行方法并抛出异常，从而穿插在代码中
+      无
 
       ## 严重
 

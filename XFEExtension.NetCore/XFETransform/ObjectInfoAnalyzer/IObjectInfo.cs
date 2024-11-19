@@ -1,4 +1,5 @@
-﻿using XFEExtension.NetCore.XFETransform.StringConverter;
+﻿using System.Reflection;
+using XFEExtension.NetCore.XFETransform.StringConverter;
 
 namespace XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
 
@@ -32,6 +33,14 @@ public interface IObjectInfo
     /// </summary>
     Type? Type { get; init; }
     /// <summary>
+    /// 字段信息
+    /// </summary>
+    FieldInfo? FieldInfo { get; init; }
+    /// <summary>
+    /// 属性信息
+    /// </summary>
+    PropertyInfo? PropertyInfo { get; init; }
+    /// <summary>
     /// 对象值
     /// </summary>
     object? Value { get; init; }
@@ -39,6 +48,10 @@ public interface IObjectInfo
     /// 对象位置
     /// </summary>
     ObjectPlace ObjectPlace { get; init; }
+    /// <summary>
+    /// 父对象信息
+    /// </summary>
+    IObjectInfo? Parent { get; set; }
     /// <summary>
     /// 对象层级
     /// </summary>
