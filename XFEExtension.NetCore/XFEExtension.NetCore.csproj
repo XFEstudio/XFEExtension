@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.2.1</Version>
+    <Version>3.2.2</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -21,7 +21,7 @@
     <PackageReleaseNotes>
       ## 调整
 
-      XFEConverter：ObjectInfo中，添加原始的PropertyInfo和FieldInfo信息以及Parent对象
+      修复：现在string扩展方法中的IsNullOrEmpty和IsNullOrWhiteSpace现在允许传入可为null的string对象
 
       ## 新增
 
