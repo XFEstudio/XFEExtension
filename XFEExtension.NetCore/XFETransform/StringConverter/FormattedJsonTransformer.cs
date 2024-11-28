@@ -4,9 +4,9 @@ using XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
 namespace XFEExtension.NetCore.XFETransform.StringConverter;
 
 /// <summary>
-/// Json转换器
+/// 格式化Json转换器
 /// </summary>
-public class JsonTransformer : StringConverter
+public class FormattedJsonTransformer : StringConverter
 {
     /// <summary>
     /// 输出Json对象信息
@@ -16,33 +16,38 @@ public class JsonTransformer : StringConverter
     public override string OutPutObject(IObjectInfo objectInfo)
     {
         var outPutString = string.Empty;
+        var tabString = string.Empty;
+        for (int k = 0; k < objectInfo.Layer; k++)
+        {
+            tabString += " ";
+        }
         if (objectInfo.IsBasicType || objectInfo.ObjectPlace == ObjectPlace.Enum)
         {
             if (IsEnumerableMember(objectInfo))
             {
                 if (objectInfo.Value is null)
-                    outPutString += "null";
+                    outPutString += $"{tabString}null";
                 else if (objectInfo.Value is string)
-                    outPutString += $"\"{objectInfo.Value}\"";
+                    outPutString += $"{tabString}\"{objectInfo.Value}\"";
                 else if (objectInfo.ObjectPlace == ObjectPlace.Enum)
-                    outPutString += $"{(int)objectInfo.Value}";
+                    outPutString += $"{tabString}{(int)objectInfo.Value}";
                 else if (objectInfo.Value is bool)
-                    outPutString += $"{objectInfo.Value.ToString()?.ToLower()}";
+                    outPutString += $"{tabString}{objectInfo.Value.ToString()?.ToLower()}";
                 else
-                    outPutString += $"\"{objectInfo.Value}\"";
+                    outPutString += $"{tabString}\"{objectInfo.Value}\"";
             }
             else
             {
                 if (objectInfo.Value is null)
-                    outPutString += $"\"{objectInfo.Name}\":null";
+                    outPutString += $"{tabString}\"{objectInfo.Name}\": null";
                 else if (objectInfo.Value is string)
-                    outPutString += $"\"{objectInfo.Name}\":\"{objectInfo.Value}\"";
+                    outPutString += $"{tabString}\"{objectInfo.Name}\": \"{objectInfo.Value}\"";
                 else if (objectInfo.ObjectPlace == ObjectPlace.Enum)
-                    outPutString += $"\"{objectInfo.Name}\":{(int)objectInfo.Value}";
+                    outPutString += $"{tabString}\"{objectInfo.Name}\": {(int)objectInfo.Value}";
                 else if (objectInfo.Value is bool)
-                    outPutString += $"\"{objectInfo.Name}\":{objectInfo.Value.ToString()?.ToLower()}";
+                    outPutString += $"{tabString}\"{objectInfo.Name}\": {objectInfo.Value.ToString()?.ToLower()}";
                 else
-                    outPutString += $"\"{objectInfo.Name}\":\"{objectInfo.Value}\"";
+                    outPutString += $"{tabString}\"{objectInfo.Name}\": \"{objectInfo.Value}\"";
             }
         }
         else
@@ -52,13 +57,15 @@ public class JsonTransformer : StringConverter
                 if (objectInfo.IsArray)
                 {
                     outPutString += objectInfo.SubObjects is not null ? $$"""
-                    [{{OutPutSubObjects(objectInfo.SubObjects)}}]
+                    [{{OutPutSubObjects(objectInfo.SubObjects)}}
+                    ]
                     """ : "null";
                 }
                 else
                 {
                     outPutString += objectInfo.SubObjects is not null ? $$"""
-                    {{{OutPutSubObjects(objectInfo.SubObjects)}}}
+                    {{{OutPutSubObjects(objectInfo.SubObjects)}}
+                    }
                     """ : "null";
                 }
             }
@@ -81,6 +88,12 @@ public class JsonTransformer : StringConverter
         for (int i = 0; i < subObjects.Count; i++)
         {
             var obj = subObjects[i];
+            var tabString = string.Empty;
+            for (int k = 0; k < obj.Layer; k++)
+            {
+                tabString += " ";
+            }
+            outString += "\n" + tabString;
             string? currentConnectString;
             if (i == subObjects.Count - 1)
             {
@@ -99,20 +112,24 @@ public class JsonTransformer : StringConverter
             {
                 if (IsEnumerableClassMember(obj))
                     outString += obj.Value is not null ? $$"""
-                     "{{obj.Name}}": [{{OutPutObject(obj)}}]{{currentConnectString}}
+                     {{tabString}}"{{obj.Name}}": [{{OutPutObject(obj)}}
+                      {{tabString}}]{{currentConnectString}}
                      """ : "null";
                 else if (IsEnumerableMember(obj))
                     if (obj.Value is not null && (obj.Type!.IsAssignableTo(typeof(IEnumerable)) || obj.Type.IsAssignableTo(typeof(Array))))
                         outString += obj.Value is not null ? $$"""
-                     [{{OutPutObject(obj)}}]{{currentConnectString}}
+                     {{tabString}}[{{OutPutObject(obj)}}
+                       {{tabString}}]{{currentConnectString}}
                      """ : "null";
                     else
                         outString += obj.Value is not null ? $$"""
-                     {{{OutPutObject(obj)}}}{{currentConnectString}}
+                     {{tabString}}{{{OutPutObject(obj)}}
+                       {{tabString}}}{{currentConnectString}}
                      """ : "null";
                 else
                     outString += obj.Value is not null ? $$"""
-                     "{{obj.Name}}": {{{OutPutObject(obj)}}}{{currentConnectString}}
+                     {{tabString}}"{{obj.Name}}": {{{tabString}}{{OutPutObject(obj)}}
+                      {{tabString}}}{{currentConnectString}}
                      """ : "null";
             }
         }

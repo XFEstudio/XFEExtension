@@ -1,4 +1,6 @@
-﻿using XFEExtension.NetCore.XFEChatGPT;
+﻿using PDDShopManagementSystem.AdminTool.Model;
+using XFEExtension.NetCore.StringExtension.Json;
+using XFEExtension.NetCore.XFEChatGPT;
 
 internal class Program
 {
@@ -11,6 +13,26 @@ internal class Program
         //client.DefaultRequestHeaders.Add("Origin", "https://www.piyao.org.cn");
         //client.DefaultRequestHeaders.Add("Referer", "https://www.piyao.org.cn/");
         //QueryableJsonNode jsonNode = @"C:\Users\XFEstudio\Desktop\新建 文本文档.txt".ReadOut()!;
+        var list = new List<UserInfo>();
+        list.Add(new()
+        {
+            ShopID = "cece",
+            RecentShopName = "cececececec",
+            EndDateTime = DateTime.Now,
+            SessionID = Guid.NewGuid().ToString(),
+            CurrentIpAddress = "127.0.0.1",
+            Banned = false
+        });
+        list.Add(new()
+        {
+            ShopID = "cecead11",
+            RecentShopName = "adadwdawd",
+            EndDateTime = DateTime.Now,
+            SessionID = Guid.NewGuid().ToString(),
+            CurrentIpAddress = "127.0.0.1",
+            Banned = false
+        });
+        Console.WriteLine(list.ToJson(true));
     }
 
     private static void XFEChatGPT_XFEChatGPTMessageReceived(object? sender, XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass.MemorableGPTMessageReceivedEventArgs e)

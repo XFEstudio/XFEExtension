@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.2.3</Version>
+    <Version>3.2.4</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -21,12 +21,12 @@
     <PackageReleaseNotes>
       ## 调整
 
-      修复：现在string扩展方法中的IsNullOrEmpty和IsNullOrWhiteSpace可以正常判断null是否为空
-      修复：JsonTransformer的现在可以正常处理第一级为数组的情况
+      修复：JsonTransformer的现在可以正常处理结构类
+      调整：ToJson方法新增一个布尔值参数，指定是否使用格式化的Json转换器
 
       ## 新增
 
-      无
+      添加：新增标准化的JsonTransformer，旧的JsonTransformer现在迁移至：FormattedJsonTransformer
 
       ## 严重
 

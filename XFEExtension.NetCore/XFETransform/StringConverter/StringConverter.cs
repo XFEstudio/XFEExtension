@@ -20,6 +20,10 @@ public abstract class StringConverter : IStringConverter
     /// </summary>
     public static JsonTransformer JsonTransformer { get; } = new();
     /// <summary>
+    /// 格式化Json转换注入
+    /// </summary>
+    public static FormattedJsonTransformer FormattedJsonTransformer { get; } = new();
+    /// <summary>
     /// 输出对象信息
     /// </summary>
     /// <param name="objectInfo"></param>

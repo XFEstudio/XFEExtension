@@ -50,7 +50,8 @@ public static class JsonStringExtension
     /// <summary>
     /// 转化为Json字符串文本
     /// </summary>
-    /// <param name="obj"></param>
+    /// <param name="obj">待转换对象</param>
+    /// <param name="formatted">格式化Json（自动换行和空格对齐）</param>
     /// <returns></returns>
-    public static string ToJson(this object obj) => XFEConverter.GetObjectInfo(StringConverter.JsonTransformer, string.Empty, ObjectPlace.Main, 0, [obj], obj?.GetType(), obj).OutPutObject();
+    public static string ToJson(this object obj, bool formatted = false) => XFEConverter.GetObjectInfo(formatted ? StringConverter.FormattedJsonTransformer : StringConverter.JsonTransformer, string.Empty, ObjectPlace.Main, 0, [obj], obj?.GetType(), obj).OutPutObject();
 }
