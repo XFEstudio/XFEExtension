@@ -1,9 +1,4 @@
-﻿using XFEExtension.NetCore.StringExtension;
-using XFEExtension.NetCore.Test;
-using XFEExtension.NetCore.XFEChatGPT;
-using XFEExtension.NetCore.XFETransform;
-using XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
-using XFEExtension.NetCore.XFETransform.StringConverter;
+﻿using XFEExtension.NetCore.XFEChatGPT;
 
 internal class Program
 {
@@ -16,32 +11,6 @@ internal class Program
         //client.DefaultRequestHeaders.Add("Origin", "https://www.piyao.org.cn");
         //client.DefaultRequestHeaders.Add("Referer", "https://www.piyao.org.cn/");
         //QueryableJsonNode jsonNode = @"C:\Users\XFEstudio\Desktop\新建 文本文档.txt".ReadOut()!;
-        var dictionary = new Dictionary<string, string>
-        {
-            { "测试1", "测测" },
-            { "测试2", "测测" },
-            { "测试3", "测测" },
-            { "测试4", "测测" }
-        }.X();
-        var testClass = new TestClass("张三", "测试秒睡", 14)
-        {
-            Enum = MyEnum.Test1,
-            OS = 1,
-            MyProperty = true,
-            Tags = [["测试1", "ce"], ["ce2", "ce3"]],
-            SubClass = new()
-            {
-                InnerClass = new()
-                {
-                    Name = "李四",
-                    Description = "李四的描述"
-                }
-            }
-        };
-        var result = XFEConverter.GetObjectInfo(StringConverter.ObjectAnalyzer, "分析对象", ObjectPlace.Main, 0, [testClass], testClass.GetType(), testClass, false, true, false);
-        var targetField = result.SubObjects[9].SubObjects[0].SubObjects[0];
-        targetField.FieldInfo.SetValue(targetField.Parent.Value, "王五");
-        Console.WriteLine(result.OutPutObject());
     }
 
     private static void XFEChatGPT_XFEChatGPTMessageReceived(object? sender, XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass.MemorableGPTMessageReceivedEventArgs e)

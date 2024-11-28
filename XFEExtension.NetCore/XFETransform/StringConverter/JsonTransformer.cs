@@ -54,10 +54,20 @@ public class JsonTransformer : StringConverter
         {
             if (objectInfo.Layer == 0)
             {
-                outPutString += objectInfo.SubObjects is not null ? $$"""
+                if (objectInfo.IsArray)
+                {
+                    outPutString += objectInfo.SubObjects is not null ? $$"""
+                    [{{OutPutSubObjects(objectInfo.SubObjects)}}
+                    ]
+                    """ : "null";
+                }
+                else
+                {
+                    outPutString += objectInfo.SubObjects is not null ? $$"""
                     {{{OutPutSubObjects(objectInfo.SubObjects)}}
                     }
                     """ : "null";
+                }
             }
             else
             {

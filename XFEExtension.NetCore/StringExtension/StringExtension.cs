@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -78,14 +79,14 @@ public static partial class StringExtension
     /// </summary>
     /// <param name="str"></param>
     /// <returns></returns>
-    public static bool IsNullOrEmpty(this string? str) => string.IsNullOrEmpty(str);
+    public static bool IsNullOrEmpty([NotNullWhen(false)] this string? str) => string.IsNullOrEmpty(str);
 
     /// <summary>
     /// 判断字符串是否是 null 、空字符串和仅包含空格的字符串
     /// </summary>
     /// <param name="str"></param>
     /// <returns></returns>
-    public static bool IsNullOrWhiteSpace(this string? str) => string.IsNullOrWhiteSpace(str);
+    public static bool IsNullOrWhiteSpace([NotNullWhen(false)] this string? str) => string.IsNullOrWhiteSpace(str);
 
     /// <summary>
     /// 判断字符串是否为邮箱地址
