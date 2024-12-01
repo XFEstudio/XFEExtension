@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.2.4</Version>
+    <Version>3.2.5</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -21,12 +21,11 @@
     <PackageReleaseNotes>
       ## 调整
 
-      修复：JsonTransformer的现在可以正常处理结构类
-      调整：ToJson方法新增一个布尔值参数，指定是否使用格式化的Json转换器
+      调整：现在EscapeConverter能够胜任更多的任务了，功能更加直接，旧版已迁移至MultiEscapeConverter
 
       ## 新增
 
-      添加：新增标准化的JsonTransformer，旧的JsonTransformer现在迁移至：FormattedJsonTransformer
+      无
 
       ## 严重
 

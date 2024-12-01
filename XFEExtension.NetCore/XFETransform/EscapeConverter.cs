@@ -3,16 +3,28 @@
 /// <summary>
 /// 转义器
 /// </summary>
-public class EscapeConverter
+/// <param name="escape">待转义字符</param>
+/// <param name="startEscapeSymbol">起始转义用符号</param>
+/// <param name="repeatEscapeSymbol">重复转义字符</param>
+/// <param name="endEscapeSymbol">结束转义用符号</param>
+public class EscapeConverter(string escape, string startEscapeSymbol, string repeatEscapeSymbol, string endEscapeSymbol)
 {
     /// <summary>
-    /// 转义用符号
+    /// 起始转义符号
     /// </summary>
-    public string EscapeSymbol { get; set; } = "/";
+    public string StartEscapeSymbol { get; set; } = startEscapeSymbol;
+    /// <summary>
+    /// 重复转义符号
+    /// </summary>
+    public string RepeatEscapeSymbol { get; set; } = repeatEscapeSymbol;
+    /// <summary>
+    /// 结束转义符号
+    /// </summary>
+    public string EndEscapeSymbol { get; set; } = endEscapeSymbol;
     /// <summary>
     /// 待转义的符号
     /// </summary>
-    public string[] Escapes { get; set; }
+    public string Escape { get; set; } = escape;
     /// <summary>
     /// 转义（生成转义后文本）
     /// </summary>
@@ -21,10 +33,7 @@ public class EscapeConverter
     public string Convert(string str)
     {
         str = ConvertEscapeSymbol(str);
-        foreach (string escape in Escapes)
-        {
-            str = str.Replace(escape, $"{EscapeSymbol}{escape}");
-        }
+        str = str.Replace(Escape, $"{StartEscapeSymbol}{RepeatEscapeSymbol}{EndEscapeSymbol}");
         return str;
     }
     /// <summary>
@@ -34,31 +43,10 @@ public class EscapeConverter
     /// <returns></returns>
     public string Inverse(string str)
     {
-        foreach (string escape in Escapes)
-        {
-            str = str.Replace($"{EscapeSymbol}{escape}", escape);
-        }
+        str = str.Replace($"{StartEscapeSymbol}{RepeatEscapeSymbol}{EndEscapeSymbol}", Escape);
         str = InverseEscapeSymbol(str);
         return str;
     }
-    private string ConvertEscapeSymbol(string str) => str.Replace(EscapeSymbol, $"{EscapeSymbol}{EscapeSymbol}");
-    private string InverseEscapeSymbol(string str) => str.Replace($"{EscapeSymbol}{EscapeSymbol}", EscapeSymbol);
-    /// <summary>
-    /// 转义器
-    /// </summary>
-    /// <param name="escapes">待转义字符</param>
-    public EscapeConverter(params string[] escapes)
-    {
-        Escapes = escapes;
-    }
-    /// <summary>
-    /// 转义器
-    /// </summary>
-    /// <param name="escapeSymbol">转义用符号</param>
-    /// <param name="escapes">待转义字符</param>
-    public EscapeConverter(string escapeSymbol, params string[] escapes)
-    {
-        EscapeSymbol = escapeSymbol;
-        Escapes = escapes;
-    }
+    private string ConvertEscapeSymbol(string str) => str.Replace($"{StartEscapeSymbol}{RepeatEscapeSymbol}", $"{StartEscapeSymbol}{RepeatEscapeSymbol}{RepeatEscapeSymbol}");
+    private string InverseEscapeSymbol(string str) => str.Replace($"{StartEscapeSymbol}{RepeatEscapeSymbol}{RepeatEscapeSymbol}", $"{StartEscapeSymbol}{RepeatEscapeSymbol}");
 }
