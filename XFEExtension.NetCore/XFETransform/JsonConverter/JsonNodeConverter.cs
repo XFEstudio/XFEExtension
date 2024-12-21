@@ -233,6 +233,7 @@ public class JsonNodeConverter(string jsonString)
     }
     private static bool IsNormalValueExceptString(char current) => current switch
     {
+        '-' => true,
         '0' => true,
         '1' => true,
         '2' => true,
