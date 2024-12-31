@@ -343,7 +343,10 @@ public abstract class XFECode
                             catch (Exception e)
                             {
                                 isSuccessful = false;
-                                failedMessage = e.Message;
+                                if (e.InnerException is not null)
+                                    failedMessage = e.InnerException.Message;
+                                else
+                                    failedMessage = e.Message;
                             }
                             elapsedTime = timeCounter.Elapsed - selfTimeCounter.Elapsed;
                             cTimeCounter++;
@@ -658,7 +661,10 @@ public abstract class XFECode
                                 catch (Exception e)
                                 {
                                     isSuccessful = false;
-                                    failedMessage = e.Message;
+                                    if (e.InnerException is not null)
+                                        failedMessage = e.InnerException.Message;
+                                    else
+                                        failedMessage = e.Message;
                                 }
                                 elapsedTime = timeCounter.Elapsed - selfTimeCounter.Elapsed;
                                 cTimeCounter++;

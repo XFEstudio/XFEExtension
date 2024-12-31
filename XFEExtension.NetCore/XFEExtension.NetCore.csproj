@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.2.6</Version>
+    <Version>3.2.7</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -21,7 +21,7 @@
     <PackageReleaseNotes>
       ## 调整
 
-      调整：修复Json解析不带负号的问题
+      修复了XFECode和单元测试中不会报出内部异常的问题
 
       ## 新增
 
