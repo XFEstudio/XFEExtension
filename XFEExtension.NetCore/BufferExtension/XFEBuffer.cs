@@ -156,18 +156,19 @@ public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
     {
         return [.. bufferDictionary.Keys];
     }
-
     /// <summary>
     /// 获取枚举器
     /// </summary>
     /// <returns></returns>
-    public IEnumerator GetEnumerator() => ((IEnumerable)bufferDictionary).GetEnumerator();
+    public IEnumerator<KeyValuePair<string, byte[]>> GetEnumerator()
+    {
+        return bufferDictionary.GetEnumerator();
+    }
 
-    /// <summary>
-    /// 获取枚举器
-    /// </summary>
-    /// <returns></returns>
-    IEnumerator<KeyValuePair<string, byte[]>> IEnumerable<KeyValuePair<string, byte[]>>.GetEnumerator() => ((IEnumerable<KeyValuePair<string, byte[]>>)bufferDictionary).GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return ((IEnumerable)bufferDictionary).GetEnumerator();
+    }
 
     /// <summary>
     /// XFE的二进制数组协议
