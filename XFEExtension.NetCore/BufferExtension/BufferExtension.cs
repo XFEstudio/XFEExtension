@@ -86,7 +86,7 @@ public static class BufferExtension
         }
         if (buffer is null || buffer.LongLength == 0)
         {
-            throw new ArgumentException("Input buffer cannot be null or empty.");
+            return [];
         }
         List<byte> result = [];
         for (long i = 0; i <= buffer.LongLength - originBuffer.LongLength; i++)
