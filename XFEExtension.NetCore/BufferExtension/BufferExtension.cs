@@ -112,7 +112,8 @@ public static class BufferExtension
         }
         for (long i = buffer.LongLength - originBuffer.LongLength + 1; i < buffer.LongLength; i++)
         {
-            result.Add(buffer[i]);
+            if (i >= 0)
+                result.Add(buffer[i]);
         }
         return [.. result];
     }

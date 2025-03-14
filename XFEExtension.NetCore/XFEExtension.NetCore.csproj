@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.2.9</Version>
+    <Version>3.3.0</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -20,8 +20,15 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>
       ## 调整
-
-      优化了XFEBuffer的枚举器实现方式
+      
+      重构文件打包功能并更新版本号
+      
+      - 修复 `BufferExtension.cs` 中的数组越界问题。
+      - 更新 `XFEExtension.NetCore.csproj` 的版本号至 `3.3.0`。
+      - 新增 `XFEPackage` 类，提供文件打包和解包的逻辑。
+      - 新增抽象基类 `XFEPackageBase`，定义文件和目录的基本属性。
+      - 新增 `XFEPackagedDirectory` 类，表示打包目录及其文件和子目录。
+      - 新增 `XFEPackagedFile` 类，表示打包文件及其数据。
 
       ## 新增
 
