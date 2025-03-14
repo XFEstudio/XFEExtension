@@ -1,11 +1,12 @@
-﻿using System.Text;
+﻿using System.Collections;
+using System.Text;
 
 namespace XFEExtension.NetCore.BufferExtension;
 
 /// <summary>
 /// XFE的二进制数组协议
 /// </summary>
-public class XFEBuffer
+public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
 {
     private readonly Dictionary<string, byte[]> bufferDictionary = [];
     private readonly List<byte[]> headerBuffers = [];
@@ -155,6 +156,19 @@ public class XFEBuffer
     {
         return [.. bufferDictionary.Keys];
     }
+
+    /// <summary>
+    /// 获取枚举器
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerator GetEnumerator() => ((IEnumerable)bufferDictionary).GetEnumerator();
+
+    /// <summary>
+    /// 获取枚举器
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator<KeyValuePair<string, byte[]>> IEnumerable<KeyValuePair<string, byte[]>>.GetEnumerator() => ((IEnumerable<KeyValuePair<string, byte[]>>)bufferDictionary).GetEnumerator();
+
     /// <summary>
     /// XFE的二进制数组协议
     /// </summary>

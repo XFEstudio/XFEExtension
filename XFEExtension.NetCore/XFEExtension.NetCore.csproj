@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.2.7</Version>
+    <Version>3.2.8</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -21,7 +21,11 @@
     <PackageReleaseNotes>
       ## 调整
 
-      修复了XFECode和单元测试中不会报出内部异常的问题
+      优化 XFEBuffer 类并更新版本号至 3.2.8
+
+在 `XFEBuffer.cs` 中实现了 `IEnumerable&lt;KeyValuePair&lt;string, byte[]&gt;&gt;` 接口，增强了枚举功能，新增获取枚举器的方法，并调整了 `GetHeaders` 方法的返回值。
+
+在 `XFEExtension.NetCore.csproj` 中更新版本号，并在发布说明中添加了对 `XFEBuffer` 中枚举器获取方式的优化说明。
 
       ## 新增
 
