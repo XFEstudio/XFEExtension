@@ -78,8 +78,11 @@ public class JsonNodeConverter(string jsonString)
                             else
                                 Console.WriteLine($"设置复杂Json节点失败：{currentLayer}\t{currentPropertyName}\t{currentPropertyValue}");
                         }
-                        currentPosition.RemoveAt(currentPosition.Count - 1);
-                        currentLayer--;
+                        if (currentPosition.Count > 0)
+                        {
+                            currentPosition.RemoveAt(currentPosition.Count - 1);
+                            currentLayer--;
+                        }
                         currentPropertyName = "";
                         currentPropertyValue = "";
                     }
@@ -151,7 +154,8 @@ public class JsonNodeConverter(string jsonString)
                     if ((currentState != CurrentState.Property && currentState != CurrentState.StringPropertyValue) || currentState == CurrentState.AfterPropertyValue || currentState == CurrentState.AfterProperty)
                     {
                         currentSymbol = JsonSymbol.Comma;
-                        currentPosition[currentLayer + 1] += 1;
+                        if (currentLayer >= -1)
+                            currentPosition[currentLayer + 1] += 1;
                         if (currentState != CurrentState.ListValue)
                             currentState = CurrentState.BeforeProperty;
                         if (lastSymbol == JsonSymbol.Text || lastSymbol == JsonSymbol.DoubleQuotationMark)
@@ -201,23 +205,26 @@ public class JsonNodeConverter(string jsonString)
                     currentState = CurrentState.None;
                     break;
                 default:
-                    currentSymbol = JsonSymbol.Text;
                     switch (currentState)
                     {
                         case CurrentState.Property:
                             currentPropertyName += current;
+                            currentSymbol = JsonSymbol.Text;
                             break;
                         case CurrentState.PropertyValue or CurrentState.StringPropertyValue:
                             currentPropertyValue += current;
+                            currentSymbol = JsonSymbol.Text;
                             break;
                         case CurrentState.ListValue:
                             currentPropertyValue += current;
+                            currentSymbol = JsonSymbol.Text;
                             break;
                         case CurrentState.BeforePropertyValue:
                             if (IsNormalValueExceptString(current))
                             {
                                 currentPropertyValue += current;
                                 currentState = CurrentState.PropertyValue;
+                                currentSymbol = JsonSymbol.Text;
                             }
                             break;
                         case CurrentState.None:

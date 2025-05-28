@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.3.1</Version>
+    <Version>3.3.2</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -21,9 +21,9 @@
     <PackageReleaseNotes>
       ## 调整
 
-      简化输入缓冲区处理并更新版本号
+      更新引用并优化 JSON 解析逻辑
 
-      在 `BufferExtension.cs` 文件中，移除了对输入缓冲区为空或长度为零的异常抛出，改为返回一个空数组，以简化错误处理逻辑。
+      在 `Program.cs` 中移除对 `XFEPackage` 的引用，添加对 `XFEExtension` 和 `XFETransform.JsonConverter` 的引用，修改主函数以读取 JSON 文件内容。
 
       ## 新增
 

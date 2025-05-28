@@ -1,10 +1,10 @@
-﻿using XFEExtension.NetCore.FileExtension.XFEPackage;
+﻿using XFEExtension.NetCore.FileExtension;
+using XFEExtension.NetCore.XFETransform.JsonConverter;
 
 internal class Program
 {
     private static void Main(string[] args)
     {
-        XFEPackage.PackFile(@"C:\Users\XFEstudio\AppData\LocalLow\Element Games\Reality Break", "测试.package");
-        XFEPackage.UnPackFile("测试.package", "测试");
+        QueryableJsonNode jsonNode = @"C:\Users\XFEstudio\Desktop\测试\Json失败示例.txt".ReadOut()!;
     }
-}
+} 
