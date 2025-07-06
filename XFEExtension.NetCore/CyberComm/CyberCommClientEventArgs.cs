@@ -11,7 +11,8 @@ namespace XFEExtension.NetCore.CyberComm;
 /// <param name="TextMessage"> 文本消息 </param>
 /// <param name="Exception"> 异常消息（如果有的话） </param>
 /// <param name="BinaryMessage"> 二进制消息 </param>
-public abstract record CyberCommClientEventArgs(BackMessageType MessageType, ClientWebSocket CurrentWebSocket, string? TextMessage, XFECyberCommException? Exception, byte[]? BinaryMessage)
+/// <param name="EndOfMessage">是否发送完成</param>
+public abstract record CyberCommClientEventArgs(BackMessageType MessageType, ClientWebSocket CurrentWebSocket, string? TextMessage, XFECyberCommException? Exception, byte[]? BinaryMessage, bool EndOfMessage)
 {
     /// <summary>
     /// 发送文本消息
@@ -46,13 +47,13 @@ public abstract record CyberCommClientEventArgs(BackMessageType MessageType, Cli
             throw new XFECyberCommException("关闭客户端连接时出现异常", ex);
         }
     }
-    internal CyberCommClientEventArgs(ClientWebSocket clientWebSocket, string message) : this(BackMessageType.Text, clientWebSocket, message, null, null)
+    internal CyberCommClientEventArgs(ClientWebSocket clientWebSocket, string message, bool endOfMessage) : this(BackMessageType.Text, clientWebSocket, message, null, null, endOfMessage)
     {
     }
-    internal CyberCommClientEventArgs(ClientWebSocket clientWebSocket, byte[] bytes) : this(BackMessageType.Binary, clientWebSocket, null, null, bytes)
+    internal CyberCommClientEventArgs(ClientWebSocket clientWebSocket, byte[] bytes, bool endOfMessage) : this(BackMessageType.Binary, clientWebSocket, null, null, bytes, endOfMessage)
     {
     }
-    internal CyberCommClientEventArgs(ClientWebSocket clientWebSocket, XFECyberCommException ex) : this(BackMessageType.Error, clientWebSocket, null, ex, null)
+    internal CyberCommClientEventArgs(ClientWebSocket clientWebSocket, XFECyberCommException ex) : this(BackMessageType.Error, clientWebSocket, null, ex, null, true)
     {
     }
 }

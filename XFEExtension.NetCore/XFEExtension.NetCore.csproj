@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.3.3</Version>
+    <Version>3.3.4</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -21,15 +21,9 @@
     <PackageReleaseNotes>
       ## 调整
       
-      增强事件参数以支持消息结束状态
-
-      在 `CyberCommServer.cs` 中，`ClientConnected`、`MessageReceived` 和 `ConnectionClosed` 事件调用中新增了 `bool` 类型的 `endOfMessage` 参数，以指示消息是否结束。
-
-      在 `CyberCommServerEventArgs.cs` 中，更新了 `CyberCommServerEventArgs` 记录类型的构造函数，新增了 `endOfMessage` 参数。
-
-      在 `CyberCommServerEventArgsImpl.cs` 中，修改了 `CyberCommServerEventArgsImpl` 类的构造函数，以支持新的 `endOfMessage` 参数。
-
-      更新项目文件 `XFEExtension.NetCore.csproj` 中的版本号，从 `3.3.2` 升级到 `3.3.3`。
+      更新事件参数以支持消息完成状态
+      
+      在 `CyberCommClient` 和 `CyberCommServer` 相关类中，修改了 `MessageReceived` 事件的调用，添加了 `EndOfMessage` 参数以指示消息是否已发送完成。同时，更新了构造函数以支持新的参数，并去掉了不必要的 `endOfMessage` 参数，确保在处理异常时的参数传递更加清晰。
 
       ## 新增
 

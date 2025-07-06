@@ -147,7 +147,7 @@ public class CyberCommServer
             }
             catch (Exception ex)
             {
-                MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, new XFECyberCommException("与客户端端通讯期间发生异常", ex), clientIP, wsHeader, true));
+                MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, new XFECyberCommException("与客户端端通讯期间发生异常", ex), clientIP, wsHeader));
                 break;
             }
         }

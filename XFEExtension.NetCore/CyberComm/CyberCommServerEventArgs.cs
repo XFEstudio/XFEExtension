@@ -89,7 +89,7 @@ public abstract record CyberCommServerEventArgs(Uri? RequestURL, BackMessageType
     internal CyberCommServerEventArgs(Uri? requestURL, WebSocket webSocket, byte[] bytes, string ipAddress, NameValueCollection wsHeader, bool endOfMessage) : this(requestURL, BackMessageType.Binary, webSocket, wsHeader, null, ipAddress, null, bytes, endOfMessage)
     {
     }
-    internal CyberCommServerEventArgs(Uri? requestURL, WebSocket webSocket, XFECyberCommException ex, string ipAddress, NameValueCollection wsHeader, bool endOfMessage) : this(requestURL, BackMessageType.Error, webSocket, wsHeader, ex, ipAddress, null, null, endOfMessage)
+    internal CyberCommServerEventArgs(Uri? requestURL, WebSocket webSocket, XFECyberCommException ex, string ipAddress, NameValueCollection wsHeader) : this(requestURL, BackMessageType.Error, webSocket, wsHeader, ex, ipAddress, null, null, true)
     {
     }
 }

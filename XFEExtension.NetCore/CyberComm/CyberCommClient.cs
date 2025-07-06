@@ -110,11 +110,11 @@ public class CyberCommClient
                 if (receiveResult.MessageType == WebSocketMessageType.Text)
                 {
                     var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
-                    MessageReceived?.Invoke(this, new CyberCommClientEventArgsImpl(ClientWebSocket, receivedMessage));
+                    MessageReceived?.Invoke(this, new CyberCommClientEventArgsImpl(ClientWebSocket, receivedMessage, receiveResult.EndOfMessage));
                 }
                 if (receiveResult.MessageType == WebSocketMessageType.Binary)
                 {
-                    MessageReceived?.Invoke(this, new CyberCommClientEventArgsImpl(ClientWebSocket, receivedBinaryBuffer));
+                    MessageReceived?.Invoke(this, new CyberCommClientEventArgsImpl(ClientWebSocket, receivedBinaryBuffer, receiveResult.EndOfMessage));
                 }
                 if (receiveResult.MessageType == WebSocketMessageType.Close)
                 {
