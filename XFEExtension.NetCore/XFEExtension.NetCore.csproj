@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.3.4</Version>
+    <Version>3.3.5</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -21,9 +21,9 @@
     <PackageReleaseNotes>
       ## 调整
       
-      更新事件参数以支持消息完成状态
-      
-      在 `CyberCommClient` 和 `CyberCommServer` 相关类中，修改了 `MessageReceived` 事件的调用，添加了 `EndOfMessage` 参数以指示消息是否已发送完成。同时，更新了构造函数以支持新的参数，并去掉了不必要的 `endOfMessage` 参数，确保在处理异常时的参数传递更加清晰。
+      添加 BufferLength 属性以动态调整缓冲区大小
+
+      在 `CyberCommClient.cs` 和 `CyberCommServer.cs` 文件中，新增公共属性 `BufferLength`，默认值为 1024，用于定义字节流缓冲区的长度。接收数据的缓冲区大小从固定的 1024 字节改为使用 `BufferLength` 属性，以便根据需要动态调整缓冲区的大小。
 
       ## 新增
 

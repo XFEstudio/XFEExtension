@@ -27,6 +27,10 @@ public class CyberCommClient
     /// </summary>
     public int ReconnectMaxTimes { get; set; } = -1;
     /// <summary>
+    /// 字节流缓冲区长度
+    /// </summary>
+    public int BufferLength { get; set; } = 1024;
+    /// <summary>
     /// 自动重连尝试间隔
     /// </summary>
     public int ReconnectTryDelay { get; set; } = 100;
@@ -93,7 +97,7 @@ public class CyberCommClient
         {
             try
             {
-                byte[] receiveBuffer = new byte[1024];
+                byte[] receiveBuffer = new byte[BufferLength];
                 WebSocketReceiveResult receiveResult = await ClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
                 var bufferList = new List<byte>();
                 bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));

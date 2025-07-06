@@ -13,6 +13,10 @@ public class CyberCommServer
     private readonly string[] serverURLs;
     #region 公共属性
     /// <summary>
+    /// 字节流缓冲区长度
+    /// </summary>
+    public int BufferLength { get; set; } = 1024;
+    /// <summary>
     /// 服务器正在运行
     /// </summary>
     public bool ServerRunning { get; set; }
@@ -116,7 +120,7 @@ public class CyberCommServer
         {
             try
             {
-                byte[] receiveBuffer = new byte[1024];
+                byte[] receiveBuffer = new byte[BufferLength];
                 WebSocketReceiveResult receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
                 //ReceiveCompletedMessageByUsingWhile
                 var bufferList = new List<byte>();
