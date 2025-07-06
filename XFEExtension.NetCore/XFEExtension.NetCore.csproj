@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.3.2</Version>
+    <Version>3.3.3</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -20,10 +20,16 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>
       ## 调整
+      
+      增强事件参数以支持消息结束状态
 
-      更新引用并优化 JSON 解析逻辑
+      在 `CyberCommServer.cs` 中，`ClientConnected`、`MessageReceived` 和 `ConnectionClosed` 事件调用中新增了 `bool` 类型的 `endOfMessage` 参数，以指示消息是否结束。
 
-      在 `Program.cs` 中移除对 `XFEPackage` 的引用，添加对 `XFEExtension` 和 `XFETransform.JsonConverter` 的引用，修改主函数以读取 JSON 文件内容。
+      在 `CyberCommServerEventArgs.cs` 中，更新了 `CyberCommServerEventArgs` 记录类型的构造函数，新增了 `endOfMessage` 参数。
+
+      在 `CyberCommServerEventArgsImpl.cs` 中，修改了 `CyberCommServerEventArgsImpl` 类的构造函数，以支持新的 `endOfMessage` 参数。
+
+      更新项目文件 `XFEExtension.NetCore.csproj` 中的版本号，从 `3.3.2` 升级到 `3.3.3`。
 
       ## 新增
 

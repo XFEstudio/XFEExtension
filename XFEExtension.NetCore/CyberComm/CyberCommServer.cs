@@ -71,7 +71,7 @@ public class CyberCommServer
                     var httpListenerWebSocketContext = await httpListenerContext.AcceptWebSocketAsync(null);
                     var webSocket = httpListenerWebSocketContext.WebSocket;
                     var wsHeader = httpListenerWebSocketContext.Headers;
-                    ClientConnected?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, string.Empty, clientIP, wsHeader));
+                    ClientConnected?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, string.Empty, clientIP, wsHeader, true));
                     CyberCommClientConnected(requestURL, webSocket, wsHeader, clientIP);
                 }
                 else
@@ -133,11 +133,11 @@ public class CyberCommServer
                 if (receiveResult.MessageType == WebSocketMessageType.Text)
                 {
                     string receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
-                    MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, receivedMessage, clientIP, wsHeader));
+                    MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, receivedMessage, clientIP, wsHeader, receiveResult.EndOfMessage));
                 }
                 if (receiveResult.MessageType == WebSocketMessageType.Binary)
                 {
-                    MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, receivedBinaryBuffer, clientIP, wsHeader));
+                    MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, receivedBinaryBuffer, clientIP, wsHeader, receiveResult.EndOfMessage));
                 }
                 if (receiveResult.MessageType == WebSocketMessageType.Close)
                 {
@@ -147,11 +147,11 @@ public class CyberCommServer
             }
             catch (Exception ex)
             {
-                MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, new XFECyberCommException("与客户端端通讯期间发生异常", ex), clientIP, wsHeader));
+                MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, new XFECyberCommException("与客户端端通讯期间发生异常", ex), clientIP, wsHeader, true));
                 break;
             }
         }
-        ConnectionClosed?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, string.Empty, clientIP, wsHeader));
+        ConnectionClosed?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, string.Empty, clientIP, wsHeader, true));
         webSocket.Dispose();
     }
     #endregion
