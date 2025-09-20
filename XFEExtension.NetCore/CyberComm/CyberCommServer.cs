@@ -10,8 +10,11 @@ namespace XFEExtension.NetCore.CyberComm;
 /// </summary>
 public class CyberCommServer
 {
-    private readonly string[] serverURLs;
     #region 公共属性
+    /// <summary>
+    /// 服务器绑定的URL
+    /// </summary>
+    public string[] ServerURLs { get; set; } = [];
     /// <summary>
     /// 字节流缓冲区长度
     /// </summary>
@@ -58,7 +61,7 @@ public class CyberCommServer
     {
         try
         {
-            foreach (var url in serverURLs)
+            foreach (var url in ServerURLs)
             {
                 Server.Prefixes.Add(url);
             }
@@ -161,6 +164,13 @@ public class CyberCommServer
     #endregion
     #region 构造函数
     /// <summary>
+    /// CyberComm服务器
+    /// </summary>
+    public CyberCommServer()
+    {
+        AutoReceiveCompletedMessage = true;
+    }
+    /// <summary>
     /// CyberComm服务器，使用端口创建
     /// </summary>
     /// <param name="listenPorts">监听端口</param>
@@ -171,7 +181,7 @@ public class CyberCommServer
         {
             serverURLs.Add($"http://*:{port}/");
         }
-        this.serverURLs = [.. serverURLs];
+        this.ServerURLs = [.. serverURLs];
         AutoReceiveCompletedMessage = true;
     }
     /// <summary>
@@ -180,7 +190,7 @@ public class CyberCommServer
     /// <param name="serverURLs">服务器URL</param>
     public CyberCommServer(params string[] serverURLs)
     {
-        this.serverURLs = serverURLs;
+        this.ServerURLs = serverURLs;
         AutoReceiveCompletedMessage = true;
     }
     /// <summary>
@@ -190,7 +200,7 @@ public class CyberCommServer
     /// <param name="serverURLs">服务器URL</param>
     public CyberCommServer(bool autoReceiveCompletedMessage = true, params string[] serverURLs)
     {
-        this.serverURLs = serverURLs;
+        this.ServerURLs = serverURLs;
         AutoReceiveCompletedMessage = autoReceiveCompletedMessage;
     }
     #endregion

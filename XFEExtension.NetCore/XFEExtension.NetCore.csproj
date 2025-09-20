@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.3.5</Version>
+    <Version>3.3.6</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -20,10 +20,8 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>
       ## 调整
-      
-      添加 BufferLength 属性以动态调整缓冲区大小
-
-      在 `CyberCommClient.cs` 和 `CyberCommServer.cs` 文件中，新增公共属性 `BufferLength`，默认值为 1024，用于定义字节流缓冲区的长度。接收数据的缓冲区大小从固定的 1024 字节改为使用 `BufferLength` 属性，以便根据需要动态调整缓冲区的大小。
+			
+			为CyberCommServer添加了无参构造函数，并且ServerUrls属性现在是公共属性
 
       ## 新增
 
