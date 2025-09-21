@@ -29,7 +29,7 @@ public class JsonTransformer : StringConverter
                 else if (objectInfo.Value is bool)
                     outPutString += $"{objectInfo.Value.ToString()?.ToLower()}";
                 else
-                    outPutString += $"\"{objectInfo.Value}\"";
+                    outPutString += objectInfo.Value;
             }
             else
             {
@@ -42,7 +42,7 @@ public class JsonTransformer : StringConverter
                 else if (objectInfo.Value is bool)
                     outPutString += $"\"{objectInfo.Name}\":{objectInfo.Value.ToString()?.ToLower()}";
                 else
-                    outPutString += $"\"{objectInfo.Name}\":\"{objectInfo.Value}\"";
+                    outPutString += $"\"{objectInfo.Name}\":{objectInfo.Value}";
             }
         }
         else

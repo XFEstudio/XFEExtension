@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.3.6</Version>
+    <Version>3.3.7</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -21,7 +21,7 @@
     <PackageReleaseNotes>
       ## 调整
 			
-			为CyberCommServer添加了无参构造函数，并且ServerUrls属性现在是公共属性
+			修复了Json转换器中，对于数值类型的解析问题
 
       ## 新增
 
