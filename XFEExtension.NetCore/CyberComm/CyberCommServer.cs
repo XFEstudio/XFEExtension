@@ -50,7 +50,7 @@ public class CyberCommServer
     /// <summary>
     /// 服务器端
     /// </summary>
-    public HttpListener Server { get; } = new();
+    public HttpListener Server { get; set; } = new();
     #endregion
     #region 公有方法
     /// <summary>
@@ -61,6 +61,7 @@ public class CyberCommServer
     {
         try
         {
+            Server = new();
             foreach (var url in ServerURLs)
             {
                 Server.Prefixes.Add(url);
