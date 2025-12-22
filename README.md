@@ -1,3 +1,5 @@
+[![](https://img.shields.io/nuget/dt/xfeextension.netcore?color=004880&label=Downloads&logo=NuGet)](https://www.nuget.org/packages/XFEExtension.NetCore/)
+
 # XFEExtension (XFEExtension)
 
 ## 描述
