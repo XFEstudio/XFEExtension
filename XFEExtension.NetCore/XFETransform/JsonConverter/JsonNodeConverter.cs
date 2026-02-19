@@ -9,7 +9,7 @@ public class JsonNodeConverter(string jsonString)
     private int currentLayer = -1;
     private string currentPropertyName = "";
     private string currentPropertyValue = "";
-    private readonly List<short> currentPosition = [0];
+    private readonly List<short> currentPosition = new List<short> { 0 };
     private string jsonString = jsonString;
     /// <summary>
     /// 原始Json字符串
@@ -265,9 +265,21 @@ public class JsonNodeConverter(string jsonString)
         for (int i = 0; i < indexes.Count - 1; i++)
         {
             short index = indexes[i];
+            // Guard against invalid indexes to avoid ArgumentOutOfRangeException.
+            if (index < 0 || index >= currentJsonComplexPropertyNode.DescendingNodes.Count)
+            {
+                // If the requested index is out of range, stop descending and return the current node.
+                return currentJsonComplexPropertyNode;
+            }
+
             if (currentJsonComplexPropertyNode.DescendingNodes[index] is JsonComplexPropertyNode complexPropertyNode)
             {
                 currentJsonComplexPropertyNode = complexPropertyNode;
+            }
+            else
+            {
+                // If the node at the index is not a complex node, stop descending.
+                return currentJsonComplexPropertyNode;
             }
         }
         return currentJsonComplexPropertyNode;
