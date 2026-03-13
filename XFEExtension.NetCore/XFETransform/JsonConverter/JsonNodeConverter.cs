@@ -78,10 +78,12 @@ public class JsonNodeConverter(string jsonString)
                             else
                                 Console.WriteLine($"设置复杂Json节点失败：{currentLayer}\t{currentPropertyName}\t{currentPropertyValue}");
                         }
-                        if (currentPosition.Count > 0)
+                        // Never remove the root position (index 0). Only pop when there are >1 entries.
+                        if (currentPosition.Count > 1)
                         {
                             currentPosition.RemoveAt(currentPosition.Count - 1);
-                            currentLayer--;
+                            if (currentLayer > -1)
+                                currentLayer--;
                         }
                         currentPropertyName = "";
                         currentPropertyValue = "";
@@ -131,8 +133,13 @@ public class JsonNodeConverter(string jsonString)
                             else
                                 Console.WriteLine($"设置复杂Json节点失败：{currentLayer}\t{currentPropertyName}\t{currentPropertyValue}");
                         }
-                        currentPosition.RemoveAt(currentPosition.Count - 1);
-                        currentLayer--;
+                        // Never remove the root position (index 0). Only pop when there are >1 entries.
+                        if (currentPosition.Count > 1)
+                        {
+                            currentPosition.RemoveAt(currentPosition.Count - 1);
+                            if (currentLayer > -1)
+                                currentLayer--;
+                        }
                     }
                     else
                     {
@@ -332,7 +339,7 @@ public class JsonNodeConverter(string jsonString)
         };
         return jsonPropertyNode;
     }
-    internal static QueryableJsonNode AnalyzePropertyArray(string[] nodeProperties, JsonComplexPropertyNode jsonComplexPropertyNode)
+    internal static QueryableJsonNode? AnalyzePropertyArray(string[] nodeProperties, JsonComplexPropertyNode jsonComplexPropertyNode)
     {
         if (nodeProperties[0].StartsWith("package:", StringComparison.CurrentCultureIgnoreCase))
         {
@@ -345,7 +352,7 @@ public class JsonNodeConverter(string jsonString)
         }
         else
         {
-            return jsonComplexPropertyNode.DescendingNodes.Find(node => node.PropertyName == nodeProperties[0]) is JsonNode jsonNode ? new(jsonNode) : throw new InvalidOperationException();
+            return jsonComplexPropertyNode.DescendingNodes.Find(node => node.PropertyName == nodeProperties[0]) is JsonNode jsonNode ? new(jsonNode) : null;
         }
     }
 }

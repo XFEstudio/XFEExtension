@@ -6,7 +6,7 @@
 public class JsonComplexPropertyNode : JsonNode, IQueryableJsonNode
 {
     ///<inheritdoc/>
-    public QueryableJsonNode this[params string[] nodeProperties] => JsonNodeConverter.AnalyzePropertyArray(nodeProperties, this);
+    public QueryableJsonNode? this[params string[] nodeProperties] => JsonNodeConverter.AnalyzePropertyArray(nodeProperties, this);
     /// <summary>
     /// 是否是列表
     /// </summary>

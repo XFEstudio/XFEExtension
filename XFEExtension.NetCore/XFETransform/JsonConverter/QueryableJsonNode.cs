@@ -7,7 +7,7 @@
 public class QueryableJsonNode(JsonNode jsonNode) : INodeBase, IQueryableJsonNode
 {
     ///<inheritdoc/>
-    public QueryableJsonNode this[params string[] nodeProperties] => OriginalNode is JsonComplexPropertyNode complexPropertyNode ? complexPropertyNode[nodeProperties] : throw new InvalidOperationException("该节点为简单节点，无法继续查找");
+    public QueryableJsonNode? this[params string[] nodeProperties] => OriginalNode is JsonComplexPropertyNode complexPropertyNode ? complexPropertyNode[nodeProperties] : throw new InvalidOperationException("该节点为简单节点，无法继续查找");
     /// <summary>
     /// 原始节点
     /// </summary>
