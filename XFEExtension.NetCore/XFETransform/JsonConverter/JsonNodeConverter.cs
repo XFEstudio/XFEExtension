@@ -347,7 +347,7 @@ public class JsonNodeConverter(string jsonString)
             {
                 "list" => NodeOperator.PackageInList(nodeProperties[1..], jsonComplexPropertyNode),
                 "object" => NodeOperator.PackageToList(nodeProperties[1..], jsonComplexPropertyNode),
-                _ => throw new InvalidOperationException()
+                _ => null,
             };
         }
         else

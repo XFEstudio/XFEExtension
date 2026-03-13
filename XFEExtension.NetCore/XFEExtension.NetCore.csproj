@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.3.11</Version>
+    <Version>3.3.12</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -20,11 +20,10 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>
       ## 调整
-      
-      支持可空节点查询并优化JSON层级处理
 
-      将QueryableJsonNode索引器及AnalyzePropertyArray方法改为可空返回，查询不到节点时返回null。
-      优化JSON解析层级逻辑，避免根节点被误移除。更新测试文件路径，提升版本至3.3.11。
+      升级版本至3.3.12，优化JsonNodeConverter异常处理
+
+      升级项目版本号至3.3.12。JsonNodeConverter遇到未知类型时不再抛出异常，而是返回null，提升容错性。
 
       ## 新增
 
