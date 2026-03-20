@@ -1,4 +1,6 @@
-﻿namespace XFEExtension.NetCore.XFETransform.JsonConverter;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace XFEExtension.NetCore.XFETransform.JsonConverter;
 
 /// <summary>
 /// 可查询节点
@@ -103,5 +105,5 @@ public class QueryableJsonNode(JsonNode jsonNode) : INodeBase, IQueryableJsonNod
     /// 隐式将Json字符串转换为节点值
     /// </summary>
     /// <param name="queryableJsonNode"></param>
-    public static implicit operator string(QueryableJsonNode queryableJsonNode) => queryableJsonNode.ToString();
+    public static implicit operator string?(QueryableJsonNode? queryableJsonNode) => queryableJsonNode?.ToString();
 }
