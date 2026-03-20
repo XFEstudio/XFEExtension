@@ -20,10 +20,10 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>
       ## 调整
+      
+      支持 QueryableJsonNode 到 string? 的隐式转换
 
-      升级版本至3.3.12，优化JsonNodeConverter异常处理
-
-      升级项目版本号至3.3.12。JsonNodeConverter遇到未知类型时不再抛出异常，而是返回null，提升容错性。
+      升级项目版本号至 3.3.13，优化 QueryableJsonNode 到 string 的隐式转换操作符，支持可空类型并在节点为空时返回 null。同时在 QueryableJsonNode.cs 顶部增加了必要的 using 引用。
 
       ## 新增
 
