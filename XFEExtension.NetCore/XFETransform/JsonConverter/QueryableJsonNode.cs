@@ -8,6 +8,10 @@ namespace XFEExtension.NetCore.XFETransform.JsonConverter;
 /// <param name="jsonNode"></param>
 public class QueryableJsonNode(JsonNode jsonNode) : INodeBase, IQueryableJsonNode
 {
+    /// <summary>
+    /// 空节点
+    /// </summary>
+    public static readonly QueryableJsonNode Empty = new(new());
     ///<inheritdoc/>
     public QueryableJsonNode? this[params string[] nodeProperties] => OriginalNode is JsonComplexPropertyNode complexPropertyNode ? complexPropertyNode[nodeProperties] : throw new InvalidOperationException("该节点为简单节点，无法继续查找");
     /// <summary>
@@ -70,14 +74,14 @@ public class QueryableJsonNode(JsonNode jsonNode) : INodeBase, IQueryableJsonNod
     /// </summary>
     /// <returns></returns>
     /// <exception cref="NullReferenceException"></exception>
-    public List<string> GetList() => OriginalNode is JsonComplexPropertyNode jsonComplexPropertyNode ? jsonComplexPropertyNode.DescendingNodes.Select(node => node is IValueNode valueNode ? valueNode.Value : null!).ToList() : throw new NullReferenceException();
+    public List<string> GetList() => OriginalNode is JsonComplexPropertyNode jsonComplexPropertyNode ? [.. jsonComplexPropertyNode.DescendingNodes.Select(node => node is IValueNode valueNode ? valueNode.Value : null!)] : throw new NullReferenceException();
     /// <summary>
     /// 使用指定类型获取列表
     /// </summary>
     /// <typeparam name="T">指定类型</typeparam>
     /// <returns></returns>
     /// <exception cref="NullReferenceException"></exception>
-    public List<T> GetList<T>() => OriginalNode is JsonComplexPropertyNode jsonComplexPropertyNode ? jsonComplexPropertyNode.DescendingNodes.Select(node => node is IValueNode valueNode ? (T)GetValueByValueType(valueNode.Value, valueNode.ValueType)! : default!).ToList() : throw new NullReferenceException();
+    public List<T> GetList<T>() => OriginalNode is JsonComplexPropertyNode jsonComplexPropertyNode ? [.. jsonComplexPropertyNode.DescendingNodes.Select(node => node is IValueNode valueNode ? (T)GetValueByValueType(valueNode.Value, valueNode.ValueType)! : default!)] : throw new NullReferenceException();
     /// <summary>
     /// 对列表内对象属性值进行打包
     /// </summary>

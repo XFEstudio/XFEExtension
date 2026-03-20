@@ -7,11 +7,11 @@ internal abstract class SubObjectsBase : ISubObjects
 
     protected readonly List<IObjectInfo> objectInfoList;
 
-    protected SubObjectsBase(List<IObjectInfo> objectInfoList, IObjectInfo parent)
+    protected SubObjectsBase(List<IObjectInfo>? objectInfoList, IObjectInfo parent)
     {
-        this.objectInfoList = objectInfoList;
+        this.objectInfoList = objectInfoList ?? [];
         Parent = parent;
-        objectInfoList.ForEach(objectInfo => objectInfo.Parent = parent);
+        objectInfoList?.ForEach(objectInfo => objectInfo.Parent = parent);
     }
 
     public IObjectInfo this[int index] { get => objectInfoList[index]; set => objectInfoList[index] = value; }

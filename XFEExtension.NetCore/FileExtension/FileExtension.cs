@@ -239,7 +239,7 @@ public static class FileExtension
         long seekPosition = endPosition;
         fileStream.Seek(startPosition, SeekOrigin.Begin);
         byte[] buffer = new byte[endPosition - startPosition];
-        await fileStream.ReadAsync(buffer.AsMemory(0, (int)(endPosition - startPosition)));
+        await fileStream.ReadExactlyAsync(buffer.AsMemory(0, (int)(endPosition - startPosition)));
         for (int i = buffer.Length - 1; i >= 0; i--)
         {
             if (buffer[i] != 0)

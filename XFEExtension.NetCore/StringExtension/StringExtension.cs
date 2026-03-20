@@ -267,7 +267,10 @@ public static partial class StringExtension
     /// <param name="onlyPublic"></param>
     public static string? X(this object? obj, bool onlyProperty = true, bool onlyPublic = true, string remarkName = "分析对象")
     {
-        var result = XFEConverter.GetObjectInfo(StringConverter.ObjectAnalyzer, remarkName, ObjectPlace.Main, 0, [obj], obj?.GetType(), obj, onlyProperty, onlyPublic).OutPutObject();
+        var fatherList = new List<object>();
+        if (obj is not null)
+            fatherList.Add(obj);
+        var result = XFEConverter.GetObjectInfo(StringConverter.ObjectAnalyzer, remarkName, ObjectPlace.Main, 0, fatherList, obj?.GetType(), obj, onlyProperty, onlyPublic).OutPutObject();
         Console.WriteLine(result);
         return result;
     }
@@ -281,7 +284,10 @@ public static partial class StringExtension
     /// <param name="onlyPublic"></param>
     public static string XL(this object? obj, string remarkName = "分析对象", bool onlyProperty = true, bool onlyPublic = true)
     {
-        var result = XFEConverter.GetObjectInfo(StringConverter.ObjectAnalyzer, remarkName, ObjectPlace.Main, 0, [obj], obj?.GetType(), obj, onlyProperty, onlyPublic).OutPutObject();
+        var fatherList = new List<object>();
+        if (obj is not null)
+            fatherList.Add(obj);
+        var result = XFEConverter.GetObjectInfo(StringConverter.ObjectAnalyzer, remarkName, ObjectPlace.Main, 0, fatherList, obj?.GetType(), obj, onlyProperty, onlyPublic).OutPutObject();
         Trace.WriteLine(result);
         return result;
     }
@@ -387,7 +393,7 @@ public static partial class StringExtension
     /// <returns>分割后的带分割器字符串数组</returns>
     public static string[] SplitAndKeepDelimiter(this string str, string delimiter, bool removeEmptyString)
     {
-        return SplitAndKeepDelimiter(str, new string[] { delimiter }, removeEmptyString);
+        return SplitAndKeepDelimiter(str, [delimiter], removeEmptyString);
     }
     /// <summary>
     /// 返回包含分割器的字符串
@@ -397,7 +403,7 @@ public static partial class StringExtension
     /// <returns>分割后的带分割器字符串数组</returns>
     public static string[] SplitAndKeepDelimiter(this string str, string delimiter)
     {
-        return SplitAndKeepDelimiter(str, new string[] { delimiter }, true);
+        return SplitAndKeepDelimiter(str, [delimiter], true);
     }
     /// <summary>
     /// 返回包含分割器的字符串

@@ -353,8 +353,12 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     }
     #endregion
     #region 停止对话
+
     //TODO:
-    public void StopChat()
+    /// <summary>
+    /// 停止对话（仅在流式输出模式下有效，非流式输出模式下调用该方法将不会有任何效果）
+    /// </summary>
+    public static void StopChat()
     {
 
     }
