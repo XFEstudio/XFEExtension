@@ -15,7 +15,7 @@ public static class XFEJsonTransformer
     /// <param name="obj"></param>
     /// <returns></returns>
     /// <exception cref="XFEJsonTransformException">空对象异常</exception>
-    public static string? ConvertToJson(this object obj)
+    public static string? ConvertToJson(this object? obj)
     {
         if (obj is null)
         {
@@ -56,22 +56,12 @@ public static class XFEJsonTransformer
 
     private static string ConvertArrayOrEnumerableToJson(object obj)
     {
-        if (obj is IEnumerable array)
-        {
-            var jsonElements = new List<string>();
+        if (obj is not IEnumerable array)
+            return string.Empty;
 
-            foreach (var item in array)
-            {
-                var json = item.ConvertToJson();
-                if (json is not null)
-                    jsonElements.Add(json);
-                else
-                    jsonElements.Add(string.Empty);
-            }
+        var jsonElements = (from object? item in array select item.ConvertToJson() into json select json ?? string.Empty).ToList();
 
-            return $"[{string.Join(",", jsonElements)}]";
-        }
-        return string.Empty;
+        return $"[{string.Join(",", jsonElements)}]";
     }
 
     private static string ConvertObjectToJson(object obj)
@@ -117,22 +107,18 @@ public static class XFEJsonTransformer
             throw new ArgumentException("Json字符串为空");
         }
 
-        var jsonObject = (T)Activator.CreateInstance(typeof(T))!;
+        var jsonObject = Activator.CreateInstance<T>()!;
 
         var jsonProperties = GetJsonProperties(jsonString);
         var objectType = typeof(T);
 
-        foreach (var jsonProperty in jsonProperties)
+        foreach ((string key, string propertyValue) in jsonProperties)
         {
-            var propertyName = jsonProperty.Key;
-            var propertyValue = jsonProperty.Value;
-
-            var property = objectType.GetProperty(propertyName);
-            if (property is not null)
-            {
-                var convertedValue = ConvertToPropertyValue(propertyValue, property.PropertyType);
-                property.SetValue(jsonObject, convertedValue);
-            }
+            var property = objectType.GetProperty(key);
+            if (property is null)
+                continue;
+            var convertedValue = ConvertToPropertyValue(propertyValue, property.PropertyType);
+            property.SetValue(jsonObject, convertedValue);
         }
 
         return jsonObject;
@@ -147,13 +133,12 @@ public static class XFEJsonTransformer
         foreach (var jsonToken in jsonTokens)
         {
             var propertyParts = jsonToken.Split(':');
-            if (propertyParts.Length == 2)
-            {
-                var propertyName = propertyParts[0].Trim('\"');
-                var propertyValue = propertyParts[1].Trim();
+            if (propertyParts.Length != 2)
+                continue;
+            var propertyName = propertyParts[0].Trim('\"');
+            var propertyValue = propertyParts[1].Trim();
 
-                jsonProperties[propertyName] = propertyValue;
-            }
+            jsonProperties[propertyName] = propertyValue;
         }
 
         return jsonProperties;
@@ -181,12 +166,7 @@ public static class XFEJsonTransformer
             return DateTime.Parse(propertyValue.Trim('\"'));
         }
 
-        if (targetType.IsEnum)
-        {
-            return Enum.Parse(targetType, propertyValue);
-        }
-
-        throw new NotSupportedException($"不支持的属性类型: {targetType.Name}");
+        return targetType.IsEnum ? Enum.Parse(targetType, propertyValue) : throw new NotSupportedException($"不支持的属性类型: {targetType.Name}");
     }
 
     #endregion

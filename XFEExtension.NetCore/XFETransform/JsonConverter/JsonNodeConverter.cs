@@ -10,15 +10,12 @@ public class JsonNodeConverter(string jsonString)
     private string currentPropertyName = "";
     private string currentPropertyValue = "";
     private readonly List<short> currentPosition = new List<short> { 0 };
-    private string jsonString = jsonString;
+
     /// <summary>
     /// 原始Json字符串
     /// </summary>
-    public string JsonString
-    {
-        get { return jsonString; }
-        set { jsonString = value; }
-    }
+    public string JsonString { get; set; } = jsonString;
+
     /// <summary>
     /// 转化为Json节点
     /// </summary>
@@ -29,15 +26,14 @@ public class JsonNodeConverter(string jsonString)
         var currentState = CurrentState.None;
         var lastSymbol = JsonSymbol.Brace;
         var currentSymbol = JsonSymbol.Brace;
-        for (var i = 0; i < jsonString.Length; i++)
+        foreach (var current in JsonString)
         {
-            var current = jsonString[i];
             var currentJsonComplexJsonNode = GetJsonNodeByIndex(jsonNode, currentPosition);
             ValueType currentValueType;
             switch (current)
             {
                 case '{':
-                    if ((currentState != CurrentState.Property && currentState != CurrentState.StringPropertyValue) || currentState == CurrentState.AfterPropertyValue || currentState == CurrentState.AfterProperty)
+                    if ((currentState != CurrentState.Property && currentState != CurrentState.StringPropertyValue))
                     {
                         currentSymbol = JsonSymbol.Brace;
                         currentState = CurrentState.BeforeProperty;
@@ -65,7 +61,7 @@ public class JsonNodeConverter(string jsonString)
                     }
                     break;
                 case '}':
-                    if ((currentState != CurrentState.Property && currentState != CurrentState.StringPropertyValue) || currentState == CurrentState.AfterPropertyValue || currentState == CurrentState.AfterProperty)
+                    if ((currentState != CurrentState.Property && currentState != CurrentState.StringPropertyValue))
                     {
                         currentSymbol = JsonSymbol.InvertedBrace;
                         currentState = CurrentState.None;
@@ -73,7 +69,7 @@ public class JsonNodeConverter(string jsonString)
                         {
                             currentValueType = JudgeValueType(ref currentPropertyValue);
                             currentJsonComplexJsonNode = GetJsonNodeByIndex(jsonNode, currentPosition);
-                            if (SummonJsonPropertyNode(currentValueType, currentLayer, currentPropertyName.Replace("\"", ""), currentPropertyValue) is JsonPropertyNode jsonPropertyNode)
+                            if (SummonJsonPropertyNode(currentValueType, currentLayer, currentPropertyName.Replace("\"", ""), currentPropertyValue) is { } jsonPropertyNode)
                                 currentJsonComplexJsonNode.DescendingNodes.Add(jsonPropertyNode);
                             else
                                 Console.WriteLine($"设置复杂Json节点失败：{currentLayer}\t{currentPropertyName}\t{currentPropertyValue}");
@@ -94,7 +90,7 @@ public class JsonNodeConverter(string jsonString)
                     }
                     break;
                 case '[':
-                    if ((currentState != CurrentState.Property && currentState != CurrentState.StringPropertyValue) || currentState == CurrentState.AfterPropertyValue || currentState == CurrentState.AfterProperty)
+                    if ((currentState != CurrentState.Property && currentState != CurrentState.StringPropertyValue))
                     {
                         currentLayer++;
                         currentSymbol = JsonSymbol.Bracket;
@@ -121,14 +117,14 @@ public class JsonNodeConverter(string jsonString)
                     break;
                 case ']':
                     currentSymbol = JsonSymbol.InvertedBracket;
-                    if ((currentState != CurrentState.Property && currentState != CurrentState.StringPropertyValue) || currentState == CurrentState.AfterPropertyValue || currentState == CurrentState.AfterProperty)
+                    if ((currentState != CurrentState.Property && currentState != CurrentState.StringPropertyValue))
                     {
                         currentState = CurrentState.None;
                         if (lastSymbol is JsonSymbol.Text or JsonSymbol.DoubleQuotationMark)
                         {
                             currentValueType = JudgeValueType(ref currentPropertyValue);
                             currentJsonComplexJsonNode = GetJsonNodeByIndex(jsonNode, currentPosition);
-                            if (SummonJsonPropertyNode(currentValueType, currentLayer, currentPropertyName.Replace("\"", ""), currentPropertyValue) is JsonPropertyNode jsonPropertyNode)
+                            if (SummonJsonPropertyNode(currentValueType, currentLayer, currentPropertyName.Replace("\"", ""), currentPropertyValue) is { } jsonPropertyNode)
                                 currentJsonComplexJsonNode.DescendingNodes.Add(jsonPropertyNode);
                             else
                                 Console.WriteLine($"设置复杂Json节点失败：{currentLayer}\t{currentPropertyName}\t{currentPropertyValue}");
@@ -147,7 +143,7 @@ public class JsonNodeConverter(string jsonString)
                     }
                     break;
                 case ':':
-                    if ((currentState != CurrentState.Property && currentState != CurrentState.StringPropertyValue) || currentState == CurrentState.AfterPropertyValue || currentState == CurrentState.AfterProperty)
+                    if ((currentState != CurrentState.Property && currentState != CurrentState.StringPropertyValue))
                     {
                         currentSymbol = JsonSymbol.Colon;
                         currentState = CurrentState.BeforePropertyValue;
@@ -158,7 +154,7 @@ public class JsonNodeConverter(string jsonString)
                     }
                     break;
                 case ',':
-                    if ((currentState != CurrentState.Property && currentState != CurrentState.StringPropertyValue) || currentState == CurrentState.AfterPropertyValue || currentState == CurrentState.AfterProperty)
+                    if ((currentState != CurrentState.Property && currentState != CurrentState.StringPropertyValue))
                     {
                         currentSymbol = JsonSymbol.Comma;
                         if (currentLayer >= -1)
@@ -169,7 +165,7 @@ public class JsonNodeConverter(string jsonString)
                         {
                             currentValueType = JudgeValueType(ref currentPropertyValue);
                             currentJsonComplexJsonNode = GetJsonNodeByIndex(jsonNode, currentPosition);
-                            if (SummonJsonPropertyNode(currentValueType, currentLayer, currentPropertyName.Replace("\"", ""), currentPropertyValue) is JsonPropertyNode jsonPropertyNode)
+                            if (SummonJsonPropertyNode(currentValueType, currentLayer, currentPropertyName.Replace("\"", ""), currentPropertyValue) is { } jsonPropertyNode)
                                 currentJsonComplexJsonNode.DescendingNodes.Add(jsonPropertyNode);
                             else
                                 Console.WriteLine($"设置复杂Json节点失败：{currentLayer}\t{currentPropertyName}\t{currentPropertyValue}");
@@ -217,9 +213,6 @@ public class JsonNodeConverter(string jsonString)
                             currentSymbol = JsonSymbol.Text;
                             break;
                         case CurrentState.PropertyValue or CurrentState.StringPropertyValue:
-                            currentPropertyValue += current;
-                            currentSymbol = JsonSymbol.Text;
-                            break;
                         case CurrentState.ListValue:
                             currentPropertyValue += current;
                             currentSymbol = JsonSymbol.Text;
@@ -321,14 +314,9 @@ public class JsonNodeConverter(string jsonString)
             return ValueType.Int;
         }
 
-        if (long.TryParse(currentPropertyValue, out _))
-        {
-            return ValueType.Long;
-        }
-
-        return ValueType.None;
+        return long.TryParse(currentPropertyValue, out _) ? ValueType.Long : ValueType.None;
     }
-    private static JsonPropertyNode? SummonJsonPropertyNode(ValueType currentValueType, int currentLayer, string currentPropertyName, string currentPropertyValue)
+    private static JsonPropertyNode SummonJsonPropertyNode(ValueType currentValueType, int currentLayer, string currentPropertyName, string currentPropertyValue)
     {
         var jsonPropertyNode = new JsonPropertyNode
         {
@@ -351,7 +339,7 @@ public class JsonNodeConverter(string jsonString)
             };
         }
 
-        return jsonComplexPropertyNode.DescendingNodes.Find(node => node.PropertyName == nodeProperties[0]) is JsonNode jsonNode ? new(jsonNode) : null;
+        return jsonComplexPropertyNode.DescendingNodes.Find(node => node.PropertyName == nodeProperties[0]) is { } jsonNode ? new(jsonNode) : null;
     }
 }
 enum CurrentState

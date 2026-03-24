@@ -103,25 +103,21 @@ public abstract class XFECode
         timeCounter.Stop();
         cTimeCounter++;
         var elapsedTime = timeCounter.Elapsed;
-        switch (autoOutPut)
-        {
-            case true:
-            {
-                if (elapsedTime.TotalHours >= 1)
-                    Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间：{elapsedTime}");
-                else if (elapsedTime.TotalMinutes >= 1)
-                    Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {Math.Floor(elapsedTime.TotalMinutes)} 分 {elapsedTime.Seconds} 秒");
-                else if (elapsedTime.TotalSeconds >= 1)
-                    Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalSeconds:F3} 秒");
-                else if (elapsedTime.TotalMilliseconds >= 1)
-                    Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds:F3} 毫秒");
-                else if (elapsedTime.TotalMicroseconds >= 1)
-                    Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMicroseconds:F3} 微秒");
-                else
-                    Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalNanoseconds:F3} 纳秒");
-                break;
-            }
-        }
+        if (!autoOutPut)
+            return elapsedTime;
+
+        if (elapsedTime.TotalHours >= 1)
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间：{elapsedTime}");
+        else if (elapsedTime.TotalMinutes >= 1)
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {Math.Floor(elapsedTime.TotalMinutes)} 分 {elapsedTime.Seconds} 秒");
+        else if (elapsedTime.TotalSeconds >= 1)
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalSeconds:F3} 秒");
+        else if (elapsedTime.TotalMilliseconds >= 1)
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds:F3} 毫秒");
+        else if (elapsedTime.TotalMicroseconds >= 1)
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMicroseconds:F3} 微秒");
+        else
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalNanoseconds:F3} 纳秒");
         return elapsedTime;
     }
     /// <summary>
@@ -139,19 +135,21 @@ public abstract class XFECode
         timeCounter.Stop();
         cTimeCounter++;
         var elapsedTime = timeCounter.Elapsed;
-        if (autoOutPut)
-            if (elapsedTime.TotalHours >= 1)
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间：{elapsedTime}");
-            else if (elapsedTime.TotalMinutes >= 1)
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {Math.Floor(elapsedTime.TotalMinutes)} 分 {elapsedTime.Seconds} 秒");
-            else if (elapsedTime.TotalSeconds >= 1)
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalSeconds:F3} 秒");
-            else if (elapsedTime.TotalMilliseconds >= 1)
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds:F3} 毫秒");
-            else if (elapsedTime.TotalMicroseconds >= 1)
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMicroseconds:F3} 微秒");
-            else
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalNanoseconds:F3} 纳秒");
+        if (!autoOutPut)
+            return elapsedTime;
+
+        if (elapsedTime.TotalHours >= 1)
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间：{elapsedTime}");
+        else if (elapsedTime.TotalMinutes >= 1)
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {Math.Floor(elapsedTime.TotalMinutes)} 分 {elapsedTime.Seconds} 秒");
+        else if (elapsedTime.TotalSeconds >= 1)
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalSeconds:F3} 秒");
+        else if (elapsedTime.TotalMilliseconds >= 1)
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds:F3} 毫秒");
+        else if (elapsedTime.TotalMicroseconds >= 1)
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMicroseconds:F3} 微秒");
+        else
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalNanoseconds:F3} 纳秒");
         return elapsedTime;
     }
     /// <summary>
@@ -201,8 +199,280 @@ public abstract class XFECode
                     var consolePort = 3280;
                     foreach (var customAttribute in method.CustomAttributes)
                     {
-                        if (customAttribute is not null && customAttribute.AttributeType.Name == "UseXFEConsoleAttribute")
+                        if (customAttribute.AttributeType.Name != "UseXFEConsoleAttribute")
+                            continue;
+
+                        useXFEConsole = true;
+                        foreach (var arg in customAttribute.ConstructorArguments)
                         {
+                            if (arg.ArgumentType == typeof(int))
+                                consolePort = (int)arg.Value!;
+                        }
+                    }
+                    foreach (var likeAttribute in attributes)
+                    {
+                        var timerName = likeAttribute switch
+                        {
+                            SMNTestAttribute subAttribute => "标识名：" + subAttribute.TimerName,
+                            SMNRTestAttribute resultAttribute => "标识名：" + resultAttribute.TimerName,
+                            _ => "方法名：" + method.Name
+                        };
+                        var paramsForMethod = likeAttribute.Params ?? method.GetDefaultParameters();
+                        var timeCounter = new Stopwatch();
+                        var selfTimeCounter = new Stopwatch();
+                        var isSuccessful = true;
+                        var isResultEqual = true;
+                        var failedMessage = string.Empty;
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.ForegroundColor = methodBorderColor;
+                        if (isFirstStaticMethod)
+                        {
+                            isFirstStaticMethod = false;
+                        }
+                        else
+                        {
+                            Console.WriteLine("\n\n\n\n\n");
+                        }
+                        var borderCount = (Console.BufferWidth - timerName.DisplayLength()) / 2;
+                        for (var i = 0; i < borderCount; i++)
+                        {
+                            Console.Write("=");
+                        }
+                        if ((Console.BufferWidth - timerName.DisplayLength()) % 2 == 1)
+                            Console.Write("=");
+                        Console.ForegroundColor = mainColor;
+                        Console.Write(timerName[..4]);
+                        Console.ForegroundColor = methodColor;
+                        Console.Write(timerName[4..]);
+                        Console.ForegroundColor = methodBorderColor;
+                        for (var i = 0; i < borderCount; i++)
+                        {
+                            Console.Write("=");
+                        }
+                        Console.WriteLine("\n");
+                        Console.BackgroundColor = mainColor;
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        Console.Write("开始执行");
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.ForegroundColor = mainColor;
+                        Console.Write("\t方法：");
+                        Console.ForegroundColor = methodColor;
+                        Console.Write(method.Name);
+                        Console.ForegroundColor = mainColor;
+                        Console.Write("\t类：");
+                        Console.ForegroundColor = classColor;
+                        Console.WriteLine($"{subClass.Name}\n");
+                        Console.ResetColor();
+                        selfTimeCounter.Start();
+                        selfTimeCounter.Stop();
+                        object? result = null;
+                        try
+                        {
+                            if (useXFEConsole)
+                            {
+                                if (Type.GetType("XFEExtension.NetCore.XFEConsole.XFEConsole, XFEExtension.NetCore.XFEConsole") is { } type)
+                                {
+                                    if (type.GetMethod("UseXFEConsole", BindingFlags.Static | BindingFlags.Public, [typeof(int), typeof(string)]) is { } useXFEConsoleMethodInfo)
+                                    {
+                                        var connectSuccessful = await (Task<bool>)useXFEConsoleMethodInfo.Invoke(null, [consolePort, ""])!;
+                                        if (!connectSuccessful)
+                                            Console.WriteLine("XFE控制台连接失败！");
+                                    }
+                                }
+                            }
+                            currentMethodIsAsserted = false;
+                            if (method.ReturnType == typeof(Task))
+                            {
+                                timeCounter.Start();
+                                await (Task)method.Invoke(Activator.CreateInstance(subClass), paramsForMethod)!;
+                                timeCounter.Stop();
+                            }
+                            else if (method.ReturnType.IsGenericType && method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+                            {
+                                timeCounter.Start();
+                                dynamic dynamicResult = method.Invoke(Activator.CreateInstance(subClass), paramsForMethod)!;
+                                result = await dynamicResult;
+                                timeCounter.Stop();
+                            }
+                            else
+                            {
+                                timeCounter.Start();
+                                result = method.Invoke(Activator.CreateInstance(subClass), paramsForMethod);
+                                timeCounter.Stop();
+                                if (likeAttribute is SMRTestAttribute resultAttribute2)
+                                {
+                                    isResultEqual = result is null && resultAttribute2.ReturnValue is null || result is not null && result.Equals(resultAttribute2.ReturnValue);
+                                    if (!isResultEqual)
+                                    {
+                                        isSuccessful = false;
+                                        failedMessage = $"预期结果：{resultAttribute2.ReturnValue}\t实际结果：{result}";
+                                    }
+                                }
+                            }
+                            if (currentMethodIsAsserted)
+                            {
+                                isSuccessful = false;
+                                if (failedMessage == string.Empty)
+                                    failedMessage = currentAssertMessage;
+                                else
+                                    failedMessage += $"\n{currentAssertMessage}";
+                                currentMethodIsAsserted = false;
+                                currentAssertMessage = string.Empty;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            isSuccessful = false;
+                            failedMessage = e.InnerException is not null ? e.InnerException.Message : e.Message;
+                        }
+                        var elapsedTime = timeCounter.Elapsed - selfTimeCounter.Elapsed;
+                        cTimeCounter++;
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.WriteLine();
+                        Console.BackgroundColor = mainColor;
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        Console.Write("执行完成");
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.ForegroundColor = mainColor;
+                        Console.Write("\t执行批次：");
+                        Console.ForegroundColor = counterColor;
+                        Console.Write(cTimeCounter);
+                        Console.ForegroundColor = mainColor;
+                        Console.Write("\t执行时间：");
+                        Console.ForegroundColor = timeColor;
+                        if (elapsedTime.TotalHours >= 1)
+                            Console.Write(elapsedTime);
+                        else if (elapsedTime.TotalMinutes >= 1)
+                            Console.Write($"{elapsedTime.Minutes} 分 {elapsedTime.Seconds} 秒 {elapsedTime.Milliseconds} 毫秒");
+                        else if (elapsedTime.TotalSeconds >= 1)
+                            Console.Write($"{elapsedTime.TotalSeconds:F3} 秒");
+                        else if (elapsedTime.TotalMilliseconds >= 1)
+                            Console.Write($"{elapsedTime.TotalMilliseconds:F3} 毫秒");
+                        else if (elapsedTime.TotalMicroseconds >= 1)
+                            Console.Write($"{elapsedTime.TotalMicroseconds:F2} 微秒");
+                        else
+                            Console.Write($"{elapsedTime.TotalMicroseconds:F2} 纳秒");
+                        if (result is not null)
+                        {
+                            Console.ForegroundColor = mainColor;
+                            Console.Write("\n\n执行结果：");
+                            Console.ForegroundColor = ConsoleColor.Gray;
+                            if (result.GetType().IsValueType)
+                                Console.WriteLine($"{result}\n");
+                            else
+                                result.X(true, true, "执行结果");
+                        }
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        Console.WriteLine();
+                        if (isSuccessful && isResultEqual)
+                        {
+                            Console.BackgroundColor = successColor;
+                            Console.Write("测试通过");
+                        }
+                        else
+                        {
+                            Console.BackgroundColor = failColor;
+                            Console.Write("测试失败");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.ForegroundColor = failColor;
+                            Console.WriteLine($"\t失败原因：{failedMessage}");
+                        }
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Write("\n");
+                        Console.ForegroundColor = methodBorderColor;
+                        Console.Write("\n");
+                        for (var i = 0; i < Console.BufferWidth; i++)
+                        {
+                            Console.Write("=");
+                        }
+                        Console.ResetColor();
+                        Console.WriteLine("\n");
+                        Console.WriteLine("\n");
+                        if (useXFEConsole)
+                        {
+                            if (Type.GetType("XFEExtension.NetCore.XFEConsole.XFEConsole") is { } type && type.GetMethod("StopXFEConsole", BindingFlags.Static | BindingFlags.Public) is { } stopXFEConsoleMethodInfo)
+                            {
+                                await (Task)stopXFEConsoleMethodInfo.Invoke(null, null)!;
+                            }
+                        }
+                    }
+                }
+                #endregion
+                var classAttributes = subClass.GetCustomAttributes<CTestAttribute>();
+                var classRunMethods = subClass.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).Where(m => m.IsDefined(typeof(MTestAttribute)));
+                foreach (var classAttribute in classAttributes)
+                {
+                    var isFirstMethod = true;
+                    var failedList = new List<MethodAndCounter>();
+                    var classInstance = classAttribute.Params is null ? subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, [], null)?.Invoke(classAttribute.Params) : subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, classAttribute.Params.GetTypes(), null)?.Invoke(classAttribute.Params);
+                    var setUpAttribute = subClass.GetAttribute<SetUpAttribute>();
+                    if (setUpAttribute is not null)
+                    {
+                        var setUpMethod = subClass.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).FirstOrDefault(m => m.IsDefined(typeof(SetUpAttribute)));
+                        setUpMethod?.Invoke(classInstance, setUpMethod.GetDefaultParameters());
+                    }
+                    var classOtherName = "类名：" + subClass.Name;
+                    if (classAttribute is CNTestAttribute subClassAttribute)
+                    {
+                        classOtherName = "标识名：" + subClassAttribute.ClassOtherName;
+                    }
+                    var classTimeCounter = new Stopwatch();
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.ForegroundColor = classBorderColor;
+                    if (isFirstClass)
+                    {
+                        isFirstClass = false;
+                    }
+                    else
+                    {
+                        Console.WriteLine("\n\n\n\n\n\n\n\n");
+                    }
+                    var borderCount = (Console.BufferWidth - classOtherName.DisplayLength()) / 2;
+                    for (var i = 0; i < borderCount; i++)
+                    {
+                        Console.Write("=");
+                    }
+                    if ((Console.BufferWidth - classOtherName.DisplayLength()) % 2 == 1)
+                        Console.Write("=");
+                    Console.ForegroundColor = mainColor;
+                    if (classOtherName[..4] == "标识名：")
+                    {
+                        Console.Write(classOtherName[..4]);
+                        Console.ForegroundColor = classColor;
+                        Console.Write(classOtherName[4..]);
+                    }
+                    else
+                    {
+                        Console.Write(classOtherName[..3]);
+                        Console.ForegroundColor = classColor;
+                        Console.Write(classOtherName[3..]);
+                    }
+                    Console.ForegroundColor = classBorderColor;
+                    for (var i = 0; i < borderCount; i++)
+                    {
+                        Console.Write("=");
+                    }
+                    Console.WriteLine("\n");
+                    Console.BackgroundColor = mainColor;
+                    Console.ForegroundColor = ConsoleColor.Black;
+                    Console.Write("开始执行");
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.ForegroundColor = mainColor;
+                    Console.Write("\t类名：");
+                    Console.ForegroundColor = classColor;
+                    Console.WriteLine($"{subClass.Name}\n\n\n\n\n");
+                    Console.ResetColor();
+                    classTimeCounter.Start();
+                    foreach (var method in classRunMethods)
+                    {
+                        var attributes = method.GetCustomAttributes<MTestAttribute>();
+                        var useXFEConsole = false;
+                        var consolePort = 3280;
+                        foreach (var customAttribute in method.CustomAttributes)
+                        {
+                            if (customAttribute.AttributeType.Name != "UseXFEConsoleAttribute")
+                                continue;
                             useXFEConsole = true;
                             foreach (var arg in customAttribute.ConstructorArguments)
                             {
@@ -210,70 +480,46 @@ public abstract class XFECode
                                     consolePort = (int)arg.Value!;
                             }
                         }
-                    }
-                    foreach (var likeAttribute in attributes)
-                    {
-                        if (likeAttribute is SMTestAttribute attribute)
+                        foreach (var attribute in attributes)
                         {
-                            var timerName = "方法名：" + method.Name;
-                            if (likeAttribute is SMNTestAttribute subAttribute)
+                            var methodOtherName = attribute switch
                             {
-                                timerName = "标识名：" + subAttribute.TimerName;
-                            }
-                            if (attribute is SMNRTestAttribute resultAttribute)
-                            {
-                                timerName = "标识名：" + resultAttribute.TimerName;
-                            }
-                            object?[]? paramsForMethod;
-                            if (attribute.Params is not null)
-                            {
-                                paramsForMethod = attribute.Params;
-                            }
-                            else
-                            {
-                                paramsForMethod = method.GetDefaultParameters();
-                            }
+                                MNTestAttribute subAttribute => "标识名：" + subAttribute.MethodOtherName,
+                                MNRTestAttribute resultAttribute => "标识名：" + resultAttribute.MethodOtherName,
+                                _ => "方法名：" + method.Name
+                            };
+
+                            var paramsForMethod = attribute.Params ?? method.GetDefaultParameters();
                             var timeCounter = new Stopwatch();
                             var selfTimeCounter = new Stopwatch();
-                            var elapsedTime = new TimeSpan();
                             var isSuccessful = true;
                             var isResultEqual = true;
                             var failedMessage = string.Empty;
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.ForegroundColor = methodBorderColor;
-                            if (isFirstStaticMethod)
+                            if (isFirstMethod)
                             {
-                                isFirstStaticMethod = false;
+                                isFirstMethod = false;
                             }
                             else
                             {
                                 Console.WriteLine("\n\n\n\n\n");
                             }
-                            var borderCount = (Console.BufferWidth - timerName.DisplayLength()) / 2;
-                            if (timerName is not null)
+                            borderCount = (Console.BufferWidth - methodOtherName.DisplayLength()) / 2;
+                            for (var i = 0; i < borderCount; i++)
                             {
-                                for (var i = 0; i < borderCount; i++)
-                                {
-                                    Console.Write("=");
-                                }
-                                if ((Console.BufferWidth - timerName.DisplayLength()) % 2 == 1)
-                                    Console.Write("=");
-                                Console.ForegroundColor = mainColor;
-                                Console.Write(timerName[..4]);
-                                Console.ForegroundColor = methodColor;
-                                Console.Write(timerName[4..]);
-                                Console.ForegroundColor = methodBorderColor;
-                                for (var i = 0; i < borderCount; i++)
-                                {
-                                    Console.Write("=");
-                                }
+                                Console.Write("=");
                             }
-                            else
+                            if ((Console.BufferWidth - methodOtherName.DisplayLength()) % 2 == 1)
+                                Console.Write("=");
+                            Console.ForegroundColor = mainColor;
+                            Console.Write(methodOtherName[..4]);
+                            Console.ForegroundColor = methodColor;
+                            Console.Write(methodOtherName[4..]);
+                            Console.ForegroundColor = methodBorderColor;
+                            for (var i = 0; i < borderCount; i++)
                             {
-                                for (var i = 0; i < Console.BufferWidth; i++)
-                                {
-                                    Console.Write("=");
-                                }
+                                Console.Write("=");
                             }
                             Console.WriteLine("\n");
                             Console.BackgroundColor = mainColor;
@@ -294,11 +540,12 @@ public abstract class XFECode
                             object? result = null;
                             try
                             {
+                                currentMethodIsAsserted = false;
                                 if (useXFEConsole)
                                 {
-                                    if (Type.GetType("XFEExtension.NetCore.XFEConsole.XFEConsole, XFEExtension.NetCore.XFEConsole") is Type type)
+                                    if (Type.GetType("XFEExtension.NetCore.XFEConsole.XFEConsole, XFEExtension.NetCore.XFEConsole") is { } type)
                                     {
-                                        if (type.GetMethod("UseXFEConsole", BindingFlags.Static | BindingFlags.Public, [typeof(int), typeof(string)]) is MethodInfo useXFEConsoleMethodInfo)
+                                        if (type.GetMethod("UseXFEConsole", BindingFlags.Static | BindingFlags.Public, [typeof(int), typeof(string)]) is { } useXFEConsoleMethodInfo)
                                         {
                                             var connectSuccessful = await (Task<bool>)useXFEConsoleMethodInfo.Invoke(null, [consolePort, ""])!;
                                             if (!connectSuccessful)
@@ -306,26 +553,25 @@ public abstract class XFECode
                                         }
                                     }
                                 }
-                                currentMethodIsAsserted = false;
                                 if (method.ReturnType == typeof(Task))
                                 {
                                     timeCounter.Start();
-                                    await (Task)method.Invoke(Activator.CreateInstance(subClass), paramsForMethod)!;
+                                    await (Task)method.Invoke(classInstance, paramsForMethod)!;
                                     timeCounter.Stop();
                                 }
                                 else if (method.ReturnType.IsGenericType && method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
                                 {
                                     timeCounter.Start();
-                                    dynamic dynamicResult = method.Invoke(Activator.CreateInstance(subClass), paramsForMethod)!;
+                                    dynamic dynamicResult = method.Invoke(classInstance, paramsForMethod)!;
                                     result = await dynamicResult;
                                     timeCounter.Stop();
                                 }
                                 else
                                 {
                                     timeCounter.Start();
-                                    result = method.Invoke(Activator.CreateInstance(subClass), paramsForMethod);
+                                    result = method.Invoke(classInstance, paramsForMethod);
                                     timeCounter.Stop();
-                                    if (attribute is SMRTestAttribute resultAttribute2)
+                                    if (attribute is MRTestAttribute resultAttribute2)
                                     {
                                         isResultEqual = result is null && resultAttribute2.ReturnValue is null || result is not null && result.Equals(resultAttribute2.ReturnValue);
                                         if (!isResultEqual)
@@ -351,7 +597,7 @@ public abstract class XFECode
                                 isSuccessful = false;
                                 failedMessage = e.InnerException is not null ? e.InnerException.Message : e.Message;
                             }
-                            elapsedTime = timeCounter.Elapsed - selfTimeCounter.Elapsed;
+                            var elapsedTime = timeCounter.Elapsed - selfTimeCounter.Elapsed;
                             cTimeCounter++;
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.WriteLine();
@@ -403,6 +649,7 @@ public abstract class XFECode
                                 Console.BackgroundColor = ConsoleColor.Black;
                                 Console.ForegroundColor = failColor;
                                 Console.WriteLine($"\t失败原因：{failedMessage}");
+                                failedList.Add(new MethodAndCounter(method, cTimeCounter, failedMessage));
                             }
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write("\n");
@@ -413,318 +660,11 @@ public abstract class XFECode
                                 Console.Write("=");
                             }
                             Console.ResetColor();
-                            Console.WriteLine("\n");
-                            Console.WriteLine("\n");
                             if (useXFEConsole)
                             {
-                                if (Type.GetType("XFEExtension.NetCore.XFEConsole.XFEConsole") is Type type && type.GetMethod("StopXFEConsole", BindingFlags.Static | BindingFlags.Public) is MethodInfo stopXFEConsoleMethodInfo)
+                                if (Type.GetType("XFEExtension.NetCore.XFEConsole.XFEConsole") is { } type && type.GetMethod("StopXFEConsole", BindingFlags.Static | BindingFlags.Public) is { } stopXFEConsoleMethodInfo)
                                 {
                                     await (Task)stopXFEConsoleMethodInfo.Invoke(null, null)!;
-                                }
-                            }
-                        }
-                    }
-                }
-                #endregion
-                var classAttributes = subClass.GetCustomAttributes<CTestAttribute>();
-                var classRunMethods = subClass.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).Where(m => m.IsDefined(typeof(MTestAttribute)));
-                foreach (var classAttribute in classAttributes)
-                {
-                    var isFirstMethod = true;
-                    var failedList = new List<MethodAndCounter>();
-                    var classInstance = classAttribute.Params is null ? subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, [], null)?.Invoke(classAttribute.Params) : subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, classAttribute.Params.GetTypes()!, null)?.Invoke(classAttribute.Params);
-                    var setUpAttribute = subClass.GetAttribute<SetUpAttribute>();
-                    if (setUpAttribute is not null)
-                    {
-                        var setUpMethod = subClass.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).FirstOrDefault(m => m.IsDefined(typeof(SetUpAttribute)));
-                        setUpMethod?.Invoke(classInstance, setUpMethod.GetDefaultParameters());
-                    }
-                    var classOtherName = "类名：" + subClass.Name;
-                    if (classAttribute is CNTestAttribute subClassAttribute)
-                    {
-                        classOtherName = "标识名：" + subClassAttribute.ClassOtherName;
-                    }
-                    var classTimeCounter = new Stopwatch();
-                    Console.BackgroundColor = ConsoleColor.Black;
-                    Console.ForegroundColor = classBorderColor;
-                    if (isFirstClass)
-                    {
-                        isFirstClass = false;
-                    }
-                    else
-                    {
-                        Console.WriteLine("\n\n\n\n\n\n\n\n");
-                    }
-                    var borderCount = (Console.BufferWidth - classOtherName.DisplayLength()) / 2;
-                    if (classOtherName is not null)
-                    {
-                        for (var i = 0; i < borderCount; i++)
-                        {
-                            Console.Write("=");
-                        }
-                        if ((Console.BufferWidth - classOtherName.DisplayLength()) % 2 == 1)
-                            Console.Write("=");
-                        Console.ForegroundColor = mainColor;
-                        if (classOtherName[..4] == "标识名：")
-                        {
-                            Console.Write(classOtherName[..4]);
-                            Console.ForegroundColor = classColor;
-                            Console.Write(classOtherName[4..]);
-                        }
-                        else
-                        {
-                            Console.Write(classOtherName[..3]);
-                            Console.ForegroundColor = classColor;
-                            Console.Write(classOtherName[3..]);
-                        }
-                        Console.ForegroundColor = classBorderColor;
-                        for (var i = 0; i < borderCount; i++)
-                        {
-                            Console.Write("=");
-                        }
-                    }
-                    else
-                    {
-                        for (var i = 0; i < Console.BufferWidth; i++)
-                        {
-                            Console.Write("=");
-                        }
-                    }
-                    Console.WriteLine("\n");
-                    Console.BackgroundColor = mainColor;
-                    Console.ForegroundColor = ConsoleColor.Black;
-                    Console.Write("开始执行");
-                    Console.BackgroundColor = ConsoleColor.Black;
-                    Console.ForegroundColor = mainColor;
-                    Console.Write("\t类名：");
-                    Console.ForegroundColor = classColor;
-                    Console.WriteLine($"{subClass.Name}\n\n\n\n\n");
-                    Console.ResetColor();
-                    classTimeCounter.Start();
-                    foreach (var method in classRunMethods)
-                    {
-                        var attributes = method.GetCustomAttributes<MTestAttribute>();
-                        var useXFEConsole = false;
-                        var consolePort = 3280;
-                        foreach (var customAttribute in method.CustomAttributes)
-                        {
-                            if (customAttribute is not null && customAttribute.AttributeType.Name == "UseXFEConsoleAttribute")
-                            {
-                                useXFEConsole = true;
-                                foreach (var arg in customAttribute.ConstructorArguments)
-                                {
-                                    if (arg.ArgumentType == typeof(int))
-                                        consolePort = (int)arg.Value!;
-                                }
-                            }
-                        }
-                        foreach (var attribute in attributes)
-                        {
-                            if (attribute is MTestAttribute methodAttribute)
-                            {
-                                var methodOtherName = attribute switch
-                                {
-                                    MNTestAttribute subAttribute => "标识名：" + subAttribute.MethodOtherName,
-                                    MNRTestAttribute resultAttribute => "标识名：" + resultAttribute.MethodOtherName,
-                                    _ => "方法名：" + method.Name
-                                };
-
-                                object?[]? paramsForMethod;
-                                if (attribute.Params is not null)
-                                {
-                                    paramsForMethod = attribute.Params;
-                                }
-                                else
-                                {
-                                    paramsForMethod = method.GetDefaultParameters();
-                                }
-                                var timeCounter = new Stopwatch();
-                                var selfTimeCounter = new Stopwatch();
-                                var elapsedTime = new TimeSpan();
-                                var isSuccessful = true;
-                                var isResultEqual = true;
-                                var failedMessage = string.Empty;
-                                Console.BackgroundColor = ConsoleColor.Black;
-                                Console.ForegroundColor = methodBorderColor;
-                                if (isFirstMethod)
-                                {
-                                    isFirstMethod = false;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("\n\n\n\n\n");
-                                }
-                                borderCount = (Console.BufferWidth - methodOtherName.DisplayLength()) / 2;
-                                if (methodOtherName is not null)
-                                {
-                                    for (var i = 0; i < borderCount; i++)
-                                    {
-                                        Console.Write("=");
-                                    }
-                                    if ((Console.BufferWidth - methodOtherName.DisplayLength()) % 2 == 1)
-                                        Console.Write("=");
-                                    Console.ForegroundColor = mainColor;
-                                    Console.Write(methodOtherName[..4]);
-                                    Console.ForegroundColor = methodColor;
-                                    Console.Write(methodOtherName[4..]);
-                                    Console.ForegroundColor = methodBorderColor;
-                                    for (var i = 0; i < borderCount; i++)
-                                    {
-                                        Console.Write("=");
-                                    }
-                                }
-                                else
-                                {
-                                    for (var i = 0; i < Console.BufferWidth; i++)
-                                    {
-                                        Console.Write("=");
-                                    }
-                                }
-                                Console.WriteLine("\n");
-                                Console.BackgroundColor = mainColor;
-                                Console.ForegroundColor = ConsoleColor.Black;
-                                Console.Write("开始执行");
-                                Console.BackgroundColor = ConsoleColor.Black;
-                                Console.ForegroundColor = mainColor;
-                                Console.Write("\t方法：");
-                                Console.ForegroundColor = methodColor;
-                                Console.Write(method.Name);
-                                Console.ForegroundColor = mainColor;
-                                Console.Write("\t类：");
-                                Console.ForegroundColor = classColor;
-                                Console.WriteLine($"{subClass.Name}\n");
-                                Console.ResetColor();
-                                selfTimeCounter.Start();
-                                selfTimeCounter.Stop();
-                                object? result = null;
-                                try
-                                {
-                                    currentMethodIsAsserted = false;
-                                    if (useXFEConsole)
-                                    {
-                                        if (Type.GetType("XFEExtension.NetCore.XFEConsole.XFEConsole, XFEExtension.NetCore.XFEConsole") is Type type)
-                                        {
-                                            if (type.GetMethod("UseXFEConsole", BindingFlags.Static | BindingFlags.Public, [typeof(int), typeof(string)]) is MethodInfo useXFEConsoleMethodInfo)
-                                            {
-                                                var connectSuccessful = await (Task<bool>)useXFEConsoleMethodInfo.Invoke(null, [consolePort, ""])!;
-                                                if (!connectSuccessful)
-                                                    Console.WriteLine("XFE控制台连接失败！");
-                                            }
-                                        }
-                                    }
-                                    if (method.ReturnType == typeof(Task))
-                                    {
-                                        timeCounter.Start();
-                                        await (Task)method.Invoke(classInstance, paramsForMethod)!;
-                                        timeCounter.Stop();
-                                    }
-                                    else if (method.ReturnType.IsGenericType && method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
-                                    {
-                                        timeCounter.Start();
-                                        dynamic dynamicResult = method.Invoke(classInstance, paramsForMethod)!;
-                                        result = await dynamicResult;
-                                        timeCounter.Stop();
-                                    }
-                                    else
-                                    {
-                                        timeCounter.Start();
-                                        result = method.Invoke(classInstance, paramsForMethod);
-                                        timeCounter.Stop();
-                                        if (methodAttribute is MRTestAttribute resultAttribute2)
-                                        {
-                                            isResultEqual = result is null && resultAttribute2.ReturnValue is null || result is not null && result.Equals(resultAttribute2.ReturnValue);
-                                            if (!isResultEqual)
-                                            {
-                                                isSuccessful = false;
-                                                failedMessage = $"预期结果：{resultAttribute2.ReturnValue}\t实际结果：{result}";
-                                            }
-                                        }
-                                    }
-                                    if (currentMethodIsAsserted)
-                                    {
-                                        isSuccessful = false;
-                                        if (failedMessage == string.Empty)
-                                            failedMessage = currentAssertMessage;
-                                        else
-                                            failedMessage += $"\n{currentAssertMessage}";
-                                        currentMethodIsAsserted = false;
-                                        currentAssertMessage = string.Empty;
-                                    }
-                                }
-                                catch (Exception e)
-                                {
-                                    isSuccessful = false;
-                                    failedMessage = e.InnerException is not null ? e.InnerException.Message : e.Message;
-                                }
-                                elapsedTime = timeCounter.Elapsed - selfTimeCounter.Elapsed;
-                                cTimeCounter++;
-                                Console.BackgroundColor = ConsoleColor.Black;
-                                Console.WriteLine();
-                                Console.BackgroundColor = mainColor;
-                                Console.ForegroundColor = ConsoleColor.Black;
-                                Console.Write("执行完成");
-                                Console.BackgroundColor = ConsoleColor.Black;
-                                Console.ForegroundColor = mainColor;
-                                Console.Write("\t执行批次：");
-                                Console.ForegroundColor = counterColor;
-                                Console.Write(cTimeCounter);
-                                Console.ForegroundColor = mainColor;
-                                Console.Write("\t执行时间：");
-                                Console.ForegroundColor = timeColor;
-                                if (elapsedTime.TotalHours >= 1)
-                                    Console.Write(elapsedTime);
-                                else if (elapsedTime.TotalMinutes >= 1)
-                                    Console.Write($"{elapsedTime.Minutes} 分 {elapsedTime.Seconds} 秒 {elapsedTime.Milliseconds} 毫秒");
-                                else if (elapsedTime.TotalSeconds >= 1)
-                                    Console.Write($"{elapsedTime.TotalSeconds:F3} 秒");
-                                else if (elapsedTime.TotalMilliseconds >= 1)
-                                    Console.Write($"{elapsedTime.TotalMilliseconds:F3} 毫秒");
-                                else if (elapsedTime.TotalMicroseconds >= 1)
-                                    Console.Write($"{elapsedTime.TotalMicroseconds:F2} 微秒");
-                                else
-                                    Console.Write($"{elapsedTime.TotalMicroseconds:F2} 纳秒");
-                                if (result is not null)
-                                {
-                                    Console.ForegroundColor = mainColor;
-                                    Console.Write("\n\n执行结果：");
-                                    Console.ForegroundColor = ConsoleColor.Gray;
-                                    if (result.GetType().IsValueType)
-                                        Console.WriteLine($"{result}\n");
-                                    else
-                                        result.X(true, true, "执行结果");
-                                }
-                                Console.WriteLine();
-                                Console.ForegroundColor = ConsoleColor.Black;
-                                Console.WriteLine();
-                                if (isSuccessful && isResultEqual)
-                                {
-                                    Console.BackgroundColor = successColor;
-                                    Console.Write("测试通过");
-                                }
-                                else
-                                {
-                                    Console.BackgroundColor = failColor;
-                                    Console.Write("测试失败");
-                                    Console.BackgroundColor = ConsoleColor.Black;
-                                    Console.ForegroundColor = failColor;
-                                    Console.WriteLine($"\t失败原因：{failedMessage}");
-                                    failedList.Add(new MethodAndCounter(method, cTimeCounter, failedMessage));
-                                }
-                                Console.BackgroundColor = ConsoleColor.Black;
-                                Console.Write("\n");
-                                Console.ForegroundColor = methodBorderColor;
-                                Console.Write("\n");
-                                for (var i = 0; i < Console.BufferWidth; i++)
-                                {
-                                    Console.Write("=");
-                                }
-                                Console.ResetColor();
-                                if (useXFEConsole)
-                                {
-                                    if (Type.GetType("XFEExtension.NetCore.XFEConsole.XFEConsole") is Type type && type.GetMethod("StopXFEConsole", BindingFlags.Static | BindingFlags.Public) is MethodInfo stopXFEConsoleMethodInfo)
-                                    {
-                                        await (Task)stopXFEConsoleMethodInfo.Invoke(null, null)!;
-                                    }
                                 }
                             }
                         }
@@ -804,13 +744,11 @@ public abstract class XFECode
     /// <param name="condition">判断条件</param>
     public static bool Assert(bool condition)
     {
-        if (!condition)
-        {
-            currentMethodIsAsserted = true;
-            currentAssertMessage = "断言失败：期望为真，实际为假";
-            return false;
-        }
-        return true;
+        if (condition)
+            return true;
+        currentMethodIsAsserted = true;
+        currentAssertMessage = "断言失败：期望为真，实际为假";
+        return false;
     }
 
     /// <summary>
@@ -820,13 +758,11 @@ public abstract class XFECode
     /// <param name="message">消息</param>
     public static bool Assert(bool condition, string message)
     {
-        if (!condition)
-        {
-            currentMethodIsAsserted = true;
-            currentAssertMessage = message;
-            return false;
-        }
-        return true;
+        if (condition)
+            return true;
+        currentMethodIsAsserted = true;
+        currentAssertMessage = message;
+        return false;
     }
 
     /// <summary>
@@ -835,13 +771,11 @@ public abstract class XFECode
     /// <param name="condition">判断条件</param>
     public static bool AssertF(bool condition)
     {
-        if (condition)
-        {
-            currentMethodIsAsserted = true;
-            currentAssertMessage = "断言失败：期望为假，实际为真";
-            return false;
-        }
-        return true;
+        if (!condition)
+            return true;
+        currentMethodIsAsserted = true;
+        currentAssertMessage = "断言失败：期望为假，实际为真";
+        return false;
     }
 
     /// <summary>
@@ -851,13 +785,11 @@ public abstract class XFECode
     /// <param name="message">消息</param>
     public static bool AssertF(bool condition, string message)
     {
-        if (condition)
-        {
-            currentMethodIsAsserted = true;
-            currentAssertMessage = message;
-            return false;
-        }
-        return true;
+        if (!condition)
+            return true;
+        currentMethodIsAsserted = true;
+        currentAssertMessage = message;
+        return false;
     }
 
     /// <summary>
@@ -869,13 +801,11 @@ public abstract class XFECode
     public static bool AssertE<T>(T expected, T actual)
     {
         var result = !EqualityComparer<T>.Default.Equals(expected, actual);
-        if (result)
-        {
-            currentMethodIsAsserted = true;
-            currentAssertMessage = $"断言失败：期望 {expected}，实际 {actual}";
-            return false;
-        }
-        return true;
+        if (!result)
+            return true;
+        currentMethodIsAsserted = true;
+        currentAssertMessage = $"断言失败：期望 {expected}，实际 {actual}";
+        return false;
     }
 
     /// <summary>
@@ -888,12 +818,10 @@ public abstract class XFECode
     public static bool AssertE<T>(T expected, T actual, string message)
     {
         var result = !EqualityComparer<T>.Default.Equals(expected, actual);
-        if (result)
-        {
-            currentMethodIsAsserted = true;
-            currentAssertMessage = message;
-            return false;
-        }
-        return true;
+        if (!result)
+            return true;
+        currentMethodIsAsserted = true;
+        currentAssertMessage = message;
+        return false;
     }
 }

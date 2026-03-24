@@ -37,14 +37,7 @@ public class XFEConverter
         if (IsBasicType(type))
             return ConvertBasicTypeToCodeType(type.Name);
         var genericArguments = type.GetGenericArguments();
-        if (genericArguments.Length == 0)
-            return type.Name;
-        return $"{type.Name.Replace($"`{genericArguments.Length}", string.Empty)}<{string.Join(", ", genericArguments.Select(x =>
-        {
-            if (IsBasicType(x))
-                return ConvertBasicTypeToCodeType(x.Name);
-            return OutPutTypeName(x);
-        }))}>";
+        return genericArguments.Length == 0 ? type.Name : $"{type.Name.Replace($"`{genericArguments.Length}", string.Empty)}<{string.Join(", ", genericArguments.Select(x => IsBasicType(x) ? ConvertBasicTypeToCodeType(x.Name) : OutPutTypeName(x)))}>";
     }
 
     /// <summary>
@@ -124,11 +117,12 @@ public class XFEConverter
                     {
                         arrayObjects.Add(GetObjectInfo(stringConverter, "数组成员", ObjectPlace.ArrayMember, layer + 1, currentFatherList, null, null, onlyProperty, onlyPublic, stopInThisLayer, maxLayer, maxArrayCount, currentFieldInfo, currentPropertyInfo));
                     }
-                    if (currentCount > maxArrayCount && maxArrayCount != -1)
-                    {
-                        arrayObjects.Add(new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, true, $"数组数量超出设定最大值（{maxArrayCount}）"));
-                        break;
-                    }
+
+                    if (currentCount <= maxArrayCount || maxArrayCount == -1)
+                        continue;
+
+                    arrayObjects.Add(new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, true, $"数组数量超出设定最大值（{maxArrayCount}）"));
+                    break;
                 }
                 return new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, false, true, value, arrayObjects);
             }
@@ -148,11 +142,12 @@ public class XFEConverter
                     {
                         enumerableObjects.Add(GetObjectInfo(stringConverter, "列表成员", ObjectPlace.ListMember, layer + 1, currentFatherList, null, null, onlyProperty, onlyPublic, stopInThisLayer, maxLayer, maxArrayCount, currentFieldInfo, currentPropertyInfo));
                     }
-                    if (currentCount > maxArrayCount && maxArrayCount != -1)
-                    {
-                        enumerableObjects.Add(new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, true, $"列表数量超出设定最大值（{maxArrayCount}）"));
-                        break;
-                    }
+
+                    if (currentCount <= maxArrayCount || maxArrayCount == -1)
+                        continue;
+
+                    enumerableObjects.Add(new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, true, $"列表数量超出设定最大值（{maxArrayCount}）"));
+                    break;
                 }
                 return new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, false, true, value, enumerableObjects);
             }
@@ -176,16 +171,17 @@ public class XFEConverter
                     }
                     continue;
                 }
-                if (!onlyProperty && memberInfo is FieldInfo fieldInfo)
+
+                if (onlyProperty || memberInfo is not FieldInfo fieldInfo)
+                    continue;
+
+                try
                 {
-                    try
-                    {
-                        subObjects.Add(GetObjectInfo(stringConverter, fieldInfo.Name, ObjectPlace.Field, layer + 1, currentFatherList, fieldInfo.FieldType, fieldInfo.GetValue(value), onlyProperty, onlyPublic, isType, maxLayer, maxArrayCount, fieldInfo));
-                    }
-                    catch
-                    {
-                        subObjects.Add(GetObjectInfo(stringConverter, fieldInfo.Name, ObjectPlace.Property, layer + 1, currentFatherList, fieldInfo.FieldType, null, onlyProperty, onlyPublic, isType, maxLayer, maxArrayCount, fieldInfo));
-                    }
+                    subObjects.Add(GetObjectInfo(stringConverter, fieldInfo.Name, ObjectPlace.Field, layer + 1, currentFatherList, fieldInfo.FieldType, fieldInfo.GetValue(value), onlyProperty, onlyPublic, isType, maxLayer, maxArrayCount, fieldInfo));
+                }
+                catch
+                {
+                    subObjects.Add(GetObjectInfo(stringConverter, fieldInfo.Name, ObjectPlace.Property, layer + 1, currentFatherList, fieldInfo.FieldType, null, onlyProperty, onlyPublic, isType, maxLayer, maxArrayCount, fieldInfo));
                 }
             }
             return new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, false, false, value, subObjects);

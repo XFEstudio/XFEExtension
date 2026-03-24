@@ -16,37 +16,22 @@ public class XFManager
     {
         get
         {
-            foreach (var field in Fields)
+            foreach (var field in Fields.Where(field => field.Name == name))
             {
-                if (field.name == name)
-                {
-                    return field.field;
-                }
+                return field.Field;
             }
-            foreach (var property in Properties)
-            {
-                if (property.Name == name)
-                {
-                    return property.Property;
-                }
-            }
-            return null;
+            return (from property in Properties where property.Name == name select property.Property).FirstOrDefault();
         }
         set
         {
-            foreach (var field in Fields)
+            foreach (var field in Fields.Where(field => field.Name == name))
             {
-                if (field.name == name)
-                {
-                    field.field = value;
-                }
+                field.Field = value;
             }
-            foreach (var property in Properties)
+
+            foreach (var property in Properties.Where(property => property.Name == name))
             {
-                if (property.Name == name)
-                {
-                    property.Property = value;
-                }
+                property.Property = value;
             }
         }
     }
@@ -58,13 +43,11 @@ public class XFManager
     /// <returns></returns>
     public T? X<T>(string name)
     {
-        foreach (var item in Properties)
+        foreach (var item in Properties.Where(item => item.Name == name))
         {
-            if (item.Name == name)
-            {
-                return (T?)item.Property;
-            }
+            return (T?)item.Property;
         }
+
         return default;
     }
     /// <summary>
@@ -74,12 +57,9 @@ public class XFManager
     /// <param name="value"></param>
     public void E(string name, object value)
     {
-        foreach (var item in Properties)
+        foreach (var item in Properties.Where(item => item.Name == name))
         {
-            if (item.Name == name)
-            {
-                item.Property = value;
-            }
+            item.Property = value;
         }
     }
     /// <summary>
@@ -110,7 +90,7 @@ public class XFManager
         {
             for (var i = 0; i < nameAndValue.Length; i += 2)
             {
-                Fields.Add(new XField { name = nameAndValue[i].ToString(), field = nameAndValue[i + 1] });
+                Fields.Add(new XField { Name = nameAndValue[i].ToString(), Field = nameAndValue[i + 1] });
             }
         }
     }
@@ -124,7 +104,7 @@ public class XFManager
         Fields = [];
         for (var i = 0; i < nameAndValue.Length; i += 2)
         {
-            Fields.Add(new XField { name = nameAndValue[i].ToString(), field = nameAndValue[i + 1] });
+            Fields.Add(new XField { Name = nameAndValue[i].ToString(), Field = nameAndValue[i + 1] });
         }
     }
 }

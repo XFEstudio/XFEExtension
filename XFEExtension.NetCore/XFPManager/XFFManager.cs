@@ -13,25 +13,12 @@ public class XFFManager
     /// <returns></returns>
     public object? this[string name]
     {
-        get
-        {
-            foreach (var field in Fields)
-            {
-                if (field.name == name)
-                {
-                    return field.field;
-                }
-            }
-            return null;
-        }
+        get => (from field in Fields where field.Name == name select field.Field).FirstOrDefault();
         set
         {
-            foreach (var field in Fields)
+            foreach (var field in Fields.Where(field => field.Name == name))
             {
-                if (field.name == name)
-                {
-                    field.field = value;
-                }
+                field.Field = value;
             }
         }
     }
@@ -43,13 +30,11 @@ public class XFFManager
     /// <returns>字段值</returns>
     public T? X<T>(string name)
     {
-        foreach (var item in Fields)
+        foreach (var item in Fields.Where(item => item.Name == name))
         {
-            if (item.name == name)
-            {
-                return item.field is null ? default : (T)item.field;
-            }
+            return item.Field is null ? default : (T)item.Field;
         }
+
         return default;
     }
     /// <summary>
@@ -59,12 +44,9 @@ public class XFFManager
     /// <param name="value"></param>
     public void E(string name, object value)
     {
-        foreach (var item in Fields)
+        foreach (var item in Fields.Where(item => item.Name == name))
         {
-            if (item.name == name)
-            {
-                item.field = value;
-            }
+            item.Field = value;
         }
     }
     /// <summary>
@@ -83,7 +65,7 @@ public class XFFManager
         Fields = [];
         for (var i = 0; i < nameAndValue.Length; i += 2)
         {
-            Fields.Add(new XField { name = nameAndValue[i].ToString(), field = nameAndValue[i + 1] });
+            Fields.Add(new XField { Name = nameAndValue[i].ToString(), Field = nameAndValue[i + 1] });
         }
     }
 }

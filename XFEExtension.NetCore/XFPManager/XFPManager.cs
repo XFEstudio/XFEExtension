@@ -14,23 +14,13 @@ public class XFPManager
     {
         get
         {
-            foreach (var property in Properties)
-            {
-                if (property.Name == name)
-                {
-                    return property.Property;
-                }
-            }
-            return null;
+            return (from property in Properties where property.Name == name select property.Property).FirstOrDefault();
         }
         set
         {
-            foreach (var property in Properties)
+            foreach (var property in Properties.Where(property => property.Name == name))
             {
-                if (property.Name == name)
-                {
-                    property.Property = value;
-                }
+                property.Property = value;
             }
         }
     }
@@ -42,13 +32,11 @@ public class XFPManager
     /// <returns>属性值</returns>
     public T? X<T>(string name)
     {
-        foreach (var item in Properties)
+        foreach (var item in Properties.Where(item => item.Name == name))
         {
-            if (item.Name == name)
-            {
-                return (T?)item.Property;
-            }
+            return (T?)item.Property;
         }
+
         return default;
     }
     /// <summary>
@@ -58,12 +46,9 @@ public class XFPManager
     /// <param name="value"></param>
     public void E(string name, object value)
     {
-        foreach (var item in Properties)
+        foreach (var item in Properties.Where(item => item.Name == name))
         {
-            if (item.Name == name)
-            {
-                item.Property = value;
-            }
+            item.Property = value;
         }
     }
     /// <summary>

@@ -253,12 +253,11 @@ public class XCCMessageReceiveHelper
         }
         if (xCCFileDictionary.TryGetValue(e.MessageId!, out var value))
         {
-            var xCCFile = value;
-            if (!xCCFile.Loaded)
+            if (!value.Loaded)
             {
                 value.LoadFile(e.BinaryMessage);
                 if (AutoSaveInLocal)
-                    SaveFile(xCCFile);
+                    SaveFile(value);
             }
         }
         else

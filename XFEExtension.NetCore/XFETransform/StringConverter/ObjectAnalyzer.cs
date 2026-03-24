@@ -25,7 +25,7 @@ public class ObjectAnalyzer : StringConverter
             {
                 outPutString += $"{AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}：{objectInfo.Value}[{(int)objectInfo.Value}]\n";
             }
-            else if (objectInfo.Value is string str && str == string.Empty)
+            else if (objectInfo.Value is "")
             {
                 outPutString += $"{AddObjectPlace(objectInfo)} {XFEConverter.OutPutTypeName(objectInfo.Type!)} {objectInfo.Name}：string.Empty\n";
             }
@@ -71,14 +71,14 @@ public class ObjectAnalyzer : StringConverter
                 {
                     tabString += "│    ";
                 }
-                if (objectInfo.SubObjects is not null)
-                {
-                    if (objectInfo.SubObjects.Count > 0)
-                        outPutString += OutPutSubObjects(objectInfo.SubObjects);
-                    else
-                        outPutString += $"{tabString}│    └─无内容";
 
-                }
+                if (objectInfo.SubObjects is null)
+                    return outPutString;
+
+                if (objectInfo.SubObjects.Count > 0)
+                    outPutString += OutPutSubObjects(objectInfo.SubObjects);
+                else
+                    outPutString += $"{tabString}│    └─无内容";
             }
         }
         return outPutString;

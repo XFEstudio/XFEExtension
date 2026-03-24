@@ -18,15 +18,8 @@ public class MultiEscapeConverter
     /// </summary>
     /// <param name="str"></param>
     /// <returns></returns>
-    public string Convert(string str)
-    {
-        str = ConvertEscapeSymbol(str);
-        foreach (var escape in Escapes)
-        {
-            str = str.Replace(escape, $"{EscapeSymbol}{escape}");
-        }
-        return str;
-    }
+    public string Convert(string str) => Escapes.Aggregate(ConvertEscapeSymbol(str), (current, escape) => current.Replace(escape, $"{EscapeSymbol}{escape}"));
+
     /// <summary>
     /// 逆转义（生成原文）
     /// </summary>
@@ -34,10 +27,7 @@ public class MultiEscapeConverter
     /// <returns></returns>
     public string Inverse(string str)
     {
-        foreach (var escape in Escapes)
-        {
-            str = str.Replace($"{EscapeSymbol}{escape}", escape);
-        }
+        str = Escapes.Aggregate(str, (current, escape) => current.Replace($"{EscapeSymbol}{escape}", escape));
         str = InverseEscapeSymbol(str);
         return str;
     }

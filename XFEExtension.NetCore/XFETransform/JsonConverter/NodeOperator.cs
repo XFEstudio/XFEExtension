@@ -11,17 +11,13 @@ class NodeOperator
         };
         foreach (var node in jsonComplexPropertyNode.DescendingNodes)
         {
-            if (node is JsonComplexPropertyNode complexPropertyNode)
-            {
-                valueNodes.Add([]);
-                foreach (var childNode in complexPropertyNode.DescendingNodes)
-                {
-                    if (childNode is JsonPropertyNode jsonPropertyNode && nodeProperties.Contains(jsonPropertyNode.PropertyName))
-                    {
-                        valueNodes[^1].Add(jsonPropertyNode.PropertyName, new(jsonPropertyNode.Value, jsonPropertyNode.ValueType));
-                    }
-                }
-            }
+            if (node is not JsonComplexPropertyNode complexPropertyNode)
+                continue;
+
+            valueNodes.Add([]);
+            foreach (var childNode in complexPropertyNode.DescendingNodes)
+                if (childNode is JsonPropertyNode jsonPropertyNode && nodeProperties.Contains(jsonPropertyNode.PropertyName))
+                    valueNodes[^1].Add(jsonPropertyNode.PropertyName, new(jsonPropertyNode.Value, jsonPropertyNode.ValueType));
         }
         return selectableJsonNode;
     }

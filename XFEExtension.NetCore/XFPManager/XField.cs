@@ -2,6 +2,6 @@
 
 internal class XField
 {
-    public object? field;
-    public string? name;
+    public object? Field;
+    public string? Name;
 }
