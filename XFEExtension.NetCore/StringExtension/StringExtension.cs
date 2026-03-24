@@ -360,15 +360,7 @@ public static partial class StringExtension
         /// <returns>分割后的带分割器字符串数组</returns>
         public string[] SplitAndKeepDelimiter(string[] delimiter, bool removeEmptyString)
         {
-            string[] result;
-            if (removeEmptyString)
-            {
-                result = str.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
-            }
-            else
-            {
-                result = str.Split(delimiter, StringSplitOptions.None);
-            }
+            var result = str.Split(delimiter, removeEmptyString ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
             for (var i = 0; i < result.Length - 1; i++)
             {
                 result[i] += delimiter;

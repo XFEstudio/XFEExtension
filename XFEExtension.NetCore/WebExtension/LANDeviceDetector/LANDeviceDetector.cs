@@ -44,10 +44,7 @@ public class LANDeviceDetector
         if(iPStart == "default")
         {
             var localIPAddress = WebExtension.GetLocalIPAddress();
-            if (localIPAddress is not null)
-                IPStart = $"{string.Join(".", localIPAddress.ToString().Split('.')[..3])}.*";
-            else
-                IPStart = "192.168.1.*";
+            IPStart = localIPAddress is not null ? $"{string.Join(".", localIPAddress.ToString().Split('.')[..3])}.*" : "192.168.1.*";
         }
         else
         {

@@ -73,8 +73,8 @@ public class JsonTransformer : StringConverter
             {
                 if (objectInfo.IsArray)
                 {
-                    outPutString += objectInfo.SubObjects is not null ? $$"""
-                    [{{OutPutSubObjects(objectInfo.SubObjects)}}]
+                    outPutString += objectInfo.SubObjects is not null ? $"""
+                    [{OutPutSubObjects(objectInfo.SubObjects)}]
                     """ : "null";
                 }
                 else
@@ -103,15 +103,7 @@ public class JsonTransformer : StringConverter
         for (var i = 0; i < subObjects.Count; i++)
         {
             var obj = subObjects[i];
-            string? currentConnectString;
-            if (i == subObjects.Count - 1)
-            {
-                currentConnectString = "";
-            }
-            else
-            {
-                currentConnectString = ",";
-            }
+            var currentConnectString = i == subObjects.Count - 1 ? "" : ",";
             if (obj.IsBasicType || obj.ObjectPlace == ObjectPlace.Enum)
             {
                 outString += obj.OutPutObject();
@@ -120,13 +112,13 @@ public class JsonTransformer : StringConverter
             else
             {
                 if (IsEnumerableClassMember(obj))
-                    outString += obj.Value is not null ? $$"""
-                     "{{obj.Name}}": [{{OutPutObject(obj)}}]{{currentConnectString}}
+                    outString += obj.Value is not null ? $"""
+                     "{obj.Name}": [{OutPutObject(obj)}]{currentConnectString}
                      """ : "null";
                 else if (IsEnumerableMember(obj))
                     if (obj.Value is not null && (obj.Type!.IsAssignableTo(typeof(IEnumerable)) || obj.Type.IsAssignableTo(typeof(Array))))
-                        outString += obj.Value is not null ? $$"""
-                     [{{OutPutObject(obj)}}]{{currentConnectString}}
+                        outString += obj.Value is not null ? $"""
+                     [{OutPutObject(obj)}]{currentConnectString}
                      """ : "null";
                     else
                         outString += obj.Value is not null ? $$"""

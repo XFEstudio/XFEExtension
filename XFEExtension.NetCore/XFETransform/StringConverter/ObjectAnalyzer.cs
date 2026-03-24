@@ -101,15 +101,7 @@ public class ObjectAnalyzer : StringConverter
                 tabString += "│    ";
             }
             outString += tabString;
-            string? currentConnectString;
-            if (i == subObjects.Count - 1)
-            {
-                currentConnectString = "└─";
-            }
-            else
-            {
-                currentConnectString = "├─";
-            }
+            var currentConnectString = i == subObjects.Count - 1 ? "└─" : "├─";
             if (obj.IsBasicType || obj.ObjectPlace == ObjectPlace.Enum)
             {
                 outString += currentConnectString;

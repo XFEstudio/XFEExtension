@@ -51,10 +51,7 @@ public static class AdministratorPermission
     static AdministratorPermission()
     {
         var isAdmin = IsAdministrator();
-        if (isAdmin)
-            PermissionState = CurrentPermissionState.Administration;
-        else
-            PermissionState = CurrentPermissionState.Normal;
+        PermissionState = isAdmin ? CurrentPermissionState.Administration : CurrentPermissionState.Normal;
     }
 }
 #endif

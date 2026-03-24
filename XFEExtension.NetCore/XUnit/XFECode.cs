@@ -103,19 +103,25 @@ public abstract class XFECode
         timeCounter.Stop();
         cTimeCounter++;
         var elapsedTime = timeCounter.Elapsed;
-        if (autoOutPut)
-            if (elapsedTime.TotalHours >= 1)
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间：{elapsedTime}");
-            else if (elapsedTime.TotalMinutes >= 1)
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {Math.Floor(elapsedTime.TotalMinutes)} 分 {elapsedTime.Seconds} 秒");
-            else if (elapsedTime.TotalSeconds >= 1)
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalSeconds:F3} 秒");
-            else if (elapsedTime.TotalMilliseconds >= 1)
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds:F3} 毫秒");
-            else if (elapsedTime.TotalMicroseconds >= 1)
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMicroseconds:F3} 微秒");
-            else
-                Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalNanoseconds:F3} 纳秒");
+        switch (autoOutPut)
+        {
+            case true:
+            {
+                if (elapsedTime.TotalHours >= 1)
+                    Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间：{elapsedTime}");
+                else if (elapsedTime.TotalMinutes >= 1)
+                    Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {Math.Floor(elapsedTime.TotalMinutes)} 分 {elapsedTime.Seconds} 秒");
+                else if (elapsedTime.TotalSeconds >= 1)
+                    Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalSeconds:F3} 秒");
+                else if (elapsedTime.TotalMilliseconds >= 1)
+                    Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds:F3} 毫秒");
+                else if (elapsedTime.TotalMicroseconds >= 1)
+                    Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalMicroseconds:F3} 微秒");
+                else
+                    Console.WriteLine($"标识名：{timerName}\t执行批次：{cTimeCounter}\t执行时间: {elapsedTime.TotalNanoseconds:F3} 纳秒");
+                break;
+            }
+        }
         return elapsedTime;
     }
     /// <summary>
@@ -343,10 +349,7 @@ public abstract class XFECode
                             catch (Exception e)
                             {
                                 isSuccessful = false;
-                                if (e.InnerException is not null)
-                                    failedMessage = e.InnerException.Message;
-                                else
-                                    failedMessage = e.Message;
+                                failedMessage = e.InnerException is not null ? e.InnerException.Message : e.Message;
                             }
                             elapsedTime = timeCounter.Elapsed - selfTimeCounter.Elapsed;
                             cTimeCounter++;
@@ -429,19 +432,11 @@ public abstract class XFECode
                 {
                     var isFirstMethod = true;
                     var failedList = new List<MethodAndCounter>();
-                    object? classInstance;
-                    if (classAttribute.Params is null)
-                    {
-                        classInstance = subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, [], null)?.Invoke(classAttribute.Params);
-                    }
-                    else
-                    {
-                        classInstance = subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, classAttribute.Params.GetTypes()!, null)?.Invoke(classAttribute.Params);
-                    }
+                    var classInstance = classAttribute.Params is null ? subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, [], null)?.Invoke(classAttribute.Params) : subClass.GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, classAttribute.Params.GetTypes()!, null)?.Invoke(classAttribute.Params);
                     var setUpAttribute = subClass.GetAttribute<SetUpAttribute>();
                     if (setUpAttribute is not null)
                     {
-                        var setUpMethod = subClass.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).Where(m => m.IsDefined(typeof(SetUpAttribute))).FirstOrDefault();
+                        var setUpMethod = subClass.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).FirstOrDefault(m => m.IsDefined(typeof(SetUpAttribute)));
                         setUpMethod?.Invoke(classInstance, setUpMethod.GetDefaultParameters());
                     }
                     var classOtherName = "类名：" + subClass.Name;
@@ -659,10 +654,7 @@ public abstract class XFECode
                                 catch (Exception e)
                                 {
                                     isSuccessful = false;
-                                    if (e.InnerException is not null)
-                                        failedMessage = e.InnerException.Message;
-                                    else
-                                        failedMessage = e.Message;
+                                    failedMessage = e.InnerException is not null ? e.InnerException.Message : e.Message;
                                 }
                                 elapsedTime = timeCounter.Elapsed - selfTimeCounter.Elapsed;
                                 cTimeCounter++;

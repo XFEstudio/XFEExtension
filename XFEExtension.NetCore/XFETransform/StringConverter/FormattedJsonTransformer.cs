@@ -74,8 +74,8 @@ public class FormattedJsonTransformer : StringConverter
             {
                 if (objectInfo.IsArray)
                 {
-                    outPutString += objectInfo.SubObjects is not null ? $$"""
-                    [{{OutPutSubObjects(objectInfo.SubObjects)}}
+                    outPutString += objectInfo.SubObjects is not null ? $"""
+                    [{OutPutSubObjects(objectInfo.SubObjects)}
                     ]
                     """ : "null";
                 }
@@ -112,15 +112,7 @@ public class FormattedJsonTransformer : StringConverter
                 tabString += " ";
             }
             outString += "\n" + tabString;
-            string? currentConnectString;
-            if (i == subObjects.Count - 1)
-            {
-                currentConnectString = "";
-            }
-            else
-            {
-                currentConnectString = ",";
-            }
+            var currentConnectString = i == subObjects.Count - 1 ? "" : ",";
             if (obj.IsBasicType || obj.ObjectPlace == ObjectPlace.Enum)
             {
                 outString += obj.OutPutObject();
@@ -129,15 +121,15 @@ public class FormattedJsonTransformer : StringConverter
             else
             {
                 if (IsEnumerableClassMember(obj))
-                    outString += obj.Value is not null ? $$"""
-                     {{tabString}}"{{obj.Name}}": [{{OutPutObject(obj)}}
-                      {{tabString}}]{{currentConnectString}}
+                    outString += obj.Value is not null ? $"""
+                     {tabString}"{obj.Name}": [{OutPutObject(obj)}
+                      {tabString}]{currentConnectString}
                      """ : "null";
                 else if (IsEnumerableMember(obj))
                     if (obj.Value is not null && (obj.Type!.IsAssignableTo(typeof(IEnumerable)) || obj.Type.IsAssignableTo(typeof(Array))))
-                        outString += obj.Value is not null ? $$"""
-                     {{tabString}}[{{OutPutObject(obj)}}
-                       {{tabString}}]{{currentConnectString}}
+                        outString += obj.Value is not null ? $"""
+                     {tabString}[{OutPutObject(obj)}
+                       {tabString}]{currentConnectString}
                      """ : "null";
                     else
                         outString += obj.Value is not null ? $$"""

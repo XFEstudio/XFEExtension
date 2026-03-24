@@ -212,15 +212,7 @@ public class XFEChatGPT : XFEChatGPTBase
         var receivedMessage = string.Empty;
         try
         {
-            string? command;
-            if (apiKeyCommand == ApiKeyCommand.GetApiKey)
-            {
-                command = "[获取]";
-            }
-            else
-            {
-                command = commandString;
-            }
+            var command = apiKeyCommand == ApiKeyCommand.GetApiKey ? "[获取]" : commandString;
             ClientWebSocket webSocket = new();
             webSocket.Options.SetRequestHeader("XFEPassword", password);
             await webSocket.ConnectAsync(new Uri("ws://api.xfegzs.com/"), CancellationToken.None);

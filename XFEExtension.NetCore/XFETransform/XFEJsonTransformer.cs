@@ -93,14 +93,9 @@ public static class XFEJsonTransformer
             }
             else
             {
-                if (property.PropertyType.IsEnum)
-                {
-                    jsonProperties.Add($"\"{propertyName}\":{(int)propertyValue}");
-                }
-                else
-                {
-                    jsonProperties.Add($"\"{propertyName}\":{propertyValue.ConvertToJson()}");
-                }
+                jsonProperties.Add(property.PropertyType.IsEnum
+                    ? $"\"{propertyName}\":{(int)propertyValue}"
+                    : $"\"{propertyName}\":{propertyValue.ConvertToJson()}");
             }
         }
 
