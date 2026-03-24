@@ -22,10 +22,8 @@ public class ApiKey(string aPiKey, string description)
     /// 转换为字符串
     /// </summary>
     /// <returns></returns>
-    public override string ToString()
-    {
-        return $"{{[+-{Description}-+][+-{Key}-+]}}";
-    }
+    public override string ToString() => $"{{[+-{Description}-+][+-{Key}-+]}}";
+
     /// <summary>
     /// 将字符串转换为ApiKey的List
     /// </summary>
@@ -35,14 +33,7 @@ public class ApiKey(string aPiKey, string description)
     {
         var keyGroup = keyString.Split(Separator);
         List<ApiKey> apiKeys = [];
-        foreach (var key in keyGroup)
-        {
-            var oneKey = key.Split(XFEDictionary.EntrySeparator, StringSplitOptions.RemoveEmptyEntries);
-            if (oneKey.Length == 2)
-            {
-                apiKeys.Add(new ApiKey(oneKey[1], oneKey[0]));
-            }
-        }
+        apiKeys.AddRange(from key in keyGroup select key.Split(XFEDictionary.EntrySeparator, StringSplitOptions.RemoveEmptyEntries) into oneKey where oneKey.Length == 2 select new ApiKey(oneKey[1], oneKey[0]));
         return apiKeys;
     }
 }
