@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using XFEExtension.NetCore.Exceptions;
 
 namespace XFEExtension.NetCore.AttributeExtension;
 

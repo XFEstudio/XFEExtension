@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>3.3.14</Version>
+    <Version>4.0.0</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -21,16 +21,8 @@
     <PackageReleaseNotes>
       ## 调整
 
-      提升健壮性与现代化，新增空节点与停止对话方法
-
-      - FileStream 读取方法由 ReadAsync 改为 ReadExactlyAsync，提升准确性
-      - StringExtension 中 X/XL 方法优化 null 处理，增强健壮性
-      - SplitAndKeepDelimiter 方法使用集合表达式简化代码
-      - MemorableXFEChatGPT 新增 StopChat 静态方法，仅流式模式有效
-      - 项目版本号升级至 3.3.14
-      - QueryableJsonNode 新增静态空节点属性 Empty
-      - GetList 和 GetList`T` 方法用集合表达式替换 ToList()
-      - SubObjectsBase 构造函数支持 objectInfoList 为 null，提升健壮性
+      全面适配.NET 10.0，提升性能和稳定性。
+      部分类名及其命名空间有所调整，建议查看文档更新日志以了解详细信息。
 
       ## 新增
 

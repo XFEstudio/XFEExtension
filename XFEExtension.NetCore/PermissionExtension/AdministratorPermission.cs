@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Security.Principal;
+using XFEExtension.NetCore.Exceptions;
 
 namespace XFEExtension.NetCore.PermissionExtension;
 

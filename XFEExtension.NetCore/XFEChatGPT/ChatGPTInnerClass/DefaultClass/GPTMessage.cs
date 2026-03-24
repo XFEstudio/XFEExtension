@@ -1,4 +1,6 @@
-﻿namespace XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.DefaultClass;
+﻿using XFEExtension.NetCore.Exceptions;
+
+namespace XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.DefaultClass;
 
 /// <summary>
 /// GPT消息

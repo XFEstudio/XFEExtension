@@ -1,7 +1,7 @@
-﻿using XFEExtension.NetCore.StringExtension;
-using XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
+﻿using XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
 using XFEExtension.NetCore.XFETransform;
 using XFEExtension.NetCore.XFETransform.StringConverter;
+using XFEExtension.NetCore.XUnit.Attributes;
 
 namespace XFEExtension.NetCore.Analyzer.Test;
 
@@ -16,7 +16,7 @@ internal class Program
             Enum = MyEnum.Test2,
             MultiEnum = MyMultiEnum.Get | MyMultiEnum.Pull | MyMultiEnum.Set | MyMultiEnum.Post
         }.GetType();
-        var result = XFEConverter.GetObjectInfo(StringConverter.ColoredObjectAnalyzer, "分析对象", ObjectPlace.Main, 0, [testClass], testClass?.GetType(), testClass, false, false).OutPutObject();
+        var result = XFEConverter.GetObjectInfo(StringConverter.ColoredObjectAnalyzer, "分析对象", ObjectPlace.Main, 0, [testClass], testClass, testClass, false, false).OutPutObject();
         Console.WriteLine(result);
         //testClass.X();
     }
