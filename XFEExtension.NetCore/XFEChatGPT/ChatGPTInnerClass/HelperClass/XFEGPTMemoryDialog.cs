@@ -8,10 +8,10 @@ namespace XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass;
 /// </summary>
 public abstract class XFEGPTMemoryDialog : IEnumerable<XFEGPTMessage>
 {
-    private readonly Dictionary<string, XFEGPTMessageCollection> gPTMessageWithId;
+    private readonly Dictionary<string, XFEGPTMessageCollection> _gPTMessageWithId;
     internal XFEGPTMemoryDialog()
     {
-        gPTMessageWithId = [];
+        _gPTMessageWithId = [];
     }
     #region 操作部分
     /// <summary>
@@ -25,7 +25,7 @@ public abstract class XFEGPTMemoryDialog : IEnumerable<XFEGPTMessage>
         {
             try
             {
-                return gPTMessageWithId[dialogId];
+                return _gPTMessageWithId[dialogId];
             }
             catch (Exception ex)
             {
@@ -36,7 +36,7 @@ public abstract class XFEGPTMemoryDialog : IEnumerable<XFEGPTMessage>
         {
             try
             {
-                gPTMessageWithId[dialogId] = value;
+                _gPTMessageWithId[dialogId] = value;
             }
             catch (Exception ex)
             {
@@ -51,7 +51,7 @@ public abstract class XFEGPTMemoryDialog : IEnumerable<XFEGPTMessage>
     /// <param name="xFEGPTMessages">XFEGPT的对话</param>
     public void Add(string dialogId, XFEGPTMessageCollection xFEGPTMessages)
     {
-        gPTMessageWithId.Add(dialogId, xFEGPTMessages);
+        _gPTMessageWithId.Add(dialogId, xFEGPTMessages);
     }
     /// <summary>
     /// 添加多个对话记录
@@ -61,7 +61,7 @@ public abstract class XFEGPTMemoryDialog : IEnumerable<XFEGPTMessage>
     {
         foreach (var item in messages)
         {
-            gPTMessageWithId.Add(item.Key, item.Value);
+            _gPTMessageWithId.Add(item.Key, item.Value);
         }
     }
     /// <summary>
@@ -70,7 +70,7 @@ public abstract class XFEGPTMemoryDialog : IEnumerable<XFEGPTMessage>
     /// <param name="dialogId">对话ID</param>
     public void Remove(string dialogId)
     {
-        gPTMessageWithId.Remove(dialogId);
+        _gPTMessageWithId.Remove(dialogId);
     }
     /// <summary>
     /// 移除多个对话记录
@@ -80,7 +80,7 @@ public abstract class XFEGPTMemoryDialog : IEnumerable<XFEGPTMessage>
     {
         foreach (var item in ids)
         {
-            gPTMessageWithId.Remove(item);
+            _gPTMessageWithId.Remove(item);
         }
     }
     /// <summary>
@@ -88,7 +88,7 @@ public abstract class XFEGPTMemoryDialog : IEnumerable<XFEGPTMessage>
     /// </summary>
     public void Clear()
     {
-        gPTMessageWithId.Clear();
+        _gPTMessageWithId.Clear();
     }
     /// <summary>
     /// 更新指定对话ID的对话记录
@@ -97,7 +97,7 @@ public abstract class XFEGPTMemoryDialog : IEnumerable<XFEGPTMessage>
     /// <param name="messages">XFEGPT的对话</param>
     public void Update(string dialogId, XFEGPTMessageCollection messages)
     {
-        gPTMessageWithId[dialogId] = messages;
+        _gPTMessageWithId[dialogId] = messages;
     }
     /// <summary>
     /// 实时更新对话记录
@@ -108,7 +108,7 @@ public abstract class XFEGPTMemoryDialog : IEnumerable<XFEGPTMessage>
     /// <param name="clear"></param>
     public void InstanceUpdate(string dialogId, string messageId, string nowMessage, bool clear)
     {
-        var xFEGPTMessages = gPTMessageWithId[dialogId];
+        var xFEGPTMessages = _gPTMessageWithId[dialogId];
         if (xFEGPTMessages.GetXFEGPTMessageByMessageId(messageId) is null)
         {
             xFEGPTMessages.Add(new XFEGPTMessage(messageId, new GPTMessage("assistant", nowMessage)));
@@ -139,7 +139,7 @@ public abstract class XFEGPTMemoryDialog : IEnumerable<XFEGPTMessage>
     /// <returns>是否含有该对话</returns>
     public bool Contains(string dialogId)
     {
-        return gPTMessageWithId.ContainsKey(dialogId);
+        return _gPTMessageWithId.ContainsKey(dialogId);
     }
     /// <summary>
     /// 获取对话记录
@@ -148,7 +148,7 @@ public abstract class XFEGPTMemoryDialog : IEnumerable<XFEGPTMessage>
     /// <returns></returns>
     public XFEGPTMessageCollection GetXFEGPTMessages(string dialogId)
     {
-        return gPTMessageWithId[dialogId];
+        return _gPTMessageWithId[dialogId];
     }
     /// <summary>
     /// 获取迭代器
@@ -156,7 +156,7 @@ public abstract class XFEGPTMemoryDialog : IEnumerable<XFEGPTMessage>
     /// <returns></returns>
     public IEnumerator<XFEGPTMessage> GetEnumerator()
     {
-        foreach (var item in gPTMessageWithId)
+        foreach (var item in _gPTMessageWithId)
         {
             foreach (var item2 in item.Value)
             {

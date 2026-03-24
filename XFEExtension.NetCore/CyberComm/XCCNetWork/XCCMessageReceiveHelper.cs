@@ -8,9 +8,9 @@ namespace XFEExtension.NetCore.CyberComm.XCCNetWork;
 /// </summary>
 public class XCCMessageReceiveHelper
 {
-    private readonly Dictionary<string, XCCFile> xCCFileDictionary = [];
-    private readonly Dictionary<string, List<XCCMessage>> xCCMessageDictionary = [];
-    private bool loaded;
+    private readonly Dictionary<string, XCCFile> _xCCFileDictionary = [];
+    private readonly Dictionary<string, List<XCCMessage>> _xCCMessageDictionary = [];
+    private bool _loaded;
     /// <summary>
     /// 自动保存到本地
     /// </summary>
@@ -60,7 +60,7 @@ public class XCCMessageReceiveHelper
                             else
                                 FileReceived?.Invoke(true, LoadFile(xCCMessage)!);
                         }
-                        xCCMessageDictionary.Add(groupId, xCCMessageList);
+                        _xCCMessageDictionary.Add(groupId, xCCMessageList);
                     }
                 }
             }
@@ -69,7 +69,7 @@ public class XCCMessageReceiveHelper
                 Directory.CreateDirectory(SavePathRoot);
             }
         });
-        loaded = true;
+        _loaded = true;
     }
     /// <summary>
     /// 从设置的根目录的指定群组加载
@@ -92,10 +92,10 @@ public class XCCMessageReceiveHelper
                     else
                         FileReceived?.Invoke(true, LoadFile(xCCMessage)!);
                 }
-                xCCMessageDictionary.Add(groupId, xCCMessageList);
+                _xCCMessageDictionary.Add(groupId, xCCMessageList);
             }
         });
-        loaded = true;
+        _loaded = true;
     }
     /// <summary>
     /// 清理无用文件
@@ -103,17 +103,17 @@ public class XCCMessageReceiveHelper
     /// <returns></returns>
     public async Task ClearUselessFile()
     {
-        if (!loaded)
+        if (!_loaded)
             throw new XFEExtensionException("不能在加载完成前调用清理");
         await Task.Run(() =>
         {
-            foreach (var groupId in xCCMessageDictionary.Keys)
+            foreach (var groupId in _xCCMessageDictionary.Keys)
             {
                 foreach (var file in Directory.EnumerateFiles($"{SavePathRoot}/{groupId}"))
                 {
                     var filePath = $"{SavePathRoot}/{groupId}/{file}";
                     var messageId = Path.GetFileNameWithoutExtension(filePath);
-                    if (!xCCMessageDictionary.TryGetValue(groupId, out var value) || value.Find(x => x.MessageId == messageId) is null)
+                    if (!_xCCMessageDictionary.TryGetValue(groupId, out var value) || value.Find(x => x.MessageId == messageId) is null)
                     {
                         File.Delete(filePath);
                     }
@@ -128,7 +128,7 @@ public class XCCMessageReceiveHelper
         if (File.Exists(filePath))
             fileBuffer = File.ReadAllBytes(filePath);
         XCCFile xCCFile;
-        if (xCCFileDictionary.TryGetValue(xCCMessage.MessageId, out var value))
+        if (_xCCFileDictionary.TryGetValue(xCCMessage.MessageId, out var value))
         {
             if (!value.Loaded && fileBuffer is not null)
                 value.LoadFile(fileBuffer);
@@ -148,7 +148,7 @@ public class XCCMessageReceiveHelper
             default:
                 return null;
         }
-        xCCFileDictionary.Add(xCCMessage.MessageId, xCCFile);
+        _xCCFileDictionary.Add(xCCMessage.MessageId, xCCFile);
         return xCCFile;
     }
     /// <summary>
@@ -158,7 +158,7 @@ public class XCCMessageReceiveHelper
     /// <returns></returns>
     public XCCFile? GetFile(string messageId)
     {
-        return xCCFileDictionary.TryGetValue(messageId, out var value) ? value : null;
+        return _xCCFileDictionary.TryGetValue(messageId, out var value) ? value : null;
     }
     /// <summary>
     /// 添加文件
@@ -166,7 +166,7 @@ public class XCCMessageReceiveHelper
     /// <param name="xCCFile">XCC文件实例</param>
     public void AddFile(XCCFile xCCFile)
     {
-        xCCFileDictionary.Add(xCCFile.MessageId, xCCFile);
+        _xCCFileDictionary.Add(xCCFile.MessageId, xCCFile);
         if (AutoSaveInLocal && xCCFile.FileBuffer is not null)
             SaveFile(xCCFile);
     }
@@ -194,7 +194,7 @@ public class XCCMessageReceiveHelper
             Directory.CreateDirectory(filePath);
         }
         var storageDictionary = new XFEDictionary();
-        foreach (var xCCMessage in xCCMessageDictionary[groupId])
+        foreach (var xCCMessage in _xCCMessageDictionary[groupId])
         {
             storageDictionary.Add(xCCMessage.MessageId, xCCMessage.ToString());
         }
@@ -203,7 +203,7 @@ public class XCCMessageReceiveHelper
     private void ReceiveFilePlaceHolder(XCCTextMessageReceivedEventArgs e, XCCFileType fileType)
     {
         var xCCFile = new XCCFile(e.GroupId, e.MessageId!, fileType, e.Sender!, e.SendTime);
-        xCCFileDictionary.TryAdd(e.MessageId!, xCCFile);
+        _xCCFileDictionary.TryAdd(e.MessageId!, xCCFile);
         FileReceived?.Invoke(e.IsHistory, xCCFile);
         if (AutoSaveInLocal)
             SaveMessage(e.GroupId);
@@ -211,7 +211,7 @@ public class XCCMessageReceiveHelper
     private void ReceiveTextMessage(object? sender, XCCTextMessageReceivedEventArgs e)
     {
         var message = new XCCMessage(e.MessageId!, e.MessageType, e.TextMessage, e.Sender!, e.SendTime, e.GroupId);
-        if (xCCMessageDictionary.TryGetValue(e.GroupId, out var value))
+        if (_xCCMessageDictionary.TryGetValue(e.GroupId, out var value))
         {
             if (value.Find(x => x.MessageId == e.MessageId) is null)
             {
@@ -224,7 +224,7 @@ public class XCCMessageReceiveHelper
         }
         else
         {
-            xCCMessageDictionary.Add(e.GroupId, [message]);
+            _xCCMessageDictionary.Add(e.GroupId, [message]);
         }
         switch (e.MessageType)
         {
@@ -251,7 +251,7 @@ public class XCCMessageReceiveHelper
             AudioBufferReceived?.Invoke(e.BinaryMessage);
             return;
         }
-        if (xCCFileDictionary.TryGetValue(e.MessageId!, out var value))
+        if (_xCCFileDictionary.TryGetValue(e.MessageId!, out var value))
         {
             if (!value.Loaded)
             {
@@ -278,7 +278,7 @@ public class XCCMessageReceiveHelper
                     break;
             }
             var xCCFile = new XCCFile(e.GroupId, e.MessageId!, fileType, e.Sender!, e.SendTime, e.BinaryMessage);
-            xCCFileDictionary.Add(e.MessageId!, xCCFile);
+            _xCCFileDictionary.Add(e.MessageId!, xCCFile);
             if (!e.IsHistory)
                 FileReceived?.Invoke(e.IsHistory, xCCFile);
         }

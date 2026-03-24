@@ -9,7 +9,7 @@ namespace XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass;
 public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
 {
     #region 属性
-    private readonly List<XFEGPTMessage> xFEGPTMessages;
+    private readonly List<XFEGPTMessage> _xFEGPTMessages;
     /// <summary>
     /// 消息数量
     /// </summary>
@@ -17,7 +17,7 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     {
         get
         {
-            return xFEGPTMessages.Count;
+            return _xFEGPTMessages.Count;
         }
     }
     /// <summary>
@@ -43,18 +43,18 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     {
         get
         {
-            if (xFEGPTMessages.Count > 0 && xFEGPTMessages[0].GPTMessage.Role == "system")
+            if (_xFEGPTMessages.Count > 0 && _xFEGPTMessages[0].GPTMessage.Role == "system")
             {
-                return xFEGPTMessages[0].GPTMessage.Content;
+                return _xFEGPTMessages[0].GPTMessage.Content;
             }
 
             throw new XFEChatGPTException("消息集合中没有系统消息！");
         }
         set
         {
-            if (xFEGPTMessages.Count > 0 && xFEGPTMessages[0].GPTMessage.Role == "system")
+            if (_xFEGPTMessages.Count > 0 && _xFEGPTMessages[0].GPTMessage.Role == "system")
             {
-                xFEGPTMessages[0].GPTMessage.Content = value;
+                _xFEGPTMessages[0].GPTMessage.Content = value;
             }
             else
             {
@@ -72,25 +72,25 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     /// 添加XFEGPT消息
     /// </summary>
     /// <param name="xFEGPTMessage"></param>
-    public void Add(XFEGPTMessage xFEGPTMessage) => xFEGPTMessages.Add(xFEGPTMessage);
+    public void Add(XFEGPTMessage xFEGPTMessage) => _xFEGPTMessages.Add(xFEGPTMessage);
 
     /// <summary>
     /// 添加XFEGPT消息
     /// </summary>
     /// <param name="xFEGPTMessages"></param>
-    public void AddRange(XFEGPTMessage[] xFEGPTMessages) => this.xFEGPTMessages.AddRange(xFEGPTMessages);
+    public void AddRange(XFEGPTMessage[] xFEGPTMessages) => this._xFEGPTMessages.AddRange(xFEGPTMessages);
 
     /// <summary>
     /// 根据指定的ID移除XFEGPT消息
     /// </summary>
     /// <param name="index"></param>
-    public void RemoveAt(int index) => xFEGPTMessages.RemoveAt(index);
+    public void RemoveAt(int index) => _xFEGPTMessages.RemoveAt(index);
 
     /// <summary>
     /// 移除XFEGPT消息
     /// </summary>
     /// <param name="xFEGPTMessage"></param>
-    public void Remove(XFEGPTMessage xFEGPTMessage) => xFEGPTMessages.Remove(xFEGPTMessage);
+    public void Remove(XFEGPTMessage xFEGPTMessage) => _xFEGPTMessages.Remove(xFEGPTMessage);
 
     /// <summary>
     /// 根据指定的ID在其后插入XFEGPT消息
@@ -100,11 +100,11 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     /// <exception cref="XFEChatGPTException"></exception>
     public void InsertByMessageId(string messageId, XFEGPTMessage xFEGPTMessage)
     {
-        for (var i = 0; i < xFEGPTMessages.Count; i++)
+        for (var i = 0; i < _xFEGPTMessages.Count; i++)
         {
-            if (xFEGPTMessages[i].MessageId != messageId)
+            if (_xFEGPTMessages[i].MessageId != messageId)
                 continue;
-            xFEGPTMessages.Insert(i, xFEGPTMessage);
+            _xFEGPTMessages.Insert(i, xFEGPTMessage);
             return;
         }
         throw new XFEChatGPTException("消息集合中没有指定ID的消息！");
@@ -112,14 +112,14 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     /// <summary>
     /// 清除XFEGPT消息
     /// </summary>
-    public void Clear() => xFEGPTMessages.Clear();
+    public void Clear() => _xFEGPTMessages.Clear();
 
     /// <summary>
     /// 通过消息ID获取XFEGPT消息
     /// </summary>
     /// <param name="messageId"></param>
     /// <returns></returns>
-    public XFEGPTMessage? GetXFEGPTMessageByMessageId(string messageId) => xFEGPTMessages.FirstOrDefault(xFEGPTMessage => xFEGPTMessage.MessageId == messageId);
+    public XFEGPTMessage? GetXFEGPTMessageByMessageId(string messageId) => _xFEGPTMessages.FirstOrDefault(xFEGPTMessage => xFEGPTMessage.MessageId == messageId);
 
     /// <summary>
     /// 获取本集合的GPTMessage数组
@@ -128,7 +128,7 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     public GPTMessage[] GetGPTMessages()
     {
         List<GPTMessage> gPTMessages = [];
-        gPTMessages.AddRange(xFEGPTMessages.Select(xFEGPTMessage => xFEGPTMessage.GPTMessage));
+        gPTMessages.AddRange(_xFEGPTMessages.Select(xFEGPTMessage => xFEGPTMessage.GPTMessage));
         return [.. gPTMessages];
     }
     /// <summary>
@@ -138,7 +138,7 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     public string[] GetGPTMessageStrings()
     {
         List<string> gPTMessages = [];
-        gPTMessages.AddRange(xFEGPTMessages.Select(xFEGPTMessage => xFEGPTMessage.GPTMessage.Content));
+        gPTMessages.AddRange(_xFEGPTMessages.Select(xFEGPTMessage => xFEGPTMessage.GPTMessage.Content));
         return [.. gPTMessages];
     }
     /// <summary>
@@ -148,8 +148,8 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     /// <returns></returns>
     public XFEGPTMessage this[int index]
     {
-        get => xFEGPTMessages[index];
-        set => xFEGPTMessages[index] = value;
+        get => _xFEGPTMessages[index];
+        set => _xFEGPTMessages[index] = value;
     }
     /// <summary>
     /// 获取最后一个角色
@@ -157,7 +157,7 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     /// <returns>最后一个角色</returns>
     public string GetLastRole()
     {
-        return xFEGPTMessages[Count - 1].GPTMessage.Role;
+        return _xFEGPTMessages[Count - 1].GPTMessage.Role;
     }
     internal XFEAskGPTMessage CreateAskMessage()
     {
@@ -169,11 +169,11 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     /// <returns></returns>
     public IEnumerator<XFEGPTMessage> GetEnumerator()
     {
-        return xFEGPTMessages.GetEnumerator();
+        return _xFEGPTMessages.GetEnumerator();
     }
     IEnumerator IEnumerable.GetEnumerator()
     {
-        return xFEGPTMessages.GetEnumerator();
+        return _xFEGPTMessages.GetEnumerator();
     }
     #endregion
     #region 构造方法
@@ -188,7 +188,7 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     /// <param name="temperature"></param>
     public XFEGPTMessageCollection(XFEGPTMessage[] xFEGPTMessages, bool memorableMode, ChatGPTModel chatGPTModel, XFEComProtocol comProtocol, bool streamMode, double temperature)
     {
-        this.xFEGPTMessages = new List<XFEGPTMessage>(xFEGPTMessages);
+        this._xFEGPTMessages = new List<XFEGPTMessage>(xFEGPTMessages);
         MemorableMode = memorableMode;
         XFEComProtocol = comProtocol;
         ChatGPTModel = chatGPTModel;
@@ -200,7 +200,7 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     /// </summary>
     internal XFEGPTMessageCollection()
     {
-        xFEGPTMessages = [];
+        _xFEGPTMessages = [];
     }
     #endregion
 }

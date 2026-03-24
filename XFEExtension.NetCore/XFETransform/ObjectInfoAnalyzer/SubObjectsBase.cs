@@ -5,40 +5,40 @@ namespace XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
 internal abstract class SubObjectsBase : ISubObjects
 {
 
-    protected readonly List<IObjectInfo> objectInfoList;
+    protected readonly List<IObjectInfo> ObjectInfoList;
 
     protected SubObjectsBase(List<IObjectInfo>? objectInfoList, IObjectInfo parent)
     {
-        this.objectInfoList = objectInfoList ?? [];
+        this.ObjectInfoList = objectInfoList ?? [];
         Parent = parent;
         objectInfoList?.ForEach(objectInfo => objectInfo.Parent = parent);
     }
 
-    public IObjectInfo this[int index] { get => objectInfoList[index]; set => objectInfoList[index] = value; }
+    public IObjectInfo this[int index] { get => ObjectInfoList[index]; set => ObjectInfoList[index] = value; }
 
-    public int Count => objectInfoList.Count;
+    public int Count => ObjectInfoList.Count;
 
     public bool IsReadOnly => false;
 
     public IObjectInfo Parent { get; init; }
 
-    public void Add(IObjectInfo item) => objectInfoList.Add(item);
+    public void Add(IObjectInfo item) => ObjectInfoList.Add(item);
 
-    public void Clear() => objectInfoList.Clear();
+    public void Clear() => ObjectInfoList.Clear();
 
-    public bool Contains(IObjectInfo item) => objectInfoList.Contains(item);
+    public bool Contains(IObjectInfo item) => ObjectInfoList.Contains(item);
 
-    public void CopyTo(IObjectInfo[] array, int arrayIndex) => objectInfoList.CopyTo(array, arrayIndex);
+    public void CopyTo(IObjectInfo[] array, int arrayIndex) => ObjectInfoList.CopyTo(array, arrayIndex);
 
-    public IEnumerator<IObjectInfo> GetEnumerator() => objectInfoList.GetEnumerator();
+    public IEnumerator<IObjectInfo> GetEnumerator() => ObjectInfoList.GetEnumerator();
 
-    public int IndexOf(IObjectInfo item) => objectInfoList.IndexOf(item);
+    public int IndexOf(IObjectInfo item) => ObjectInfoList.IndexOf(item);
 
-    public void Insert(int index, IObjectInfo item) => objectInfoList.Insert(index, item);
+    public void Insert(int index, IObjectInfo item) => ObjectInfoList.Insert(index, item);
 
-    public bool Remove(IObjectInfo item) => objectInfoList.Remove(item);
+    public bool Remove(IObjectInfo item) => ObjectInfoList.Remove(item);
 
-    public void RemoveAt(int index) => objectInfoList.RemoveAt(index);
+    public void RemoveAt(int index) => ObjectInfoList.RemoveAt(index);
 
-    IEnumerator IEnumerable.GetEnumerator() => objectInfoList.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ObjectInfoList.GetEnumerator();
 }

@@ -8,12 +8,12 @@ namespace XFEExtension.NetCore.CyberComm;
 /// </summary>
 public class CyberCommClient
 {
-    private int reconnectTimes = -1;
+    private int _reconnectTimes = -1;
     #region 公共属性
     /// <summary>
     /// 指定的WS服务器URL
     /// </summary>
-    public string? ServerURL { get; set; }
+    public string? ServerUrl { get; set; }
     /// <summary>
     /// 是否已连接
     /// </summary>
@@ -63,10 +63,10 @@ public class CyberCommClient
     public async Task StartCyberCommClient()
     {
     StartConnect:
-        reconnectTimes++;
+        _reconnectTimes++;
         try
         {
-            Uri serverUri = new(ServerURL!);
+            Uri serverUri = new(ServerUrl!);
             await ClientWebSocket.ConnectAsync(serverUri, CancellationToken.None);
         }
         catch (Exception ex)
@@ -78,7 +78,7 @@ public class CyberCommClient
             IsConnected = false;
             if (AutoReconnect)
             {
-                if (reconnectTimes <= ReconnectMaxTimes || ReconnectMaxTimes == -1)
+                if (_reconnectTimes <= ReconnectMaxTimes || ReconnectMaxTimes == -1)
                 {
                     Thread.Sleep(ReconnectTryDelay);
                     goto StartConnect;
@@ -92,7 +92,7 @@ public class CyberCommClient
         }
         IsConnected = true;
         Connected?.Invoke(this, EventArgs.Empty);
-        reconnectTimes = 0;
+        _reconnectTimes = 0;
         while (ClientWebSocket.State == WebSocketState.Open)
         {
             try
@@ -145,7 +145,7 @@ public class CyberCommClient
                     if (AutoReconnect)
                     {
                         Thread.Sleep(ReconnectTryDelay);
-                        if (reconnectTimes <= ReconnectMaxTimes || ReconnectMaxTimes == -1)
+                        if (_reconnectTimes <= ReconnectMaxTimes || ReconnectMaxTimes == -1)
                             goto StartConnect;
                     }
                 }
@@ -208,14 +208,14 @@ public class CyberCommClient
     /// <summary>
     /// CyberComm客户端
     /// </summary>
-    /// <param name="serverURL">WS服务器地址</param>
+    /// <param name="serverUrl">WS服务器地址</param>
     /// <param name="autoReconnect">是否自动重连</param>
     /// <param name="autoReceiveCompletedMessage">是否自动接收完整消息</param>
-    public CyberCommClient(string serverURL, bool autoReconnect = true, bool autoReceiveCompletedMessage = true)
+    public CyberCommClient(string serverUrl, bool autoReconnect = true, bool autoReceiveCompletedMessage = true)
     {
         AutoReconnect = autoReconnect;
         AutoReceiveCompletedMessage = autoReceiveCompletedMessage;
-        ServerURL = serverURL;
+        ServerUrl = serverUrl;
     }
     /// <summary>
     /// CyberComm客户端

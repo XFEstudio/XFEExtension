@@ -12,7 +12,7 @@ namespace XFEExtension.NetCore.XFEChatGPT;
 /// </summary>
 public class MemorableXFEChatGPT : XFEChatGPTBase
 {
-    private readonly XFEGPTMemoryDialog xFEGPTMemoryDialog;
+    private readonly XFEGPTMemoryDialog _xFEGPTMemoryDialog;
     /// <summary>
     /// 获取或设置对话记录
     /// </summary>
@@ -20,7 +20,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     {
         get
         {
-            return xFEGPTMemoryDialog;
+            return _xFEGPTMemoryDialog;
         }
     }
     #region 公共方法
@@ -32,7 +32,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <param name="system">系统消息</param>
     public void CreateDialog(string dialogId, string system)
     {
-        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], false, ChatGPTModel.gpt3point5turbo, XFEComProtocol.XFEFAST, false, 0.7));
+        _xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], false, ChatGPTModel.gpt3point5turbo, XFEComProtocol.XFEFAST, false, 0.7));
     }
     /// <summary>
     /// 创建一个新的对话，使用默认通信协议（快速响应通讯协议）
@@ -42,7 +42,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <param name="hasMemory">是否记录对话信息</param>
     public void CreateDialog(string dialogId, string system, bool hasMemory)
     {
-        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], false, ChatGPTModel.gpt3point5turbo, XFEComProtocol.XFEFAST, hasMemory, 0.7));
+        _xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], false, ChatGPTModel.gpt3point5turbo, XFEComProtocol.XFEFAST, hasMemory, 0.7));
     }
     /// <summary>
     /// 创建一个新的对话，使用默认通信协议（快速响应通讯协议）
@@ -53,7 +53,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <param name="streamMode">是否为流式输出</param>
     public void CreateDialog(string dialogId, string system, bool hasMemory, bool streamMode)
     {
-        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], hasMemory, ChatGPTModel.gpt3point5turbo, XFEComProtocol.XFEFAST, streamMode, 0.7));
+        _xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], hasMemory, ChatGPTModel.gpt3point5turbo, XFEComProtocol.XFEFAST, streamMode, 0.7));
     }
     /// <summary>
     /// 创建一个新的对话，使用默认通信协议（快速响应通讯协议）
@@ -65,7 +65,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <param name="chatGPTModel">所用的ChatGPT模型</param>
     public void CreateDialog(string dialogId, string system, bool hasMemory, bool streamMode, ChatGPTModel chatGPTModel)
     {
-        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], hasMemory, chatGPTModel, XFEComProtocol.XFEFAST, streamMode, 0.7));
+        _xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], hasMemory, chatGPTModel, XFEComProtocol.XFEFAST, streamMode, 0.7));
     }
     /// <summary>
     /// 创建一个新的对话，使用默认通信协议（快速响应通讯协议）
@@ -78,7 +78,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <param name="temperature">系统的Temperature</param>
     public void CreateDialog(string dialogId, string system, bool hasMemory, bool streamMode, ChatGPTModel chatGPTModel, double temperature)
     {
-        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], hasMemory, chatGPTModel, XFEComProtocol.XFEFAST, streamMode, temperature));
+        _xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], hasMemory, chatGPTModel, XFEComProtocol.XFEFAST, streamMode, temperature));
     }
     /// <summary>
     /// 创建一个新的对话，自定义通讯协议
@@ -91,7 +91,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <param name="comProtocol">通信协议</param>
     public void CreateDialog(string dialogId, string system, bool hasMemory, bool streamMode, ChatGPTModel chatGPTModel, XFEComProtocol comProtocol)
     {
-        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], hasMemory, chatGPTModel, comProtocol, streamMode, 0.7));
+        _xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], hasMemory, chatGPTModel, comProtocol, streamMode, 0.7));
     }
     /// <summary>
     /// 创建一个新的对话，自定义通讯协议
@@ -105,7 +105,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <param name="comProtocol">通信协议</param>
     public void CreateDialog(string dialogId, string system, bool hasMemory, bool streamMode, ChatGPTModel chatGPTModel, double temperature, XFEComProtocol comProtocol)
     {
-        xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], hasMemory, chatGPTModel, comProtocol, streamMode, temperature));
+        _xFEGPTMemoryDialog.Add(dialogId, new XFEGPTMessageCollection([new XFEGPTMessage(dialogId, new GPTMessage("system", system))], hasMemory, chatGPTModel, comProtocol, streamMode, temperature));
     }
     #endregion
     #region 插入对话
@@ -119,8 +119,8 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     public string InsertDialog(string dialogId, string userMessage, string assistantMessage)
     {
         var messageId = Guid.NewGuid().ToString();
-        xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId, new GPTMessage("user", userMessage)));
-        xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId + "_Assistant", new GPTMessage("assistant", assistantMessage)));
+        _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId, new GPTMessage("user", userMessage)));
+        _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId + "_Assistant", new GPTMessage("assistant", assistantMessage)));
         return messageId;
     }
     /// <summary>
@@ -132,8 +132,8 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <param name="assistantMessage">AI对话的内容</param>
     public void InsertDialog(string dialogId, string messageId, string userMessage, string assistantMessage)
     {
-        xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId, new GPTMessage("user", userMessage)));
-        xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId + "_Assistant", new GPTMessage("assistant", assistantMessage)));
+        _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId, new GPTMessage("user", userMessage)));
+        _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId + "_Assistant", new GPTMessage("assistant", assistantMessage)));
     }
     /// <summary>
     /// 插入对话
@@ -160,8 +160,8 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
             {
                 messageId[i] = Guid.NewGuid().ToString();
                 messageId[i + 1] = messageId[i] + "_Assistant";
-                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i == 0 ? 0 : i / 2, 0])));
-                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i == 0 ? 0 : i / 2, 1])));
+                _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i == 0 ? 0 : i / 2, 0])));
+                _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i == 0 ? 0 : i / 2, 1])));
             }
             return messageId;
         }
@@ -191,8 +191,8 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
             {
                 messageId[i] = Guid.NewGuid().ToString();
                 messageId[i + 1] = messageId[i] + "_Assistant";
-                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i])));
-                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i + 1])));
+                _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i])));
+                _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i + 1])));
             }
             return messageId;
         }
@@ -229,8 +229,8 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
 
             for (var i = 0; i < dialogMessage.Length; i += 2)
             {
-                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i == 0 ? 0 : i / 2, 0])));
-                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i == 0 ? 0 : i / 2, 1])));
+                _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i == 0 ? 0 : i / 2, 0])));
+                _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i == 0 ? 0 : i / 2, 1])));
             }
         }
         catch (IndexOutOfRangeException ex)
@@ -261,8 +261,8 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
 
             for (var i = 0; i < dialogMessage.Length; i += 2)
             {
-                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i])));
-                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i + 1])));
+                _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i])));
+                _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i + 1])));
             }
         }
         catch (IndexOutOfRangeException ex)
@@ -286,8 +286,8 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
             {
                 messageId[i] = Guid.NewGuid().ToString();
                 messageId[i + 1] = messageId[i] + "_Assistant";
-                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i])));
-                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage.Length > i + 1 ? dialogMessage[i + 1] : "该条问题未回复")));
+                _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i])));
+                _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage.Length > i + 1 ? dialogMessage[i + 1] : "该条问题未回复")));
             }
             return messageId;
         }
@@ -305,7 +305,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <returns></returns>
     public GPTMessage[] GetDialog(string dialogId)
     {
-        return xFEGPTMemoryDialog[dialogId].GetGPTMessages();
+        return _xFEGPTMemoryDialog[dialogId].GetGPTMessages();
     }
     /// <summary>
     /// 以字符串数组的形式获取对话
@@ -314,7 +314,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <returns></returns>
     public string[] GetDialogStrings(string dialogId)
     {
-        return xFEGPTMemoryDialog[dialogId].GetGPTMessageStrings();
+        return _xFEGPTMemoryDialog[dialogId].GetGPTMessageStrings();
     }
     #endregion
     #region 开始对话
@@ -326,17 +326,17 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <param name="askMessage">询问的内容</param>
     public void AskChatGPT(string dialogId, string messageId, string askMessage)
     {
-        if (xFEGPTMemoryDialog[dialogId].GetGPTMessages().CheckLegal())
+        if (_xFEGPTMemoryDialog[dialogId].GetGPTMessages().CheckLegal())
         {
             //判断如果最后一条消息是用户消息，则在添加新的用户消息前添加一条助手消息然后再添加用户消息，否则直接添加用户消息
-            if (xFEGPTMemoryDialog[dialogId].GetLastRole() == "user")
+            if (_xFEGPTMemoryDialog[dialogId].GetLastRole() == "user")
             {
-                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId + "_Assistant", new GPTMessage("assistant", "正在思考中...")));
-                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId, new GPTMessage("user", askMessage)));
+                _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId + "_Assistant", new GPTMessage("assistant", "正在思考中...")));
+                _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId, new GPTMessage("user", askMessage)));
             }
             else
             {
-                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId, new GPTMessage("user", askMessage)));
+                _xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId, new GPTMessage("user", askMessage)));
             }
             var nowThread = new Thread(StartGetGPTMessage);
             nowThread.Start(new MessageIdDialogIdAndThread(messageId, dialogId, nowThread));
@@ -366,7 +366,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
         var dialogId = messageIdAndThread.DialogId;
         var messageId = messageIdAndThread.MessageId;
         var thread = messageIdAndThread.Thread;
-        var nowDialog = xFEGPTMemoryDialog[dialogId];
+        var nowDialog = _xFEGPTMemoryDialog[dialogId];
         if (nowDialog.StreamMode)
         {
             var isStarted = false;
@@ -416,11 +416,11 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                             if (!isStarted)
                             {
                                 XFEChatGPTMessageReceived?.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs("[XFESTART]", messageId, GenerateState.Start, dialogId));
-                                xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", "该回复发生了一个错误，可能需要重新回复", true);
+                                _xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", "该回复发生了一个错误，可能需要重新回复", true);
                             }
                             else
                             {
-                                xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", "该回复发生了一个错误，可能需要重新回复", false);
+                                _xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", "该回复发生了一个错误，可能需要重新回复", false);
                             }
                             XFEChatGPTMessageReceived?.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs(nowReceivedMessage.Replace("[XFERemoteAPIError]", string.Empty), messageId, GenerateState.Error, dialogId));
                         }
@@ -428,11 +428,11 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                         {
                             XFEChatGPTMessageReceived?.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs("[XFESTART]", messageId, GenerateState.Start, dialogId));
                             isStarted = true;
-                            xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", string.Empty, true);
+                            _xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", string.Empty, true);
                         }
                         else
                         {
-                            xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", nowReceivedMessage, false);
+                            _xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", nowReceivedMessage, false);
                             XFEChatGPTMessageReceived?.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs(nowReceivedMessage, messageId, GenerateState.Continue, dialogId));
                         }
                     }
@@ -449,11 +449,11 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                             if (!isStarted)
                             {
                                 XFEChatGPTMessageReceived?.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs("[XFESTART]", messageId, GenerateState.Start, dialogId));
-                                xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", "该回复发生了一个错误，可能需要重新回复", true);
+                                _xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", "该回复发生了一个错误，可能需要重新回复", true);
                             }
                             else
                             {
-                                xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", "该回复发生了一个错误，可能需要重新回复", false);
+                                _xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", "该回复发生了一个错误，可能需要重新回复", false);
                             }
                             XFEChatGPTMessageReceived?.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs(nowReceivedMessage.Replace("[XFERemoteAPIError]", string.Empty), messageId, GenerateState.Error, dialogId));
                         }
@@ -461,14 +461,14 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                         {
                             XFEChatGPTMessageReceived?.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs("[XFESTART]", messageId, GenerateState.Start, dialogId));
                             isStarted = true;
-                            xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", string.Empty, true);
+                            _xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", string.Empty, true);
                         }
                         else
                         {
                             if (nowReceivedMessage.Contains("[XFE]"))
                             {
                                 nowReceivedMessage = nowReceivedMessage.Replace("[XFE]", string.Empty);
-                                xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", nowReceivedMessage, false);
+                                _xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", nowReceivedMessage, false);
                                 XFEChatGPTMessageReceived?.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs(nowReceivedMessage, messageId, GenerateState.Continue, dialogId));
                             }
                             else
@@ -476,11 +476,11 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                                 if (!isStarted)
                                 {
                                     XFEChatGPTMessageReceived?.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs("[XFESTART]", messageId, GenerateState.Start, dialogId));
-                                    xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", "该回复发生了一个错误，可能需要重新回复", true);
+                                    _xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", "该回复发生了一个错误，可能需要重新回复", true);
                                 }
                                 else
                                 {
-                                    xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", "该回复发生了一个错误，可能需要重新回复", false);
+                                    _xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", "该回复发生了一个错误，可能需要重新回复", false);
                                 }
                             }
                         }
@@ -493,11 +493,11 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                 if (!isStarted)
                 {
                     XFEChatGPTMessageReceived?.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs("[XFESTART]", messageId, GenerateState.Start, dialogId));
-                    xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", "该回复发生了一个错误，可能需要重新回复", true);
+                    _xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", "该回复发生了一个错误，可能需要重新回复", true);
                 }
                 else
                 {
-                    xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", "该回复发生了一个错误，可能需要重新回复", false);
+                    _xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", "该回复发生了一个错误，可能需要重新回复", false);
                 }
                 XFEChatGPTMessageReceived?.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs(ex.ToString(), messageId, GenerateState.Error, dialogId));
                 Console.WriteLine(ex.ToString());
@@ -539,24 +539,24 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                 if (nowReceivedMessage.Contains("[XFE]"))
                 {
                     nowReceivedMessage = nowReceivedMessage.Replace("[XFE]", string.Empty);
-                    xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", nowReceivedMessage, true);
+                    _xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", nowReceivedMessage, true);
                     XFEChatGPTMessageReceived?.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs(nowReceivedMessage, messageId, GenerateState.Start, dialogId));
                 }
                 else
                 {
-                    xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", nowReceivedMessage, true);
+                    _xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", nowReceivedMessage, true);
                     XFEChatGPTMessageReceived?.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs(nowReceivedMessage.Replace("[XFERemoteAPIError]", string.Empty), messageId, GenerateState.Error, dialogId));
                 }
                 await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection closed.", CancellationToken.None);
             }
             catch (Exception ex)
             {
-                xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", ex.ToString(), true);
+                _xFEGPTMemoryDialog.InstanceUpdate(dialogId, messageId + "_Assistant", ex.ToString(), true);
                 XFEChatGPTMessageReceived?.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs(ex.ToString(), messageId, GenerateState.Error, dialogId));
                 Console.WriteLine(ex.ToString());
             }
         }
-        threadList.Remove(thread);
+        ThreadList.Remove(thread);
     }
     #endregion
     #region 公有事件
@@ -569,6 +569,6 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <summary>
     /// 创建一个有记忆功能的XFEChatGPT对象
     /// </summary>
-    public MemorableXFEChatGPT() => xFEGPTMemoryDialog = new PrivateXFEGPTMemoryDialog();
+    public MemorableXFEChatGPT() => _xFEGPTMemoryDialog = new PrivateXFEGPTMemoryDialog();
     #endregion
 }

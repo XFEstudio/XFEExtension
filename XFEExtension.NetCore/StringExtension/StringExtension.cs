@@ -88,7 +88,7 @@ public static partial class StringExtension
         /// 验证是否是URL链接
         /// </summary>
         /// <returns></returns>
-        public bool IsURL()
+        public bool IsUrl()
         {
             var pattern = @"^(https?|ftp|file|ws)://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
             return IsMatch(pattern, telephoneNum);

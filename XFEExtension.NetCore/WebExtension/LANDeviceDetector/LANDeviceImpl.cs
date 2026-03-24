@@ -2,4 +2,4 @@
 
 namespace XFEExtension.NetCore.WebExtension.LANDeviceDetector;
 
-internal class LANDeviceImpl(IPAddress iPAddress, IPHostEntry? hostEntry, string? deviceName) : LANDevice(iPAddress, hostEntry,  deviceName);
+internal class LanDeviceImpl(IPAddress iPAddress, IPHostEntry? hostEntry, string? deviceName) : LanDevice(iPAddress, hostEntry,  deviceName);

@@ -7,7 +7,7 @@ namespace XFEExtension.NetCore.CyberComm;
 /// </summary>
 public class CyberCommGroup
 {
-    private readonly List<CyberCommServerEventArgs> cyberCommList = [];
+    private readonly List<CyberCommServerEventArgs> _cyberCommList = [];
     /// <summary>
     /// 组ID
     /// </summary>
@@ -18,7 +18,7 @@ public class CyberCommGroup
     /// <param name="e">客户端</param>
     public void Add(CyberCommServerEventArgs e)
     {
-        cyberCommList.Add(e);
+        _cyberCommList.Add(e);
     }
     /// <summary>
     /// 移除指定的客户端
@@ -26,9 +26,9 @@ public class CyberCommGroup
     /// <param name="webSocket">客户端</param>
     public void Remove(WebSocket webSocket)
     {
-        var cyberCommServerEventArgs = cyberCommList.Find(x => x.CurrentWebSocket == webSocket);
+        var cyberCommServerEventArgs = _cyberCommList.Find(x => x.CurrentWebSocket == webSocket);
         if (cyberCommServerEventArgs is not null)
-            cyberCommList.Remove(cyberCommServerEventArgs);
+            _cyberCommList.Remove(cyberCommServerEventArgs);
     }
     /// <summary>
     /// 移除指定索引的客户端
@@ -36,14 +36,14 @@ public class CyberCommGroup
     /// <param name="index">客户单索引</param>
     public void RemoveAt(int index)
     {
-        cyberCommList.RemoveAt(index);
+        _cyberCommList.RemoveAt(index);
     }
     /// <summary>
     /// 清空列表
     /// </summary>
     public void Clear()
     {
-        cyberCommList.Clear();
+        _cyberCommList.Clear();
     }
     /// <summary>
     /// 群组客户端数量
@@ -52,7 +52,7 @@ public class CyberCommGroup
     {
         get
         {
-            return cyberCommList.Count;
+            return _cyberCommList.Count;
         }
     }
     /// <summary>
@@ -64,7 +64,7 @@ public class CyberCommGroup
     {
         get
         {
-            return cyberCommList.Find(findFunc);
+            return _cyberCommList.Find(findFunc);
         }
     }
     /// <summary>
@@ -74,7 +74,7 @@ public class CyberCommGroup
     public async Task SendGroupTextMessage(string message)
     {
         List<Task> tasks = [];
-        foreach (var cyberCommServerEventArgs in cyberCommList)
+        foreach (var cyberCommServerEventArgs in _cyberCommList)
         {
             tasks.Add(cyberCommServerEventArgs.ReplyMessage(message));
         }
@@ -88,7 +88,7 @@ public class CyberCommGroup
     public async Task SendGroupTextMessage(string message, Func<CyberCommServerEventArgs, bool> findFunc)
     {
         List<Task> tasks = [];
-        foreach (var cyberCommServerEventArgs in cyberCommList)
+        foreach (var cyberCommServerEventArgs in _cyberCommList)
         {
             if (findFunc.Invoke(cyberCommServerEventArgs))
             {
@@ -104,7 +104,7 @@ public class CyberCommGroup
     public async Task SendGroupBinaryMessage(byte[] bytes)
     {
         List<Task> tasks = [];
-        foreach (var cyberCommServerEventArgs in cyberCommList)
+        foreach (var cyberCommServerEventArgs in _cyberCommList)
         {
             tasks.Add(cyberCommServerEventArgs.ReplyBinaryMessage(bytes));
         }
@@ -118,7 +118,7 @@ public class CyberCommGroup
     public async Task SendGroupBinaryMessage(byte[] bytes, Func<CyberCommServerEventArgs, bool> findFunc)
     {
         List<Task> tasks = [];
-        foreach (var cyberCommServerEventArgs in cyberCommList)
+        foreach (var cyberCommServerEventArgs in _cyberCommList)
         {
             if (findFunc.Invoke(cyberCommServerEventArgs))
             {
@@ -130,19 +130,19 @@ public class CyberCommGroup
     /// <summary>
     /// 客户端群组
     /// </summary>
-    /// <param name="GroupId">群组ID</param>
-    public CyberCommGroup(string GroupId)
+    /// <param name="groupId">群组ID</param>
+    public CyberCommGroup(string groupId)
     {
-        this.GroupId = GroupId;
+        this.GroupId = groupId;
     }
     /// <summary>
     /// 客户端群组
     /// </summary>
-    /// <param name="GroupId">群组ID</param>
+    /// <param name="groupId">群组ID</param>
     /// <param name="cyberCommList">客户端群组</param>
-    public CyberCommGroup(string GroupId, List<CyberCommServerEventArgs> cyberCommList)
+    public CyberCommGroup(string groupId, List<CyberCommServerEventArgs> cyberCommList)
     {
-        this.GroupId = GroupId;
-        this.cyberCommList = cyberCommList;
+        this.GroupId = groupId;
+        this._cyberCommList = cyberCommList;
     }
 }

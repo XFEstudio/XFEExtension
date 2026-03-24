@@ -5,17 +5,17 @@
 /// </summary>
 public class CyberCommGroupController
 {
-    private readonly List<CyberCommGroup> commGroups;
+    private readonly List<CyberCommGroup> _commGroups;
     /// <summary>
     /// 刷新
     /// </summary>
     public void Refresh()
     {
-        for (var i = commGroups.Count - 1; i >= 0; i--)
+        for (var i = _commGroups.Count - 1; i >= 0; i--)
         {
-            if (commGroups[i].Count == 0)
+            if (_commGroups[i].Count == 0)
             {
-                commGroups.Remove(commGroups[i]);
+                _commGroups.Remove(_commGroups[i]);
             }
         }
     }
@@ -25,7 +25,7 @@ public class CyberCommGroupController
     /// <param name="commGroup"></param>
     public void AddGroup(CyberCommGroup commGroup)
     {
-        commGroups.Add(commGroup);
+        _commGroups.Add(commGroup);
     }
     /// <summary>
     /// 移除群组
@@ -33,7 +33,7 @@ public class CyberCommGroupController
     /// <param name="commGroup"></param>
     public void RemoveGroup(CyberCommGroup commGroup)
     {
-        commGroups.Remove(commGroup);
+        _commGroups.Remove(commGroup);
     }
     /// <summary>
     /// 移除指定索引的群组
@@ -41,14 +41,14 @@ public class CyberCommGroupController
     /// <param name="index"></param>
     public void RemoveGroupAt(int index)
     {
-        commGroups.RemoveAt(index);
+        _commGroups.RemoveAt(index);
     }
     /// <summary>
     /// 清空群组
     /// </summary>
     public void Clear()
     {
-        commGroups.Clear();
+        _commGroups.Clear();
     }
     /// <summary>
     /// 群组数量
@@ -57,7 +57,7 @@ public class CyberCommGroupController
     {
         get
         {
-            return commGroups.Count;
+            return _commGroups.Count;
         }
     }
     /// <summary>
@@ -69,7 +69,7 @@ public class CyberCommGroupController
     {
         get
         {
-            return commGroups[index];
+            return _commGroups[index];
         }
     }
     /// <summary>
@@ -81,7 +81,7 @@ public class CyberCommGroupController
     {
         get
         {
-            foreach (var commGroup in commGroups)
+            foreach (var commGroup in _commGroups)
             {
                 if (commGroup.GroupId == groupId)
                 {
@@ -122,6 +122,6 @@ public class CyberCommGroupController
     /// </summary>
     public CyberCommGroupController()
     {
-        commGroups = [];
+        _commGroups = [];
     }
 }

@@ -11,11 +11,11 @@ namespace XFEExtension.NetCore.WebExtension;
 /// </summary>
 public class XFEDownloader : IDisposable
 {
-    private bool disposedValue;
-    private readonly List<HttpClient> httpClientList = [];
-    private HttpResponseMessage? responseMessage;
-    private readonly List<HttpResponseMessage> httpResponseMessages = [];
-    private readonly List<Task> downloadTasks = [];
+    private bool _disposedValue;
+    private readonly List<HttpClient> _httpClientList = [];
+    private HttpResponseMessage? _responseMessage;
+    private readonly List<HttpResponseMessage> _httpResponseMessages = [];
+    private readonly List<Task> _downloadTasks = [];
     /// <summary>
     /// 字节下载事件
     /// </summary>
@@ -36,14 +36,14 @@ public class XFEDownloader : IDisposable
     /// 已下载
     /// </summary>
     public bool Downloaded { get; private set; }
-    private bool isPaused;
+    private bool _isPaused;
     /// <summary>
     /// 暂停
     /// </summary>
     public bool IsPaused
     {
-        get { return isPaused; }
-        set { isPaused = value; }
+        get { return _isPaused; }
+        set { _isPaused = value; }
     }
 
     /// <summary>
@@ -56,15 +56,15 @@ public class XFEDownloader : IDisposable
         var continueDownload = continueFromLastDownload && File.Exists(SavePath);
         long totalRead = 0;
         var getInfoClient = new HttpClient();
-        responseMessage ??= await GetHttpResponseMessage(getInfoClient, CancellationToken.None);
-        var totalFileSize = responseMessage.Content.Headers.ContentLength;
+        _responseMessage ??= await GetHttpResponseMessage(getInfoClient, CancellationToken.None);
+        var totalFileSize = _responseMessage.Content.Headers.ContentLength;
         using var createFileStream = new FileStream(SavePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite, 8192, true);
         if (totalFileSize is not null)
             createFileStream.SetLength(totalFileSize.Value);
         for (var i = 0; i < FileSegmentCount; i++)
         {
             var currentSegment = i;
-            downloadTasks.Add(Task.Run(async () =>
+            _downloadTasks.Add(Task.Run(async () =>
             {
                 using var fileStream = new FileStream(SavePath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, 8192, true);
                 var currentSegmentTotalBufferSize = fileStream.Length / FileSegmentCount;
@@ -74,7 +74,7 @@ public class XFEDownloader : IDisposable
                 fileStream.Seek(startPosition, SeekOrigin.Begin);
                 var currentSegmentDownloadedBuffeSize = startPosition - startBufferIndex;
                 var httpClient = new HttpClient();
-                httpClientList.Add(httpClient);
+                _httpClientList.Add(httpClient);
                 httpClient.DefaultRequestHeaders.Range = new RangeHeaderValue(startPosition, endPosition);
                 if (continueDownload)
                     totalRead += currentSegmentDownloadedBuffeSize;
@@ -83,7 +83,7 @@ public class XFEDownloader : IDisposable
                 using var contentStream = await (await GetHttpResponseMessage(httpClient, cancellationToken)).Content.ReadAsStreamAsync(cancellationToken);
                 var buffer = new byte[8192];
                 int currentRead;
-                while ((currentRead = await contentStream.ReadAsync(buffer)) > 0 && !disposedValue)
+                while ((currentRead = await contentStream.ReadAsync(buffer)) > 0 && !_disposedValue)
                 {
                     if (IsPaused)
                     {
@@ -103,7 +103,7 @@ public class XFEDownloader : IDisposable
                 }
             }));
         }
-        await Task.WhenAll(downloadTasks);
+        await Task.WhenAll(_downloadTasks);
     }
     /// <summary>
     /// 暂停下载
@@ -126,8 +126,8 @@ public class XFEDownloader : IDisposable
     public async Task<(string? fileName, long? fileSize)> GetDownloadInfo()
     {
         using var httpClient = new HttpClient();
-        responseMessage ??= await GetHttpResponseMessage(httpClient, CancellationToken.None);
-        return (Path.GetFileName(responseMessage.RequestMessage?.RequestUri?.AbsolutePath), responseMessage.Content.Headers.ContentLength);
+        _responseMessage ??= await GetHttpResponseMessage(httpClient, CancellationToken.None);
+        return (Path.GetFileName(_responseMessage.RequestMessage?.RequestUri?.AbsolutePath), _responseMessage.Content.Headers.ContentLength);
     }
     private async Task<HttpResponseMessage> GetHttpResponseMessage(HttpClient httpClient, CancellationToken cancellationToken)
     {
@@ -141,20 +141,20 @@ public class XFEDownloader : IDisposable
     /// <param name="disposing"></param>
     protected virtual void Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (!_disposedValue)
         {
             if (disposing)
             {
-                responseMessage?.Dispose();
-                foreach (var httpClient in httpClientList)
+                _responseMessage?.Dispose();
+                foreach (var httpClient in _httpClientList)
                 {
                     httpClient.Dispose();
                 }
-                foreach (var response in httpResponseMessages)
+                foreach (var response in _httpResponseMessages)
                 {
                     response.Dispose();
                 }
-                foreach (var task in downloadTasks)
+                foreach (var task in _downloadTasks)
                 {
                     task.Dispose();
                 }
@@ -162,7 +162,7 @@ public class XFEDownloader : IDisposable
 
             // TODO: 释放未托管的资源(未托管的对象)并重写终结器
             // TODO: 将大型字段设置为 null
-            disposedValue = true;
+            _disposedValue = true;
         }
     }
     /// <summary>
@@ -193,7 +193,7 @@ public class XFEDownloader : IDisposable
     {
         if (string.IsNullOrEmpty(url))
             throw new ArgumentException($"“{nameof(url)}”不能为 null 或空。", nameof(url));
-        var filePath = url.GetFileNameFromURL().WaitAndGetResult()!;
+        var filePath = url.GetFileNameFromUrl().WaitAndGetResult()!;
         DownloadUrl = url;
         SavePath = filePath;
     }

@@ -7,12 +7,12 @@ namespace XFEExtension.NetCore.WebExtension.LANDeviceDetector;
 /// <summary>
 /// 局域网设备探测器
 /// </summary>
-public class LANDeviceDetector
+public class LanDeviceDetector
 {
     /// <summary>
     /// 找到设备
     /// </summary>
-    public event XFEEventHandler<LANDevice>? DeviceFind;
+    public event XFEEventHandler<LanDevice>? DeviceFind;
 
     /// <summary>
     /// 网络地址搜索的起始位置
@@ -32,14 +32,14 @@ public class LANDeviceDetector
     /// <summary>
     /// 已找到的设备
     /// </summary>
-    public List<LANDevice> FindDevices { get; set; } = [];
+    public List<LanDevice> FindDevices { get; set; } = [];
 
     /// <summary>
     /// 局域网设备探测器
     /// </summary>
     /// <param name="iPStart">网络地址搜索起始位置，default默认为本机设备所在网络频段</param>
     /// <param name="timeOut">超时</param>
-    public LANDeviceDetector(string iPStart = "default", int timeOut = 100)
+    public LanDeviceDetector(string iPStart = "default", int timeOut = 100)
     {
         if(iPStart == "default")
         {
@@ -66,7 +66,7 @@ public class LANDeviceDetector
             {
                 IPHostEntry? hostEntry = null;
                 try { hostEntry = Dns.GetHostEntry(reply.Address); } catch { }
-                var device = new LANDeviceImpl(reply.Address, hostEntry, hostEntry?.HostName);
+                var device = new LanDeviceImpl(reply.Address, hostEntry, hostEntry?.HostName);
                 if (FindDevices.Any(d => d.IPAddress.ToString() == reply.Address.ToString()))
                     return;
                 FindDevices.Add(device);
@@ -79,11 +79,11 @@ public class LANDeviceDetector
     /// 检测一次
     /// </summary>
     /// <returns></returns>
-    public async Task<List<LANDevice>> Detect() => await InnerDetect(reply =>
+    public async Task<List<LanDevice>> Detect() => await InnerDetect(reply =>
     {
         IPHostEntry? hostEntry = null;
         try { hostEntry = Dns.GetHostEntry(reply.Address); } catch { }
-        DeviceFind?.Invoke(new LANDeviceImpl(reply.Address, hostEntry, hostEntry?.HostName));
+        DeviceFind?.Invoke(new LanDeviceImpl(reply.Address, hostEntry, hostEntry?.HostName));
     });
 
     /// <summary>
@@ -91,10 +91,10 @@ public class LANDeviceDetector
     /// </summary>
     public void Stop() => IsDetecting = false;
 
-    private async Task<List<LANDevice>> InnerDetect(Action<PingReply> action)
+    private async Task<List<LanDevice>> InnerDetect(Action<PingReply> action)
     {
         var tasks = new List<Task>();
-        var findDevices = new List<LANDevice>();
+        var findDevices = new List<LanDevice>();
         for (var i = 1; i < 256; i++)
         {
             var currentIndex = i;
@@ -107,7 +107,7 @@ public class LANDeviceDetector
                 {
                     IPHostEntry? hostEntry = null;
                     try { hostEntry = await Dns.GetHostEntryAsync(ipAddress); } catch { }
-                    findDevices.Add(new LANDeviceImpl(reply.Address, hostEntry, hostEntry?.HostName));
+                    findDevices.Add(new LanDeviceImpl(reply.Address, hostEntry, hostEntry?.HostName));
                     action.Invoke(reply);
                 }
             }));

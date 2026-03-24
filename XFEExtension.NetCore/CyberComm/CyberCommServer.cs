@@ -14,7 +14,7 @@ public class CyberCommServer
     /// <summary>
     /// 服务器绑定的URL
     /// </summary>
-    public string[] ServerURLs { get; set; } = [];
+    public string[] ServerUrLs { get; set; } = [];
     /// <summary>
     /// 字节流缓冲区长度
     /// </summary>
@@ -62,7 +62,7 @@ public class CyberCommServer
         try
         {
             Server = new();
-            foreach (var url in ServerURLs)
+            foreach (var url in ServerUrLs)
             {
                 Server.Prefixes.Add(url);
             }
@@ -72,15 +72,15 @@ public class CyberCommServer
             while (ServerRunning)
             {
                 var httpListenerContext = await Server.GetContextAsync();
-                var requestURL = httpListenerContext.Request.Url;
+                var requestUrl = httpListenerContext.Request.Url;
                 var clientIP = httpListenerContext.Request.RemoteEndPoint.Address.ToString();
                 if (httpListenerContext.Request.IsWebSocketRequest)
                 {
                     var httpListenerWebSocketContext = await httpListenerContext.AcceptWebSocketAsync(null);
                     var webSocket = httpListenerWebSocketContext.WebSocket;
                     var wsHeader = httpListenerWebSocketContext.Headers;
-                    ClientConnected?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, string.Empty, clientIP, wsHeader, true));
-                    CyberCommClientConnected(requestURL, webSocket, wsHeader, clientIP);
+                    ClientConnected?.Invoke(this, new CyberCommServerEventArgsImpl(requestUrl, webSocket, string.Empty, clientIP, wsHeader, true));
+                    CyberCommClientConnected(requestUrl, webSocket, wsHeader, clientIP);
                 }
                 else
                 {
@@ -95,12 +95,12 @@ public class CyberCommServer
                         {
                             using var reader = new StreamReader(request.InputStream, request.ContentEncoding);
                             var postData = reader.ReadToEnd();
-                            RequestReceived?.Invoke(this, new CyberCommRequestEventArgsImpl(requestURL, requestMethod, postData, headers, queryString, request, response, clientIP));
+                            RequestReceived?.Invoke(this, new CyberCommRequestEventArgsImpl(requestUrl, requestMethod, postData, headers, queryString, request, response, clientIP));
                         });
                     }
                     else
                     {
-                        RequestReceived?.Invoke(this, new CyberCommRequestEventArgsImpl(requestURL, requestMethod, null, headers, queryString, request, response, clientIP));
+                        RequestReceived?.Invoke(this, new CyberCommRequestEventArgsImpl(requestUrl, requestMethod, null, headers, queryString, request, response, clientIP));
                     }
                 }
             }
@@ -118,7 +118,7 @@ public class CyberCommServer
         ServerRunning = false;
         Server.Close();
     }
-    private async void CyberCommClientConnected(Uri? requestURL, WebSocket webSocket, NameValueCollection wsHeader, string clientIP)
+    private async void CyberCommClientConnected(Uri? requestUrl, WebSocket webSocket, NameValueCollection wsHeader, string clientIP)
     {
         while (webSocket.State == WebSocketState.Open)
         {
@@ -143,11 +143,11 @@ public class CyberCommServer
                     case WebSocketMessageType.Text:
                     {
                         var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
-                        MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, receivedMessage, clientIP, wsHeader, receiveResult.EndOfMessage));
+                        MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestUrl, webSocket, receivedMessage, clientIP, wsHeader, receiveResult.EndOfMessage));
                         break;
                     }
                     case WebSocketMessageType.Binary:
-                        MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, receivedBinaryBuffer, clientIP, wsHeader, receiveResult.EndOfMessage));
+                        MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestUrl, webSocket, receivedBinaryBuffer, clientIP, wsHeader, receiveResult.EndOfMessage));
                         break;
                     case WebSocketMessageType.Close:
                         break;
@@ -162,11 +162,11 @@ public class CyberCommServer
             }
             catch (Exception ex)
             {
-                MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, new XFECyberCommException("与客户端端通讯期间发生异常", ex), clientIP, wsHeader));
+                MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestUrl, webSocket, new XFECyberCommException("与客户端端通讯期间发生异常", ex), clientIP, wsHeader));
                 break;
             }
         }
-        ConnectionClosed?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, string.Empty, clientIP, wsHeader, true));
+        ConnectionClosed?.Invoke(this, new CyberCommServerEventArgsImpl(requestUrl, webSocket, string.Empty, clientIP, wsHeader, true));
         webSocket.Dispose();
     }
     #endregion
@@ -184,27 +184,27 @@ public class CyberCommServer
     /// <param name="listenPorts">监听端口</param>
     public CyberCommServer(params int[] listenPorts)
     {
-        var serverURLs = listenPorts.Select(port => $"http://*:{port}/").ToList();
-        ServerURLs = [.. serverURLs];
+        var serverUrLs = listenPorts.Select(port => $"http://*:{port}/").ToList();
+        ServerUrLs = [.. serverUrLs];
         AutoReceiveCompletedMessage = true;
     }
     /// <summary>
     /// CyberComm服务器，使用URL创建
     /// </summary>
-    /// <param name="serverURLs">服务器URL</param>
-    public CyberCommServer(params string[] serverURLs)
+    /// <param name="serverUrLs">服务器URL</param>
+    public CyberCommServer(params string[] serverUrLs)
     {
-        ServerURLs = serverURLs;
+        ServerUrLs = serverUrLs;
         AutoReceiveCompletedMessage = true;
     }
     /// <summary>
     /// CyberComm服务器，使用URL创建
     /// </summary>
     /// <param name="autoReceiveCompletedMessage">是否自动接收完整消息</param>
-    /// <param name="serverURLs">服务器URL</param>
-    public CyberCommServer(bool autoReceiveCompletedMessage = true, params string[] serverURLs)
+    /// <param name="serverUrLs">服务器URL</param>
+    public CyberCommServer(bool autoReceiveCompletedMessage = true, params string[] serverUrLs)
     {
-        ServerURLs = serverURLs;
+        ServerUrLs = serverUrLs;
         AutoReceiveCompletedMessage = autoReceiveCompletedMessage;
     }
     #endregion

@@ -7,7 +7,7 @@ namespace XFEExtension.NetCore.CyberComm;
 /// <summary>
 /// CyberComm服务器Http请求事件参数
 /// </summary>
-/// <param name="RequestURL">请求的URL地址</param>
+/// <param name="RequestUrl">请求的URL地址</param>
 /// <param name="RequestMethod">请求方法</param>
 /// <param name="RequestBody">当请求方法为POST时的请求体</param>
 /// <param name="RequestHeaders">请求头</param>
@@ -15,7 +15,7 @@ namespace XFEExtension.NetCore.CyberComm;
 /// <param name="Request">请求对象</param>
 /// <param name="Response">响应对象</param>
 /// <param name="ClientIP">客户端IP</param>
-public abstract record CyberCommRequestEventArgs(Uri? RequestURL, string RequestMethod, string? RequestBody, NameValueCollection RequestHeaders, NameValueCollection QueryString, HttpListenerRequest Request, HttpListenerResponse Response, string ClientIP)
+public abstract record CyberCommRequestEventArgs(Uri? RequestUrl, string RequestMethod, string? RequestBody, NameValueCollection RequestHeaders, NameValueCollection QueryString, HttpListenerRequest Request, HttpListenerResponse Response, string ClientIP)
 {
     /// <summary>
     /// 回复消息并关闭连接

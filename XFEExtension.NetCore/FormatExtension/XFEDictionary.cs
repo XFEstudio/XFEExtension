@@ -7,7 +7,7 @@ namespace XFEExtension.NetCore.FormatExtension;
 /// </summary>
 public class XFEDictionary : ICollection<XFEEntry>
 {
-    private List<XFEEntry> xFEDictionaryList = [];
+    private List<XFEEntry> _xFEDictionaryList = [];
     /// <summary>
     /// 字典分隔符
     /// </summary>
@@ -19,7 +19,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <summary>
     /// 字典中的条目数
     /// </summary>
-    public int Count => xFEDictionaryList.Count;
+    public int Count => _xFEDictionaryList.Count;
     /// <summary>
     /// 只读
     /// </summary>
@@ -30,7 +30,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <param name="dictionaryString"></param>
     public void Load(string dictionaryString)
     {
-        xFEDictionaryList = ToList(dictionaryString);
+        _xFEDictionaryList = ToList(dictionaryString);
     }
     /// <summary>
     /// 追加条目
@@ -41,7 +41,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     {
         if (Contains(entry.Header))
             throw new XFEDictionaryException("Header的值应唯一！");
-        xFEDictionaryList.Add(entry);
+        _xFEDictionaryList.Add(entry);
     }
     /// <summary>
     /// 追加条目
@@ -55,7 +55,7 @@ public class XFEDictionary : ICollection<XFEEntry>
         {
             if (Contains(entry.Header))
                 throw new XFEDictionaryException("Header的值应唯一！");
-            xFEDictionaryList.Add(entry);
+            _xFEDictionaryList.Add(entry);
         }
     }
     /// <summary>
@@ -68,7 +68,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     {
         if (Contains(header))
             throw new XFEDictionaryException("Header的值应唯一！");
-        xFEDictionaryList.Add(new XFEEntry(header, content));
+        _xFEDictionaryList.Add(new XFEEntry(header, content));
     }
     /// <summary>
     /// 追加字典
@@ -82,7 +82,7 @@ public class XFEDictionary : ICollection<XFEEntry>
                                 .Select(group => group.Key);
         if (duplicates.Any())
             throw new XFEDictionaryException("Header的值应唯一");
-        xFEDictionaryList.AddRange(collection);
+        _xFEDictionaryList.AddRange(collection);
     }
     /// <summary>
     /// 追加字典
@@ -90,7 +90,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <param name="dictionaryString">字典字符串</param>
     public void AddRange(string dictionaryString)
     {
-        xFEDictionaryList.AddRange(ToList(dictionaryString));
+        _xFEDictionaryList.AddRange(ToList(dictionaryString));
     }
     /// <summary>
     /// 插入条目
@@ -102,7 +102,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     {
         if (Contains(entry.Header))
             throw new XFEDictionaryException("Header的值应唯一！");
-        xFEDictionaryList.Insert(index, entry);
+        _xFEDictionaryList.Insert(index, entry);
     }
     /// <summary>
     /// 插入条目
@@ -117,7 +117,7 @@ public class XFEDictionary : ICollection<XFEEntry>
         {
             if (Contains(entry.Header))
                 throw new XFEDictionaryException("Header的值应唯一！");
-            xFEDictionaryList.Insert(index, entry);
+            _xFEDictionaryList.Insert(index, entry);
         }
     }
     /// <summary>
@@ -131,14 +131,14 @@ public class XFEDictionary : ICollection<XFEEntry>
     {
         if (Contains(header))
             throw new XFEDictionaryException("Header的值应唯一！");
-        xFEDictionaryList.Insert(index, new XFEEntry(header, content));
+        _xFEDictionaryList.Insert(index, new XFEEntry(header, content));
     }
     /// <summary>
     /// 清空字典
     /// </summary>
     public void Clear()
     {
-        xFEDictionaryList.Clear();
+        _xFEDictionaryList.Clear();
     }
     /// <summary>
     /// 检测是否包含
@@ -147,7 +147,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <returns></returns>
     public bool Contains(XFEEntry item)
     {
-        return xFEDictionaryList.Contains(item);
+        return _xFEDictionaryList.Contains(item);
     }
     /// <summary>
     /// 检测是否包含头
@@ -156,7 +156,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <returns></returns>
     public bool Contains(string headerString)
     {
-        return xFEDictionaryList.Find(x => x.Header == headerString) is not null;
+        return _xFEDictionaryList.Find(x => x.Header == headerString) is not null;
     }
     /// <summary>
     /// 检测是否包含内容
@@ -165,7 +165,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <returns></returns>
     public bool ContainContent(string contentString)
     {
-        return xFEDictionaryList.Find(x => x.Content == contentString) is not null;
+        return _xFEDictionaryList.Find(x => x.Content == contentString) is not null;
     }
     /// <summary>
     /// 复制
@@ -174,7 +174,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <param name="arrayIndex">索引</param>
     public void CopyTo(XFEEntry[] array, int arrayIndex)
     {
-        xFEDictionaryList.CopyTo(array, arrayIndex);
+        _xFEDictionaryList.CopyTo(array, arrayIndex);
     }
     /// <summary>
     /// 获取索引器
@@ -182,7 +182,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <returns></returns>
     public IEnumerator<XFEEntry> GetEnumerator()
     {
-        return xFEDictionaryList.GetEnumerator();
+        return _xFEDictionaryList.GetEnumerator();
     }
     /// <summary>
     /// 移除指定的条目
@@ -191,7 +191,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <returns></returns>
     public bool Remove(XFEEntry item)
     {
-        return xFEDictionaryList.Remove(item);
+        return _xFEDictionaryList.Remove(item);
     }
     /// <summary>
     /// 移除指定的条目
@@ -200,9 +200,9 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <returns></returns>
     public bool Remove(string headerString)
     {
-        var entry = xFEDictionaryList.Find(x => x.Header == headerString);
+        var entry = _xFEDictionaryList.Find(x => x.Header == headerString);
         if (entry is not null)
-            return xFEDictionaryList.Remove(entry);
+            return _xFEDictionaryList.Remove(entry);
         return false;
     }
     /// <summary>
@@ -212,7 +212,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <param name="count">移除长度</param>
     public void RemoveRange(int startIndex, int count)
     {
-        xFEDictionaryList.RemoveRange(startIndex, count);
+        _xFEDictionaryList.RemoveRange(startIndex, count);
     }
     /// <summary>
     /// 索引器
@@ -223,13 +223,13 @@ public class XFEDictionary : ICollection<XFEEntry>
     {
         get
         {
-            return xFEDictionaryList.Find(x => x.Header == headerString)?.Content;
+            return _xFEDictionaryList.Find(x => x.Header == headerString)?.Content;
         }
         set
         {
             if (value is not null)
             {
-                var entry = xFEDictionaryList.Find(x => x.Header == headerString);
+                var entry = _xFEDictionaryList.Find(x => x.Header == headerString);
                 if (entry is not null)
                     entry.Content = value;
             }
@@ -237,7 +237,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     }
     IEnumerator IEnumerable.GetEnumerator()
     {
-        return xFEDictionaryList.GetEnumerator();
+        return _xFEDictionaryList.GetEnumerator();
     }
     /// <summary>
     /// 转换为字符串
@@ -246,7 +246,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     public override string ToString()
     {
         var result = "";
-        foreach (var item in xFEDictionaryList)
+        foreach (var item in _xFEDictionaryList)
         {
             result += item.ToString();
         }
@@ -293,7 +293,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <param name="xFEDictionaryList">条目列表</param>
     public XFEDictionary(List<XFEEntry> xFEDictionaryList)
     {
-        this.xFEDictionaryList = xFEDictionaryList;
+        this._xFEDictionaryList = xFEDictionaryList;
     }
     /// <summary>
     /// XFE字典存储
@@ -306,7 +306,7 @@ public class XFEDictionary : ICollection<XFEEntry>
             throw new XFEDictionaryException("输入的字符串数组格式不正确，应为Header，Content，Header，Content...");
         for (var i = 0; i < headerAndContentStrings.Length; i += 2)
         {
-            xFEDictionaryList.Add(new XFEEntry(headerAndContentStrings[i], headerAndContentStrings[i + 1]));
+            _xFEDictionaryList.Add(new XFEEntry(headerAndContentStrings[i], headerAndContentStrings[i + 1]));
         }
     }
     /// <summary>
@@ -315,7 +315,7 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// <param name="dictionaryString">字典字符串</param>
     public XFEDictionary(string dictionaryString)
     {
-        xFEDictionaryList = ToList(dictionaryString);
+        _xFEDictionaryList = ToList(dictionaryString);
     }
     /// <summary>
     /// XFE字典存储

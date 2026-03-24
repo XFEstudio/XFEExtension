@@ -8,7 +8,7 @@ namespace XFEExtension.NetCore.FileExtension;
 public class XFEFileWatcher
 {
     #region 字段
-    private readonly List<FileSystemWatcher> watchers = [];
+    private readonly List<FileSystemWatcher> _watchers = [];
     #endregion
     #region 属性
     /// <summary>
@@ -71,7 +71,7 @@ public class XFEFileWatcher
                 {
                     NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName
                 };
-                watchers.Add(subdirectoryWatcher);
+                _watchers.Add(subdirectoryWatcher);
                 subdirectoryWatcher.Changed += OnFileChanged;
                 subdirectoryWatcher.Created += OnFileChanged;
                 subdirectoryWatcher.Deleted += OnFileChanged;
@@ -102,7 +102,7 @@ public class XFEFileWatcher
                     await new Action(() => { MonitorSubdirectories(Path); }).StartNewTask();
                 }
                 FileSystemWatcher rootWatcher = new(Path);
-                watchers.Add(rootWatcher);
+                _watchers.Add(rootWatcher);
                 rootWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
                 rootWatcher.Changed += OnFileChanged;
                 rootWatcher.Created += OnFileChanged;
@@ -149,7 +149,7 @@ public class XFEFileWatcher
             {
                 throw new XFEExtensionException("文件或文件夹不存在");
             }
-            watchers.Add(rootWatcher);
+            _watchers.Add(rootWatcher);
             rootWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
             rootWatcher.Changed += OnFileChanged;
             rootWatcher.Created += OnFileChanged;
@@ -167,7 +167,7 @@ public class XFEFileWatcher
     /// </summary>
     public void StopWatching()
     {
-        foreach (var watcher in watchers)
+        foreach (var watcher in _watchers)
         {
             watcher.EnableRaisingEvents = false;
         }
@@ -177,7 +177,7 @@ public class XFEFileWatcher
     /// </summary>
     public void ContinueWatching()
     {
-        foreach (var watcher in watchers)
+        foreach (var watcher in _watchers)
         {
             watcher.EnableRaisingEvents = true;
         }
@@ -187,7 +187,7 @@ public class XFEFileWatcher
     /// </summary>
     public void Dispose()
     {
-        foreach (var watcher in watchers)
+        foreach (var watcher in _watchers)
         {
             watcher.Dispose();
         }

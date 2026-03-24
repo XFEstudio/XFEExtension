@@ -8,22 +8,22 @@ namespace XFEExtension.NetCore.BufferExtension;
 /// </summary>
 public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
 {
-    private readonly Dictionary<string, byte[]> bufferDictionary = [];
-    private readonly List<byte[]> headerBuffers = [];
+    private readonly Dictionary<string, byte[]> _bufferDictionary = [];
+    private readonly List<byte[]> _headerBuffers = [];
     /// <summary>
     /// 所有的头
     /// </summary>
-    public Dictionary<string, byte[]>.KeyCollection Headers => bufferDictionary.Keys;
+    public Dictionary<string, byte[]>.KeyCollection Headers => _bufferDictionary.Keys;
 
     /// <summary>
     /// 所有的值
     /// </summary>
-    public Dictionary<string, byte[]>.ValueCollection Buffers => bufferDictionary.Values;
+    public Dictionary<string, byte[]>.ValueCollection Buffers => _bufferDictionary.Values;
 
     /// <summary>
     /// 长度
     /// </summary>
-    public int Count => bufferDictionary.Count;
+    public int Count => _bufferDictionary.Count;
 
     /// <summary>
     /// 获取或设置Buffer
@@ -32,15 +32,15 @@ public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
     /// <returns></returns>
     public byte[] this[string header]
     {
-        get => bufferDictionary[header];
-        set => bufferDictionary[header] = value;
+        get => _bufferDictionary[header];
+        set => _bufferDictionary[header] = value;
     }
 
     /// <summary>
     /// 封装Buffer
     /// </summary>
     /// <returns></returns>
-    public byte[] ToBuffer() => headerBuffers.PackBuffer();
+    public byte[] ToBuffer() => _headerBuffers.PackBuffer();
 
     /// <summary>
     /// 将Buffer转换为XFEBuffer
@@ -55,9 +55,9 @@ public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
         {
             if (i % 2 != 0)
                 continue;
-            xFEBuffer.bufferDictionary.Add(Encoding.UTF8.GetString(buffers[i]), buffers[i + 1]);
-            xFEBuffer.headerBuffers.Add(buffers[i]);
-            xFEBuffer.headerBuffers.Add(buffers[i + 1]);
+            xFEBuffer._bufferDictionary.Add(Encoding.UTF8.GetString(buffers[i]), buffers[i + 1]);
+            xFEBuffer._headerBuffers.Add(buffers[i]);
+            xFEBuffer._headerBuffers.Add(buffers[i + 1]);
         }
         return xFEBuffer;
     }
@@ -68,9 +68,9 @@ public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
     /// <param name="buffer">Buffer</param>
     public void Add(string header, byte[] buffer)
     {
-        bufferDictionary.Add(header, buffer);
-        headerBuffers.Add(Encoding.UTF8.GetBytes(header));
-        headerBuffers.Add(buffer);
+        _bufferDictionary.Add(header, buffer);
+        _headerBuffers.Add(Encoding.UTF8.GetBytes(header));
+        _headerBuffers.Add(buffer);
     }
     /// <summary>
     /// 添加XFEBuffer
@@ -83,9 +83,9 @@ public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
             throw new XFEExtensionException("头和Buffer必须成对输入");
         for (var i = 0; i < @params.Length; i += 2)
         {
-            bufferDictionary.Add(@params[i].ToString()!, (byte[])@params[i + 1]);
-            headerBuffers.Add(Encoding.UTF8.GetBytes(@params[i].ToString()!));
-            headerBuffers.Add((byte[])@params[i + 1]);
+            _bufferDictionary.Add(@params[i].ToString()!, (byte[])@params[i + 1]);
+            _headerBuffers.Add(Encoding.UTF8.GetBytes(@params[i].ToString()!));
+            _headerBuffers.Add((byte[])@params[i + 1]);
         }
     }
     /// <summary>
@@ -94,8 +94,8 @@ public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
     /// <param name="header">头</param>
     public void Remove(string header)
     {
-        bufferDictionary.Remove(header);
-        headerBuffers.Remove(Encoding.UTF8.GetBytes(header));
+        _bufferDictionary.Remove(header);
+        _headerBuffers.Remove(Encoding.UTF8.GetBytes(header));
     }
     /// <summary>
     /// 移除指定位置的XFEBuffer
@@ -103,43 +103,43 @@ public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
     /// <param name="index"></param>
     public void RemoveAt(int index)
     {
-        var header = bufferDictionary.Keys.ToArray()[index];
-        bufferDictionary.Remove(header);
-        headerBuffers.Remove(Encoding.UTF8.GetBytes(header));
+        var header = _bufferDictionary.Keys.ToArray()[index];
+        _bufferDictionary.Remove(header);
+        _headerBuffers.Remove(Encoding.UTF8.GetBytes(header));
     }
     /// <summary>
     /// 清空
     /// </summary>
     public void Clear()
     {
-        bufferDictionary.Clear();
-        headerBuffers.Clear();
+        _bufferDictionary.Clear();
+        _headerBuffers.Clear();
     }
     /// <summary>
     /// 是否包含
     /// </summary>
     /// <param name="header">头</param>
     /// <returns></returns>
-    public bool Contains(string header) => bufferDictionary.ContainsKey(header);
+    public bool Contains(string header) => _bufferDictionary.ContainsKey(header);
 
     /// <summary>
     /// 获取头
     /// </summary>
     /// <returns></returns>
-    public string[] GetHeaders() => [.. bufferDictionary.Keys];
+    public string[] GetHeaders() => [.. _bufferDictionary.Keys];
 
     /// <summary>
     /// 获取枚举器
     /// </summary>
     /// <returns></returns>
-    public IEnumerator<KeyValuePair<string, byte[]>> GetEnumerator() => bufferDictionary.GetEnumerator();
+    public IEnumerator<KeyValuePair<string, byte[]>> GetEnumerator() => _bufferDictionary.GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)bufferDictionary).GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_bufferDictionary).GetEnumerator();
 
     /// <summary>
     /// XFE的二进制数组协议
     /// </summary>
-    public XFEBuffer() => bufferDictionary = [];
+    public XFEBuffer() => _bufferDictionary = [];
 
     /// <summary>
     /// XFE的二进制数组协议
@@ -152,9 +152,9 @@ public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
             throw new XFEExtensionException("头和Buffer必须成对输入");
         for (var i = 0; i < @params.Length; i += 2)
         {
-            bufferDictionary.Add(@params[i].ToString()!, (byte[])@params[i + 1]);
-            headerBuffers.Add(Encoding.UTF8.GetBytes(@params[i].ToString()!));
-            headerBuffers.Add((byte[])@params[i + 1]);
+            _bufferDictionary.Add(@params[i].ToString()!, (byte[])@params[i + 1]);
+            _headerBuffers.Add(Encoding.UTF8.GetBytes(@params[i].ToString()!));
+            _headerBuffers.Add((byte[])@params[i + 1]);
         }
     }
 }

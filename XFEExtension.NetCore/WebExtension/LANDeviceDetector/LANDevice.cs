@@ -5,7 +5,7 @@ namespace XFEExtension.NetCore.WebExtension.LANDeviceDetector;
 /// <summary>
 /// 局域网设备
 /// </summary>
-public abstract class LANDevice(IPAddress iPAddress, IPHostEntry? hostEntry, string? deviceName)
+public abstract class LanDevice(IPAddress iPAddress, IPHostEntry? hostEntry, string? deviceName)
 {
     /// <summary>
     /// 设备名称

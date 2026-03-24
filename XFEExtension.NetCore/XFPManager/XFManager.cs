@@ -74,12 +74,12 @@ public class XFManager
     /// XFE字段属性管理器
     /// </summary>
     /// <param name="nameAndValue">属性/字段名称和其值</param>
-    /// <param name="IsProperty">是否为属性</param>
-    public XFManager(bool IsProperty, params object[] nameAndValue)
+    /// <param name="isProperty">是否为属性</param>
+    public XFManager(bool isProperty, params object[] nameAndValue)
     {
         Properties = [];
         Fields = [];
-        if (IsProperty)
+        if (isProperty)
         {
             for (var i = 0; i < nameAndValue.Length; i += 2)
             {

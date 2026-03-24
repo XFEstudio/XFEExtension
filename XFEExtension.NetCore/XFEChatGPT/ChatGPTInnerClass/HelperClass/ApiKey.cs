@@ -5,15 +5,15 @@ namespace XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass;
 /// <summary>
 /// API密钥
 /// </summary>
-/// <param name="aPIKey">秘钥</param>
+/// <param name="aPiKey">秘钥</param>
 /// <param name="description">描述</param>
-public class ApiKey(string aPIKey, string description)
+public class ApiKey(string aPiKey, string description)
 {
-    private static readonly char[] separator = ['{', '}'];
+    private static readonly char[] Separator = ['{', '}'];
     /// <summary>
     /// APIKEY
     /// </summary>
-    public string APIKey { get; set; } = aPIKey;
+    public string Key { get; set; } = aPiKey;
     /// <summary>
     /// APIKey的描述
     /// </summary>
@@ -24,7 +24,7 @@ public class ApiKey(string aPIKey, string description)
     /// <returns></returns>
     public override string ToString()
     {
-        return $"{{[+-{Description}-+][+-{APIKey}-+]}}";
+        return $"{{[+-{Description}-+][+-{Key}-+]}}";
     }
     /// <summary>
     /// 将字符串转换为ApiKey的List
@@ -33,7 +33,7 @@ public class ApiKey(string aPIKey, string description)
     /// <returns></returns>
     public static List<ApiKey> ToApiKey(string keyString)
     {
-        var keyGroup = keyString.Split(separator);
+        var keyGroup = keyString.Split(Separator);
         List<ApiKey> apiKeys = [];
         foreach (var key in keyGroup)
         {

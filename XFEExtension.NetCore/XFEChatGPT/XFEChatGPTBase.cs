@@ -5,5 +5,5 @@
 /// </summary>
 public class XFEChatGPTBase
 {
-    private protected List<Thread> threadList = [];
+    private protected List<Thread> ThreadList = [];
 }

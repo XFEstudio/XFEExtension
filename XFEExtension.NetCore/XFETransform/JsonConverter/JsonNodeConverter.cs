@@ -6,10 +6,10 @@
 /// <param name="jsonString"></param>
 public class JsonNodeConverter(string jsonString)
 {
-    private int currentLayer = -1;
-    private string currentPropertyName = "";
-    private string currentPropertyValue = "";
-    private readonly List<short> currentPosition = new List<short> { 0 };
+    private int _currentLayer = -1;
+    private string _currentPropertyName = "";
+    private string _currentPropertyValue = "";
+    private readonly List<short> _currentPosition = new List<short> { 0 };
 
     /// <summary>
     /// 原始Json字符串
@@ -28,7 +28,7 @@ public class JsonNodeConverter(string jsonString)
         var currentSymbol = JsonSymbol.Brace;
         foreach (var current in JsonString)
         {
-            var currentJsonComplexJsonNode = GetJsonNodeByIndex(jsonNode, currentPosition);
+            var currentJsonComplexJsonNode = GetJsonNodeByIndex(jsonNode, _currentPosition);
             ValueType currentValueType;
             switch (current)
             {
@@ -39,25 +39,25 @@ public class JsonNodeConverter(string jsonString)
                         currentState = CurrentState.BeforeProperty;
                         if (jsonNode.DescendingNodes.Count == 0 && lastSymbol != JsonSymbol.Colon)
                             break;
-                        currentLayer++;
-                        if (currentPosition.Count < currentLayer + 2)
-                            currentPosition.Add(0);
+                        _currentLayer++;
+                        if (_currentPosition.Count < _currentLayer + 2)
+                            _currentPosition.Add(0);
                         else
-                            currentPosition[currentLayer + 1] += 1;
+                            _currentPosition[_currentLayer + 1] += 1;
                         var newObjectNode = new JsonComplexPropertyNode
                         {
                             DescendingNodes = [],
                             IsList = false,
-                            Layer = currentLayer,
-                            PropertyName = currentPropertyName.Replace("\"", "")
+                            Layer = _currentLayer,
+                            PropertyName = _currentPropertyName.Replace("\"", "")
                         };
                         currentJsonComplexJsonNode.DescendingNodes.Add(newObjectNode);
-                        currentPropertyName = "";
-                        currentPropertyValue = "";
+                        _currentPropertyName = "";
+                        _currentPropertyValue = "";
                     }
                     else
                     {
-                        currentPropertyValue += "{";
+                        _currentPropertyValue += "{";
                     }
                     break;
                 case '}':
@@ -67,52 +67,52 @@ public class JsonNodeConverter(string jsonString)
                         currentState = CurrentState.None;
                         if (lastSymbol is JsonSymbol.Text or JsonSymbol.DoubleQuotationMark)
                         {
-                            currentValueType = JudgeValueType(ref currentPropertyValue);
-                            currentJsonComplexJsonNode = GetJsonNodeByIndex(jsonNode, currentPosition);
-                            if (SummonJsonPropertyNode(currentValueType, currentLayer, currentPropertyName.Replace("\"", ""), currentPropertyValue) is { } jsonPropertyNode)
+                            currentValueType = JudgeValueType(ref _currentPropertyValue);
+                            currentJsonComplexJsonNode = GetJsonNodeByIndex(jsonNode, _currentPosition);
+                            if (SummonJsonPropertyNode(currentValueType, _currentLayer, _currentPropertyName.Replace("\"", ""), _currentPropertyValue) is { } jsonPropertyNode)
                                 currentJsonComplexJsonNode.DescendingNodes.Add(jsonPropertyNode);
                             else
-                                Console.WriteLine($"设置复杂Json节点失败：{currentLayer}\t{currentPropertyName}\t{currentPropertyValue}");
+                                Console.WriteLine($"设置复杂Json节点失败：{_currentLayer}\t{_currentPropertyName}\t{_currentPropertyValue}");
                         }
                         // Never remove the root position (index 0). Only pop when there are >1 entries.
-                        if (currentPosition.Count > 1)
+                        if (_currentPosition.Count > 1)
                         {
-                            currentPosition.RemoveAt(currentPosition.Count - 1);
-                            if (currentLayer > -1)
-                                currentLayer--;
+                            _currentPosition.RemoveAt(_currentPosition.Count - 1);
+                            if (_currentLayer > -1)
+                                _currentLayer--;
                         }
-                        currentPropertyName = "";
-                        currentPropertyValue = "";
+                        _currentPropertyName = "";
+                        _currentPropertyValue = "";
                     }
                     else
                     {
-                        currentPropertyValue += "}";
+                        _currentPropertyValue += "}";
                     }
                     break;
                 case '[':
                     if ((currentState != CurrentState.Property && currentState != CurrentState.StringPropertyValue))
                     {
-                        currentLayer++;
+                        _currentLayer++;
                         currentSymbol = JsonSymbol.Bracket;
                         currentState = CurrentState.ListValue;
-                        if (currentPosition.Count < currentLayer + 2)
-                            currentPosition.Add(0);
+                        if (_currentPosition.Count < _currentLayer + 2)
+                            _currentPosition.Add(0);
                         else
-                            currentPosition[currentLayer + 1] += 1;
+                            _currentPosition[_currentLayer + 1] += 1;
                         var newListNode = new JsonComplexPropertyNode
                         {
                             DescendingNodes = [],
                             IsList = true,
-                            Layer = currentLayer,
-                            PropertyName = currentPropertyName.Replace("\"", "")
+                            Layer = _currentLayer,
+                            PropertyName = _currentPropertyName.Replace("\"", "")
                         };
                         currentJsonComplexJsonNode.DescendingNodes.Add(newListNode);
-                        currentPropertyName = "";
-                        currentPropertyValue = "";
+                        _currentPropertyName = "";
+                        _currentPropertyValue = "";
                     }
                     else
                     {
-                        currentPropertyValue += "[";
+                        _currentPropertyValue += "[";
                     }
                     break;
                 case ']':
@@ -122,24 +122,24 @@ public class JsonNodeConverter(string jsonString)
                         currentState = CurrentState.None;
                         if (lastSymbol is JsonSymbol.Text or JsonSymbol.DoubleQuotationMark)
                         {
-                            currentValueType = JudgeValueType(ref currentPropertyValue);
-                            currentJsonComplexJsonNode = GetJsonNodeByIndex(jsonNode, currentPosition);
-                            if (SummonJsonPropertyNode(currentValueType, currentLayer, currentPropertyName.Replace("\"", ""), currentPropertyValue) is { } jsonPropertyNode)
+                            currentValueType = JudgeValueType(ref _currentPropertyValue);
+                            currentJsonComplexJsonNode = GetJsonNodeByIndex(jsonNode, _currentPosition);
+                            if (SummonJsonPropertyNode(currentValueType, _currentLayer, _currentPropertyName.Replace("\"", ""), _currentPropertyValue) is { } jsonPropertyNode)
                                 currentJsonComplexJsonNode.DescendingNodes.Add(jsonPropertyNode);
                             else
-                                Console.WriteLine($"设置复杂Json节点失败：{currentLayer}\t{currentPropertyName}\t{currentPropertyValue}");
+                                Console.WriteLine($"设置复杂Json节点失败：{_currentLayer}\t{_currentPropertyName}\t{_currentPropertyValue}");
                         }
                         // Never remove the root position (index 0). Only pop when there are >1 entries.
-                        if (currentPosition.Count > 1)
+                        if (_currentPosition.Count > 1)
                         {
-                            currentPosition.RemoveAt(currentPosition.Count - 1);
-                            if (currentLayer > -1)
-                                currentLayer--;
+                            _currentPosition.RemoveAt(_currentPosition.Count - 1);
+                            if (_currentLayer > -1)
+                                _currentLayer--;
                         }
                     }
                     else
                     {
-                        currentPropertyValue += "]";
+                        _currentPropertyValue += "]";
                     }
                     break;
                 case ':':
@@ -150,32 +150,32 @@ public class JsonNodeConverter(string jsonString)
                     }
                     else
                     {
-                        currentPropertyValue += ":";
+                        _currentPropertyValue += ":";
                     }
                     break;
                 case ',':
                     if ((currentState != CurrentState.Property && currentState != CurrentState.StringPropertyValue))
                     {
                         currentSymbol = JsonSymbol.Comma;
-                        if (currentLayer >= -1)
-                            currentPosition[currentLayer + 1] += 1;
+                        if (_currentLayer >= -1)
+                            _currentPosition[_currentLayer + 1] += 1;
                         if (currentState != CurrentState.ListValue)
                             currentState = CurrentState.BeforeProperty;
                         if (lastSymbol is JsonSymbol.Text or JsonSymbol.DoubleQuotationMark)
                         {
-                            currentValueType = JudgeValueType(ref currentPropertyValue);
-                            currentJsonComplexJsonNode = GetJsonNodeByIndex(jsonNode, currentPosition);
-                            if (SummonJsonPropertyNode(currentValueType, currentLayer, currentPropertyName.Replace("\"", ""), currentPropertyValue) is { } jsonPropertyNode)
+                            currentValueType = JudgeValueType(ref _currentPropertyValue);
+                            currentJsonComplexJsonNode = GetJsonNodeByIndex(jsonNode, _currentPosition);
+                            if (SummonJsonPropertyNode(currentValueType, _currentLayer, _currentPropertyName.Replace("\"", ""), _currentPropertyValue) is { } jsonPropertyNode)
                                 currentJsonComplexJsonNode.DescendingNodes.Add(jsonPropertyNode);
                             else
-                                Console.WriteLine($"设置复杂Json节点失败：{currentLayer}\t{currentPropertyName}\t{currentPropertyValue}");
+                                Console.WriteLine($"设置复杂Json节点失败：{_currentLayer}\t{_currentPropertyName}\t{_currentPropertyValue}");
                         }
-                        currentPropertyName = "";
-                        currentPropertyValue = "";
+                        _currentPropertyName = "";
+                        _currentPropertyValue = "";
                     }
                     else
                     {
-                        currentPropertyValue += ",";
+                        _currentPropertyValue += ",";
                     }
                     break;
                 case '"':
@@ -183,44 +183,44 @@ public class JsonNodeConverter(string jsonString)
                     switch (currentState)
                     {
                         case CurrentState.Property:
-                            currentPropertyName += "\"";
+                            _currentPropertyName += "\"";
                             currentState = CurrentState.AfterPropertyValue;
                             break;
                         case CurrentState.BeforeProperty:
-                            currentPropertyName += "\"";
+                            _currentPropertyName += "\"";
                             currentState = CurrentState.Property;
                             break;
                         case CurrentState.StringPropertyValue:
-                            currentPropertyValue += "\"";
+                            _currentPropertyValue += "\"";
                             currentState = CurrentState.AfterPropertyValue;
                             break;
                         case CurrentState.BeforePropertyValue:
-                            currentPropertyValue += "\"";
+                            _currentPropertyValue += "\"";
                             currentState = CurrentState.StringPropertyValue;
                             break;
                     }
                     break;
                 case '\'':
                     currentSymbol = JsonSymbol.QuotationMark;
-                    currentPropertyName += "'";
+                    _currentPropertyName += "'";
                     currentState = CurrentState.None;
                     break;
                 default:
                     switch (currentState)
                     {
                         case CurrentState.Property:
-                            currentPropertyName += current;
+                            _currentPropertyName += current;
                             currentSymbol = JsonSymbol.Text;
                             break;
                         case CurrentState.PropertyValue or CurrentState.StringPropertyValue:
                         case CurrentState.ListValue:
-                            currentPropertyValue += current;
+                            _currentPropertyValue += current;
                             currentSymbol = JsonSymbol.Text;
                             break;
                         case CurrentState.BeforePropertyValue:
                             if (IsNormalValueExceptString(current))
                             {
-                                currentPropertyValue += current;
+                                _currentPropertyValue += current;
                                 currentState = CurrentState.PropertyValue;
                                 currentSymbol = JsonSymbol.Text;
                             }

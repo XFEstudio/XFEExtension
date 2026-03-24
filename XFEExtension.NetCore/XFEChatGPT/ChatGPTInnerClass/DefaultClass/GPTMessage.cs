@@ -7,7 +7,7 @@
 /// <param name="content">内容</param>
 public class GPTMessage(string role, string content)
 {
-    private string role = role;
+    private string _role = role;
     /// <summary>
     /// 角色（目前已知有：System，User和Assistant）
     /// </summary>
@@ -15,11 +15,11 @@ public class GPTMessage(string role, string content)
     {
         get
         {
-            return role;
+            return _role;
         }
         set
         {
-            role = SetRoleAndCheckRoleLegal(value);
+            _role = SetRoleAndCheckRoleLegal(value);
         }
     }
     /// <summary>

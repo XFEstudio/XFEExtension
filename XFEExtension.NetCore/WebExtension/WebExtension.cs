@@ -16,7 +16,7 @@ public static class WebExtension
     /// </summary>
     /// <param name="url"></param>
     /// <returns></returns>
-    public static async Task<string?> GetFromURLAsync(this string url)
+    public static async Task<string?> GetFromUrlAsync(this string url)
     {
         if (string.IsNullOrEmpty(url))
         {
@@ -38,7 +38,7 @@ public static class WebExtension
     /// </summary>
     /// <param name="url"></param>
     /// <returns></returns>
-    public static string? GetFromURL(this string url)
+    public static string? GetFromUrl(this string url)
     {
         if (string.IsNullOrEmpty(url))
         {
@@ -61,7 +61,7 @@ public static class WebExtension
     /// <param name="url"></param>
     /// <param name="content">POST的内容</param>
     /// <returns></returns>
-    public static async Task<string?> PostToURLAsync(this string url, string content)
+    public static async Task<string?> PostToUrlAsync(this string url, string content)
     {
         if (string.IsNullOrEmpty(url))
         {
@@ -84,7 +84,7 @@ public static class WebExtension
     /// <param name="url"></param>
     /// <param name="content">POST的内容</param>
     /// <returns></returns>
-    public static string? PostToURL(this string url, string content)
+    public static string? PostToUrl(this string url, string content)
     {
         if (string.IsNullOrEmpty(url))
         {
@@ -108,7 +108,7 @@ public static class WebExtension
     /// <param name="content">POST的内容</param>
     /// <param name="contentType">POST的类型</param>
     /// <returns></returns>
-    public static async Task<string?> PostToURLAsync(this string url, string content, string contentType)
+    public static async Task<string?> PostToUrlAsync(this string url, string content, string contentType)
     {
         if (string.IsNullOrEmpty(url))
         {
@@ -132,7 +132,7 @@ public static class WebExtension
     /// <param name="content">POST的内容</param>
     /// <param name="contentType">POST的类型</param>
     /// <returns></returns>
-    public static string? PostToURL(this string url, string content, string contentType)
+    public static string? PostToUrl(this string url, string content, string contentType)
     {
         if (string.IsNullOrEmpty(url))
         {
@@ -154,7 +154,7 @@ public static class WebExtension
     /// </summary>
     /// <param name="url">指定的URL</param>
     /// <returns></returns>
-    public static async Task<string?> GetFileNameFromURL(this string url)
+    public static async Task<string?> GetFileNameFromUrl(this string url)
     {
         var response = await new HttpClient().GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
         response.EnsureSuccessStatusCode();

@@ -5,7 +5,7 @@
 /// </summary>
 public class XCCNetWork
 {
-    private readonly XCCNetWorkBase xCCNetWorkBase;
+    private readonly XCCNetWorkBase _xCCNetWorkBase;
     /// <summary>
     /// XCC当前群组
     /// </summary>
@@ -17,11 +17,11 @@ public class XCCNetWork
     {
         add
         {
-            xCCNetWorkBase.textMessageReceived += value;
+            _xCCNetWorkBase.TextMessageReceived += value;
         }
         remove
         {
-            xCCNetWorkBase.textMessageReceived -= value;
+            _xCCNetWorkBase.TextMessageReceived -= value;
         }
     }
     /// <summary>
@@ -31,11 +31,11 @@ public class XCCNetWork
     {
         add
         {
-            xCCNetWorkBase.binaryMessageReceived += value;
+            _xCCNetWorkBase.BinaryMessageReceived += value;
         }
         remove
         {
-            xCCNetWorkBase.binaryMessageReceived -= value;
+            _xCCNetWorkBase.BinaryMessageReceived -= value;
         }
     }
     /// <summary>
@@ -45,11 +45,11 @@ public class XCCNetWork
     {
         add
         {
-            xCCNetWorkBase.exceptionMessageReceived += value;
+            _xCCNetWorkBase.ExceptionMessageReceived += value;
         }
         remove
         {
-            xCCNetWorkBase.exceptionMessageReceived -= value;
+            _xCCNetWorkBase.ExceptionMessageReceived -= value;
         }
     }
     /// <summary>
@@ -59,11 +59,11 @@ public class XCCNetWork
     {
         add
         {
-            xCCNetWorkBase.connectionClosed += value;
+            _xCCNetWorkBase.ConnectionClosed += value;
         }
         remove
         {
-            xCCNetWorkBase.connectionClosed -= value;
+            _xCCNetWorkBase.ConnectionClosed -= value;
         }
     }
     /// <summary>
@@ -73,11 +73,11 @@ public class XCCNetWork
     {
         add
         {
-            xCCNetWorkBase.connected += value;
+            _xCCNetWorkBase.Connected += value;
         }
         remove
         {
-            xCCNetWorkBase.connected -= value;
+            _xCCNetWorkBase.Connected -= value;
         }
     }
     /// <summary>
@@ -88,7 +88,7 @@ public class XCCNetWork
     /// <returns></returns>
     public XCCGroup CreateGroup(string groupId, string sender)
     {
-        var group = new XCCGroupImpl(Guid.NewGuid().ToString(), groupId, sender, xCCNetWorkBase);
+        var group = new XCCGroupImpl(Guid.NewGuid().ToString(), groupId, sender, _xCCNetWorkBase);
         Groups.Add(group);
         return group;
     }
@@ -97,7 +97,7 @@ public class XCCNetWork
     /// </summary>
     public XCCNetWork()
     {
-        xCCNetWorkBase = new XCCNetWorkBase();
+        _xCCNetWorkBase = new XCCNetWorkBase();
         Groups = [];
     }
 }

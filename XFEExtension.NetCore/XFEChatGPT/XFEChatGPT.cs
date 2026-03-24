@@ -13,7 +13,7 @@ namespace XFEExtension.NetCore.XFEChatGPT;
 public class XFEChatGPT : XFEChatGPTBase
 {
     #region 私有字段
-    private readonly XFEAskGPTMessage xFEAskGPTMessage;
+    private readonly XFEAskGPTMessage _xFEAskGPTMessage;
     #endregion
     #region 公有封装字段
     /// <summary>
@@ -21,15 +21,15 @@ public class XFEChatGPT : XFEChatGPTBase
     /// </summary>
     public string? SystemString
     {
-        get => xFEAskGPTMessage.IsSelfEditData ? throw new XFEChatGPTException("自定义数据模式下不可获取") : xFEAskGPTMessage.SystemContent;
+        get => _xFEAskGPTMessage.IsSelfEditData ? throw new XFEChatGPTException("自定义数据模式下不可获取") : _xFEAskGPTMessage.SystemContent;
         set
         {
-            if (xFEAskGPTMessage.IsSelfEditData)
+            if (_xFEAskGPTMessage.IsSelfEditData)
             {
                 throw new XFEChatGPTException("自定义数据模式下不可设置");
             }
 
-            xFEAskGPTMessage.SystemContent = value;
+            _xFEAskGPTMessage.SystemContent = value;
         }
     }
     /// <summary>
@@ -37,15 +37,15 @@ public class XFEChatGPT : XFEChatGPTBase
     /// </summary>
     public string? AskContent
     {
-        get => xFEAskGPTMessage.IsSelfEditData ? throw new XFEChatGPTException("自定义数据模式下不可获取") : xFEAskGPTMessage.AskContent;
+        get => _xFEAskGPTMessage.IsSelfEditData ? throw new XFEChatGPTException("自定义数据模式下不可获取") : _xFEAskGPTMessage.AskContent;
         set
         {
-            if (xFEAskGPTMessage.IsSelfEditData)
+            if (_xFEAskGPTMessage.IsSelfEditData)
             {
                 throw new XFEChatGPTException("自定义数据模式下不可设置");
             }
 
-            xFEAskGPTMessage.AskContent = value;
+            _xFEAskGPTMessage.AskContent = value;
         }
     }
     /// <summary>
@@ -53,41 +53,41 @@ public class XFEChatGPT : XFEChatGPTBase
     /// </summary>
     public ChatGPTModel GPTModel
     {
-        get => xFEAskGPTMessage.IsSelfEditData ? xFEAskGPTMessage.EnvironmentGPTData!.Model.GetModel() : xFEAskGPTMessage.ChatGPTModel!.GetModel();
+        get => _xFEAskGPTMessage.IsSelfEditData ? _xFEAskGPTMessage.EnvironmentGPTData!.Model.GetModel() : _xFEAskGPTMessage.ChatGPTModel!.GetModel();
         set
         {
-            if (xFEAskGPTMessage.IsSelfEditData)
+            if (_xFEAskGPTMessage.IsSelfEditData)
             {
-                xFEAskGPTMessage.EnvironmentGPTData!.Model = value.GetModelString();
+                _xFEAskGPTMessage.EnvironmentGPTData!.Model = value.GetModelString();
             }
             else
             {
-                xFEAskGPTMessage.ChatGPTModel = value.GetModelString();
+                _xFEAskGPTMessage.ChatGPTModel = value.GetModelString();
             }
         }
     }
     /// <summary>
     /// XFE通信协议
     /// </summary>
-    public XFEComProtocol XFEComProtocol => xFEAskGPTMessage.ComProtocol;
+    public XFEComProtocol XFEComProtocol => _xFEAskGPTMessage.ComProtocol;
 
     /// <summary>
     /// 设置是否为自定义数据模式
     /// </summary>
-    public bool IsSelfEditData => xFEAskGPTMessage.IsSelfEditData;
+    public bool IsSelfEditData => _xFEAskGPTMessage.IsSelfEditData;
 
     /// <summary>
     /// 流式输出（打字效果）还是一次性输出
     /// </summary>
-    public bool StreamMode => xFEAskGPTMessage.IsSelfEditData ? xFEAskGPTMessage.EnvironmentGPTData!.Stream : xFEAskGPTMessage.Stream;
+    public bool StreamMode => _xFEAskGPTMessage.IsSelfEditData ? _xFEAskGPTMessage.EnvironmentGPTData!.Stream : _xFEAskGPTMessage.Stream;
 
     /// <summary>
     /// ChatGPT的环境数据
     /// </summary>
     public EnvironmentGPTData? EnvironmentGPTData
     {
-        get => xFEAskGPTMessage.EnvironmentGPTData;
-        set => xFEAskGPTMessage.EnvironmentGPTData = value;
+        get => _xFEAskGPTMessage.EnvironmentGPTData;
+        set => _xFEAskGPTMessage.EnvironmentGPTData = value;
     }
     #endregion
     #region 公有方法
@@ -100,7 +100,7 @@ public class XFEChatGPT : XFEChatGPTBase
     {
         var askGPTThread = new Thread(StartGetGPTMessage);
         askGPTThread.Start(new MessageIdAndThread(messageId, askGPTThread));
-        threadList.Add(askGPTThread);
+        ThreadList.Add(askGPTThread);
     }
     /// <summary>
     /// 向ChatGPT发送指定消息
@@ -119,7 +119,7 @@ public class XFEChatGPT : XFEChatGPTBase
     [Obsolete("方法已经过时，请使用MemorableXFEChatGPT")]
     public void Dispose()
     {
-        foreach (var thread in threadList)
+        foreach (var thread in ThreadList)
         {
             thread.Abort();
         }
@@ -193,7 +193,7 @@ public class XFEChatGPT : XFEChatGPTBase
                 #region 进行HTTP请求
                 ClientWebSocket webSocket = new();
                 await webSocket.ConnectAsync(new Uri("ws://gpt.api.xfegzs.com/"), CancellationToken.None);
-                var json = xFEAskGPTMessage.ConvertToJson();
+                var json = _xFEAskGPTMessage.ConvertToJson();
                 if (json is not null)
                     await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(json)), WebSocketMessageType.Text, true, CancellationToken.None);
                 #endregion
@@ -286,7 +286,7 @@ public class XFEChatGPT : XFEChatGPTBase
                 #region 进行HTTP请求
                 ClientWebSocket webSocket = new();
                 await webSocket.ConnectAsync(new Uri("ws://gpt.api.xfegzs.com/"), CancellationToken.None);
-                var json = xFEAskGPTMessage.ConvertToJson();
+                var json = _xFEAskGPTMessage.ConvertToJson();
                 if (json is not null)
                     await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(json)), WebSocketMessageType.Text, true, CancellationToken.None);
                 #endregion
@@ -319,7 +319,7 @@ public class XFEChatGPT : XFEChatGPTBase
                 Console.WriteLine(ex.ToString());
             }
         }
-        threadList.Remove(thread);
+        ThreadList.Remove(thread);
     }
     #endregion
     #region 公有事件
@@ -333,13 +333,13 @@ public class XFEChatGPT : XFEChatGPTBase
     /// 从EnvironmentGPTData构造，使用默认通信协议（快速响应通讯协议）
     /// </summary>
     /// <param name="environmentGPTData">ChatGPT环境设置</param>
-    public XFEChatGPT(EnvironmentGPTData environmentGPTData) => xFEAskGPTMessage = new XFEAskGPTMessage(true, environmentGPTData.Stream, environmentGPTData.Model, environmentGPTData, XFEComProtocol.XFEFAST, string.Empty, string.Empty);
+    public XFEChatGPT(EnvironmentGPTData environmentGPTData) => _xFEAskGPTMessage = new XFEAskGPTMessage(true, environmentGPTData.Stream, environmentGPTData.Model, environmentGPTData, XFEComProtocol.XFEFAST, string.Empty, string.Empty);
     /// <summary>
     /// 从EnvironmentGPTData构造，自定义通讯协议
     /// </summary>
     /// <param name="environmentGPTData">ChatGPT环境设置</param>
     /// <param name="comProtocol">通信协议</param>
-    public XFEChatGPT(EnvironmentGPTData environmentGPTData, XFEComProtocol comProtocol) => xFEAskGPTMessage = new XFEAskGPTMessage(true, environmentGPTData.Stream, environmentGPTData.Model, environmentGPTData, comProtocol, string.Empty, string.Empty);
+    public XFEChatGPT(EnvironmentGPTData environmentGPTData, XFEComProtocol comProtocol) => _xFEAskGPTMessage = new XFEAskGPTMessage(true, environmentGPTData.Stream, environmentGPTData.Model, environmentGPTData, comProtocol, string.Empty, string.Empty);
     #region 默认模型构造
     /// <summary>
     /// 使用系统和内容构造，使用默认通信协议（快速响应通讯协议）
@@ -348,7 +348,7 @@ public class XFEChatGPT : XFEChatGPTBase
     /// <param name="askContent">向ChatGPT提问的内容</param>
     public XFEChatGPT(string systemContent, string askContent)
     {
-        xFEAskGPTMessage = new XFEAskGPTMessage(false, false, ChatGPTModel.gpt3point5turbo.GetModelString(), null, XFEComProtocol.XFEFAST, systemContent, askContent);
+        _xFEAskGPTMessage = new XFEAskGPTMessage(false, false, ChatGPTModel.gpt3point5turbo.GetModelString(), null, XFEComProtocol.XFEFAST, systemContent, askContent);
     }
     /// <summary>
     /// 使用系统和内容构造，可设置流式输出（打字效果）还是一次性输出，使用默认通信协议（快速响应通讯协议）
@@ -358,7 +358,7 @@ public class XFEChatGPT : XFEChatGPTBase
     /// <param name="stream">设置流式输出（打字效果）还是一次性输出</param>
     public XFEChatGPT(string systemContent, string askContent, bool stream)
     {
-        xFEAskGPTMessage = new XFEAskGPTMessage(false, stream, ChatGPTModel.gpt3point5turbo.GetModelString(), null, XFEComProtocol.XFEFAST, systemContent, askContent);
+        _xFEAskGPTMessage = new XFEAskGPTMessage(false, stream, ChatGPTModel.gpt3point5turbo.GetModelString(), null, XFEComProtocol.XFEFAST, systemContent, askContent);
     }
     /// <summary>
     /// 使用系统构造
@@ -366,7 +366,7 @@ public class XFEChatGPT : XFEChatGPTBase
     /// <param name="systemContent">ChatGPT的系统设置，即设置ChatGPT的背景故事（类比）</param>
     public XFEChatGPT(string systemContent)
     {
-        xFEAskGPTMessage = new XFEAskGPTMessage(false, false, ChatGPTModel.gpt3point5turbo.GetModelString(), null, XFEComProtocol.XFEFAST, systemContent, string.Empty);
+        _xFEAskGPTMessage = new XFEAskGPTMessage(false, false, ChatGPTModel.gpt3point5turbo.GetModelString(), null, XFEComProtocol.XFEFAST, systemContent, string.Empty);
     }
     /// <summary>
     /// 使用系统构造，可设置流式输出（打字效果）还是一次性输出，自定义通讯协议
@@ -375,7 +375,7 @@ public class XFEChatGPT : XFEChatGPTBase
     /// <param name="stream">设置流式输出（打字效果）还是一次性输出</param>
     public XFEChatGPT(string systemContent, bool stream)
     {
-        xFEAskGPTMessage = new XFEAskGPTMessage(false, stream, ChatGPTModel.gpt3point5turbo.GetModelString(), null, XFEComProtocol.XFEFAST, systemContent, string.Empty);
+        _xFEAskGPTMessage = new XFEAskGPTMessage(false, stream, ChatGPTModel.gpt3point5turbo.GetModelString(), null, XFEComProtocol.XFEFAST, systemContent, string.Empty);
     }
     /// <summary>
     /// 使用系统构造，可设置流式输出（打字效果）还是一次性输出，自定义通讯协议
@@ -385,7 +385,7 @@ public class XFEChatGPT : XFEChatGPTBase
     /// <param name="comProtocol">通信协议</param>
     public XFEChatGPT(string systemContent, bool stream, XFEComProtocol comProtocol)
     {
-        xFEAskGPTMessage = new XFEAskGPTMessage(false, stream, ChatGPTModel.gpt3point5turbo.GetModelString(), null, comProtocol, systemContent, string.Empty);
+        _xFEAskGPTMessage = new XFEAskGPTMessage(false, stream, ChatGPTModel.gpt3point5turbo.GetModelString(), null, comProtocol, systemContent, string.Empty);
     }
     #endregion
     #region 自定义模型构造
@@ -397,7 +397,7 @@ public class XFEChatGPT : XFEChatGPTBase
     /// <param name="chatGPTModel">选用的GPT模型</param>
     public XFEChatGPT(string systemContent, string askContent, ChatGPTModel chatGPTModel)
     {
-        xFEAskGPTMessage = new XFEAskGPTMessage(false, false, chatGPTModel.GetModelString(), null, XFEComProtocol.XFEFAST, systemContent, askContent);
+        _xFEAskGPTMessage = new XFEAskGPTMessage(false, false, chatGPTModel.GetModelString(), null, XFEComProtocol.XFEFAST, systemContent, askContent);
     }
     /// <summary>
     /// 使用系统和内容构造，可设置流式输出（打字效果）还是一次性输出，自定义模型，使用默认通信协议（快速响应通讯协议）
@@ -408,7 +408,7 @@ public class XFEChatGPT : XFEChatGPTBase
     /// <param name="chatGPTModel">选用的GPT模型</param>
     public XFEChatGPT(string systemContent, string askContent, bool stream, ChatGPTModel chatGPTModel)
     {
-        xFEAskGPTMessage = new XFEAskGPTMessage(false, stream, chatGPTModel.GetModelString(), null, XFEComProtocol.XFEFAST, systemContent, askContent);
+        _xFEAskGPTMessage = new XFEAskGPTMessage(false, stream, chatGPTModel.GetModelString(), null, XFEComProtocol.XFEFAST, systemContent, askContent);
     }
     /// <summary>
     /// 使用系统构造，自定义模型，使用默认通信协议（快速响应通讯协议）
@@ -417,7 +417,7 @@ public class XFEChatGPT : XFEChatGPTBase
     /// <param name="chatGPTModel">选用的GPT模型</param>
     public XFEChatGPT(string systemContent, ChatGPTModel chatGPTModel)
     {
-        xFEAskGPTMessage = new XFEAskGPTMessage(false, false, chatGPTModel.GetModelString(), null, XFEComProtocol.XFEFAST, systemContent, string.Empty);
+        _xFEAskGPTMessage = new XFEAskGPTMessage(false, false, chatGPTModel.GetModelString(), null, XFEComProtocol.XFEFAST, systemContent, string.Empty);
     }
     /// <summary>
     /// 使用系统构造，可设置流式输出（打字效果）还是一次性输出，自定义模型，使用默认通信协议（快速响应通讯协议）
@@ -427,7 +427,7 @@ public class XFEChatGPT : XFEChatGPTBase
     /// <param name="chatGPTModel">选用的GPT模型</param>
     public XFEChatGPT(string systemContent, bool stream, ChatGPTModel chatGPTModel)
     {
-        xFEAskGPTMessage = new XFEAskGPTMessage(false, stream, chatGPTModel.GetModelString(), null, XFEComProtocol.XFEFAST, systemContent, string.Empty);
+        _xFEAskGPTMessage = new XFEAskGPTMessage(false, stream, chatGPTModel.GetModelString(), null, XFEComProtocol.XFEFAST, systemContent, string.Empty);
     }
     /// <summary>
     /// 使用系统构造，可设置流式输出（打字效果）还是一次性输出，自定义模型，自定义通讯协议
@@ -438,7 +438,7 @@ public class XFEChatGPT : XFEChatGPTBase
     /// <param name="comProtocol">通信协议</param>
     public XFEChatGPT(string systemContent, bool stream, ChatGPTModel chatGPTModel, XFEComProtocol comProtocol)
     {
-        xFEAskGPTMessage = new XFEAskGPTMessage(false, stream, chatGPTModel.GetModelString(), null, comProtocol, systemContent, string.Empty);
+        _xFEAskGPTMessage = new XFEAskGPTMessage(false, stream, chatGPTModel.GetModelString(), null, comProtocol, systemContent, string.Empty);
     }
     #endregion
     #endregion
