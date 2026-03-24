@@ -459,7 +459,7 @@ public abstract class XCCGroup
     /// <exception cref="XFECyberCommException"></exception>
     public async Task<bool> SendImage(string filePath)
     {
-        try { return await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "image", 60000); } catch (Exception ex) { throw new XFECyberCommException("客户端发送图片到服务器时出现异常", ex); }
+        try { return await SendSignedBinaryMessage(await File.ReadAllBytesAsync(filePath), "image", 60000); } catch (Exception ex) { throw new XFECyberCommException("客户端发送图片到服务器时出现异常", ex); }
     }
     /// <summary>
     /// 发送视频
@@ -469,7 +469,7 @@ public abstract class XCCGroup
     /// <exception cref="XFECyberCommException"></exception>
     public async Task<bool> SendVideo(string filePath)
     {
-        try { return await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "video", 300000); } catch (Exception ex) { throw new XFECyberCommException("客户端发送视频到服务器时出现异常", ex); }
+        try { return await SendSignedBinaryMessage(await File.ReadAllBytesAsync(filePath), "video", 300000); } catch (Exception ex) { throw new XFECyberCommException("客户端发送视频到服务器时出现异常", ex); }
     }
     /// <summary>
     /// 发送音频
@@ -479,7 +479,7 @@ public abstract class XCCGroup
     /// <exception cref="XFECyberCommException"></exception>
     public async Task<bool> SendAudio(string filePath)
     {
-        try { return await SendSignedBinaryMessage(File.ReadAllBytes(filePath), "audio"); } catch (Exception ex) { throw new XFECyberCommException("客户端发送音频到服务器时出现异常", ex); }
+        try { return await SendSignedBinaryMessage(await File.ReadAllBytesAsync(filePath), "audio"); } catch (Exception ex) { throw new XFECyberCommException("客户端发送音频到服务器时出现异常", ex); }
     }
     /// <summary>
     /// 发送音频字节流（服务器不会缓存）

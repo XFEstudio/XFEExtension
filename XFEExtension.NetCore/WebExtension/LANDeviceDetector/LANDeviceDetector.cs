@@ -109,7 +109,7 @@ public class LANDeviceDetector
                 if (reply.Status == IPStatus.Success)
                 {
                     IPHostEntry? hostEntry = null;
-                    try { hostEntry = Dns.GetHostEntry(ipAddress); } catch { }
+                    try { hostEntry = await Dns.GetHostEntryAsync(ipAddress); } catch { }
                     findDevices.Add(new LANDeviceImpl(reply.Address, hostEntry, hostEntry?.HostName));
                     action.Invoke(reply);
                 }
