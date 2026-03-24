@@ -6,6 +6,7 @@ using XFEExtension.NetCore.TaskExtension;
 
 namespace XFEExtension.NetCore.CyberComm.XCCNetWork;
 
+// TODO: 完善超时功能
 /// <summary>
 /// XCC群组
 /// </summary>
@@ -489,11 +490,7 @@ public abstract class XCCGroup
     /// <exception cref="XFECyberCommException"></exception>
     public async Task<bool> SendAudioBuffer(byte[] buffer)
     {
-        try
-        {
-            return await SendSignedBinaryMessage(buffer, "audio-buffer");
-        }
-        catch (Exception ex) { throw new XFECyberCommException("客户端发送音频到服务器时出现异常", ex); }
+        try { return await SendSignedBinaryMessage(buffer, "audio-buffer"); } catch (Exception ex) { throw new XFECyberCommException("客户端发送音频到服务器时出现异常", ex); }
     }
     /// <summary>
     /// 获取历史记录
@@ -506,7 +503,7 @@ public abstract class XCCGroup
             var messageId = Guid.NewGuid().ToString();
             byte[] sendBuffer = Encoding.UTF8.GetBytes(new[] { messageId, "[XCCGetHistory]", "[XCCGetHistory]" }.ToXFEString());
             await TextMessageClientWebSocket!.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 await Task.Delay(5000);
                 UpdateTaskTrigger?.Invoke(false, messageId);
