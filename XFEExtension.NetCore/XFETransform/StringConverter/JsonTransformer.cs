@@ -127,7 +127,7 @@ public class JsonTransformer : StringConverter
         return outString;
     }
 
-    internal static bool IsEnumerable(IObjectInfo objectInfo) => objectInfo.ObjectPlace == ObjectPlace.Array || objectInfo.ObjectPlace == ObjectPlace.List;
-    internal static bool IsEnumerableMember(IObjectInfo objectInfo) => objectInfo.ObjectPlace == ObjectPlace.ArrayMember || objectInfo.ObjectPlace == ObjectPlace.ListMember;
+    internal static bool IsEnumerable(IObjectInfo objectInfo) => objectInfo.ObjectPlace is ObjectPlace.Array or ObjectPlace.List;
+    internal static bool IsEnumerableMember(IObjectInfo objectInfo) => objectInfo.ObjectPlace is ObjectPlace.ArrayMember or ObjectPlace.ListMember;
     internal static bool IsEnumerableClassMember(IObjectInfo objectInfo) => objectInfo.Value is not null && objectInfo.ObjectPlace == ObjectPlace.Property && (objectInfo.Type!.IsAssignableTo(typeof(IEnumerable)) || objectInfo.Type.IsAssignableTo(typeof(Array)));
 }

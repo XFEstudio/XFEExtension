@@ -5,76 +5,80 @@
 /// </summary>
 public static class ArrayExtension
 {
-    private static readonly string[] separator = ["[+-", "-+]"];
+    private static readonly string[] Separator = ["[+-", "-+]"];
+
     /// <summary>
-    /// 将数组转换为XFE格式字符串
+    /// 对数组的拓展
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="arrays"></param>
-    /// <returns></returns>
-    public static string ToXFEString<T>(this T[] arrays)
+    extension<T>(T[] arrays)
     {
-        string str = string.Empty;
-        foreach (var ary in arrays)
-        {
-            if (ary is not null)
-                str += $"[+-{ary?.ToString()?.Replace("[+", "[++").Replace("+]", "++]")}-+]";
-        }
-        return str;
+        /// <summary>
+        /// 将数组转换为XFE格式字符串
+        /// </summary>
+        /// <returns></returns>
+        public string ToXFEString() => arrays.Aggregate(string.Empty, (current, ary) => current + $"[+-{ary?.ToString()?.Replace("[+", "[++").Replace("+]", "++]")}-+]");
     }
+
     /// <summary>
-    /// 将数组转换为XFE格式字符串
+    /// 对数组的拓展
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="arrays"></param>
-    /// <param name="propertyName">属性名称</param>
-    /// <returns></returns>
-    public static string ToXFEString<T>(this T[] arrays, string propertyName) where T : class
+    extension<T>(T[] arrays) where T : class
     {
-        string str = string.Empty;
-        foreach (var ary in arrays)
-        {
-            if (ary is not null)
-                str += $"[+-{ary?.GetType()?.GetProperty(propertyName)?.GetValue(ary)?.ToString()?.Replace("[+", "[++").Replace("+]", "++]")}-+]";
-        }
-        return str;
+        /// <summary>
+        /// 将数组转换为XFE格式字符串
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="propertyName">属性名称</param>
+        /// <returns></returns>
+        public string ToXFEString(string propertyName) => arrays.Aggregate(string.Empty, (current, ary) => current + $"[+-{ary?.GetType()?.GetProperty(propertyName)?.GetValue(ary)?.ToString()?.Replace("[+", "[++").Replace("+]", "++]")}-+]");
     }
 
 
-    /// <summary>
-    /// 将XFE格式字符串转换为数组
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
     /// <param name="str"></param>
-    /// <returns>T类型的数组</returns>
-    public static T[] ToXFEArray<T>(this string str)
+    extension(string str)
     {
-        string[] strings = str.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-        for (int i = 0; i < strings.Length; i++)
+        /// <summary>
+        /// 将XFE格式字符串转换为数组
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>T类型的数组</returns>
+        public T[] ToXFEArray<T>()
         {
-            strings[i] = strings[i].Replace("[++", "[+").Replace("++]", "+]");
+            string[] strings = str.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < strings.Length; i++)
+            {
+                strings[i] = strings[i].Replace("[++", "[+").Replace("++]", "+]");
+            }
+            var array = new T[(strings.Length - 1) / 2];
+            for (int i = 0, j = 1; i < array.Length; i++, j += 2)
+            {
+                array[i] = (T)Convert.ChangeType(strings[j], typeof(T));
+            }
+            return array;
         }
-        T[] array = new T[(strings.Length - 1) / 2];
-        for (int i = 0, j = 1; i < array.Length; i++, j += 2)
-        {
-            array[i] = (T)Convert.ChangeType(strings[j], typeof(T));
-        }
-        return array;
     }
-    /// <summary>
-    /// 获取数组中的类型
-    /// </summary>
+
     /// <param name="objects"></param>
-    /// <returns></returns>
-    public static Type[]? GetTypes(this object[] objects)
+    extension(object[]? objects)
     {
-        if (objects is null)
-            return null;
-        Type[] types = new Type[objects.Length];
-        for (int i = 0; i < objects.Length; i++)
+        /// <summary>
+        /// 获取数组中的类型
+        /// </summary>
+        /// <returns></returns>
+        public Type[]? GetTypes()
         {
-            types[i] = objects[i].GetType();
+            if (objects is null)
+                return null;
+            var types = new Type[objects.Length];
+            for (int i = 0; i < objects.Length; i++)
+            {
+                types[i] = objects[i].GetType();
+            }
+            return types;
         }
-        return types;
     }
 }

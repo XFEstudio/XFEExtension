@@ -35,7 +35,7 @@ public class ColoredObjectAnalyzer : StringConverter
             {
                 outPutString += $"{AddObjectPlace(objectInfo)} [color #569cd6]{XFEConverter.OutPutTypeName(objectInfo.Type!)}[color white] {AddObjectPlaceColor(objectInfo)}{objectInfo.Name}[color white]：[color #d69d85]{objectInfo.Value}[color white]\n";
             }
-            else if (objectInfo.Value is float || objectInfo.Value is int || objectInfo.Value is double || objectInfo.Value is long || objectInfo.Value is short || objectInfo.Value is byte || objectInfo.Value is uint || objectInfo.Value is ulong || objectInfo.Value is ushort || objectInfo.Value is decimal)
+            else if (objectInfo.Value is float or int or double or long or short or byte or uint or ulong or ushort or decimal)
             {
                 outPutString += $"{AddObjectPlace(objectInfo)} [color #569cd6]{XFEConverter.OutPutTypeName(objectInfo.Type!)}[color white] {AddObjectPlaceColor(objectInfo)}{objectInfo.Name}[color white]：[color #b5cea8]{objectInfo.Value}[color white]\n";
             }

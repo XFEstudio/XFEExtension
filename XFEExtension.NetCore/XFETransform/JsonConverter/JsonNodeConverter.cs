@@ -69,7 +69,7 @@ public class JsonNodeConverter(string jsonString)
                     {
                         currentSymbol = JsonSymbol.InvertedBrace;
                         currentState = CurrentState.None;
-                        if (lastSymbol == JsonSymbol.Text || lastSymbol == JsonSymbol.DoubleQuotationMark)
+                        if (lastSymbol is JsonSymbol.Text or JsonSymbol.DoubleQuotationMark)
                         {
                             currentValueType = JudgeValueType(ref currentPropertyValue);
                             currentJsonComplexJsonNode = GetJsonNodeByIndex(jsonNode, currentPosition);
@@ -124,7 +124,7 @@ public class JsonNodeConverter(string jsonString)
                     if ((currentState != CurrentState.Property && currentState != CurrentState.StringPropertyValue) || currentState == CurrentState.AfterPropertyValue || currentState == CurrentState.AfterProperty)
                     {
                         currentState = CurrentState.None;
-                        if (lastSymbol == JsonSymbol.Text || lastSymbol == JsonSymbol.DoubleQuotationMark)
+                        if (lastSymbol is JsonSymbol.Text or JsonSymbol.DoubleQuotationMark)
                         {
                             currentValueType = JudgeValueType(ref currentPropertyValue);
                             currentJsonComplexJsonNode = GetJsonNodeByIndex(jsonNode, currentPosition);
@@ -165,7 +165,7 @@ public class JsonNodeConverter(string jsonString)
                             currentPosition[currentLayer + 1] += 1;
                         if (currentState != CurrentState.ListValue)
                             currentState = CurrentState.BeforeProperty;
-                        if (lastSymbol == JsonSymbol.Text || lastSymbol == JsonSymbol.DoubleQuotationMark)
+                        if (lastSymbol is JsonSymbol.Text or JsonSymbol.DoubleQuotationMark)
                         {
                             currentValueType = JudgeValueType(ref currentPropertyValue);
                             currentJsonComplexJsonNode = GetJsonNodeByIndex(jsonNode, currentPosition);

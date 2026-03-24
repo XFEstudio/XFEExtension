@@ -5,44 +5,47 @@
 /// </summary>
 public static class ObjectExtension
 {
-    /// <summary>
-    /// 进行浅拷贝
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
     /// <param name="source"></param>
-    /// <returns>浅拷贝后的对象</returns>
-    /// <exception cref="ArgumentNullException">无类型错误</exception>
-    public static T ActiveCopyOf<T>(this T source) where T : class
-    {
-        return source is null
-            ? throw new ArgumentNullException(nameof(source))
-            : (T)source.GetType().GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)?.Invoke(source, null)!;
-    }
-    /// <summary>
-    /// 进行静态拷贝
-    /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="source"></param>
-    /// <returns>静态拷贝后的对象</returns>
-    public static T? StaticCopyOf<T>(this T source) where T : class
+    extension<T>(T source) where T : class
     {
-        if (source is null)
+        /// <summary>
+        /// 进行浅拷贝
+        /// </summary>
+        /// <returns>浅拷贝后的对象</returns>
+        /// <exception cref="ArgumentNullException">无类型错误</exception>
+        public T ActiveCopyOf()
         {
-            return default;
+            return source is null
+                ? throw new ArgumentNullException(nameof(source))
+                : (T)source.GetType().GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)?.Invoke(source, null)!;
         }
-        var fields = typeof(T).GetFields();
-        var properties = typeof(T).GetProperties();
-        var newObject = Activator.CreateInstance<T>();
-        foreach (var property in properties)
+
+        /// <summary>
+        /// 进行静态拷贝
+        /// </summary>
+        /// <returns>静态拷贝后的对象</returns>
+        public T? StaticCopyOf()
         {
-            property.SetValue(newObject, property.GetValue(source));
+            if (source is null)
+            {
+                return default;
+            }
+            var fields = typeof(T).GetFields();
+            var properties = typeof(T).GetProperties();
+            var newObject = Activator.CreateInstance<T>();
+            foreach (var property in properties)
+            {
+                property.SetValue(newObject, property.GetValue(source));
+            }
+            foreach (var field in fields)
+            {
+                field.SetValue(newObject, field.GetValue(source));
+            }
+            return newObject;
         }
-        foreach (var field in fields)
-        {
-            field.SetValue(newObject, field.GetValue(source));
-        }
-        return newObject;
     }
+
     /// <summary>
     /// 比较两个对象的属性是否完全相同而非对象本身相同
     /// </summary>

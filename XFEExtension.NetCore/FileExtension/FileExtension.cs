@@ -37,70 +37,75 @@ public static class FileExtension
         fileStream.Flush();
         fileStream.Close();
     }
-    /// <summary>
-    /// 读取文件中的字符串
-    /// </summary>
+
     /// <param name="name"></param>
-    /// <param name="content">读取的内容</param>
-    /// <returns>被读取的文件是否存在</returns>
-    public static bool ReadOut(this string name, out string? content)
+    extension(string name)
     {
-        FileInfo fileInfo = new(name);
-        if (fileInfo.Exists)
+        /// <summary>
+        /// 读取文件中的字符串
+        /// </summary>
+        /// <param name="content">读取的内容</param>
+        /// <returns>被读取的文件是否存在</returns>
+        public bool ReadOut(out string? content)
         {
-            using StreamReader streamReader = fileInfo.OpenText();
-            content = streamReader.ReadToEnd();
-            streamReader.Close();
-            return true;
+            FileInfo fileInfo = new(name);
+            if (fileInfo.Exists)
+            {
+                using StreamReader streamReader = fileInfo.OpenText();
+                content = streamReader.ReadToEnd();
+                streamReader.Close();
+                return true;
+            }
+            else
+            {
+                content = string.Empty;
+                return false;
+            }
         }
-        else
+
+        /// <summary>
+        /// 读取文件中的字符串
+        /// </summary>
+        /// <returns>目标文件内容，如不存在则返回-1</returns>
+        public string? ReadOut()
         {
-            content = string.Empty;
-            return false;
+            FileInfo fileInfo = new(name);
+            if (fileInfo.Exists)
+            {
+                using var streamReader = fileInfo.OpenText();
+                var text = streamReader.ReadToEnd();
+                streamReader.Close();
+                return text;
+            }
+            else
+            {
+                return "-1";
+            }
+        }
+
+        /// <summary>
+        /// 读取文件中的字符串
+        /// </summary>
+        /// <returns></returns>
+        [Obsolete("序列化方法在.NET 8.0中已经不再受支持")]
+        public T? ReadOutObj<T>()
+        {
+            FileInfo fileInfo = new(name);
+            if (fileInfo.Exists)
+            {
+                using var fileStream = fileInfo.OpenRead();
+                BinaryFormatter bf = new();
+                var result = (T)bf.Deserialize(fileStream);
+                fileStream.Close();
+                return result;
+            }
+            else
+            {
+                return default;
+            }
         }
     }
-    /// <summary>
-    /// 读取文件中的字符串
-    /// </summary>
-    /// <param name="fileName">目标文件路径及文件名</param>
-    /// <returns>目标文件内容，如不存在则返回-1</returns>
-    public static string? ReadOut(this string fileName)
-    {
-        FileInfo fileInfo = new(fileName);
-        if (fileInfo.Exists)
-        {
-            using var streamReader = fileInfo.OpenText();
-            var text = streamReader.ReadToEnd();
-            streamReader.Close();
-            return text;
-        }
-        else
-        {
-            return "-1";
-        }
-    }
-    /// <summary>
-    /// 读取文件中的字符串
-    /// </summary>
-    /// <param name="fileName"></param>
-    /// <returns></returns>
-    [Obsolete("序列化方法在.NET 8.0中已经不再受支持")]
-    public static T? ReadOutObj<T>(this string fileName)
-    {
-        FileInfo fileInfo = new(fileName);
-        if (fileInfo.Exists)
-        {
-            using var fileStream = fileInfo.OpenRead();
-            BinaryFormatter bf = new();
-            var result = (T)bf.Deserialize(fileStream);
-            fileStream.Close();
-            return result;
-        }
-        else
-        {
-            return default;
-        }
-    }
+
     /// <summary>
     /// 读取文件中的字符串
     /// </summary>
@@ -227,38 +232,42 @@ public static class FileExtension
         catch { }
         return null; // 如果没有找到占用文件的进程，返回null
     }
-    /// <summary>
-    /// 获取文件的有效起始位置
-    /// </summary>
+
     /// <param name="fileStream">文件流</param>
-    /// <param name="startPosition">起始搜寻位置</param>
-    /// <param name="endPosition">结束搜寻位置</param>
-    /// <returns>一个长整型，介于起始位置和结束位置之间</returns>
-    public static async Task<long> GetValidPosition(this FileStream fileStream, long startPosition, long endPosition)
+    extension(FileStream fileStream)
     {
-        long seekPosition = endPosition;
-        fileStream.Seek(startPosition, SeekOrigin.Begin);
-        byte[] buffer = new byte[endPosition - startPosition];
-        await fileStream.ReadExactlyAsync(buffer.AsMemory(0, (int)(endPosition - startPosition)));
-        for (int i = buffer.Length - 1; i >= 0; i--)
+        /// <summary>
+        /// 获取文件的有效起始位置
+        /// </summary>
+        /// <param name="startPosition">起始搜寻位置</param>
+        /// <param name="endPosition">结束搜寻位置</param>
+        /// <returns>一个长整型，介于起始位置和结束位置之间</returns>
+        public async Task<long> GetValidPosition(long startPosition, long endPosition)
         {
-            if (buffer[i] != 0)
-                break;
-            seekPosition--;
+            long seekPosition = endPosition;
+            fileStream.Seek(startPosition, SeekOrigin.Begin);
+            byte[] buffer = new byte[endPosition - startPosition];
+            await fileStream.ReadExactlyAsync(buffer.AsMemory(0, (int)(endPosition - startPosition)));
+            for (int i = buffer.Length - 1; i >= 0; i--)
+            {
+                if (buffer[i] != 0)
+                    break;
+                seekPosition--;
+            }
+            return seekPosition > startPosition ? seekPosition : startPosition;
         }
-        return seekPosition > startPosition ? seekPosition : startPosition;
+
+        /// <summary>
+        /// 获取文件的有效起始位置
+        /// </summary>
+        /// <param name="startPosition">起始搜寻位置</param>
+        /// <returns>一个长整型，介于起始位置和结束位置之间</returns>
+        public async Task<long> GetValidPosition(long startPosition) => await GetValidPosition(fileStream, startPosition, fileStream.Length);
+
+        /// <summary>
+        /// 获取文件的有效起始位置
+        /// </summary>
+        /// <returns>一个长整型，介于起始位置和结束位置之间</returns>
+        public async Task<long> GetValidPosition() => await GetValidPosition(fileStream, 0, fileStream.Length);
     }
-    /// <summary>
-    /// 获取文件的有效起始位置
-    /// </summary>
-    /// <param name="fileStream">文件流</param>
-    /// <param name="startPosition">起始搜寻位置</param>
-    /// <returns>一个长整型，介于起始位置和结束位置之间</returns>
-    public static async Task<long> GetValidPosition(this FileStream fileStream, long startPosition) => await GetValidPosition(fileStream, startPosition, fileStream.Length);
-    /// <summary>
-    /// 获取文件的有效起始位置
-    /// </summary>
-    /// <param name="fileStream">文件流</param>
-    /// <returns>一个长整型，介于起始位置和结束位置之间</returns>
-    public static async Task<long> GetValidPosition(this FileStream fileStream) => await GetValidPosition(fileStream, 0, fileStream.Length);
 }

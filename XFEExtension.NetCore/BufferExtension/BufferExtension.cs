@@ -7,146 +7,135 @@ namespace XFEExtension.NetCore.BufferExtension;
 /// </summary>
 public static class BufferExtension
 {
-    /// <summary>
-    /// 获取第一个匹配Buffer的位置
-    /// </summary>
     /// <param name="buffer"></param>
-    /// <param name="targetBuffer">要匹配Buffer</param>
-    /// <returns>没有查找到为-1</returns>
-    public static int IndexOf(this byte[] buffer, byte[] targetBuffer)
+    extension(byte[] buffer)
     {
-        int index = -1;
-        for (int i = 0; i < buffer.Length; i++)
+        /// <summary>
+        /// 获取第一个匹配Buffer的位置
+        /// </summary>
+        /// <param name="targetBuffer">要匹配Buffer</param>
+        /// <returns>没有查找到为-1</returns>
+        public int IndexOf(byte[] targetBuffer)
         {
-            if (buffer[i] == targetBuffer[0])
+            int index = -1;
+            for (int i = 0; i < buffer.Length; i++)
             {
+                if (buffer[i] != targetBuffer[0])
+                    continue;
                 bool isMatch = true;
-                for (int j = 0; j < targetBuffer.Length; j++)
+                for (int j = targetBuffer.Length - 1; j >= 0; j--)
                 {
-                    if (buffer[i + j] != targetBuffer[j])
-                    {
-                        isMatch = false;
-                        break;
-                    }
-                }
-                if (isMatch)
-                {
-                    index = i;
-                    break;
-                }
-            }
-        }
-        return index;
-    }
-    /// <summary>
-    /// 获取所有匹配的Buffer的位置
-    /// </summary>
-    /// <param name="buffer"></param>
-    /// <param name="targetBuffer">要匹配的Buffer</param>
-    /// <param name="shareable">是否可以共用</param>
-    /// <returns>查找到的位置数组</returns>
-    public static int[] IndexesOf(this byte[] buffer, byte[] targetBuffer, bool shareable = false)
-    {
-        var indexes = new List<int>();
-        for (int i = 0; i < buffer.Length; i++)
-        {
-            if (buffer[i] == targetBuffer[0])
-            {
-                bool isMatch = true;
-                for (int j = 0; j < targetBuffer.Length; j++)
-                {
-                    if (buffer[i + j] != targetBuffer[j])
-                    {
-                        isMatch = false;
-                        break;
-                    }
-                }
-                if (isMatch)
-                {
-                    indexes.Add(i);
-                    if (!shareable)
-                        i += targetBuffer.Length - 1;
-                }
-            }
-        }
-        return [.. indexes];
-    }
-    /// <summary>
-    /// 替换Buffer中的指定Buffer为目标Buffer
-    /// </summary>
-    /// <param name="buffer"></param>
-    /// <param name="originBuffer"></param>
-    /// <param name="targetBuffer"></param>
-    /// <returns>替换后的Buffer</returns>
-    public static byte[] Replace(this byte[] buffer, byte[] originBuffer, byte[] targetBuffer)
-    {
-        if (originBuffer is null || originBuffer.LongLength == 0)
-        {
-            throw new ArgumentException("Origin buffer cannot be null or empty.");
-        }
-        if (buffer is null || buffer.LongLength == 0)
-        {
-            return [];
-        }
-        List<byte> result = [];
-        for (long i = 0; i <= buffer.LongLength - originBuffer.LongLength; i++)
-        {
-            bool isMatch = true;
-            for (long j = 0; j < originBuffer.LongLength; j++)
-            {
-                if (buffer[i + j] != originBuffer[j])
-                {
+                    if (buffer[i + j] == targetBuffer[j])
+                        continue;
                     isMatch = false;
                     break;
                 }
+                if (!isMatch)
+                    continue;
+                index = i;
+                break;
             }
-            if (isMatch)
-            {
-                result.AddRange(targetBuffer);
-                i += originBuffer.LongLength - 1;
-            }
-            else
-            {
-                result.Add(buffer[i]);
-            }
+            return index;
         }
-        for (long i = buffer.LongLength - originBuffer.LongLength + 1; i < buffer.LongLength; i++)
+
+        /// <summary>
+        /// 获取所有匹配的Buffer的位置
+        /// </summary>
+        /// <param name="targetBuffer">要匹配的Buffer</param>
+        /// <param name="shareable">是否可以共用</param>
+        /// <returns>查找到的位置数组</returns>
+        public int[] IndexesOf(byte[] targetBuffer, bool shareable = false)
         {
-            if (i >= 0)
-                result.Add(buffer[i]);
+            var indexes = new List<int>();
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                if (buffer[i] != targetBuffer[0])
+                    continue;
+                bool isMatch = !targetBuffer.Where((t, j) => buffer[i + j] != t).Any();
+                if (!isMatch) continue;
+                indexes.Add(i);
+                if (!shareable)
+                    i += targetBuffer.Length - 1;
+            }
+            return [.. indexes];
         }
-        return [.. result];
+
+        /// <summary>
+        /// 替换Buffer中的指定Buffer为目标Buffer
+        /// </summary>
+        /// <param name="originBuffer"></param>
+        /// <param name="targetBuffer"></param>
+        /// <returns>替换后的Buffer</returns>
+        public byte[] Replace(byte[] originBuffer, byte[] targetBuffer)
+        {
+            if (originBuffer is null || originBuffer.LongLength == 0)
+            {
+                throw new ArgumentException("Origin buffer cannot be null or empty.");
+            }
+            if (buffer is null || buffer.LongLength == 0)
+            {
+                return [];
+            }
+            List<byte> result = [];
+            for (long i = 0; i <= buffer.LongLength - originBuffer.LongLength; i++)
+            {
+                bool isMatch = true;
+                for (long j = 0; j < originBuffer.LongLength; j++)
+                {
+                    if (buffer[i + j] != originBuffer[j])
+                    {
+                        isMatch = false;
+                        break;
+                    }
+                }
+                if (isMatch)
+                {
+                    result.AddRange(targetBuffer);
+                    i += originBuffer.LongLength - 1;
+                }
+                else
+                {
+                    result.Add(buffer[i]);
+                }
+            }
+            for (long i = buffer.LongLength - originBuffer.LongLength + 1; i < buffer.LongLength; i++)
+            {
+                if (i >= 0)
+                    result.Add(buffer[i]);
+            }
+            return [.. result];
+        }
+
+        /// <summary>
+        /// 分割Buffer
+        /// </summary>
+        /// <param name="targetBuffer">分割器</param>
+        /// <returns></returns>
+        public List<byte[]> Split(byte[] targetBuffer)
+        {
+            var indexes = buffer.IndexesOf(targetBuffer);
+            var buffers = new List<byte[]>();
+            long index = 0;
+            for (long i = 0; i < indexes.LongLength; i++)
+            {
+                var newBuffer = new byte[indexes[i] - index];
+                for (long j = index; j < indexes[i]; j++)
+                {
+                    newBuffer[j - index] = buffer[j];
+                }
+                buffers.Add(newBuffer);
+                index = indexes[i] + targetBuffer.LongLength;
+            }
+            var lastBuffer = new byte[buffer.LongLength - index];
+            for (long i = index; i < buffer.LongLength; i++)
+            {
+                lastBuffer[i - index] = buffer[i];
+            }
+            buffers.Add(lastBuffer);
+            return buffers;
+        }
     }
 
-    /// <summary>
-    /// 分割Buffer
-    /// </summary>
-    /// <param name="buffer"></param>
-    /// <param name="targetBuffer">分割器</param>
-    /// <returns></returns>
-    public static List<byte[]> Split(this byte[] buffer, byte[] targetBuffer)
-    {
-        var indexes = buffer.IndexesOf(targetBuffer);
-        var buffers = new List<byte[]>();
-        long index = 0;
-        for (long i = 0; i < indexes.LongLength; i++)
-        {
-            var newBuffer = new byte[indexes[i] - index];
-            for (long j = index; j < indexes[i]; j++)
-            {
-                newBuffer[j - index] = buffer[j];
-            }
-            buffers.Add(newBuffer);
-            index = indexes[i] + targetBuffer.LongLength;
-        }
-        var lastBuffer = new byte[buffer.LongLength - index];
-        for (long i = index; i < buffer.LongLength; i++)
-        {
-            lastBuffer[i - index] = buffer[i];
-        }
-        buffers.Add(lastBuffer);
-        return buffers;
-    }
     /// <summary>
     /// 将Buffer转换为XFEBuffer
     /// </summary>
@@ -163,44 +152,48 @@ public static class BufferExtension
         }
         return [.. packedBuffer];
     }
-    /// <summary>
-    /// 为Buffer添加头部并封装为XFEBuffer
-    /// </summary>
+
     /// <param name="buffer"></param>
-    /// <param name="headers"></param>
-    /// <returns></returns>
-    public static byte[] AddHeaderAndPack(this byte[] buffer, params string[] headers)
+    extension(byte[] buffer)
     {
-        var buffers = new List<byte[]>();
-        foreach (var header in headers)
+        /// <summary>
+        /// 为Buffer添加头部并封装为XFEBuffer
+        /// </summary>
+        /// <param name="headers"></param>
+        /// <returns></returns>
+        public byte[] AddHeaderAndPack(params string[] headers)
         {
-            buffers.Add(Encoding.UTF8.GetBytes(header));
+            var buffers = new List<byte[]>();
+            foreach (var header in headers)
+            {
+                buffers.Add(Encoding.UTF8.GetBytes(header));
+            }
+            buffers.Add(buffer);
+            return buffers.PackBuffer();
         }
-        buffers.Add(buffer);
-        return buffers.PackBuffer();
-    }
-    /// <summary>
-    /// 为Buffer添加头部并封装为XFEBuffer
-    /// </summary>
-    /// <param name="buffer"></param>
-    /// <param name="headers"></param>
-    /// <returns></returns>
-    public static byte[] AddHeaderAndPack(this byte[] buffer, params byte[] headers)
-    {
-        return new List<byte[]>() { headers, buffer }.PackBuffer();
-    }
-    /// <summary>
-    /// 将XEFBuffer转换为BufferList
-    /// </summary>
-    /// <param name="buffer"></param>
-    /// <returns></returns>
-    public static List<byte[]> UnPackBuffer(this byte[] buffer)
-    {
-        var unPackedBuffers = new List<byte[]>();
-        foreach (var unPackedBuffer in buffer.Split([0x01, 0x02, 0x03]))
+
+        /// <summary>
+        /// 为Buffer添加头部并封装为XFEBuffer
+        /// </summary>
+        /// <param name="headers"></param>
+        /// <returns></returns>
+        public byte[] AddHeaderAndPack(params byte[] headers)
         {
-            unPackedBuffers.Add(unPackedBuffer.Replace([0x02, 0x02, 0x03], [0x02, 0x03]));
+            return new List<byte[]>() { headers, buffer }.PackBuffer();
         }
-        return unPackedBuffers;
+
+        /// <summary>
+        /// 将XEFBuffer转换为BufferList
+        /// </summary>
+        /// <returns></returns>
+        public List<byte[]> UnPackBuffer()
+        {
+            var unPackedBuffers = new List<byte[]>();
+            foreach (var unPackedBuffer in buffer.Split([0x01, 0x02, 0x03]))
+            {
+                unPackedBuffers.Add(unPackedBuffer.Replace([0x02, 0x02, 0x03], [0x02, 0x03]));
+            }
+            return unPackedBuffers;
+        }
     }
 }

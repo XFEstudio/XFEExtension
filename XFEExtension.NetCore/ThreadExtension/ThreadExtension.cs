@@ -6,80 +6,89 @@
 public static class ThreadExtension
 {
     #region 等待线程状态
-    /// <summary>
-    /// 等待指定线程组的所有线程完成
-    /// </summary>
+
     /// <param name="threads"></param>
-    /// <returns>等待任务</returns>
-    public static Task WaitThreadListComplete(this List<Thread> threads)
+    extension(List<Thread> threads)
     {
-        return Task.Run(() =>
+        /// <summary>
+        /// 等待指定线程组的所有线程完成
+        /// </summary>
+        /// <returns>等待任务</returns>
+        public Task WaitThreadListComplete()
         {
-            while (true)
+            return Task.Run(() =>
             {
-                bool isAllThreadComplete = true;
-                foreach (var thread in threads)
+                while (true)
                 {
-                    if (thread.ThreadState != ThreadState.Stopped)
+                    bool isAllThreadComplete = true;
+                    foreach (var thread in threads)
                     {
-                        isAllThreadComplete = false;
+                        if (thread.ThreadState != ThreadState.Stopped)
+                        {
+                            isAllThreadComplete = false;
+                            break;
+                        }
+                    }
+                    if (isAllThreadComplete)
+                    {
                         break;
                     }
                 }
-                if (isAllThreadComplete)
-                {
-                    break;
-                }
-            }
-        });
-    }
-    /// <summary>
-    /// 等待指定线程组的所有线程达到指定状态
-    /// </summary>
-    /// <param name="threads"></param>
-    /// <param name="threadState">线程的状态</param>
-    /// <returns></returns>
-    public static Task WaitThreadListComplete(this List<Thread> threads, ThreadState threadState)
-    {
-        return Task.Run(() =>
+            });
+        }
+
+        /// <summary>
+        /// 等待指定线程组的所有线程达到指定状态
+        /// </summary>
+        /// <param name="threadState">线程的状态</param>
+        /// <returns></returns>
+        public Task WaitThreadListComplete(ThreadState threadState)
         {
-            while (true)
+            return Task.Run(() =>
             {
-                bool isAllThreadComplete = true;
-                foreach (var thread in threads)
+                while (true)
                 {
-                    if (thread.ThreadState != threadState)
+                    bool isAllThreadComplete = true;
+                    foreach (var thread in threads)
                     {
-                        isAllThreadComplete = false;
+                        if (thread.ThreadState != threadState)
+                        {
+                            isAllThreadComplete = false;
+                            break;
+                        }
+                    }
+                    if (isAllThreadComplete)
+                    {
                         break;
                     }
                 }
-                if (isAllThreadComplete)
-                {
-                    break;
-                }
-            }
-        });
+            });
+        }
     }
-    /// <summary>
-    /// 等待指定线程完成
-    /// </summary>
+
     /// <param name="thread"></param>
-    /// <returns>等待任务</returns>
-    public static Task WaitThreadComplete(this Thread thread)
+    extension(Thread thread)
     {
-        return Task.Run(() => { while (thread.ThreadState != ThreadState.Stopped) ; });
+        /// <summary>
+        /// 等待指定线程完成
+        /// </summary>
+        /// <returns>等待任务</returns>
+        public Task WaitThreadComplete()
+        {
+            return Task.Run(() => { while (thread.ThreadState != ThreadState.Stopped) ; });
+        }
+
+        /// <summary>
+        /// 等待指定线程达到指定状态
+        /// </summary>
+        /// <param name="threadState">线程的状态</param>
+        /// <returns></returns>
+        public Task WaitThreadComplete(ThreadState threadState)
+        {
+            return Task.Run(() => { while (thread.ThreadState != threadState) ; });
+        }
     }
-    /// <summary>
-    /// 等待指定线程达到指定状态
-    /// </summary>
-    /// <param name="thread"></param>
-    /// <param name="threadState">线程的状态</param>
-    /// <returns></returns>
-    public static Task WaitThreadComplete(this Thread thread, ThreadState threadState)
-    {
-        return Task.Run(() => { while (thread.ThreadState != threadState) ; });
-    }
+
     #endregion
     #region 新建线程并开始
     /// <summary>

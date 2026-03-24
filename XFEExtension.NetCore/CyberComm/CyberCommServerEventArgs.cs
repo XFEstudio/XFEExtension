@@ -7,16 +7,16 @@ namespace XFEExtension.NetCore.CyberComm;
 /// <summary>
 /// CyberComm服务器事件参数
 /// </summary>
-/// <param name="RequestURL">请求时的URL地址</param>
+/// <param name="RequestUrl">请求时的URL地址</param>
 /// <param name="MessageType"> 消息类型 </param>
 /// <param name="CurrentWebSocket"> 当前WebSocket </param>
-/// <param name="WSHeader"> 客户端请求头 </param>
+/// <param name="WsHeader"> 客户端请求头 </param>
 /// <param name="Exception"> 异常消息（如果有的话） </param>
 /// <param name="IpAddress"> 客户端IP地址 </param>
 /// <param name="TextMessage"> 文本消息 </param>
 /// <param name="BinaryMessage"> 二进制消息 </param>
 /// <param name="EndOfMessage">消息是否结束</param>
-public abstract record CyberCommServerEventArgs(Uri? RequestURL, BackMessageType MessageType, WebSocket CurrentWebSocket, NameValueCollection WSHeader, XFECyberCommException? Exception, string IpAddress, string? TextMessage, byte[]? BinaryMessage, bool EndOfMessage)
+public abstract record CyberCommServerEventArgs(Uri? RequestUrl, BackMessageType MessageType, WebSocket CurrentWebSocket, NameValueCollection WsHeader, XFECyberCommException? Exception, string IpAddress, string? TextMessage, byte[]? BinaryMessage, bool EndOfMessage)
 {
     /// <summary>
     /// 发送文本消息
@@ -83,13 +83,13 @@ public abstract record CyberCommServerEventArgs(Uri? RequestURL, BackMessageType
             throw new XFECyberCommException("强制关闭服务器端连接时出现异常", ex);
         }
     }
-    internal CyberCommServerEventArgs(Uri? requestURL, WebSocket webSocket, string message, string ipAddress, NameValueCollection wsHeader, bool endOfMessage) : this(requestURL, BackMessageType.Text, webSocket, wsHeader, null, ipAddress, message, null, endOfMessage)
+    internal CyberCommServerEventArgs(Uri? requestUrl, WebSocket webSocket, string message, string ipAddress, NameValueCollection wsHeader, bool endOfMessage) : this(requestUrl, BackMessageType.Text, webSocket, wsHeader, null, ipAddress, message, null, endOfMessage)
     {
     }
-    internal CyberCommServerEventArgs(Uri? requestURL, WebSocket webSocket, byte[] bytes, string ipAddress, NameValueCollection wsHeader, bool endOfMessage) : this(requestURL, BackMessageType.Binary, webSocket, wsHeader, null, ipAddress, null, bytes, endOfMessage)
+    internal CyberCommServerEventArgs(Uri? requestUrl, WebSocket webSocket, byte[] bytes, string ipAddress, NameValueCollection wsHeader, bool endOfMessage) : this(requestUrl, BackMessageType.Binary, webSocket, wsHeader, null, ipAddress, null, bytes, endOfMessage)
     {
     }
-    internal CyberCommServerEventArgs(Uri? requestURL, WebSocket webSocket, XFECyberCommException ex, string ipAddress, NameValueCollection wsHeader) : this(requestURL, BackMessageType.Error, webSocket, wsHeader, ex, ipAddress, null, null, true)
+    internal CyberCommServerEventArgs(Uri? requestUrl, WebSocket webSocket, XFECyberCommException ex, string ipAddress, NameValueCollection wsHeader) : this(requestUrl, BackMessageType.Error, webSocket, wsHeader, ex, ipAddress, null, null, true)
     {
     }
 }
