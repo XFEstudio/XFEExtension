@@ -122,6 +122,19 @@ public static class ReflectionExtension
             var property = type.GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Static);
             property?.SetValue(null, value);
         }
+
+        /// <summary>
+        /// 调用某个类中的某个私有静态方法
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="methodName">方法名称</param>
+        /// <param name="parameters">传入参数</param>
+        /// <returns></returns>
+        public T? InvokePrivateStaticMethod<T>(string methodName, params object[] parameters)
+        {
+            var method = type.GetMethod(methodName);
+            return (T?)method?.Invoke(null, parameters);
+        }
     }
 
     /// <param name="obj"></param>
@@ -150,19 +163,5 @@ public static class ReflectionExtension
             var method = obj.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
             method?.Invoke(obj, parameters);
         }
-    }
-
-    /// <summary>
-    /// 调用某个类中的某个私有静态方法
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="type"></param>
-    /// <param name="methodName">方法名称</param>
-    /// <param name="parameters">传入参数</param>
-    /// <returns></returns>
-    public static T? InvokePrivateStaticMethod<T>(this Type type, string methodName, params object[] parameters)
-    {
-        var method = type.GetMethod(methodName);
-        return (T?)method?.Invoke(null, parameters);
     }
 }

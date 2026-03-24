@@ -7,19 +7,14 @@ public static class ObjectExtension
 {
     /// <param name="source"></param>
     /// <typeparam name="T"></typeparam>
-    extension<T>(T source) where T : class
+    extension<T>(T? source) where T : class
     {
         /// <summary>
         /// 进行浅拷贝
         /// </summary>
         /// <returns>浅拷贝后的对象</returns>
         /// <exception cref="ArgumentNullException">无类型错误</exception>
-        public T ActiveCopyOf()
-        {
-            return source is null
-                ? throw new ArgumentNullException(nameof(source))
-                : (T)source.GetType().GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)?.Invoke(source, null)!;
-        }
+        public T ActiveCopyOf() => source is null ? throw new ArgumentNullException(nameof(source)) : (T)source.GetType().GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)?.Invoke(source, null)!;
 
         /// <summary>
         /// 进行静态拷贝
@@ -28,66 +23,34 @@ public static class ObjectExtension
         public T? StaticCopyOf()
         {
             if (source is null)
-            {
-                return default;
-            }
+                return null;
             var fields = typeof(T).GetFields();
             var properties = typeof(T).GetProperties();
             var newObject = Activator.CreateInstance<T>();
             foreach (var property in properties)
-            {
                 property.SetValue(newObject, property.GetValue(source));
-            }
             foreach (var field in fields)
-            {
                 field.SetValue(newObject, field.GetValue(source));
-            }
             return newObject;
         }
-    }
 
-    /// <summary>
-    /// 比较两个对象的属性是否完全相同而非对象本身相同
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="obj1"></param>
-    /// <param name="obj2"></param>
-    /// <returns></returns>
-    public static bool AboutEqual<T>(this T obj1, T obj2)
-    {
-        if (obj1 is null && obj2 is null)
+        /// <summary>
+        /// 比较两个对象的属性是否完全相同而非对象本身相同
+        /// </summary>
+        /// <param name="obj2"></param>
+        /// <returns></returns>
+        public bool AboutEqual(T? obj2)
         {
-            return true;
-        }
-
-        if (obj1 is null || obj2 is null)
-        {
-            return false;
-        }
-
-        Type type = typeof(T);
-        var properties = type.GetProperties();
-        var fields = type.GetFields();
-        foreach (var property in properties)
-        {
-            var value1 = property.GetValue(obj1);
-            var value2 = property.GetValue(obj2);
-
-            if (!Equals(value1, value2))
-            {
+            if (source is null && obj2 is null)
+                return true;
+            if (source is null || obj2 is null)
                 return false;
-            }
-        }
-        foreach (var field in fields)
-        {
-            var value1 = field.GetValue(obj1);
-            var value2 = field.GetValue(obj2);
-
-            if (!Equals(value1, value2))
-            {
+            Type type = typeof(T);
+            var properties = type.GetProperties();
+            var fields = type.GetFields();
+            if ((from property in properties let value1 = property.GetValue(source) let value2 = property.GetValue(obj2) where !Equals(value1, value2) select value1).Any())
                 return false;
-            }
+            return !(from field in fields let value1 = field.GetValue(source) let value2 = field.GetValue(obj2) where !Equals(value1, value2) select value1).Any();
         }
-        return true;
     }
 }

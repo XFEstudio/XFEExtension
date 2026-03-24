@@ -19,21 +19,11 @@ public static class AttributeExtension
     {
         var type = Assembly.GetCallingAssembly().GetType(className, false, true);
         if (type is null)
-        {
             throw new XFEExtensionException($"未找到类{className}");
-        }
-        else
-        {
-            var method = type.GetMethod(methodName);
-            if (method is null)
-            {
-                throw new XFEExtensionException($"未找到方法{methodName}");
-            }
-            else
-            {
-                return method.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
-            }
-        }
+        var method = type.GetMethod(methodName);
+        if (method is null)
+            throw new XFEExtensionException($"未找到方法{methodName}");
+        return method.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
     }
     /// <summary>
     /// 获取给定类的某个方法的给定属性的对象列表
@@ -46,21 +36,9 @@ public static class AttributeExtension
     {
         var type = Assembly.GetCallingAssembly().GetType(className, false, true);
         if (type is null)
-        {
             throw new XFEExtensionException($"未找到类{className}");
-        }
-        else
-        {
-            var method = type.GetMethod(methodName);
-            if (method is null)
-            {
-                throw new XFEExtensionException($"未找到方法{methodName}");
-            }
-            else
-            {
-                return method.GetCustomAttributes(typeof(T), false).Select(x => x as T).ToList();
-            }
-        }
+        var method = type.GetMethod(methodName);
+        return method is null ? throw new XFEExtensionException($"未找到方法{methodName}") : method.GetCustomAttributes(typeof(T), false).Select(x => x as T).ToList();
     }
     /// <summary>
     /// 获取给定类的某个字段的给定属性的对象
@@ -73,21 +51,11 @@ public static class AttributeExtension
     {
         var type = Assembly.GetCallingAssembly().GetType(className, false, true);
         if (type is null)
-        {
             throw new XFEExtensionException($"未找到类{className}");
-        }
-        else
-        {
-            var field = type.GetField(fieldName);
-            if (field is null)
-            {
-                throw new XFEExtensionException($"未找到字段{fieldName}");
-            }
-            else
-            {
-                return field.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
-            }
-        }
+        var field = type.GetField(fieldName);
+        if (field is null)
+            throw new XFEExtensionException($"未找到字段{fieldName}");
+        return field.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
     }
     /// <summary>
     /// 获取给定类的某个字段的给定属性的对象列表
@@ -100,21 +68,9 @@ public static class AttributeExtension
     {
         var type = Assembly.GetCallingAssembly().GetType(className, false, true);
         if (type is null)
-        {
             throw new XFEExtensionException($"未找到类{className}");
-        }
-        else
-        {
-            var field = type.GetField(fieldName);
-            if (field is null)
-            {
-                throw new XFEExtensionException($"未找到字段{fieldName}");
-            }
-            else
-            {
-                return field.GetCustomAttributes(typeof(T), false).Select(x => x as T).ToList();
-            }
-        }
+        var field = type.GetField(fieldName);
+        return field is null ? throw new XFEExtensionException($"未找到字段{fieldName}") : field.GetCustomAttributes(typeof(T), false).Select(x => x as T).ToList();
     }
     /// <summary>
     /// 获取给定类的某个属性的给定属性的对象
@@ -127,21 +83,11 @@ public static class AttributeExtension
     {
         var type = Assembly.GetCallingAssembly().GetType(className, false, true);
         if (type is null)
-        {
             throw new XFEExtensionException($"未找到类{className}");
-        }
-        else
-        {
-            var property = type.GetProperty(propertyName);
-            if (property is null)
-            {
-                throw new XFEExtensionException($"未找到属性{propertyName}");
-            }
-            else
-            {
-                return property.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
-            }
-        }
+        var property = type.GetProperty(propertyName);
+        if (property is null)
+            throw new XFEExtensionException($"未找到属性{propertyName}");
+        return property.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
     }
     /// <summary>
     /// 获取给定类的某个属性的给定属性的对象列表
@@ -154,21 +100,9 @@ public static class AttributeExtension
     {
         var type = Assembly.GetCallingAssembly().GetType(className, false, true);
         if (type is null)
-        {
             throw new XFEExtensionException($"未找到类{className}");
-        }
-        else
-        {
-            var property = type.GetProperty(propertyName);
-            if (property is null)
-            {
-                throw new XFEExtensionException($"未找到属性{propertyName}");
-            }
-            else
-            {
-                return property.GetCustomAttributes(typeof(T), false).Select(x => x as T).ToList();
-            }
-        }
+        var property = type.GetProperty(propertyName);
+        return property is null ? throw new XFEExtensionException($"未找到属性{propertyName}") : property.GetCustomAttributes(typeof(T), false).Select(x => x as T).ToList();
     }
     /// <summary>
     /// 获取给定类的给定方法的给定参数的给定属性的对象
@@ -182,29 +116,14 @@ public static class AttributeExtension
     {
         var type = Assembly.GetCallingAssembly().GetType(className, false, true);
         if (type is null)
-        {
             throw new XFEExtensionException($"未找到类{className}");
-        }
-        else
-        {
-            var method = type.GetMethod(methodName);
-            if (method is null)
-            {
-                throw new XFEExtensionException($"未找到方法{methodName}");
-            }
-            else
-            {
-                var param = method.GetParameters().FirstOrDefault(x => x.Name == paramName);
-                if (param is null)
-                {
-                    throw new XFEExtensionException($"未找到参数{paramName}");
-                }
-                else
-                {
-                    return param.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
-                }
-            }
-        }
+        var method = type.GetMethod(methodName);
+        if (method is null)
+            throw new XFEExtensionException($"未找到方法{methodName}");
+        var param = method.GetParameters().FirstOrDefault(x => x.Name == paramName);
+        if (param is null)
+            throw new XFEExtensionException($"未找到参数{paramName}");
+        return param.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
     }
     /// <summary>
     /// 获取给定类的给定方法的给定参数的给定属性的对象列表
@@ -218,29 +137,12 @@ public static class AttributeExtension
     {
         var type = Assembly.GetCallingAssembly().GetType(className, false, true);
         if (type is null)
-        {
             throw new XFEExtensionException($"未找到类{className}");
-        }
-        else
-        {
-            var method = type.GetMethod(methodName);
-            if (method is null)
-            {
-                throw new XFEExtensionException($"未找到方法{methodName}");
-            }
-            else
-            {
-                var param = method.GetParameters().FirstOrDefault(x => x.Name == paramName);
-                if (param is null)
-                {
-                    throw new XFEExtensionException($"未找到参数{paramName}");
-                }
-                else
-                {
-                    return param.GetCustomAttributes(typeof(T), false).Select(x => x as T).ToList();
-                }
-            }
-        }
+        var method = type.GetMethod(methodName);
+        if (method is null)
+            throw new XFEExtensionException($"未找到方法{methodName}");
+        var param = method.GetParameters().FirstOrDefault(x => x.Name == paramName);
+        return param is null ? throw new XFEExtensionException($"未找到参数{paramName}") : param.GetCustomAttributes(typeof(T), false).Select(x => x as T).ToList();
     }
     /// <summary>
     /// 给定类的给定属性的对象
@@ -252,13 +154,8 @@ public static class AttributeExtension
     {
         var type = Assembly.GetCallingAssembly().GetType(className, false, true);
         if (type is null)
-        {
             throw new XFEExtensionException($"未找到类{className}");
-        }
-        else
-        {
-            return type.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
-        }
+        return type.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
     }
     /// <summary>
     /// 给定类的给定属性的对象列表
@@ -269,14 +166,7 @@ public static class AttributeExtension
     public static List<T?> GetAttributesOnClass<T>(string className) where T : Attribute
     {
         var type = Assembly.GetCallingAssembly().GetType(className, false, true);
-        if (type is null)
-        {
-            throw new XFEExtensionException($"未找到类{className}");
-        }
-        else
-        {
-            return type.GetCustomAttributes(typeof(T), false).Select(x => x as T).ToList();
-        }
+        return type is null ? throw new XFEExtensionException($"未找到类{className}") : type.GetCustomAttributes(typeof(T), false).Select(x => x as T).ToList();
     }
     #endregion
     #region 拓展方法

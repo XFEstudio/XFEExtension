@@ -58,7 +58,7 @@ public static class TaskExtension
     /// <param name="autoOutPut">自动输出</param>
     /// <param name="timerName">该次计时标识名</param>
     /// <returns></returns>
-    public static TimeSpan CTime(this Action action, bool autoOutPut = true, string timerName = "无标识名计时器")
+    public static TimeSpan CTime(this Action? action, bool autoOutPut = true, string timerName = "无标识名计时器")
     {
         var timeCounter = new Stopwatch();
         timeCounter.Start();

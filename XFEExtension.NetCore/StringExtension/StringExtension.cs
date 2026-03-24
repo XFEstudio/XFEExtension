@@ -76,6 +76,66 @@ public static partial class StringExtension
         {
             return IdCardRegex().IsMatch(telephoneNum);
         }
+
+        /// <summary>
+        /// 判断字符串是否为邮箱地址
+        /// </summary>
+        /// <returns></returns>
+        public bool IsValidEmail()
+        {
+            if (string.IsNullOrWhiteSpace(telephoneNum))
+                return false;
+
+            try
+            {
+                telephoneNum = Regex.Replace(telephoneNum, @"(@)(.+)$", DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
+                var validDomain = new System.Net.Mail.MailAddress(telephoneNum).Host;
+                return Regex.IsMatch(telephoneNum, @"^(?("")("".+?""@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)[0-9a-zA-Z]\@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,}))$", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 验证是否是URL链接
+        /// </summary>
+        /// <returns></returns>
+        public bool IsURL()
+        {
+            string pattern = @"^(https?|ftp|file|ws)://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
+            return IsMatch(pattern, telephoneNum);
+        }
+
+        /// <summary>
+        /// 字符串实际显示的长度
+        /// </summary>
+        /// <returns></returns>
+        public int DisplayLength()
+        {
+            int lengthCount = 0;
+            var splits = telephoneNum.ToCharArray();
+            for (int i = 0; i < splits.Length; i++)
+            {
+                if (splits[i] == '\t')
+                {
+                    lengthCount += 8 - lengthCount % 8;
+                }
+                else
+                {
+                    if (splits[i] > 255)
+                    {
+                        lengthCount += 2;
+                    }
+                    else
+                    {
+                        lengthCount += 1;
+                    }
+                }
+            }
+            return lengthCount;
+        }
     }
 
     /// <param name="str"></param>
@@ -94,27 +154,6 @@ public static partial class StringExtension
         public bool IsNullOrWhiteSpace() => string.IsNullOrWhiteSpace(str);
     }
 
-    /// <summary>
-    /// 判断字符串是否为邮箱地址
-    /// </summary>
-    /// <param name="emailString"></param>
-    /// <returns></returns>
-    public static bool IsValidEmail(this string emailString)
-    {
-        if (string.IsNullOrWhiteSpace(emailString))
-            return false;
-
-        try
-        {
-            emailString = Regex.Replace(emailString, @"(@)(.+)$", DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
-            var validDomain = new System.Net.Mail.MailAddress(emailString).Host;
-            return Regex.IsMatch(emailString, @"^(?("")("".+?""@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)[0-9a-zA-Z]\@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,}))$", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
-        }
-        catch (FormatException)
-        {
-            return false;
-        }
-    }
     private static string DomainMapper(Match match)
     {
         var idn = new IdnMapping();
@@ -122,16 +161,7 @@ public static partial class StringExtension
         domainName = idn.GetAscii(domainName);
         return match.Groups[1].Value + domainName;
     }
-    /// <summary>
-    /// 验证是否是URL链接
-    /// </summary>
-    /// <param name="str">指定字符串</param>
-    /// <returns></returns>
-    public static bool IsURL(this string str)
-    {
-        string pattern = @"^(https?|ftp|file|ws)://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
-        return IsMatch(pattern, str);
-    }
+
     /// <summary>
     /// 判断一个字符串，是否匹配指定的表达式(区分大小写的情况下)
     /// </summary>
@@ -147,7 +177,7 @@ public static partial class StringExtension
     }
 
     /// <param name="str"></param>
-    extension(string str)
+    extension(string? str)
     {
         /// <summary>
         /// 提取字符串中的URL链接
@@ -309,35 +339,6 @@ public static partial class StringExtension
         }
     }
 
-    /// <summary>
-    /// 字符串实际显示的长度
-    /// </summary>
-    /// <param name="str"></param>
-    /// <returns></returns>
-    public static int DisplayLength(this string str)
-    {
-        int lengthCount = 0;
-        var splits = str.ToCharArray();
-        for (int i = 0; i < splits.Length; i++)
-        {
-            if (splits[i] == '\t')
-            {
-                lengthCount += 8 - lengthCount % 8;
-            }
-            else
-            {
-                if (splits[i] > 255)
-                {
-                    lengthCount += 2;
-                }
-                else
-                {
-                    lengthCount += 1;
-                }
-            }
-        }
-        return lengthCount;
-    }
     /// <summary>
     /// 随机生成指定长度的字符串
     /// </summary>

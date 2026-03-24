@@ -8,7 +8,7 @@ namespace XFEExtension.NetCore.BufferExtension;
 public static class BufferExtension
 {
     /// <param name="buffer"></param>
-    extension(byte[] buffer)
+    extension(byte[]? buffer)
     {
         /// <summary>
         /// 获取第一个匹配Buffer的位置
@@ -18,6 +18,9 @@ public static class BufferExtension
         public int IndexOf(byte[] targetBuffer)
         {
             int index = -1;
+            if (buffer is null)
+                return index;
+
             for (int i = 0; i < buffer.Length; i++)
             {
                 if (buffer[i] != targetBuffer[0])
@@ -30,6 +33,7 @@ public static class BufferExtension
                     isMatch = false;
                     break;
                 }
+
                 if (!isMatch)
                     continue;
                 index = i;
@@ -47,6 +51,9 @@ public static class BufferExtension
         public int[] IndexesOf(byte[] targetBuffer, bool shareable = false)
         {
             var indexes = new List<int>();
+            if (buffer == null)
+                return [.. indexes];
+
             for (int i = 0; i < buffer.Length; i++)
             {
                 if (buffer[i] != targetBuffer[0])
@@ -57,6 +64,7 @@ public static class BufferExtension
                 if (!shareable)
                     i += targetBuffer.Length - 1;
             }
+
             return [.. indexes];
         }
 
@@ -69,24 +77,19 @@ public static class BufferExtension
         public byte[] Replace(byte[] originBuffer, byte[] targetBuffer)
         {
             if (originBuffer is null || originBuffer.LongLength == 0)
-            {
                 throw new ArgumentException("Origin buffer cannot be null or empty.");
-            }
             if (buffer is null || buffer.LongLength == 0)
-            {
                 return [];
-            }
             List<byte> result = [];
             for (long i = 0; i <= buffer.LongLength - originBuffer.LongLength; i++)
             {
                 bool isMatch = true;
                 for (long j = 0; j < originBuffer.LongLength; j++)
                 {
-                    if (buffer[i + j] != originBuffer[j])
-                    {
-                        isMatch = false;
-                        break;
-                    }
+                    if (buffer[i + j] == originBuffer[j])
+                        continue;
+                    isMatch = false;
+                    break;
                 }
                 if (isMatch)
                 {
@@ -120,17 +123,17 @@ public static class BufferExtension
             {
                 var newBuffer = new byte[indexes[i] - index];
                 for (long j = index; j < indexes[i]; j++)
-                {
-                    newBuffer[j - index] = buffer[j];
-                }
+                    if (buffer is not null)
+                        newBuffer[j - index] = buffer[j];
                 buffers.Add(newBuffer);
                 index = indexes[i] + targetBuffer.LongLength;
             }
+
+            if (buffer is null)
+                return buffers;
             var lastBuffer = new byte[buffer.LongLength - index];
             for (long i = index; i < buffer.LongLength; i++)
-            {
                 lastBuffer[i - index] = buffer[i];
-            }
             buffers.Add(lastBuffer);
             return buffers;
         }
@@ -163,11 +166,7 @@ public static class BufferExtension
         /// <returns></returns>
         public byte[] AddHeaderAndPack(params string[] headers)
         {
-            var buffers = new List<byte[]>();
-            foreach (var header in headers)
-            {
-                buffers.Add(Encoding.UTF8.GetBytes(header));
-            }
+            var buffers = headers.Select(header => Encoding.UTF8.GetBytes(header)).ToList();
             buffers.Add(buffer);
             return buffers.PackBuffer();
         }
@@ -177,23 +176,12 @@ public static class BufferExtension
         /// </summary>
         /// <param name="headers"></param>
         /// <returns></returns>
-        public byte[] AddHeaderAndPack(params byte[] headers)
-        {
-            return new List<byte[]>() { headers, buffer }.PackBuffer();
-        }
+        public byte[] AddHeaderAndPack(params byte[] headers) => new List<byte[]>() { headers, buffer }.PackBuffer();
 
         /// <summary>
         /// 将XEFBuffer转换为BufferList
         /// </summary>
         /// <returns></returns>
-        public List<byte[]> UnPackBuffer()
-        {
-            var unPackedBuffers = new List<byte[]>();
-            foreach (var unPackedBuffer in buffer.Split([0x01, 0x02, 0x03]))
-            {
-                unPackedBuffers.Add(unPackedBuffer.Replace([0x02, 0x02, 0x03], [0x02, 0x03]));
-            }
-            return unPackedBuffers;
-        }
+        public List<byte[]> UnPackBuffer() => buffer.Split([0x01, 0x02, 0x03]).Select(unPackedBuffer => unPackedBuffer.Replace([0x02, 0x02, 0x03], [0x02, 0x03])).ToList();
     }
 }
