@@ -14,7 +14,6 @@ public class XFEDownloader : IDisposable
     private bool _disposedValue;
     private readonly List<HttpClient> _httpClientList = [];
     private HttpResponseMessage? _responseMessage;
-    private readonly List<HttpResponseMessage> _httpResponseMessages = [];
     private readonly List<Task> _downloadTasks = [];
     /// <summary>
     /// 字节下载事件
@@ -36,15 +35,11 @@ public class XFEDownloader : IDisposable
     /// 已下载
     /// </summary>
     public bool Downloaded { get; private set; }
-    private bool _isPaused;
+
     /// <summary>
     /// 暂停
     /// </summary>
-    public bool IsPaused
-    {
-        get { return _isPaused; }
-        set { _isPaused = value; }
-    }
+    public bool IsPaused { get; set; }
 
     /// <summary>
     /// 开始下载
@@ -58,7 +53,7 @@ public class XFEDownloader : IDisposable
         var getInfoClient = new HttpClient();
         _responseMessage ??= await GetHttpResponseMessage(getInfoClient, CancellationToken.None);
         var totalFileSize = _responseMessage.Content.Headers.ContentLength;
-        using var createFileStream = new FileStream(SavePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite, 8192, true);
+        await using var createFileStream = new FileStream(SavePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite, 8192, true);
         if (totalFileSize is not null)
             createFileStream.SetLength(totalFileSize.Value);
         for (var i = 0; i < FileSegmentCount; i++)
@@ -66,7 +61,7 @@ public class XFEDownloader : IDisposable
             var currentSegment = i;
             _downloadTasks.Add(Task.Run(async () =>
             {
-                using var fileStream = new FileStream(SavePath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, 8192, true);
+                await using var fileStream = new FileStream(SavePath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, 8192, true);
                 var currentSegmentTotalBufferSize = fileStream.Length / FileSegmentCount;
                 var endPosition = currentSegment == FileSegmentCount - 1 ? fileStream.Length : currentSegmentTotalBufferSize * (currentSegment + 1);
                 var startBufferIndex = currentSegmentTotalBufferSize * currentSegment;
@@ -80,17 +75,17 @@ public class XFEDownloader : IDisposable
                     totalRead += currentSegmentDownloadedBuffeSize;
                 var cancellationTokenSource = new CancellationTokenSource();
                 var cancellationToken = cancellationTokenSource.Token;
-                using var contentStream = await (await GetHttpResponseMessage(httpClient, cancellationToken)).Content.ReadAsStreamAsync(cancellationToken);
+                await using var contentStream = await (await GetHttpResponseMessage(httpClient, cancellationToken)).Content.ReadAsStreamAsync(cancellationToken);
                 var buffer = new byte[8192];
                 int currentRead;
-                while ((currentRead = await contentStream.ReadAsync(buffer)) > 0 && !_disposedValue)
+                while ((currentRead = await contentStream.ReadAsync(buffer, cancellationToken)) > 0 && !_disposedValue)
                 {
                     if (IsPaused)
                     {
                         await cancellationTokenSource.CancelAsync();
                         break;
                     }
-                    await fileStream.WriteAsync(buffer.AsMemory(0, currentRead));
+                    await fileStream.WriteAsync(buffer.AsMemory(0, currentRead), cancellationToken);
                     totalRead += currentRead;
                     currentSegmentDownloadedBuffeSize += currentRead;
                     var bufferCopy = new byte[8192];
@@ -141,29 +136,24 @@ public class XFEDownloader : IDisposable
     /// <param name="disposing"></param>
     protected virtual void Dispose(bool disposing)
     {
-        if (!_disposedValue)
+        if (_disposedValue)
+            return;
+        if (disposing)
         {
-            if (disposing)
+            _responseMessage?.Dispose();
+            foreach (var httpClient in _httpClientList)
             {
-                _responseMessage?.Dispose();
-                foreach (var httpClient in _httpClientList)
-                {
-                    httpClient.Dispose();
-                }
-                foreach (var response in _httpResponseMessages)
-                {
-                    response.Dispose();
-                }
-                foreach (var task in _downloadTasks)
-                {
-                    task.Dispose();
-                }
+                httpClient.Dispose();
             }
-
-            // TODO: 释放未托管的资源(未托管的对象)并重写终结器
-            // TODO: 将大型字段设置为 null
-            _disposedValue = true;
+            foreach (var task in _downloadTasks)
+            {
+                task.Dispose();
+            }
         }
+
+        // TODO: 释放未托管的资源(未托管的对象)并重写终结器
+        // TODO: 将大型字段设置为 null
+        _disposedValue = true;
     }
     /// <summary>
     /// 释放资源

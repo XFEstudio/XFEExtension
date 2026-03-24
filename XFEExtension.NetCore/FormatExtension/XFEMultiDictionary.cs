@@ -148,7 +148,7 @@ public class XFEMultiDictionary : ICollection<XFEEntry>
     public List<string> GetContents(string header)
     {
         var list = new List<string>();
-        _xFEMultiDictionaryList.FindAll(x => x.Header == header)?.ForEach(y => list.Add(y.Content));
+        _xFEMultiDictionaryList.FindAll(x => x.Header == header).ForEach(y => list.Add(y.Content));
         return list;
     }
     /// <summary>

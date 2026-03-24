@@ -1,4 +1,5 @@
-﻿using XFEExtension.NetCore.ArrayExtension;
+﻿using System.Globalization;
+using XFEExtension.NetCore.ArrayExtension;
 
 namespace XFEExtension.NetCore.CyberComm.XCCNetWork;
 
@@ -44,10 +45,8 @@ public class XCCMessage(string messageId, XCCTextMessageType messageType, string
     /// 封装为字符串
     /// </summary>
     /// <returns></returns>
-    public override string ToString()
-    {
-        return new[] { MessageId, MessageType.ToString(), Message, Sender, SendTime.ToString() }.ToXFEString();
-    }
+    public override string ToString() => new[] { MessageId, MessageType.ToString(), Message, Sender, SendTime.ToString(CultureInfo.CurrentCulture) }.ToXFEString();
+
     /// <summary>
     /// 将封装后的XCC消息字符串转换为XCC消息对象
     /// </summary>
@@ -57,6 +56,6 @@ public class XCCMessage(string messageId, XCCTextMessageType messageType, string
     public static XCCMessage ConvertToXCCMessage(string xCCMessageStringFormat, string groupId)
     {
         var unPackedMessage = xCCMessageStringFormat.ToXFEArray<string>();
-        return new XCCMessage(unPackedMessage[0], (XCCTextMessageType)Enum.Parse(typeof(XCCTextMessageType), unPackedMessage[1]), unPackedMessage[2], unPackedMessage[3], DateTime.Parse(unPackedMessage[4]), groupId);
+        return new XCCMessage(unPackedMessage[0], Enum.Parse<XCCTextMessageType>(unPackedMessage[1]), unPackedMessage[2], unPackedMessage[3], DateTime.Parse(unPackedMessage[4]), groupId);
     }
 }
