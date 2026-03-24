@@ -74,7 +74,7 @@ public class CyberCommGroup
     public async Task SendGroupTextMessage(string message)
     {
         List<Task> tasks = [];
-        foreach (CyberCommServerEventArgs cyberCommServerEventArgs in cyberCommList)
+        foreach (var cyberCommServerEventArgs in cyberCommList)
         {
             tasks.Add(cyberCommServerEventArgs.ReplyMessage(message));
         }
@@ -88,7 +88,7 @@ public class CyberCommGroup
     public async Task SendGroupTextMessage(string message, Func<CyberCommServerEventArgs, bool> findFunc)
     {
         List<Task> tasks = [];
-        foreach (CyberCommServerEventArgs cyberCommServerEventArgs in cyberCommList)
+        foreach (var cyberCommServerEventArgs in cyberCommList)
         {
             if (findFunc.Invoke(cyberCommServerEventArgs))
             {
@@ -104,7 +104,7 @@ public class CyberCommGroup
     public async Task SendGroupBinaryMessage(byte[] bytes)
     {
         List<Task> tasks = [];
-        foreach (CyberCommServerEventArgs cyberCommServerEventArgs in cyberCommList)
+        foreach (var cyberCommServerEventArgs in cyberCommList)
         {
             tasks.Add(cyberCommServerEventArgs.ReplyBinaryMessage(bytes));
         }
@@ -118,7 +118,7 @@ public class CyberCommGroup
     public async Task SendGroupBinaryMessage(byte[] bytes, Func<CyberCommServerEventArgs, bool> findFunc)
     {
         List<Task> tasks = [];
-        foreach (CyberCommServerEventArgs cyberCommServerEventArgs in cyberCommList)
+        foreach (var cyberCommServerEventArgs in cyberCommList)
         {
             if (findFunc.Invoke(cyberCommServerEventArgs))
             {

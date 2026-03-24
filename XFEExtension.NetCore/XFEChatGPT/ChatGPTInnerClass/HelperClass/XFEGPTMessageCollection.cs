@@ -108,7 +108,7 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     /// <exception cref="XFEChatGPTException"></exception>
     public void InsertByMessageId(string messageId, XFEGPTMessage xFEGPTMessage)
     {
-        for (int i = 0; i < xFEGPTMessages.Count; i++)
+        for (var i = 0; i < xFEGPTMessages.Count; i++)
         {
             if (xFEGPTMessages[i].MessageId == messageId)
             {
@@ -132,7 +132,7 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     /// <returns></returns>
     public XFEGPTMessage? GetXFEGPTMessageByMessageId(string messageId)
     {
-        foreach (XFEGPTMessage xFEGPTMessage in xFEGPTMessages)
+        foreach (var xFEGPTMessage in xFEGPTMessages)
         {
             if (xFEGPTMessage.MessageId == messageId)
             {
@@ -148,7 +148,7 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     public GPTMessage[] GetGPTMessages()
     {
         List<GPTMessage> gPTMessages = [];
-        foreach (XFEGPTMessage xFEGPTMessage in xFEGPTMessages)
+        foreach (var xFEGPTMessage in xFEGPTMessages)
         {
             gPTMessages.Add(xFEGPTMessage.GPTMessage);
         }
@@ -161,7 +161,7 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     public string[] GetGPTMessageStrings()
     {
         List<string> gPTMessages = [];
-        foreach (XFEGPTMessage xFEGPTMessage in xFEGPTMessages)
+        foreach (var xFEGPTMessage in xFEGPTMessages)
         {
             gPTMessages.Add(xFEGPTMessage.GPTMessage.Content);
         }

@@ -26,7 +26,7 @@ public abstract record CyberCommRequestEventArgs(Uri? RequestURL, string Request
     public async Task ReplyAndClose(string message, HttpStatusCode statusCode = HttpStatusCode.OK)
     {
         Response.StatusCode = (int)statusCode;
-        byte[] buffer = Encoding.UTF8.GetBytes(message);
+        var buffer = Encoding.UTF8.GetBytes(message);
         Response.ContentLength64 = buffer.Length;
         await Response.OutputStream.WriteAsync(buffer);
         Response.Close();
@@ -38,7 +38,7 @@ public abstract record CyberCommRequestEventArgs(Uri? RequestURL, string Request
     /// <returns></returns>
     public async Task ReplyMessage(string message)
     {
-        byte[] buffer = Encoding.UTF8.GetBytes(message);
+        var buffer = Encoding.UTF8.GetBytes(message);
         Response.ContentLength64 = buffer.Length;
         await Response.OutputStream.WriteAsync(buffer);
     }

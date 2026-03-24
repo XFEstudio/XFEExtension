@@ -47,7 +47,7 @@ public static class ObjectExtension
                 return true;
             if (source is null || obj2 is null)
                 return false;
-            Type type = typeof(T);
+            var type = typeof(T);
             var properties = type.GetProperties();
             var fields = type.GetFields();
             if ((from property in properties let value1 = property.GetValue(source) let value2 = property.GetValue(obj2) where !Equals(value1, value2) select value1).Any())

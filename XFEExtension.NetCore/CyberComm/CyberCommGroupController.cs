@@ -11,7 +11,7 @@ public class CyberCommGroupController
     /// </summary>
     public void Refresh()
     {
-        for (int i = commGroups.Count - 1; i >= 0; i--)
+        for (var i = commGroups.Count - 1; i >= 0; i--)
         {
             if (commGroups[i].Count == 0)
             {
@@ -81,7 +81,7 @@ public class CyberCommGroupController
     {
         get
         {
-            foreach (CyberCommGroup commGroup in commGroups)
+            foreach (var commGroup in commGroups)
             {
                 if (commGroup.GroupId == groupId)
                 {

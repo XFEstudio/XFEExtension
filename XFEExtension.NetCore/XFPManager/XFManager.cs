@@ -101,14 +101,14 @@ public class XFManager
         Fields = [];
         if (IsProperty)
         {
-            for (int i = 0; i < nameAndValue.Length; i += 2)
+            for (var i = 0; i < nameAndValue.Length; i += 2)
             {
                 Properties.Add(new XProperty { Name = nameAndValue[i].ToString(), Property = nameAndValue[i + 1] });
             }
         }
         else
         {
-            for (int i = 0; i < nameAndValue.Length; i += 2)
+            for (var i = 0; i < nameAndValue.Length; i += 2)
             {
                 Fields.Add(new XField { name = nameAndValue[i].ToString(), field = nameAndValue[i + 1] });
             }
@@ -122,7 +122,7 @@ public class XFManager
     {
         Properties = [];
         Fields = [];
-        for (int i = 0; i < nameAndValue.Length; i += 2)
+        for (var i = 0; i < nameAndValue.Length; i += 2)
         {
             Fields.Add(new XField { name = nameAndValue[i].ToString(), field = nameAndValue[i + 1] });
         }

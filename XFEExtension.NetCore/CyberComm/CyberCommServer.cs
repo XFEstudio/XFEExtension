@@ -94,7 +94,7 @@ public class CyberCommServer
                         _ = Task.Run(() =>
                         {
                             using var reader = new StreamReader(request.InputStream, request.ContentEncoding);
-                            string postData = reader.ReadToEnd();
+                            var postData = reader.ReadToEnd();
                             RequestReceived?.Invoke(this, new CyberCommRequestEventArgsImpl(requestURL, requestMethod, postData, headers, queryString, request, response, clientIP));
                         });
                     }
@@ -124,8 +124,8 @@ public class CyberCommServer
         {
             try
             {
-                byte[] receiveBuffer = new byte[BufferLength];
-                WebSocketReceiveResult receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                var receiveBuffer = new byte[BufferLength];
+                var receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
                 //ReceiveCompletedMessageByUsingWhile
                 var bufferList = new List<byte>();
                 if (AutoReceiveCompletedMessage)
@@ -138,20 +138,27 @@ public class CyberCommServer
                     }
                 }
                 var receivedBinaryBuffer = bufferList.ToArray();
-                if (receiveResult.MessageType == WebSocketMessageType.Text)
+                switch (receiveResult.MessageType)
                 {
-                    string receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
-                    MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, receivedMessage, clientIP, wsHeader, receiveResult.EndOfMessage));
+                    case WebSocketMessageType.Text:
+                    {
+                        var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
+                        MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, receivedMessage, clientIP, wsHeader, receiveResult.EndOfMessage));
+                        break;
+                    }
+                    case WebSocketMessageType.Binary:
+                        MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, receivedBinaryBuffer, clientIP, wsHeader, receiveResult.EndOfMessage));
+                        break;
+                    case WebSocketMessageType.Close:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
-                if (receiveResult.MessageType == WebSocketMessageType.Binary)
-                {
-                    MessageReceived?.Invoke(this, new CyberCommServerEventArgsImpl(requestURL, webSocket, receivedBinaryBuffer, clientIP, wsHeader, receiveResult.EndOfMessage));
-                }
-                if (receiveResult.MessageType == WebSocketMessageType.Close)
-                {
-                    await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection Closed", CancellationToken.None);
-                    break;
-                }
+
+                if (receiveResult.MessageType != WebSocketMessageType.Close)
+                    continue;
+                await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection Closed", CancellationToken.None);
+                break;
             }
             catch (Exception ex)
             {
@@ -177,11 +184,7 @@ public class CyberCommServer
     /// <param name="listenPorts">监听端口</param>
     public CyberCommServer(params int[] listenPorts)
     {
-        var serverURLs = new List<string>();
-        foreach (var port in listenPorts)
-        {
-            serverURLs.Add($"http://*:{port}/");
-        }
+        var serverURLs = listenPorts.Select(port => $"http://*:{port}/").ToList();
         ServerURLs = [.. serverURLs];
         AutoReceiveCompletedMessage = true;
     }

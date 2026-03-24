@@ -20,33 +20,51 @@ public class JsonTransformer : StringConverter
         {
             if (IsEnumerableMember(objectInfo))
             {
-                if (objectInfo.Value is null)
-                    outPutString += "null";
-                else if (objectInfo.Value is string)
-                    outPutString += $"\"{objectInfo.Value}\"";
-                else if (objectInfo.ObjectPlace == ObjectPlace.Enum)
-                    outPutString += $"{(int)objectInfo.Value}";
-                else if (objectInfo.Value is bool)
-                    outPutString += $"{objectInfo.Value.ToString()?.ToLower()}";
-                else if (objectInfo.Type == typeof(int) || objectInfo.Type == typeof(double) || objectInfo.Type == typeof(float) || objectInfo.Type == typeof(decimal) || objectInfo.Type == typeof(long) || objectInfo.Type == typeof(short) || objectInfo.Type == typeof(byte) || objectInfo.Type == typeof(nint) || objectInfo.Type == typeof(uint) || objectInfo.Type == typeof(ulong) || objectInfo.Type == typeof(ushort) || objectInfo.Type == typeof(sbyte))
-                    outPutString += objectInfo.Value;
-                else
-                    outPutString += $"\"{objectInfo.Value}\"";
+                switch (objectInfo.Value)
+                {
+                    case null:
+                        outPutString += "null";
+                        break;
+                    case string:
+                        outPutString += $"\"{objectInfo.Value}\"";
+                        break;
+                    default:
+                    {
+                        if (objectInfo.ObjectPlace == ObjectPlace.Enum)
+                            outPutString += $"{(int)objectInfo.Value}";
+                        else if (objectInfo.Value is bool)
+                            outPutString += $"{objectInfo.Value.ToString()?.ToLower()}";
+                        else if (objectInfo.Type == typeof(int) || objectInfo.Type == typeof(double) || objectInfo.Type == typeof(float) || objectInfo.Type == typeof(decimal) || objectInfo.Type == typeof(long) || objectInfo.Type == typeof(short) || objectInfo.Type == typeof(byte) || objectInfo.Type == typeof(nint) || objectInfo.Type == typeof(uint) || objectInfo.Type == typeof(ulong) || objectInfo.Type == typeof(ushort) || objectInfo.Type == typeof(sbyte))
+                            outPutString += objectInfo.Value;
+                        else
+                            outPutString += $"\"{objectInfo.Value}\"";
+                        break;
+                    }
+                }
             }
             else
             {
-                if (objectInfo.Value is null)
-                    outPutString += $"\"{objectInfo.Name}\":null";
-                else if (objectInfo.Value is string)
-                    outPutString += $"\"{objectInfo.Name}\":\"{objectInfo.Value}\"";
-                else if (objectInfo.ObjectPlace == ObjectPlace.Enum)
-                    outPutString += $"\"{objectInfo.Name}\":{(int)objectInfo.Value}";
-                else if (objectInfo.Value is bool)
-                    outPutString += $"\"{objectInfo.Name}\":{objectInfo.Value.ToString()?.ToLower()}";
-                else if (objectInfo.Type == typeof(int) || objectInfo.Type == typeof(double) || objectInfo.Type == typeof(float) || objectInfo.Type == typeof(decimal) || objectInfo.Type == typeof(long) || objectInfo.Type == typeof(short) || objectInfo.Type == typeof(byte) || objectInfo.Type == typeof(nint) || objectInfo.Type == typeof(uint) || objectInfo.Type == typeof(ulong) || objectInfo.Type == typeof(ushort) || objectInfo.Type == typeof(sbyte))
-                    outPutString += $"\"{objectInfo.Name}\":{objectInfo.Value}";
-                else
-                    outPutString += $"\"{objectInfo.Name}\":\"{objectInfo.Value}\"";
+                switch (objectInfo.Value)
+                {
+                    case null:
+                        outPutString += $"\"{objectInfo.Name}\":null";
+                        break;
+                    case string:
+                        outPutString += $"\"{objectInfo.Name}\":\"{objectInfo.Value}\"";
+                        break;
+                    default:
+                    {
+                        if (objectInfo.ObjectPlace == ObjectPlace.Enum)
+                            outPutString += $"\"{objectInfo.Name}\":{(int)objectInfo.Value}";
+                        else if (objectInfo.Value is bool)
+                            outPutString += $"\"{objectInfo.Name}\":{objectInfo.Value.ToString()?.ToLower()}";
+                        else if (objectInfo.Type == typeof(int) || objectInfo.Type == typeof(double) || objectInfo.Type == typeof(float) || objectInfo.Type == typeof(decimal) || objectInfo.Type == typeof(long) || objectInfo.Type == typeof(short) || objectInfo.Type == typeof(byte) || objectInfo.Type == typeof(nint) || objectInfo.Type == typeof(uint) || objectInfo.Type == typeof(ulong) || objectInfo.Type == typeof(ushort) || objectInfo.Type == typeof(sbyte))
+                            outPutString += $"\"{objectInfo.Name}\":{objectInfo.Value}";
+                        else
+                            outPutString += $"\"{objectInfo.Name}\":\"{objectInfo.Value}\"";
+                        break;
+                    }
+                }
             }
         }
         else
@@ -82,7 +100,7 @@ public class JsonTransformer : StringConverter
     public override string OutPutSubObjects(ISubObjects subObjects)
     {
         var outString = string.Empty;
-        for (int i = 0; i < subObjects.Count; i++)
+        for (var i = 0; i < subObjects.Count; i++)
         {
             var obj = subObjects[i];
             string? currentConnectString;

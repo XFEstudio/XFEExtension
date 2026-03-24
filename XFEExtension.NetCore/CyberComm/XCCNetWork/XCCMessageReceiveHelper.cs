@@ -113,7 +113,7 @@ public class XCCMessageReceiveHelper
                 {
                     var filePath = $"{SavePathRoot}/{groupId}/{file}";
                     var messageId = Path.GetFileNameWithoutExtension(filePath);
-                    if (!xCCMessageDictionary.TryGetValue(groupId, out List<XCCMessage>? value) || value.Find(x => x.MessageId == messageId) is null)
+                    if (!xCCMessageDictionary.TryGetValue(groupId, out var value) || value.Find(x => x.MessageId == messageId) is null)
                     {
                         File.Delete(filePath);
                     }
@@ -128,7 +128,7 @@ public class XCCMessageReceiveHelper
         if (File.Exists(filePath))
             fileBuffer = File.ReadAllBytes(filePath);
         XCCFile xCCFile;
-        if (xCCFileDictionary.TryGetValue(xCCMessage.MessageId, out XCCFile? value))
+        if (xCCFileDictionary.TryGetValue(xCCMessage.MessageId, out var value))
         {
             if (!value.Loaded && fileBuffer is not null)
                 value.LoadFile(fileBuffer);
@@ -158,7 +158,7 @@ public class XCCMessageReceiveHelper
     /// <returns></returns>
     public XCCFile? GetFile(string messageId)
     {
-        return xCCFileDictionary.TryGetValue(messageId, out XCCFile? value) ? value : null;
+        return xCCFileDictionary.TryGetValue(messageId, out var value) ? value : null;
     }
     /// <summary>
     /// 添加文件
@@ -211,7 +211,7 @@ public class XCCMessageReceiveHelper
     private void ReceiveTextMessage(object? sender, XCCTextMessageReceivedEventArgs e)
     {
         var message = new XCCMessage(e.MessageId!, e.MessageType, e.TextMessage, e.Sender!, e.SendTime, e.GroupId);
-        if (xCCMessageDictionary.TryGetValue(e.GroupId, out List<XCCMessage>? value))
+        if (xCCMessageDictionary.TryGetValue(e.GroupId, out var value))
         {
             if (value.Find(x => x.MessageId == e.MessageId) is null)
             {
@@ -251,7 +251,7 @@ public class XCCMessageReceiveHelper
             AudioBufferReceived?.Invoke(e.BinaryMessage);
             return;
         }
-        if (xCCFileDictionary.TryGetValue(e.MessageId!, out XCCFile? value))
+        if (xCCFileDictionary.TryGetValue(e.MessageId!, out var value))
         {
             var xCCFile = value;
             if (!xCCFile.Loaded)

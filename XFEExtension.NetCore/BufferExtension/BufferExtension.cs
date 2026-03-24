@@ -17,16 +17,16 @@ public static class BufferExtension
         /// <returns>没有查找到为-1</returns>
         public int IndexOf(byte[] targetBuffer)
         {
-            int index = -1;
+            var index = -1;
             if (buffer is null)
                 return index;
 
-            for (int i = 0; i < buffer.Length; i++)
+            for (var i = 0; i < buffer.Length; i++)
             {
                 if (buffer[i] != targetBuffer[0])
                     continue;
-                bool isMatch = true;
-                for (int j = targetBuffer.Length - 1; j >= 0; j--)
+                var isMatch = true;
+                for (var j = targetBuffer.Length - 1; j >= 0; j--)
                 {
                     if (buffer[i + j] == targetBuffer[j])
                         continue;
@@ -54,11 +54,11 @@ public static class BufferExtension
             if (buffer == null)
                 return [.. indexes];
 
-            for (int i = 0; i < buffer.Length; i++)
+            for (var i = 0; i < buffer.Length; i++)
             {
                 if (buffer[i] != targetBuffer[0])
                     continue;
-                bool isMatch = !targetBuffer.Where((t, j) => buffer[i + j] != t).Any();
+                var isMatch = !targetBuffer.Where((t, j) => buffer[i + j] != t).Any();
                 if (!isMatch) continue;
                 indexes.Add(i);
                 if (!shareable)
@@ -83,7 +83,7 @@ public static class BufferExtension
             List<byte> result = [];
             for (long i = 0; i <= buffer.LongLength - originBuffer.LongLength; i++)
             {
-                bool isMatch = true;
+                var isMatch = true;
                 for (long j = 0; j < originBuffer.LongLength; j++)
                 {
                     if (buffer[i + j] == originBuffer[j])
@@ -101,7 +101,7 @@ public static class BufferExtension
                     result.Add(buffer[i]);
                 }
             }
-            for (long i = buffer.LongLength - originBuffer.LongLength + 1; i < buffer.LongLength; i++)
+            for (var i = buffer.LongLength - originBuffer.LongLength + 1; i < buffer.LongLength; i++)
             {
                 if (i >= 0)
                     result.Add(buffer[i]);
@@ -122,7 +122,7 @@ public static class BufferExtension
             for (long i = 0; i < indexes.LongLength; i++)
             {
                 var newBuffer = new byte[indexes[i] - index];
-                for (long j = index; j < indexes[i]; j++)
+                for (var j = index; j < indexes[i]; j++)
                     if (buffer is not null)
                         newBuffer[j - index] = buffer[j];
                 buffers.Add(newBuffer);
@@ -132,7 +132,7 @@ public static class BufferExtension
             if (buffer is null)
                 return buffers;
             var lastBuffer = new byte[buffer.LongLength - index];
-            for (long i = index; i < buffer.LongLength; i++)
+            for (var i = index; i < buffer.LongLength; i++)
                 lastBuffer[i - index] = buffer[i];
             buffers.Add(lastBuffer);
             return buffers;
@@ -147,7 +147,7 @@ public static class BufferExtension
     public static byte[] PackBuffer(this List<byte[]> buffers)
     {
         var packedBuffer = new List<byte>();
-        for (int i = 0; i < buffers.Count; i++)
+        for (var i = 0; i < buffers.Count; i++)
         {
             if (i != 0)
                 packedBuffer.AddRange(new List<byte> { 0x01, 0x02, 0x03 });

@@ -33,11 +33,11 @@ public class ApiKey(string aPIKey, string description)
     /// <returns></returns>
     public static List<ApiKey> ToApiKey(string keyString)
     {
-        string[] keyGroup = keyString.Split(separator);
+        var keyGroup = keyString.Split(separator);
         List<ApiKey> apiKeys = [];
-        foreach (string key in keyGroup)
+        foreach (var key in keyGroup)
         {
-            string[] oneKey = key.Split(XFEDictionary.EntrySeparator, StringSplitOptions.RemoveEmptyEntries);
+            var oneKey = key.Split(XFEDictionary.EntrySeparator, StringSplitOptions.RemoveEmptyEntries);
             if (oneKey.Length == 2)
             {
                 apiKeys.Add(new ApiKey(oneKey[1], oneKey[0]));

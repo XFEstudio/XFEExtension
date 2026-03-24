@@ -60,12 +60,14 @@ public abstract class XCCGroup
         var fileTransportXCCTask = StartFileTransportXCC(autoReconnect, reconnectMaxTimes, reconnectTryDelay);
         await Task.WhenAll(textMessageXCCTask, fileTransportXCCTask);
     }
+
     /// <summary>
     /// 启动XCC文本会话
     /// </summary>
     /// <param name="autoReconnect">是否自动重连</param>
     /// <param name="reconnectMaxTimes">最大重连次数，-1则为无限次</param>
     /// <param name="reconnectTryDelay">重连尝试延迟</param>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     /// <returns></returns>
     public async Task StartTextMessageXCC(bool autoReconnect = true, int reconnectMaxTimes = -1, int reconnectTryDelay = 100)
     {
@@ -116,8 +118,8 @@ public abstract class XCCGroup
         {
             try
             {
-                byte[] receiveBuffer = new byte[1024];
-                WebSocketReceiveResult receiveResult = await TextMessageClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                var receiveBuffer = new byte[1024];
+                var receiveResult = await TextMessageClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
                 var bufferList = new List<byte>();
                 bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                 //ReceiveCompletedMessageByUsingWhile
@@ -127,59 +129,58 @@ public abstract class XCCGroup
                     bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                 }
                 var receivedBinaryBuffer = bufferList.ToArray();
-                if (receiveResult.MessageType == WebSocketMessageType.Text)
+                switch (receiveResult.MessageType)
                 {
-                    try
-                    {
-                        var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
-                        var isHistory = receivedMessage.StartsWith("[XCCGetHistory]");
-                        if (isHistory)
+                    case WebSocketMessageType.Text:
+                        try
                         {
-                            receivedMessage = receivedMessage[15..];
+                            var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
+                            var isHistory = receivedMessage.StartsWith("[XCCGetHistory]");
+                            if (isHistory)
+                            {
+                                receivedMessage = receivedMessage[15..];
+                            }
+                            var unPackedMessage = receivedMessage.ToXFEArray<string>();
+                            var messageId = unPackedMessage[0];
+                            var signature = unPackedMessage[1];
+                            var message = unPackedMessage[2];
+                            var senderName = unPackedMessage[3];
+                            var sendTime = DateTime.Parse(unPackedMessage[4]);
+                            var messageType = signature switch
+                            {
+                                "[XCCTextMessage]" => XCCTextMessageType.Text,
+                                "[XCCImage]" => XCCTextMessageType.Image,
+                                "[XCCAudio]" => XCCTextMessageType.Audio,
+                                "[XCCVideo]" => XCCTextMessageType.Video,
+                                _ => XCCTextMessageType.Text
+                            };
+                            workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.TextMessageClient, messageId, messageType, message, senderName, sendTime, isHistory));
                         }
-                        var unPackedMessage = receivedMessage.ToXFEArray<string>();
-                        var messageId = unPackedMessage[0];
-                        var signature = unPackedMessage[1];
-                        var message = unPackedMessage[2];
-                        var senderName = unPackedMessage[3];
-                        var sendTime = DateTime.Parse(unPackedMessage[4]);
-                        var messageType = XCCTextMessageType.Text;
-                        switch (signature)
+                        catch (Exception ex)
                         {
-                            case "[XCCTextMessage]":
-                                messageType = XCCTextMessageType.Text;
-                                break;
-                            case "[XCCImage]":
-                                messageType = XCCTextMessageType.Image;
-                                break;
-                            case "[XCCAudio]":
-                                messageType = XCCTextMessageType.Audio;
-                                break;
-                            case "[XCCVideo]":
-                                messageType = XCCTextMessageType.Video;
-                                break;
+                            workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.TextMessageClient, null, null, new XFECyberCommException("接收XCC服务器消息时发生异常", ex)));
                         }
-                        workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.TextMessageClient, messageId, messageType, message, senderName, sendTime, isHistory));
-                    }
-                    catch (Exception ex)
-                    {
-                        workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.TextMessageClient, null, null, new XFECyberCommException("接收XCC服务器消息时发生异常", ex)));
-                    }
-                }
-                else if (receiveResult.MessageType == WebSocketMessageType.Binary)
-                {
-                    try
-                    {
-                        var xFEBuffer = XFEBuffer.ToXFEBuffer(receivedBinaryBuffer);
-                        var signature = Encoding.UTF8.GetString(xFEBuffer["Type"]);
-                        var messageId = Encoding.UTF8.GetString(xFEBuffer["ID"]);
-                        if (signature == "callback")
-                            UpdateTaskTrigger?.Invoke(true, messageId);
-                    }
-                    catch (Exception ex)
-                    {
-                        workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.TextMessageClient, null, null, new XFECyberCommException("接收XCC服务器消息时发生异常", ex)));
-                    }
+
+                        break;
+                    case WebSocketMessageType.Binary:
+                        try
+                        {
+                            var xFEBuffer = XFEBuffer.ToXFEBuffer(receivedBinaryBuffer);
+                            var signature = Encoding.UTF8.GetString(xFEBuffer["Type"]);
+                            var messageId = Encoding.UTF8.GetString(xFEBuffer["ID"]);
+                            if (signature == "callback")
+                                UpdateTaskTrigger?.Invoke(true, messageId);
+                        }
+                        catch (Exception ex)
+                        {
+                            workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.TextMessageClient, null, null, new XFECyberCommException("接收XCC服务器消息时发生异常", ex)));
+                        }
+
+                        break;
+                    case WebSocketMessageType.Close:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(receivedBinaryBuffer), "未知的WebSocket消息类型");
                 }
             }
             catch (Exception ex)
@@ -264,8 +265,8 @@ public abstract class XCCGroup
         {
             try
             {
-                byte[] receiveBuffer = new byte[1024];
-                WebSocketReceiveResult receiveResult = await FileTransportClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                var receiveBuffer = new byte[1024];
+                var receiveResult = await FileTransportClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
                 var bufferList = new List<byte>();
                 bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                 //ReceiveCompletedMessageByUsingWhile
@@ -286,9 +287,9 @@ public abstract class XCCGroup
                     if (signature == "callback")
                         return;
                     var messageId = Encoding.UTF8.GetString(xFEBuffer["ID"]);
-                    bool isHistory = Encoding.UTF8.GetString(xFEBuffer["IsHistory"]) == "True";
+                    var isHistory = Encoding.UTF8.GetString(xFEBuffer["IsHistory"]) == "True";
                     var sendTime = DateTime.Parse(Encoding.UTF8.GetString(xFEBuffer["SendTime"]));
-                    byte[] unPackedBuffer = xFEBuffer[sender];
+                    var unPackedBuffer = xFEBuffer[sender];
                     switch (signature)
                     {
                         case "text":
@@ -370,7 +371,7 @@ public abstract class XCCGroup
     {
         try
         {
-            byte[] sendBuffer = Encoding.UTF8.GetBytes(new[] { messageId, "[XCCTextMessage]", message }.ToXFEString());
+            var sendBuffer = Encoding.UTF8.GetBytes(new[] { messageId, "[XCCTextMessage]", message }.ToXFEString());
             await TextMessageClientWebSocket!.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
             _ = Task.Run(async () =>
             {
@@ -392,10 +393,12 @@ public abstract class XCCGroup
     /// <exception cref="XFECyberCommException"></exception>
     /// <returns>服务器接收校验是否成功</returns>
     [Obsolete("发送者已统一，请使用SendTextMessage或SendBinaryTextMessage")]
+    // ReSharper disable once UnusedParameter.Global
     public async Task<bool> SendStandardTextMessage(string role, string message)
     {
         try { return await SendTextMessage(message); } catch (Exception ex) { throw new XFECyberCommException("客户端发送文本到服务器时出现异常", ex); }
     }
+
     /// <summary>
     /// 发送签名二进制消息
     /// </summary>
@@ -501,7 +504,7 @@ public abstract class XCCGroup
         try
         {
             var messageId = Guid.NewGuid().ToString();
-            byte[] sendBuffer = Encoding.UTF8.GetBytes(new[] { messageId, "[XCCGetHistory]", "[XCCGetHistory]" }.ToXFEString());
+            var sendBuffer = Encoding.UTF8.GetBytes(new[] { messageId, "[XCCGetHistory]", "[XCCGetHistory]" }.ToXFEString());
             await TextMessageClientWebSocket!.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
             _ = Task.Run(async () =>
             {

@@ -67,7 +67,7 @@ public class ObjectAnalyzer : StringConverter
             else
             {
                 var tabString = string.Empty;
-                for (int k = 0; k < objectInfo.Layer; k++)
+                for (var k = 0; k < objectInfo.Layer; k++)
                 {
                     tabString += "│    ";
                 }
@@ -92,11 +92,11 @@ public class ObjectAnalyzer : StringConverter
     public override string OutPutSubObjects(ISubObjects subObjects)
     {
         var outString = string.Empty;
-        for (int i = 0; i < subObjects.Count; i++)
+        for (var i = 0; i < subObjects.Count; i++)
         {
             var obj = subObjects[i];
             var tabString = string.Empty;
-            for (int k = 0; k < obj.Layer; k++)
+            for (var k = 0; k < obj.Layer; k++)
             {
                 tabString += "│    ";
             }

@@ -28,7 +28,7 @@ public class GPTMessage(string role, string content)
     public string Content { get; set; } = content;
     private static string SetRoleAndCheckRoleLegal(string inputRole)
     {
-        string lowerRole = inputRole.ToLower();
+        var lowerRole = inputRole.ToLower();
         if (lowerRole is "system" or "user" or "assistant")
         {
             return lowerRole;

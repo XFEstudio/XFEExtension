@@ -62,8 +62,8 @@ public class XFEFileWatcher
 
     private void MonitorSubdirectories(string folderPath)
     {
-        string[] subdirectories = Directory.GetDirectories(folderPath);
-        foreach (string subdirectory in subdirectories)
+        var subdirectories = Directory.GetDirectories(folderPath);
+        foreach (var subdirectory in subdirectories)
         {
             try
             {
@@ -167,7 +167,7 @@ public class XFEFileWatcher
     /// </summary>
     public void StopWatching()
     {
-        foreach (FileSystemWatcher watcher in watchers)
+        foreach (var watcher in watchers)
         {
             watcher.EnableRaisingEvents = false;
         }
@@ -177,7 +177,7 @@ public class XFEFileWatcher
     /// </summary>
     public void ContinueWatching()
     {
-        foreach (FileSystemWatcher watcher in watchers)
+        foreach (var watcher in watchers)
         {
             watcher.EnableRaisingEvents = true;
         }
@@ -187,7 +187,7 @@ public class XFEFileWatcher
     /// </summary>
     public void Dispose()
     {
-        foreach (FileSystemWatcher watcher in watchers)
+        foreach (var watcher in watchers)
         {
             watcher.Dispose();
         }

@@ -221,7 +221,7 @@ public class XFEMultiDictionary : ICollection<XFEEntry>
     /// <returns></returns>
     public override string ToString()
     {
-        string result = "";
+        var result = "";
         foreach (var entry in xFEMultiDictionaryList)
         {
             result += entry.ToString();
@@ -236,10 +236,10 @@ public class XFEMultiDictionary : ICollection<XFEEntry>
     protected static List<XFEEntry> ToList(string dictionaryString)
     {
         List<XFEEntry> xFEList = [];
-        string[] messages = dictionaryString.Split(XFEDictionary.DictionarySeparator, StringSplitOptions.None);
-        foreach (string message in messages)
+        var messages = dictionaryString.Split(XFEDictionary.DictionarySeparator, StringSplitOptions.None);
+        foreach (var message in messages)
         {
-            string[] xFEDictionaryString = message.Split(XFEDictionary.EntrySeparator, StringSplitOptions.None);
+            var xFEDictionaryString = message.Split(XFEDictionary.EntrySeparator, StringSplitOptions.None);
             if (xFEDictionaryString.Length == 5)
             {
                 xFEList.Add(new XFEEntry(xFEDictionaryString[1].Replace("[++", "[+").Replace("++]", "+]").Replace("|{++", "|{+").Replace("++}|", "+}|"), xFEDictionaryString[3].Replace("[++", "[+").Replace("++]", "+]").Replace("|{++", "|{+").Replace("++}|", "+}|")));
@@ -273,7 +273,7 @@ public class XFEMultiDictionary : ICollection<XFEEntry>
     {
         if (!(headerAndContentStrings.Length % 2 == 0))
             throw new XFEDictionaryException("输入的字符串数组格式不正确，应为Header，Content，Header，Content...");
-        for (int i = 0; i < headerAndContentStrings.Length; i += 2)
+        for (var i = 0; i < headerAndContentStrings.Length; i += 2)
         {
             xFEMultiDictionaryList.Add(new XFEEntry(headerAndContentStrings[i], headerAndContentStrings[i + 1]));
         }

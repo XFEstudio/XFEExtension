@@ -50,8 +50,8 @@ public static class ArrayExtension
         /// <returns>T类型的数组</returns>
         public T[] ToXFEArray<T>()
         {
-            string[] strings = str.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 0; i < strings.Length; i++)
+            var strings = str.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
+            for (var i = 0; i < strings.Length; i++)
             {
                 strings[i] = strings[i].Replace("[++", "[+").Replace("++]", "+]");
             }
@@ -77,7 +77,7 @@ public static class ArrayExtension
             if (objects is null)
                 return null;
             var types = new Type[objects.Length];
-            for (int i = 0; i < objects.Length; i++)
+            for (var i = 0; i < objects.Length; i++)
             {
                 types[i] = objects[i].GetType();
             }

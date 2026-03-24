@@ -23,8 +23,8 @@ public static class XFEChatGPTExtension
             return false;
         }
 
-        string lastRole = xFEGPTMessages[0].Role;
-        for (int i = 1; i < xFEGPTMessages.Length; i++)
+        var lastRole = xFEGPTMessages[0].Role;
+        for (var i = 1; i < xFEGPTMessages.Length; i++)
         {
             if (xFEGPTMessages[i].Role == lastRole)
             {

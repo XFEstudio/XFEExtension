@@ -22,10 +22,10 @@ public static class JsonStringExtension
         {
             if (str == string.Empty)
                 return string.Empty;
-            int beginIndex = str.IndexOf(beginString, StringComparison.Ordinal);
+            var beginIndex = str.IndexOf(beginString, StringComparison.Ordinal);
             if (beginIndex is -1 or 0)
                 return string.Empty;
-            int endIndex = str.IndexOf(endString, beginIndex, StringComparison.Ordinal);
+            var endIndex = str.IndexOf(endString, beginIndex, StringComparison.Ordinal);
             return endIndex is -1 or 0 ? string.Empty : str.Substring(beginIndex + beginString.Length, endIndex - beginIndex - beginString.Length);
         }
 

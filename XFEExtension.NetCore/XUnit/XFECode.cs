@@ -68,7 +68,7 @@ public abstract class XFECode
     protected static async Task<List<Task>> Circle(Action action, int count, bool autoWaitAll = false)
     {
         var taskList = new List<Task>();
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             taskList.Add(action.StartNewTask());
         }
@@ -83,7 +83,7 @@ public abstract class XFECode
     /// <param name="count">循环次数</param>
     protected static async void CircleOrderly(Action action, int count)
     {
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             await action.StartNewTask();
         }
@@ -191,8 +191,8 @@ public abstract class XFECode
                 foreach (var method in singleRunMethods)
                 {
                     var attributes = method.GetCustomAttributes<SMTestAttribute>();
-                    bool useXFEConsole = false;
-                    int consolePort = 3280;
+                    var useXFEConsole = false;
+                    var consolePort = 3280;
                     foreach (var customAttribute in method.CustomAttributes)
                     {
                         if (customAttribute is not null && customAttribute.AttributeType.Name == "UseXFEConsoleAttribute")
@@ -209,7 +209,7 @@ public abstract class XFECode
                     {
                         if (likeAttribute is SMTestAttribute attribute)
                         {
-                            string timerName = "方法名：" + method.Name;
+                            var timerName = "方法名：" + method.Name;
                             if (likeAttribute is SMNTestAttribute subAttribute)
                             {
                                 timerName = "标识名：" + subAttribute.TimerName;
@@ -246,7 +246,7 @@ public abstract class XFECode
                             var borderCount = (Console.BufferWidth - timerName.DisplayLength()) / 2;
                             if (timerName is not null)
                             {
-                                for (int i = 0; i < borderCount; i++)
+                                for (var i = 0; i < borderCount; i++)
                                 {
                                     Console.Write("=");
                                 }
@@ -257,14 +257,14 @@ public abstract class XFECode
                                 Console.ForegroundColor = methodColor;
                                 Console.Write(timerName[4..]);
                                 Console.ForegroundColor = methodBorderColor;
-                                for (int i = 0; i < borderCount; i++)
+                                for (var i = 0; i < borderCount; i++)
                                 {
                                     Console.Write("=");
                                 }
                             }
                             else
                             {
-                                for (int i = 0; i < Console.BufferWidth; i++)
+                                for (var i = 0; i < Console.BufferWidth; i++)
                                 {
                                     Console.Write("=");
                                 }
@@ -405,7 +405,7 @@ public abstract class XFECode
                             Console.Write("\n");
                             Console.ForegroundColor = methodBorderColor;
                             Console.Write("\n");
-                            for (int i = 0; i < Console.BufferWidth; i++)
+                            for (var i = 0; i < Console.BufferWidth; i++)
                             {
                                 Console.Write("=");
                             }
@@ -444,7 +444,7 @@ public abstract class XFECode
                         var setUpMethod = subClass.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).Where(m => m.IsDefined(typeof(SetUpAttribute))).FirstOrDefault();
                         setUpMethod?.Invoke(classInstance, setUpMethod.GetDefaultParameters());
                     }
-                    string classOtherName = "类名：" + subClass.Name;
+                    var classOtherName = "类名：" + subClass.Name;
                     if (classAttribute is CNTestAttribute subClassAttribute)
                     {
                         classOtherName = "标识名：" + subClassAttribute.ClassOtherName;
@@ -463,7 +463,7 @@ public abstract class XFECode
                     var borderCount = (Console.BufferWidth - classOtherName.DisplayLength()) / 2;
                     if (classOtherName is not null)
                     {
-                        for (int i = 0; i < borderCount; i++)
+                        for (var i = 0; i < borderCount; i++)
                         {
                             Console.Write("=");
                         }
@@ -483,14 +483,14 @@ public abstract class XFECode
                             Console.Write(classOtherName[3..]);
                         }
                         Console.ForegroundColor = classBorderColor;
-                        for (int i = 0; i < borderCount; i++)
+                        for (var i = 0; i < borderCount; i++)
                         {
                             Console.Write("=");
                         }
                     }
                     else
                     {
-                        for (int i = 0; i < Console.BufferWidth; i++)
+                        for (var i = 0; i < Console.BufferWidth; i++)
                         {
                             Console.Write("=");
                         }
@@ -509,8 +509,8 @@ public abstract class XFECode
                     foreach (var method in classRunMethods)
                     {
                         var attributes = method.GetCustomAttributes<MTestAttribute>();
-                        bool useXFEConsole = false;
-                        int consolePort = 3280;
+                        var useXFEConsole = false;
+                        var consolePort = 3280;
                         foreach (var customAttribute in method.CustomAttributes)
                         {
                             if (customAttribute is not null && customAttribute.AttributeType.Name == "UseXFEConsoleAttribute")
@@ -523,19 +523,17 @@ public abstract class XFECode
                                 }
                             }
                         }
-                        foreach (MTestAttribute attribute in attributes)
+                        foreach (var attribute in attributes)
                         {
                             if (attribute is MTestAttribute methodAttribute)
                             {
-                                string methodOtherName = "方法名：" + method.Name;
-                                if (attribute is MNTestAttribute subAttribute)
+                                var methodOtherName = attribute switch
                                 {
-                                    methodOtherName = "标识名：" + subAttribute.MethodOtherName;
-                                }
-                                if (attribute is MNRTestAttribute resultAttribute)
-                                {
-                                    methodOtherName = "标识名：" + resultAttribute.MethodOtherName;
-                                }
+                                    MNTestAttribute subAttribute => "标识名：" + subAttribute.MethodOtherName,
+                                    MNRTestAttribute resultAttribute => "标识名：" + resultAttribute.MethodOtherName,
+                                    _ => "方法名：" + method.Name
+                                };
+
                                 object?[]? paramsForMethod;
                                 if (attribute.Params is not null)
                                 {
@@ -564,7 +562,7 @@ public abstract class XFECode
                                 borderCount = (Console.BufferWidth - methodOtherName.DisplayLength()) / 2;
                                 if (methodOtherName is not null)
                                 {
-                                    for (int i = 0; i < borderCount; i++)
+                                    for (var i = 0; i < borderCount; i++)
                                     {
                                         Console.Write("=");
                                     }
@@ -575,14 +573,14 @@ public abstract class XFECode
                                     Console.ForegroundColor = methodColor;
                                     Console.Write(methodOtherName[4..]);
                                     Console.ForegroundColor = methodBorderColor;
-                                    for (int i = 0; i < borderCount; i++)
+                                    for (var i = 0; i < borderCount; i++)
                                     {
                                         Console.Write("=");
                                     }
                                 }
                                 else
                                 {
-                                    for (int i = 0; i < Console.BufferWidth; i++)
+                                    for (var i = 0; i < Console.BufferWidth; i++)
                                     {
                                         Console.Write("=");
                                     }
@@ -724,7 +722,7 @@ public abstract class XFECode
                                 Console.Write("\n");
                                 Console.ForegroundColor = methodBorderColor;
                                 Console.Write("\n");
-                                for (int i = 0; i < Console.BufferWidth; i++)
+                                for (var i = 0; i < Console.BufferWidth; i++)
                                 {
                                     Console.Write("=");
                                 }
@@ -800,7 +798,7 @@ public abstract class XFECode
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.ForegroundColor = classBorderColor;
                     Console.Write("\n");
-                    for (int i = 0; i < Console.BufferWidth; i++)
+                    for (var i = 0; i < Console.BufferWidth; i++)
                     {
                         Console.Write("=");
                     }

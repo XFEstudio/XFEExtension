@@ -183,14 +183,14 @@ public class XFEChatGPT : XFEChatGPTBase
     /// <returns></returns>
     public static async Task<string> SendAndGetGPTResponse(string message)
     {
-        string receivedMessage = string.Empty;
+        var receivedMessage = string.Empty;
         try
         {
             ClientWebSocket webSocket = new();
             await webSocket.ConnectAsync(new Uri("ws://gpt.api.xfegzs.com/"), CancellationToken.None);
             await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(message)), WebSocketMessageType.Text, true, CancellationToken.None);
-            byte[] buffer = new byte[1024];
-            WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            var buffer = new byte[1024];
+            var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             receivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
             await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection closed.", CancellationToken.None);
         }
@@ -209,7 +209,7 @@ public class XFEChatGPT : XFEChatGPTBase
     /// <returns></returns>
     public static async Task<string> GPTAPIKeyCommand(string password, ApiKeyCommand apiKeyCommand, string commandString)
     {
-        string receivedMessage = string.Empty;
+        var receivedMessage = string.Empty;
         try
         {
             string? command;
@@ -225,8 +225,8 @@ public class XFEChatGPT : XFEChatGPTBase
             webSocket.Options.SetRequestHeader("XFEPassword", password);
             await webSocket.ConnectAsync(new Uri("ws://api.xfegzs.com/"), CancellationToken.None);
             await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(command)), WebSocketMessageType.Text, true, CancellationToken.None);
-            byte[] buffer = new byte[1024];
-            WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            var buffer = new byte[1024];
+            var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             receivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
             await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection closed.", CancellationToken.None);
         }
@@ -241,11 +241,11 @@ public class XFEChatGPT : XFEChatGPTBase
     private async void StartGetGPTMessage(object? sender)
     {
         var messageIdAndThread = (MessageIdAndThread)sender!;
-        string messageId = messageIdAndThread.MessageId;
-        Thread thread = messageIdAndThread.Thread;
+        var messageId = messageIdAndThread.MessageId;
+        var thread = messageIdAndThread.Thread;
         if (StreamMode)
         {
-            bool isStarted = false;
+            var isStarted = false;
             try
             {
                 #region 进行HTTP请求
@@ -258,7 +258,7 @@ public class XFEChatGPT : XFEChatGPTBase
                 while (true)
                 {
                     #region 读取消息
-                    byte[] buffer = new byte[1024];
+                    var buffer = new byte[1024];
                     var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);//接收消息
                     var nowReceivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);//将消息转换为字符串
                     #endregion
@@ -349,9 +349,9 @@ public class XFEChatGPT : XFEChatGPTBase
                     await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(json)), WebSocketMessageType.Text, true, CancellationToken.None);
                 #endregion
                 #region 读取消息
-                byte[] buffer = new byte[1024];
-                WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);//接收消息
-                string nowReceivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);//将消息转换为字符串
+                var buffer = new byte[1024];
+                var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);//接收消息
+                var nowReceivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);//将消息转换为字符串
                 #endregion
                 if (XFEComProtocol == XFEComProtocol.XFEFAST)
                 {

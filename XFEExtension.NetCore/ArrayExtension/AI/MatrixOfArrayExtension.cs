@@ -27,7 +27,7 @@ public static class MatrixOfArrayExtension
     /// <param name="arrays"></param>
     public static void OutPutInMatrix<T>(this T[][] arrays)
     {
-        for (int i = 0; i < arrays.GetLength(0); i++)
+        for (var i = 0; i < arrays.GetLength(0); i++)
         {
             int j;
             Console.Write("[");
@@ -45,7 +45,7 @@ public static class MatrixOfArrayExtension
     /// <param name="arrays"></param>
     public static void OutPutInMatrix<T>(this T[,] arrays)
     {
-        for (int i = 0; i < arrays.GetLength(0); i++)
+        for (var i = 0; i < arrays.GetLength(0); i++)
         {
             int j;
             Console.Write("[");

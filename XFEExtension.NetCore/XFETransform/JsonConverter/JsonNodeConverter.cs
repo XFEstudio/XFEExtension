@@ -26,10 +26,10 @@ public class JsonNodeConverter(string jsonString)
     public JsonNode ConvertToJsonNode()
     {
         var jsonNode = new JsonComplexPropertyNode();
-        CurrentState currentState = CurrentState.None;
-        JsonSymbol lastSymbol = JsonSymbol.Brace;
-        JsonSymbol currentSymbol = JsonSymbol.Brace;
-        for (int i = 0; i < jsonString.Length; i++)
+        var currentState = CurrentState.None;
+        var lastSymbol = JsonSymbol.Brace;
+        var currentSymbol = JsonSymbol.Brace;
+        for (var i = 0; i < jsonString.Length; i++)
         {
             var current = jsonString[i];
             var currentJsonComplexJsonNode = GetJsonNodeByIndex(jsonNode, currentPosition);
@@ -265,9 +265,9 @@ public class JsonNodeConverter(string jsonString)
     private static JsonComplexPropertyNode GetJsonNodeByIndex(JsonComplexPropertyNode jsonComplexPropertyNode, List<short> indexes)
     {
         var currentJsonComplexPropertyNode = jsonComplexPropertyNode;
-        for (int i = 0; i < indexes.Count - 1; i++)
+        for (var i = 0; i < indexes.Count - 1; i++)
         {
-            short index = indexes[i];
+            var index = indexes[i];
             // Guard against invalid indexes to avoid ArgumentOutOfRangeException.
             if (index < 0 || index >= currentJsonComplexPropertyNode.DescendingNodes.Count)
             {

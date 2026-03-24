@@ -38,7 +38,7 @@ public static class FileExtension
             FileInfo fileInfo = new(name);
             if (fileInfo.Exists)
             {
-                using StreamReader streamReader = fileInfo.OpenText();
+                using var streamReader = fileInfo.OpenText();
                 content = streamReader.ReadToEnd();
                 streamReader.Close();
                 return true;
@@ -121,7 +121,7 @@ public static class FileExtension
         {
             BinaryFormatter readBinary = new();
             using var readStream = File.OpenRead(name);
-            T obj = (T)readBinary.Deserialize(readStream);
+            var obj = (T)readBinary.Deserialize(readStream);
             readStream.Close();
             return obj;
         }
@@ -135,9 +135,9 @@ public static class FileExtension
             try
             {
                 // 获取所有正在运行的进程
-                Process[] processes = Process.GetProcesses();
+                var processes = Process.GetProcesses();
 
-                foreach (Process process in processes)
+                foreach (var process in processes)
                 {
                     try
                     {
@@ -172,7 +172,7 @@ public static class FileExtension
         exist = fileInfo.Exists;
         if (!fileInfo.Exists)
             return "-1";
-        using StreamReader streamReader = fileInfo.OpenText();
+        using var streamReader = fileInfo.OpenText();
         var text = streamReader.ReadLine();
         streamReader.Close();
         return text;
@@ -202,7 +202,7 @@ public static class FileExtension
     {
         string[] sizes = ["B", "KB", "MB", "GB", "TB"];
         double len = bufferLength;
-        int order = 0;
+        var order = 0;
         while (len >= 1024 && order < sizes.Length - 1)
         {
             order++;
@@ -222,11 +222,11 @@ public static class FileExtension
         /// <returns>一个长整型，介于起始位置和结束位置之间</returns>
         public async Task<long> GetValidPosition(long startPosition, long endPosition)
         {
-            long seekPosition = endPosition;
+            var seekPosition = endPosition;
             fileStream.Seek(startPosition, SeekOrigin.Begin);
-            byte[] buffer = new byte[endPosition - startPosition];
+            var buffer = new byte[endPosition - startPosition];
             await fileStream.ReadExactlyAsync(buffer.AsMemory(0, (int)(endPosition - startPosition)));
-            for (int i = buffer.Length - 1; i >= 0; i--)
+            for (var i = buffer.Length - 1; i >= 0; i--)
             {
                 if (buffer[i] != 0)
                     break;

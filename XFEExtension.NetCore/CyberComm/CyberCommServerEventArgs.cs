@@ -28,7 +28,7 @@ public abstract record CyberCommServerEventArgs(Uri? RequestUrl, BackMessageType
     {
         try
         {
-            byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
+            var sendBuffer = Encoding.UTF8.GetBytes(message);
             await CurrentWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
         }
         catch (Exception ex)

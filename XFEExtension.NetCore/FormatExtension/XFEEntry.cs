@@ -30,10 +30,10 @@ public class XFEEntry(string header, string content)
     /// <returns></returns>
     public static XFEEntry? ToEntry(string entryString)
     {
-        string[] messages = entryString.Split(XFEDictionary.DictionarySeparator, StringSplitOptions.None);
-        foreach (string message in messages)
+        var messages = entryString.Split(XFEDictionary.DictionarySeparator, StringSplitOptions.None);
+        foreach (var message in messages)
         {
-            string[] xFEDictionaryString = message.Split(XFEDictionary.EntrySeparator, StringSplitOptions.None);
+            var xFEDictionaryString = message.Split(XFEDictionary.EntrySeparator, StringSplitOptions.None);
             if (xFEDictionaryString.Length == 5)
             {
                 return new XFEEntry(xFEDictionaryString[1].Replace("[++", "[+").Replace("++]", "+]").Replace("|{++", "|{+").Replace("++}|", "+}|"), xFEDictionaryString[3].Replace("[++", "[+").Replace("++]", "+]").Replace("|{++", "|{+").Replace("++}|", "+}|"));

@@ -57,22 +57,22 @@ public class XFEDownloader : IDisposable
         long totalRead = 0;
         var getInfoClient = new HttpClient();
         responseMessage ??= await GetHttpResponseMessage(getInfoClient, CancellationToken.None);
-        long? totalFileSize = responseMessage.Content.Headers.ContentLength;
+        var totalFileSize = responseMessage.Content.Headers.ContentLength;
         using var createFileStream = new FileStream(SavePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite, 8192, true);
         if (totalFileSize is not null)
             createFileStream.SetLength(totalFileSize.Value);
-        for (int i = 0; i < FileSegmentCount; i++)
+        for (var i = 0; i < FileSegmentCount; i++)
         {
-            int currentSegment = i;
+            var currentSegment = i;
             downloadTasks.Add(Task.Run(async () =>
             {
                 using var fileStream = new FileStream(SavePath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, 8192, true);
-                long currentSegmentTotalBufferSize = fileStream.Length / FileSegmentCount;
-                long endPosition = currentSegment == FileSegmentCount - 1 ? fileStream.Length : currentSegmentTotalBufferSize * (currentSegment + 1);
-                long startBufferIndex = currentSegmentTotalBufferSize * currentSegment;
-                long startPosition = continueDownload ? await fileStream.GetValidPosition(startBufferIndex, endPosition) : startBufferIndex;
+                var currentSegmentTotalBufferSize = fileStream.Length / FileSegmentCount;
+                var endPosition = currentSegment == FileSegmentCount - 1 ? fileStream.Length : currentSegmentTotalBufferSize * (currentSegment + 1);
+                var startBufferIndex = currentSegmentTotalBufferSize * currentSegment;
+                var startPosition = continueDownload ? await fileStream.GetValidPosition(startBufferIndex, endPosition) : startBufferIndex;
                 fileStream.Seek(startPosition, SeekOrigin.Begin);
-                long currentSegmentDownloadedBuffeSize = startPosition - startBufferIndex;
+                var currentSegmentDownloadedBuffeSize = startPosition - startBufferIndex;
                 var httpClient = new HttpClient();
                 httpClientList.Add(httpClient);
                 httpClient.DefaultRequestHeaders.Range = new RangeHeaderValue(startPosition, endPosition);
@@ -81,7 +81,7 @@ public class XFEDownloader : IDisposable
                 var cancellationTokenSource = new CancellationTokenSource();
                 var cancellationToken = cancellationTokenSource.Token;
                 using var contentStream = await (await GetHttpResponseMessage(httpClient, cancellationToken)).Content.ReadAsStreamAsync(cancellationToken);
-                byte[] buffer = new byte[8192];
+                var buffer = new byte[8192];
                 int currentRead;
                 while ((currentRead = await contentStream.ReadAsync(buffer)) > 0 && !disposedValue)
                 {
@@ -193,7 +193,7 @@ public class XFEDownloader : IDisposable
     {
         if (string.IsNullOrEmpty(url))
             throw new ArgumentException($"“{nameof(url)}”不能为 null 或空。", nameof(url));
-        string filePath = url.GetFileNameFromURL().WaitAndGetResult()!;
+        var filePath = url.GetFileNameFromURL().WaitAndGetResult()!;
         DownloadUrl = url;
         SavePath = filePath;
     }

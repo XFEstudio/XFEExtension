@@ -97,8 +97,8 @@ public class CyberCommClient
         {
             try
             {
-                byte[] receiveBuffer = new byte[BufferLength];
-                WebSocketReceiveResult receiveResult = await ClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                var receiveBuffer = new byte[BufferLength];
+                var receiveResult = await ClientWebSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
                 var bufferList = new List<byte>();
                 bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                 //ReceiveCompletedMessageByUsingWhile
@@ -171,7 +171,7 @@ public class CyberCommClient
     {
         try
         {
-            byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
+            var sendBuffer = Encoding.UTF8.GetBytes(message);
             await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
         }
         catch (Exception ex)

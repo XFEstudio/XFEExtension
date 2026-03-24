@@ -98,7 +98,7 @@ public class LANDeviceDetector
     {
         var tasks = new List<Task>();
         var findDevices = new List<LANDevice>();
-        for (int i = 1; i < 256; i++)
+        for (var i = 1; i < 256; i++)
         {
             var currentIndex = i;
             tasks.Add(Task.Run(async () =>

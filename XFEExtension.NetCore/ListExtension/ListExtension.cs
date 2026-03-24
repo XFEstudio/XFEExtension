@@ -13,7 +13,7 @@ public static class ListExtension
     /// <returns></returns>
     public static string ToXFEString<T>(this List<T> list)
     {
-        string str = string.Empty;
+        var str = string.Empty;
         foreach (var ary in list)
         {
             if (ary is not null)
@@ -30,7 +30,7 @@ public static class ListExtension
     /// <returns></returns>
     public static string ToXFEString<T>(this List<T> list, string propertyName) where T : class
     {
-        string str = string.Empty;
+        var str = string.Empty;
         foreach (var ary in list)
         {
             if (ary is not null)
@@ -46,9 +46,9 @@ public static class ListExtension
     /// <returns>T类型的List列表</returns>
     public static List<T> ToXFEList<T>(this string str)
     {
-        string[] strings = str.Split(new[] { "[+-", "-+]" }, StringSplitOptions.RemoveEmptyEntries);
-        List<T> list = new List<T>();
-        for (int j = 1; j < strings.Length - 1; j += 2)
+        var strings = str.Split(new[] { "[+-", "-+]" }, StringSplitOptions.RemoveEmptyEntries);
+        var list = new List<T>();
+        for (var j = 1; j < strings.Length - 1; j += 2)
         {
             list.Add((T)Convert.ChangeType(strings[j].Replace("[++", "[+").Replace("++]", "+]"), typeof(T)));
         }

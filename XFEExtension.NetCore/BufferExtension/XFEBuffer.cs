@@ -51,7 +51,7 @@ public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
     {
         var xFEBuffer = new XFEBuffer();
         var buffers = buffer.UnPackBuffer();
-        for (int i = 0; i < buffers.Count; i++)
+        for (var i = 0; i < buffers.Count; i++)
         {
             if (i % 2 != 0)
                 continue;
@@ -81,7 +81,7 @@ public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
     {
         if (@params.Length % 2 != 0)
             throw new XFEExtensionException("头和Buffer必须成对输入");
-        for (int i = 0; i < @params.Length; i += 2)
+        for (var i = 0; i < @params.Length; i += 2)
         {
             bufferDictionary.Add(@params[i].ToString()!, (byte[])@params[i + 1]);
             headerBuffers.Add(Encoding.UTF8.GetBytes(@params[i].ToString()!));
@@ -150,7 +150,7 @@ public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
     {
         if (@params.Length % 2 != 0)
             throw new XFEExtensionException("头和Buffer必须成对输入");
-        for (int i = 0; i < @params.Length; i += 2)
+        for (var i = 0; i < @params.Length; i += 2)
         {
             bufferDictionary.Add(@params[i].ToString()!, (byte[])@params[i + 1]);
             headerBuffers.Add(Encoding.UTF8.GetBytes(@params[i].ToString()!));

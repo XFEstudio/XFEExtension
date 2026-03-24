@@ -118,7 +118,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     /// <returns>插入的消息ID</returns>
     public string InsertDialog(string dialogId, string userMessage, string assistantMessage)
     {
-        string messageId = Guid.NewGuid().ToString();
+        var messageId = Guid.NewGuid().ToString();
         xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId, new GPTMessage("user", userMessage)));
         xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId + "_Assistant", new GPTMessage("assistant", assistantMessage)));
         return messageId;
@@ -155,8 +155,8 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                 throw new XFEChatGPTException("dialogMessage不合法！只能成对添加user和assistant");
             }
 
-            string[] messageId = new string[dialogMessage.Length];
-            for (int i = 0; i < dialogMessage.Length; i += 2)
+            var messageId = new string[dialogMessage.Length];
+            for (var i = 0; i < dialogMessage.Length; i += 2)
             {
                 messageId[i] = Guid.NewGuid().ToString();
                 messageId[i + 1] = messageId[i] + "_Assistant";
@@ -186,8 +186,8 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                 throw new XFEChatGPTException("dialogMessage不合法！只能成对添加user和assistant");
             }
 
-            string[] messageId = new string[dialogMessage.Length];
-            for (int i = 0; i < dialogMessage.Length; i += 2)
+            var messageId = new string[dialogMessage.Length];
+            for (var i = 0; i < dialogMessage.Length; i += 2)
             {
                 messageId[i] = Guid.NewGuid().ToString();
                 messageId[i + 1] = messageId[i] + "_Assistant";
@@ -227,7 +227,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                 throw new XFEChatGPTException("dialogMessage不合法！只能成对添加user和assistant");
             }
 
-            for (int i = 0; i < dialogMessage.Length; i += 2)
+            for (var i = 0; i < dialogMessage.Length; i += 2)
             {
                 xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i == 0 ? 0 : i / 2, 0])));
                 xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i == 0 ? 0 : i / 2, 1])));
@@ -259,7 +259,7 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                 throw new XFEChatGPTException("dialogMessage不合法！只能成对添加user和assistant");
             }
 
-            for (int i = 0; i < dialogMessage.Length; i += 2)
+            for (var i = 0; i < dialogMessage.Length; i += 2)
             {
                 xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i])));
                 xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i + 1])));
@@ -281,8 +281,8 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     {
         try
         {
-            string[] messageId = dialogMessage.Length % 2 == 0 ? new string[dialogMessage.Length] : new string[dialogMessage.Length + 1];
-            for (int i = 0; i < dialogMessage.Length; i += 2)
+            var messageId = dialogMessage.Length % 2 == 0 ? new string[dialogMessage.Length] : new string[dialogMessage.Length + 1];
+            for (var i = 0; i < dialogMessage.Length; i += 2)
             {
                 messageId[i] = Guid.NewGuid().ToString();
                 messageId[i + 1] = messageId[i] + "_Assistant";
@@ -363,13 +363,13 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
     private async void StartGetGPTMessage(object? sender)
     {
         var messageIdAndThread = (MessageIdDialogIdAndThread)sender!;
-        string dialogId = messageIdAndThread.DialogId;
-        string messageId = messageIdAndThread.MessageId;
-        Thread thread = messageIdAndThread.Thread;
+        var dialogId = messageIdAndThread.DialogId;
+        var messageId = messageIdAndThread.MessageId;
+        var thread = messageIdAndThread.Thread;
         var nowDialog = xFEGPTMemoryDialog[dialogId];
         if (nowDialog.StreamMode)
         {
-            bool isStarted = false;
+            var isStarted = false;
             try
             {
                 #region 进行HTTP请求
@@ -391,8 +391,8 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                 while (true)
                 {
                     #region 读取消息
-                    byte[] receiveBuffer = new byte[1024];
-                    WebSocketReceiveResult receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                    var receiveBuffer = new byte[1024];
+                    var receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
                     var bufferList = new List<byte>();
                     bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                     while (!receiveResult.EndOfMessage)
@@ -524,8 +524,8 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                 }
                 #endregion
                 #region 读取消息
-                byte[] receiveBuffer = new byte[1024];
-                WebSocketReceiveResult receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
+                var receiveBuffer = new byte[1024];
+                var receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
                 var bufferList = new List<byte>();
                 bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                 while (!receiveResult.EndOfMessage)

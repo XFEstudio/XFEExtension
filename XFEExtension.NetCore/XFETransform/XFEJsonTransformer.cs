@@ -22,7 +22,7 @@ public static class XFEJsonTransformer
             throw new XFEJsonTransformException("对象为空");
         }
 
-        Type type = obj.GetType();
+        var type = obj.GetType();
 
         if (IsSimpleType(type))
         {
@@ -44,22 +44,13 @@ public static class XFEJsonTransformer
 
     private static string? GetSimpleValueAsString(object value)
     {
-        if (value is string)
+        return value switch
         {
-            return $"\"{value}\"";
-        }
-
-        if (value is DateTime dateTime)
-        {
-            return $"\"{dateTime:s}\"";
-        }
-
-        if (value is bool boolValue)
-        {
-            return boolValue ? "true" : "false";
-        }
-
-        return value.ToString();
+            string => $"\"{value}\"",
+            DateTime dateTime => $"\"{dateTime:s}\"",
+            bool boolValue => boolValue ? "true" : "false",
+            _ => value.ToString()
+        };
     }
 
 

@@ -21,7 +21,7 @@ public class MultiEscapeConverter
     public string Convert(string str)
     {
         str = ConvertEscapeSymbol(str);
-        foreach (string escape in Escapes)
+        foreach (var escape in Escapes)
         {
             str = str.Replace(escape, $"{EscapeSymbol}{escape}");
         }
@@ -34,7 +34,7 @@ public class MultiEscapeConverter
     /// <returns></returns>
     public string Inverse(string str)
     {
-        foreach (string escape in Escapes)
+        foreach (var escape in Escapes)
         {
             str = str.Replace($"{EscapeSymbol}{escape}", escape);
         }

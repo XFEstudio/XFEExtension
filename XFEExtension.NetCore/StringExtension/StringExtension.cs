@@ -90,7 +90,7 @@ public static partial class StringExtension
         /// <returns></returns>
         public bool IsURL()
         {
-            string pattern = @"^(https?|ftp|file|ws)://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
+            var pattern = @"^(https?|ftp|file|ws)://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
             return IsMatch(pattern, telephoneNum);
         }
 
@@ -100,7 +100,7 @@ public static partial class StringExtension
         /// <returns></returns>
         public int DisplayLength()
         {
-            int lengthCount = 0;
+            var lengthCount = 0;
             var splits = telephoneNum.ToCharArray();
             foreach (var split in splits)
             {
@@ -172,10 +172,10 @@ public static partial class StringExtension
         {
             if (str is null)
                 return null;
-            Regex regex = UrlRegex();
-            MatchCollection matches = regex.Matches(str);
-            string[] result = new string[matches.Count];
-            for (int i = 0; i < matches.Count; i++)
+            var regex = UrlRegex();
+            var matches = regex.Matches(str);
+            var result = new string[matches.Count];
+            for (var i = 0; i < matches.Count; i++)
                 result[i] = matches[i].Value;
             return result;
         }
@@ -198,10 +198,10 @@ public static partial class StringExtension
         {
             if (str.IsNullOrWhiteSpace())
                 return [];
-            string pattern = $"{Regex.Escape(startString)}(.*?){Regex.Escape(endString)}";
+            var pattern = $"{Regex.Escape(startString)}(.*?){Regex.Escape(endString)}";
             var matches = Regex.Matches(str, pattern);
-            string[] result = new string[matches.Count];
-            for (int i = 0; i < matches.Count; i++)
+            var result = new string[matches.Count];
+            for (var i = 0; i < matches.Count; i++)
                 result[i] = matches[i].Groups[1].Value;
             return result;
         }
@@ -217,11 +217,11 @@ public static partial class StringExtension
             if (str is null)
                 return str;
             StringBuilder stringBuilder = new();
-            int startIndex = 0;
+            var startIndex = 0;
             while (startIndex < str.Length)
             {
                 // 寻找下一个换行位置
-                int endIndex = startIndex + width;
+                var endIndex = startIndex + width;
                 if (endIndex >= str.Length)
                 {
                     // 如果已经到达文本末尾，则直接添加剩余部分并结束循环
@@ -230,7 +230,7 @@ public static partial class StringExtension
                 }
 
                 // 在指定宽度范围内寻找最后一个空格字符
-                int lastSpaceIndex = str.LastIndexOf(' ', endIndex, width);
+                var lastSpaceIndex = str.LastIndexOf(' ', endIndex, width);
                 if (lastSpaceIndex > startIndex)
                 {
                     // 如果找到了空格字符，则将文本从起始位置到空格字符位置添加到结果中，并进行换行
@@ -316,13 +316,13 @@ public static partial class StringExtension
     /// <returns></returns>
     public static string GenerateRandomString(int length)
     {
-        string allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         Random random = new();
-        char[] randomChars = new char[length];
+        var randomChars = new char[length];
 
-        for (int i = 0; i < length; i++)
+        for (var i = 0; i < length; i++)
         {
-            int randomIndex = random.Next(0, allowedChars.Length);
+            var randomIndex = random.Next(0, allowedChars.Length);
             randomChars[i] = allowedChars[randomIndex];
         }
 
@@ -337,11 +337,11 @@ public static partial class StringExtension
     public static string GenerateRandomString(int length, string allowedChars)
     {
         Random random = new();
-        char[] randomChars = new char[length];
+        var randomChars = new char[length];
 
-        for (int i = 0; i < length; i++)
+        for (var i = 0; i < length; i++)
         {
-            int randomIndex = random.Next(0, allowedChars.Length);
+            var randomIndex = random.Next(0, allowedChars.Length);
             randomChars[i] = allowedChars[randomIndex];
         }
 
@@ -369,7 +369,7 @@ public static partial class StringExtension
             {
                 result = str.Split(delimiter, StringSplitOptions.None);
             }
-            for (int i = 0; i < result.Length - 1; i++)
+            for (var i = 0; i < result.Length - 1; i++)
             {
                 result[i] += delimiter;
             }

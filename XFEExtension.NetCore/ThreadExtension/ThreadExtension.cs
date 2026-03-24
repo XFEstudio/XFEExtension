@@ -22,7 +22,7 @@ public static class ThreadExtension
             {
                 while (true)
                 {
-                    bool isAllThreadComplete = true;
+                    var isAllThreadComplete = true;
                     foreach (var thread in threads)
                     {
                         if (thread.ThreadState != ThreadState.Stopped)
@@ -50,7 +50,7 @@ public static class ThreadExtension
             {
                 while (true)
                 {
-                    bool isAllThreadComplete = true;
+                    var isAllThreadComplete = true;
                     foreach (var thread in threads)
                     {
                         if (thread.ThreadState != threadState)

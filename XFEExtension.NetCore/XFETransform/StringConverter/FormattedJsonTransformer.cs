@@ -17,7 +17,7 @@ public class FormattedJsonTransformer : StringConverter
     {
         var outPutString = string.Empty;
         var tabString = string.Empty;
-        for (int k = 0; k < objectInfo.Layer; k++)
+        for (var k = 0; k < objectInfo.Layer; k++)
         {
             tabString += " ";
         }
@@ -25,29 +25,47 @@ public class FormattedJsonTransformer : StringConverter
         {
             if (IsEnumerableMember(objectInfo))
             {
-                if (objectInfo.Value is null)
-                    outPutString += $"{tabString}null";
-                else if (objectInfo.Value is string)
-                    outPutString += $"{tabString}\"{objectInfo.Value}\"";
-                else if (objectInfo.ObjectPlace == ObjectPlace.Enum)
-                    outPutString += $"{tabString}{(int)objectInfo.Value}";
-                else if (objectInfo.Value is bool)
-                    outPutString += $"{tabString}{objectInfo.Value.ToString()?.ToLower()}";
-                else
-                    outPutString += $"{tabString}\"{objectInfo.Value}\"";
+                switch (objectInfo.Value)
+                {
+                    case null:
+                        outPutString += $"{tabString}null";
+                        break;
+                    case string:
+                        outPutString += $"{tabString}\"{objectInfo.Value}\"";
+                        break;
+                    default:
+                    {
+                        if (objectInfo.ObjectPlace == ObjectPlace.Enum)
+                            outPutString += $"{tabString}{(int)objectInfo.Value}";
+                        else if (objectInfo.Value is bool)
+                            outPutString += $"{tabString}{objectInfo.Value.ToString()?.ToLower()}";
+                        else
+                            outPutString += $"{tabString}\"{objectInfo.Value}\"";
+                        break;
+                    }
+                }
             }
             else
             {
-                if (objectInfo.Value is null)
-                    outPutString += $"{tabString}\"{objectInfo.Name}\": null";
-                else if (objectInfo.Value is string)
-                    outPutString += $"{tabString}\"{objectInfo.Name}\": \"{objectInfo.Value}\"";
-                else if (objectInfo.ObjectPlace == ObjectPlace.Enum)
-                    outPutString += $"{tabString}\"{objectInfo.Name}\": {(int)objectInfo.Value}";
-                else if (objectInfo.Value is bool)
-                    outPutString += $"{tabString}\"{objectInfo.Name}\": {objectInfo.Value.ToString()?.ToLower()}";
-                else
-                    outPutString += $"{tabString}\"{objectInfo.Name}\": \"{objectInfo.Value}\"";
+                switch (objectInfo.Value)
+                {
+                    case null:
+                        outPutString += $"{tabString}\"{objectInfo.Name}\": null";
+                        break;
+                    case string:
+                        outPutString += $"{tabString}\"{objectInfo.Name}\": \"{objectInfo.Value}\"";
+                        break;
+                    default:
+                    {
+                        if (objectInfo.ObjectPlace == ObjectPlace.Enum)
+                            outPutString += $"{tabString}\"{objectInfo.Name}\": {(int)objectInfo.Value}";
+                        else if (objectInfo.Value is bool)
+                            outPutString += $"{tabString}\"{objectInfo.Name}\": {objectInfo.Value.ToString()?.ToLower()}";
+                        else
+                            outPutString += $"{tabString}\"{objectInfo.Name}\": \"{objectInfo.Value}\"";
+                        break;
+                    }
+                }
             }
         }
         else
@@ -85,11 +103,11 @@ public class FormattedJsonTransformer : StringConverter
     public override string OutPutSubObjects(ISubObjects subObjects)
     {
         var outString = string.Empty;
-        for (int i = 0; i < subObjects.Count; i++)
+        for (var i = 0; i < subObjects.Count; i++)
         {
             var obj = subObjects[i];
             var tabString = string.Empty;
-            for (int k = 0; k < obj.Layer; k++)
+            for (var k = 0; k < obj.Layer; k++)
             {
                 tabString += " ";
             }

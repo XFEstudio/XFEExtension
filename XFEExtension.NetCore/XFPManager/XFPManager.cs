@@ -80,7 +80,7 @@ public class XFPManager
     public XFPManager(params object[] nameAndValue)
     {
         Properties = [];
-        for (int i = 0; i < nameAndValue.Length; i += 2)
+        for (var i = 0; i < nameAndValue.Length; i += 2)
         {
             Properties.Add(new XProperty { Name = nameAndValue[i].ToString()!, Property = nameAndValue[i + 1] });
         }

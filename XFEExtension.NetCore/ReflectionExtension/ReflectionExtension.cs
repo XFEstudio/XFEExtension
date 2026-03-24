@@ -15,8 +15,8 @@ public static class ReflectionExtension
     public static object?[] GetDefaultParameters(this MethodInfo method)
     {
         var parameters = method.GetParameters();
-        object?[] defaultParameters = new object[parameters.Length];
-        for (int i = 0; i < parameters.Length; i++)
+        var defaultParameters = new object[parameters.Length];
+        for (var i = 0; i < parameters.Length; i++)
         {
             var paramType = parameters[i].ParameterType;
             defaultParameters[i] = paramType.IsValueType ? Activator.CreateInstance(paramType) : null;
