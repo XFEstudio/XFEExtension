@@ -21,15 +21,7 @@ public class XFEChatGPT : XFEChatGPTBase
     /// </summary>
     public string? SystemString
     {
-        get
-        {
-            if (xFEAskGPTMessage.IsSelfEditData)
-            {
-                throw new XFEChatGPTException("自定义数据模式下不可获取");
-            }
-
-            return xFEAskGPTMessage.SystemContent;
-        }
+        get => xFEAskGPTMessage.IsSelfEditData ? throw new XFEChatGPTException("自定义数据模式下不可获取") : xFEAskGPTMessage.SystemContent;
         set
         {
             if (xFEAskGPTMessage.IsSelfEditData)
@@ -45,15 +37,7 @@ public class XFEChatGPT : XFEChatGPTBase
     /// </summary>
     public string? AskContent
     {
-        get
-        {
-            if (xFEAskGPTMessage.IsSelfEditData)
-            {
-                throw new XFEChatGPTException("自定义数据模式下不可获取");
-            }
-
-            return xFEAskGPTMessage.AskContent;
-        }
+        get => xFEAskGPTMessage.IsSelfEditData ? throw new XFEChatGPTException("自定义数据模式下不可获取") : xFEAskGPTMessage.AskContent;
         set
         {
             if (xFEAskGPTMessage.IsSelfEditData)
@@ -69,15 +53,7 @@ public class XFEChatGPT : XFEChatGPTBase
     /// </summary>
     public ChatGPTModel GPTModel
     {
-        get
-        {
-            if (xFEAskGPTMessage.IsSelfEditData)
-            {
-                return xFEAskGPTMessage.EnvironmentGPTData!.Model.GetModel();
-            }
-
-            return xFEAskGPTMessage.ChatGPTModel!.GetModel();
-        }
+        get => xFEAskGPTMessage.IsSelfEditData ? xFEAskGPTMessage.EnvironmentGPTData!.Model.GetModel() : xFEAskGPTMessage.ChatGPTModel!.GetModel();
         set
         {
             if (xFEAskGPTMessage.IsSelfEditData)
@@ -93,51 +69,25 @@ public class XFEChatGPT : XFEChatGPTBase
     /// <summary>
     /// XFE通信协议
     /// </summary>
-    public XFEComProtocol XFEComProtocol
-    {
-        get
-        {
-            return xFEAskGPTMessage.ComProtocol;
-        }
-    }
+    public XFEComProtocol XFEComProtocol => xFEAskGPTMessage.ComProtocol;
+
     /// <summary>
     /// 设置是否为自定义数据模式
     /// </summary>
-    public bool IsSelfEditData
-    {
-        get
-        {
-            return xFEAskGPTMessage.IsSelfEditData;
-        }
-    }
+    public bool IsSelfEditData => xFEAskGPTMessage.IsSelfEditData;
+
     /// <summary>
     /// 流式输出（打字效果）还是一次性输出
     /// </summary>
-    public bool StreamMode
-    {
-        get
-        {
-            if (xFEAskGPTMessage.IsSelfEditData)
-            {
-                return xFEAskGPTMessage.EnvironmentGPTData!.Stream;
-            }
+    public bool StreamMode => xFEAskGPTMessage.IsSelfEditData ? xFEAskGPTMessage.EnvironmentGPTData!.Stream : xFEAskGPTMessage.Stream;
 
-            return xFEAskGPTMessage.Stream;
-        }
-    }
     /// <summary>
     /// ChatGPT的环境数据
     /// </summary>
     public EnvironmentGPTData? EnvironmentGPTData
     {
-        get
-        {
-            return xFEAskGPTMessage.EnvironmentGPTData;
-        }
-        set
-        {
-            xFEAskGPTMessage.EnvironmentGPTData = value;
-        }
+        get => xFEAskGPTMessage.EnvironmentGPTData;
+        set => xFEAskGPTMessage.EnvironmentGPTData = value;
     }
     #endregion
     #region 公有方法

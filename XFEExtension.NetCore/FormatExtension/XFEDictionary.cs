@@ -7,6 +7,7 @@ namespace XFEExtension.NetCore.FormatExtension;
 /// </summary>
 public class XFEDictionary : ICollection<XFEEntry>
 {
+    private List<XFEEntry> xFEDictionaryList = [];
     /// <summary>
     /// 字典分隔符
     /// </summary>
@@ -15,7 +16,6 @@ public class XFEDictionary : ICollection<XFEEntry>
     /// 条目分隔符
     /// </summary>
     public static string[] EntrySeparator { get; } = ["[+-", "-+]"];
-    private List<XFEEntry> xFEDictionaryList = [];
     /// <summary>
     /// 字典中的条目数
     /// </summary>

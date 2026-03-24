@@ -1,4 +1,5 @@
-﻿namespace XFEExtension.NetCore.XFEChatGPT;
+﻿// ReSharper disable InconsistentNaming
+namespace XFEExtension.NetCore.XFEChatGPT;
 
 /// <summary>
 /// ChatGPT的模型

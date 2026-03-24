@@ -72,34 +72,26 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     /// 添加XFEGPT消息
     /// </summary>
     /// <param name="xFEGPTMessage"></param>
-    public void Add(XFEGPTMessage xFEGPTMessage)
-    {
-        xFEGPTMessages.Add(xFEGPTMessage);
-    }
+    public void Add(XFEGPTMessage xFEGPTMessage) => xFEGPTMessages.Add(xFEGPTMessage);
+
     /// <summary>
     /// 添加XFEGPT消息
     /// </summary>
     /// <param name="xFEGPTMessages"></param>
-    public void AddRange(XFEGPTMessage[] xFEGPTMessages)
-    {
-        this.xFEGPTMessages.AddRange(xFEGPTMessages);
-    }
+    public void AddRange(XFEGPTMessage[] xFEGPTMessages) => this.xFEGPTMessages.AddRange(xFEGPTMessages);
+
     /// <summary>
     /// 根据指定的ID移除XFEGPT消息
     /// </summary>
     /// <param name="index"></param>
-    public void RemoveAt(int index)
-    {
-        xFEGPTMessages.RemoveAt(index);
-    }
+    public void RemoveAt(int index) => xFEGPTMessages.RemoveAt(index);
+
     /// <summary>
     /// 移除XFEGPT消息
     /// </summary>
     /// <param name="xFEGPTMessage"></param>
-    public void Remove(XFEGPTMessage xFEGPTMessage)
-    {
-        xFEGPTMessages.Remove(xFEGPTMessage);
-    }
+    public void Remove(XFEGPTMessage xFEGPTMessage) => xFEGPTMessages.Remove(xFEGPTMessage);
+
     /// <summary>
     /// 根据指定的ID在其后插入XFEGPT消息
     /// </summary>
@@ -110,37 +102,25 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     {
         for (var i = 0; i < xFEGPTMessages.Count; i++)
         {
-            if (xFEGPTMessages[i].MessageId == messageId)
-            {
-                xFEGPTMessages.Insert(i, xFEGPTMessage);
-                return;
-            }
+            if (xFEGPTMessages[i].MessageId != messageId)
+                continue;
+            xFEGPTMessages.Insert(i, xFEGPTMessage);
+            return;
         }
         throw new XFEChatGPTException("消息集合中没有指定ID的消息！");
     }
     /// <summary>
     /// 清除XFEGPT消息
     /// </summary>
-    public void Clear()
-    {
-        xFEGPTMessages.Clear();
-    }
+    public void Clear() => xFEGPTMessages.Clear();
+
     /// <summary>
     /// 通过消息ID获取XFEGPT消息
     /// </summary>
     /// <param name="messageId"></param>
     /// <returns></returns>
-    public XFEGPTMessage? GetXFEGPTMessageByMessageId(string messageId)
-    {
-        foreach (var xFEGPTMessage in xFEGPTMessages)
-        {
-            if (xFEGPTMessage.MessageId == messageId)
-            {
-                return xFEGPTMessage;
-            }
-        }
-        return null;
-    }
+    public XFEGPTMessage? GetXFEGPTMessageByMessageId(string messageId) => xFEGPTMessages.FirstOrDefault(xFEGPTMessage => xFEGPTMessage.MessageId == messageId);
+
     /// <summary>
     /// 获取本集合的GPTMessage数组
     /// </summary>
@@ -148,10 +128,7 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     public GPTMessage[] GetGPTMessages()
     {
         List<GPTMessage> gPTMessages = [];
-        foreach (var xFEGPTMessage in xFEGPTMessages)
-        {
-            gPTMessages.Add(xFEGPTMessage.GPTMessage);
-        }
+        gPTMessages.AddRange(xFEGPTMessages.Select(xFEGPTMessage => xFEGPTMessage.GPTMessage));
         return [.. gPTMessages];
     }
     /// <summary>
@@ -161,10 +138,7 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     public string[] GetGPTMessageStrings()
     {
         List<string> gPTMessages = [];
-        foreach (var xFEGPTMessage in xFEGPTMessages)
-        {
-            gPTMessages.Add(xFEGPTMessage.GPTMessage.Content);
-        }
+        gPTMessages.AddRange(xFEGPTMessages.Select(xFEGPTMessage => xFEGPTMessage.GPTMessage.Content));
         return [.. gPTMessages];
     }
     /// <summary>
@@ -174,14 +148,8 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
     /// <returns></returns>
     public XFEGPTMessage this[int index]
     {
-        get
-        {
-            return xFEGPTMessages[index];
-        }
-        set
-        {
-            xFEGPTMessages[index] = value;
-        }
+        get => xFEGPTMessages[index];
+        set => xFEGPTMessages[index] = value;
     }
     /// <summary>
     /// 获取最后一个角色
