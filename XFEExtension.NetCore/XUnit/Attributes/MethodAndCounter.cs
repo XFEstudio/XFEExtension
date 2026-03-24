@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace XFEExtension.NetCore.XUnit;
+namespace XFEExtension.NetCore.XUnit.Attributes;
 
 class MethodAndCounter(MethodInfo method, int counter, string failMessage)
 {

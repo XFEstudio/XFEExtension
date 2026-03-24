@@ -1,4 +1,5 @@
 ﻿using XFEExtension.NetCore.DelegateExtension;
+using XFEExtension.NetCore.Exceptions;
 using XFEExtension.NetCore.FormatExtension;
 
 namespace XFEExtension.NetCore.CyberComm.XCCNetWork;

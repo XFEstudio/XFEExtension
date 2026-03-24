@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using XFEExtension.NetCore.Exceptions;
 
 namespace XFEExtension.NetCore.MailExtension;
 

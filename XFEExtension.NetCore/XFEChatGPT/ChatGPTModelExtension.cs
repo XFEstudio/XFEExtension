@@ -1,4 +1,6 @@
-﻿namespace XFEExtension.NetCore.XFEChatGPT;
+﻿using XFEExtension.NetCore.Exceptions;
+
+namespace XFEExtension.NetCore.XFEChatGPT;
 
 /// <summary>
 /// ChatGPT模型的拓展

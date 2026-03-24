@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using XFEExtension.NetCore.Exceptions;
 
 namespace XFEExtension.NetCore.FormatExtension;
 

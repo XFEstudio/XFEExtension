@@ -1,4 +1,4 @@
-﻿namespace XFEExtension.NetCore;
+﻿namespace XFEExtension.NetCore.Exceptions;
 
 /// <summary>
 /// XFEJson转换的异常

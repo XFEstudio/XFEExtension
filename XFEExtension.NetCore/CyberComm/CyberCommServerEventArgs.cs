@@ -1,6 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.Net.WebSockets;
 using System.Text;
+using XFEExtension.NetCore.Exceptions;
 
 namespace XFEExtension.NetCore.CyberComm;
 

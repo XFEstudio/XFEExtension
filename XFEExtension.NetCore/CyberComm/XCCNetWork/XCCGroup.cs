@@ -2,6 +2,7 @@
 using System.Text;
 using XFEExtension.NetCore.ArrayExtension;
 using XFEExtension.NetCore.BufferExtension;
+using XFEExtension.NetCore.Exceptions;
 using XFEExtension.NetCore.TaskExtension;
 
 namespace XFEExtension.NetCore.CyberComm.XCCNetWork;

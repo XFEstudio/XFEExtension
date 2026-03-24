@@ -1,4 +1,4 @@
-﻿namespace XFEExtension.NetCore;
+﻿namespace XFEExtension.NetCore.Exceptions;
 
 /// <summary>
 /// XFEChatGPT的异常

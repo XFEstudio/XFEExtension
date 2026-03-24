@@ -1,4 +1,4 @@
-﻿namespace XFEExtension.NetCore;
+﻿namespace XFEExtension.NetCore.Exceptions;
 
 /// <summary>
 /// XFE字典的异常

@@ -1,4 +1,4 @@
-﻿namespace XFEExtension.NetCore;
+﻿namespace XFEExtension.NetCore.Exceptions;
 
 /// <summary>
 /// 流程控制：停止并执行方法

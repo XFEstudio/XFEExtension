@@ -70,6 +70,7 @@ public static class XFEPackage
         var buffer = XFEBuffer.ToXFEBuffer(filePackageBytes);
         if (buffer.FirstOrDefault() is var keyValuePair)
             return GetFilePackageRecursion(keyValuePair.Key, keyValuePair.Value);
+        return new XFEPackagedDirectory();
     }
 
     internal static XFEPackagedDirectory GetFilePackageRecursion(string packageName, byte[] filePackageBytes)

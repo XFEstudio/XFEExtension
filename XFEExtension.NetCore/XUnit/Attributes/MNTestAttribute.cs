@@ -1,4 +1,4 @@
-﻿namespace XFEExtension.NetCore.XUnit;
+﻿namespace XFEExtension.NetCore.XUnit.Attributes;
 
 /// <summary>
 /// 方法测试，可自定义名称

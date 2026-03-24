@@ -1,4 +1,5 @@
 ﻿using System.Net.WebSockets;
+using XFEExtension.NetCore.Exceptions;
 
 namespace XFEExtension.NetCore.CyberComm.XCCNetWork;
 

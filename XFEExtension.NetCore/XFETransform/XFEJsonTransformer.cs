@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Reflection;
+using XFEExtension.NetCore.Exceptions;
 
 namespace XFEExtension.NetCore.XFETransform;
 

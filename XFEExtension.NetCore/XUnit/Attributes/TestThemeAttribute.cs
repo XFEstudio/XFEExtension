@@ -1,4 +1,4 @@
-﻿namespace XFEExtension.NetCore.XUnit;
+﻿namespace XFEExtension.NetCore.XUnit.Attributes;
 
 /// <summary>
 /// 测试颜色主题

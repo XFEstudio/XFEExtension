@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using XFEExtension.NetCore.Exceptions;
 using XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.DefaultClass;
 
 namespace XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass;

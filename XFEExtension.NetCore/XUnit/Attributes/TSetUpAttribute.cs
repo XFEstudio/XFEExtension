@@ -1,4 +1,4 @@
-﻿namespace XFEExtension.NetCore.XUnit;
+﻿namespace XFEExtension.NetCore.XUnit.Attributes;
 
 /// <summary>
 /// 用于标记测试类初始函数的特性

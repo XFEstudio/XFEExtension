@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Text;
+using XFEExtension.NetCore.Exceptions;
 
 namespace XFEExtension.NetCore.BufferExtension;
 
