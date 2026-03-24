@@ -15,7 +15,7 @@ namespace XFEExtension.NetCore.CyberComm;
 /// <param name="Request">请求对象</param>
 /// <param name="Response">响应对象</param>
 /// <param name="ClientIP">客户端IP</param>
-public abstract record class CyberCommRequestEventArgs(Uri? RequestURL, string RequestMethod, string? RequestBody, NameValueCollection RequestHeaders, NameValueCollection QueryString, HttpListenerRequest Request, HttpListenerResponse Response, string ClientIP)
+public abstract record CyberCommRequestEventArgs(Uri? RequestURL, string RequestMethod, string? RequestBody, NameValueCollection RequestHeaders, NameValueCollection QueryString, HttpListenerRequest Request, HttpListenerResponse Response, string ClientIP)
 {
     /// <summary>
     /// 回复消息并关闭连接

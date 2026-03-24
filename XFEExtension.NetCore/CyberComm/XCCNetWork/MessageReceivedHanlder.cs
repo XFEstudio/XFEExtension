@@ -6,4 +6,4 @@
 /// <typeparam name="T"></typeparam>
 /// <param name="isHistory">是否为历史消息</param>
 /// <param name="message">消息</param>
-public delegate void MessageReceivedHandler<T>(bool isHistory, T message);
+public delegate void MessageReceivedHandler<in T>(bool isHistory, T message);

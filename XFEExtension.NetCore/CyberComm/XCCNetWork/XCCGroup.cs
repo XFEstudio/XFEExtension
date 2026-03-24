@@ -274,50 +274,49 @@ public abstract class XCCGroup
                     bufferList.AddRange(receiveBuffer.Take(receiveResult.Count));
                 }
                 var receivedBinaryBuffer = bufferList.ToArray();
-                if (receiveResult.MessageType == WebSocketMessageType.Binary)
+                if (receiveResult.MessageType != WebSocketMessageType.Binary)
+                    continue;
+                try
                 {
-                    try
+                    XCCBinaryMessageType messageType;
+                    var xFEBuffer = XFEBuffer.ToXFEBuffer(receivedBinaryBuffer);
+                    var sender = Encoding.UTF8.GetString(xFEBuffer["Sender"]);
+                    var signature = Encoding.UTF8.GetString(xFEBuffer["Type"]);
+                    if (signature == "callback")
+                        return;
+                    var messageId = Encoding.UTF8.GetString(xFEBuffer["ID"]);
+                    bool isHistory = Encoding.UTF8.GetString(xFEBuffer["IsHistory"]) == "True";
+                    var sendTime = DateTime.Parse(Encoding.UTF8.GetString(xFEBuffer["SendTime"]));
+                    byte[] unPackedBuffer = xFEBuffer[sender];
+                    switch (signature)
                     {
-                        var messageType = XCCBinaryMessageType.Binary;
-                        var xFEBuffer = XFEBuffer.ToXFEBuffer(receivedBinaryBuffer);
-                        var sender = Encoding.UTF8.GetString(xFEBuffer["Sender"]);
-                        var signature = Encoding.UTF8.GetString(xFEBuffer["Type"]);
-                        if (signature == "callback")
-                            return;
-                        var messageId = Encoding.UTF8.GetString(xFEBuffer["ID"]);
-                        bool isHistory = Encoding.UTF8.GetString(xFEBuffer["IsHistory"]) == "True";
-                        var sendTime = DateTime.Parse(Encoding.UTF8.GetString(xFEBuffer["SendTime"]));
-                        byte[] unPackedBuffer = xFEBuffer[sender];
-                        switch (signature)
-                        {
-                            case "text":
-                                messageType = XCCBinaryMessageType.Text;
-                                break;
-                            case "image":
-                                messageType = XCCBinaryMessageType.Image;
-                                break;
-                            case "audio":
-                                messageType = XCCBinaryMessageType.Audio;
-                                break;
-                            case "audio-buffer":
-                                messageType = XCCBinaryMessageType.AudioBuffer;
-                                break;
-                            case "video":
-                                messageType = XCCBinaryMessageType.Video;
-                                break;
-                            case "callback":
-                                UpdateTaskTrigger?.Invoke(true, messageId);
-                                continue;
-                            default:
-                                messageType = XCCBinaryMessageType.Binary;
-                                break;
-                        }
-                        workBase.binaryMessageReceived?.Invoke(this, new XCCBinaryMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.FileTransportClient, sender, messageId, unPackedBuffer, messageType, signature, sendTime, isHistory));
+                        case "text":
+                            messageType = XCCBinaryMessageType.Text;
+                            break;
+                        case "image":
+                            messageType = XCCBinaryMessageType.Image;
+                            break;
+                        case "audio":
+                            messageType = XCCBinaryMessageType.Audio;
+                            break;
+                        case "audio-buffer":
+                            messageType = XCCBinaryMessageType.AudioBuffer;
+                            break;
+                        case "video":
+                            messageType = XCCBinaryMessageType.Video;
+                            break;
+                        case "callback":
+                            UpdateTaskTrigger?.Invoke(true, messageId);
+                            continue;
+                        default:
+                            messageType = XCCBinaryMessageType.Binary;
+                            break;
                     }
-                    catch (Exception ex)
-                    {
-                        workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.FileTransportClient, null, null, new XFECyberCommException("接收XCC服务器消息时发生异常", ex)));
-                    }
+                    workBase.binaryMessageReceived?.Invoke(this, new XCCBinaryMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.FileTransportClient, sender, messageId, unPackedBuffer, messageType, signature, sendTime, isHistory));
+                }
+                catch (Exception ex)
+                {
+                    workBase.exceptionMessageReceived?.Invoke(this, new XCCExceptionMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.FileTransportClient, null, null, new XFECyberCommException("接收XCC服务器消息时发生异常", ex)));
                 }
             }
             catch (Exception ex)
@@ -372,7 +371,7 @@ public abstract class XCCGroup
         {
             byte[] sendBuffer = Encoding.UTF8.GetBytes(new[] { messageId, "[XCCTextMessage]", message }.ToXFEString());
             await TextMessageClientWebSocket!.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
-            var endTask = Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 await Task.Delay(timeout);
                 UpdateTaskTrigger?.Invoke(false, messageId);
@@ -419,7 +418,7 @@ public abstract class XCCGroup
         {
             var xFEBuffer = new XFEBuffer(Sender, message, "Type", Encoding.UTF8.GetBytes(signature), "ID", Encoding.UTF8.GetBytes(messageId));
             await FileTransportClientWebSocket!.SendAsync(new ArraySegment<byte>(xFEBuffer.ToBuffer()), WebSocketMessageType.Binary, true, CancellationToken.None);
-            var endTask = Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 await Task.Delay(timeout);
                 UpdateTaskTrigger?.Invoke(false, messageId);
@@ -507,7 +506,7 @@ public abstract class XCCGroup
             var messageId = Guid.NewGuid().ToString();
             byte[] sendBuffer = Encoding.UTF8.GetBytes(new[] { messageId, "[XCCGetHistory]", "[XCCGetHistory]" }.ToXFEString());
             await TextMessageClientWebSocket!.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
-            var endTask = Task.Run(async () =>
+            Task.Run(async () =>
             {
                 await Task.Delay(5000);
                 UpdateTaskTrigger?.Invoke(false, messageId);

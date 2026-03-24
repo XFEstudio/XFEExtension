@@ -37,46 +37,31 @@ public static partial class StringExtension
         /// 判断字符串是否为座机号码
         /// </summary>
         /// <returns></returns>
-        public bool IsTelePhone()
-        {
-            return TelePhoneRegex().IsMatch(telephoneNum);
-        }
+        public bool IsTelePhone() => TelePhoneRegex().IsMatch(telephoneNum);
 
         /// <summary>
         /// 判断字符串是否为手机号码
         /// </summary>
         /// <returns></returns>
-        public bool IsMobPhoneNumber()
-        {
-            return MobPhoneNumberRegex().IsMatch(telephoneNum);
-        }
+        public bool IsMobPhoneNumber() => MobPhoneNumberRegex().IsMatch(telephoneNum);
 
         /// <summary>
         /// 判断字符串是否为邮政编码
         /// </summary>
         /// <returns></returns>
-        public bool IsPostalCode()
-        {
-            return PostalCodeRegex().IsMatch(telephoneNum);
-        }
+        public bool IsPostalCode() => PostalCodeRegex().IsMatch(telephoneNum);
 
         /// <summary>
         /// 判断字符串是否为数字
         /// </summary>
         /// <returns></returns>
-        public bool IsNumber()
-        {
-            return NumberRegex().IsMatch(telephoneNum);
-        }
+        public bool IsNumber() => NumberRegex().IsMatch(telephoneNum);
 
         /// <summary>
         /// 判断字符串是否为身份证件号
         /// </summary>
         /// <returns></returns>
-        public bool IsIdCard()
-        {
-            return IdCardRegex().IsMatch(telephoneNum);
-        }
+        public bool IsIdCard() => IdCardRegex().IsMatch(telephoneNum);
 
         /// <summary>
         /// 判断字符串是否为邮箱地址
@@ -90,8 +75,8 @@ public static partial class StringExtension
             try
             {
                 telephoneNum = Regex.Replace(telephoneNum, @"(@)(.+)$", DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
-                var validDomain = new MailAddress(telephoneNum).Host;
-                return Regex.IsMatch(telephoneNum, @"^(?("")("".+?""@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)[0-9a-zA-Z]\@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,}))$", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+                _ = new MailAddress(telephoneNum).Host;
+                return Regex.IsMatch(telephoneNum, """^(?(")(".+?"@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)[0-9a-zA-Z]\@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,}))$""", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
             }
             catch (FormatException)
             {
@@ -117,15 +102,15 @@ public static partial class StringExtension
         {
             int lengthCount = 0;
             var splits = telephoneNum.ToCharArray();
-            for (int i = 0; i < splits.Length; i++)
+            foreach (var split in splits)
             {
-                if (splits[i] == '\t')
+                if (split == '\t')
                 {
                     lengthCount += 8 - lengthCount % 8;
                 }
                 else
                 {
-                    if (splits[i] > 255)
+                    if (split > 255)
                     {
                         lengthCount += 2;
                     }
@@ -142,6 +127,11 @@ public static partial class StringExtension
     /// <param name="str"></param>
     extension([NotNullWhen(false)] string? str)
     {
+        /// <summary>
+        /// 判断字符串是否是 null 、空字符串和仅包含空格的字符串
+        /// </summary>
+        public bool IsWhiteSpace { get=> str?.IsNullOrWhiteSpace() ?? true; }
+
         /// <summary>
         /// 判断字符串是否为 null 或者是空字符串
         /// </summary>
@@ -169,13 +159,7 @@ public static partial class StringExtension
     /// <param name="expression">正则表达式</param>
     /// <param name="str">要匹配的字符串</param>
     /// <returns></returns>
-    public static bool IsMatch(string expression, string str)
-    {
-        Regex reg = new(expression);
-        if (string.IsNullOrEmpty(str))
-            return false;
-        return reg.IsMatch(str);
-    }
+    public static bool IsMatch(string expression, string str) => !string.IsNullOrEmpty(str) && new Regex(expression).IsMatch(str);
 
     /// <param name="str"></param>
     extension(string? str)
@@ -186,19 +170,14 @@ public static partial class StringExtension
         /// <returns></returns>
         public string[]? GetUrl()
         {
-            if (str is not null)
-            {
-                Regex regex = UrlRegex();
-                MatchCollection matches = regex.Matches(str);
-                string[] result = new string[matches.Count];
-                for (int i = 0; i < matches.Count; i++)
-                {
-                    result[i] = matches[i].Value;
-                }
-                return result;
-            }
-
-            return null;
+            if (str is null)
+                return null;
+            Regex regex = UrlRegex();
+            MatchCollection matches = regex.Matches(str);
+            string[] result = new string[matches.Count];
+            for (int i = 0; i < matches.Count; i++)
+                result[i] = matches[i].Value;
+            return result;
         }
 
         /// <summary>
@@ -207,14 +186,7 @@ public static partial class StringExtension
         /// <param name="replaceStringArray">替换的字符串组</param>
         /// <param name="tarString">目的字符串</param>
         /// <returns></returns>
-        public string ReplaceStrings(string[] replaceStringArray, string tarString)
-        {
-            foreach (string replaceString in replaceStringArray)
-            {
-                str = str.Replace(replaceString, tarString);
-            }
-            return str;
-        }
+        public string? ReplaceStrings(string[] replaceStringArray, string tarString) => replaceStringArray.Aggregate(str, (current, replaceString) => current?.Replace(replaceString, tarString));
 
         /// <summary>
         /// 匹配两个字符串之间的字符串
@@ -224,15 +196,13 @@ public static partial class StringExtension
         /// <returns></returns>
         public string[] MatchStringsBetween(string startString, string endString)
         {
+            if (str.IsNullOrWhiteSpace())
+                return [];
             string pattern = $"{Regex.Escape(startString)}(.*?){Regex.Escape(endString)}";
-            MatchCollection matches = Regex.Matches(str, pattern);
-
+            var matches = Regex.Matches(str, pattern);
             string[] result = new string[matches.Count];
             for (int i = 0; i < matches.Count; i++)
-            {
                 result[i] = matches[i].Groups[1].Value;
-            }
-
             return result;
         }
 
@@ -241,8 +211,11 @@ public static partial class StringExtension
         /// </summary>
         /// <param name="width">一行文本的最大长度</param>
         /// <returns></returns>
-        public string WrapText(int width)
+        [return: NotNullIfNotNull(nameof(str))]
+        public string? WrapText(int width)
         {
+            if (str is null)
+                return str;
             StringBuilder stringBuilder = new();
             int startIndex = 0;
             while (startIndex < str.Length)

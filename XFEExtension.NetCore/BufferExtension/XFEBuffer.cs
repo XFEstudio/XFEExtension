@@ -13,33 +13,18 @@ public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
     /// <summary>
     /// 所有的头
     /// </summary>
-    public Dictionary<string, byte[]>.KeyCollection Headers
-    {
-        get
-        {
-            return bufferDictionary.Keys;
-        }
-    }
+    public Dictionary<string, byte[]>.KeyCollection Headers => bufferDictionary.Keys;
+
     /// <summary>
     /// 所有的值
     /// </summary>
-    public Dictionary<string, byte[]>.ValueCollection Buffers
-    {
-        get
-        {
-            return bufferDictionary.Values;
-        }
-    }
+    public Dictionary<string, byte[]>.ValueCollection Buffers => bufferDictionary.Values;
+
     /// <summary>
     /// 长度
     /// </summary>
-    public int Count
-    {
-        get
-        {
-            return bufferDictionary.Count;
-        }
-    }
+    public int Count => bufferDictionary.Count;
+
     /// <summary>
     /// 获取或设置Buffer
     /// </summary>
@@ -47,24 +32,16 @@ public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
     /// <returns></returns>
     public byte[] this[string header]
     {
-        get
-        {
-            return bufferDictionary[header];
-        }
-        set
-        {
-            bufferDictionary[header] = value;
-        }
+        get => bufferDictionary[header];
+        set => bufferDictionary[header] = value;
     }
+
     /// <summary>
     /// 封装Buffer
     /// </summary>
     /// <returns></returns>
+    public byte[] ToBuffer() => headerBuffers.PackBuffer();
 
-    public byte[] ToBuffer()
-    {
-        return headerBuffers.PackBuffer();
-    }
     /// <summary>
     /// 将Buffer转换为XFEBuffer
     /// </summary>
@@ -76,12 +53,11 @@ public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
         var buffers = buffer.UnPackBuffer();
         for (int i = 0; i < buffers.Count; i++)
         {
-            if (i % 2 == 0)
-            {
-                xFEBuffer.bufferDictionary.Add(Encoding.UTF8.GetString(buffers[i]), buffers[i + 1]);
-                xFEBuffer.headerBuffers.Add(buffers[i]);
-                xFEBuffer.headerBuffers.Add(buffers[i + 1]);
-            }
+            if (i % 2 != 0)
+                continue;
+            xFEBuffer.bufferDictionary.Add(Encoding.UTF8.GetString(buffers[i]), buffers[i + 1]);
+            xFEBuffer.headerBuffers.Add(buffers[i]);
+            xFEBuffer.headerBuffers.Add(buffers[i + 1]);
         }
         return xFEBuffer;
     }
@@ -144,39 +120,27 @@ public class XFEBuffer : IEnumerable<KeyValuePair<string, byte[]>>
     /// </summary>
     /// <param name="header">头</param>
     /// <returns></returns>
-    public bool Contains(string header)
-    {
-        return bufferDictionary.ContainsKey(header);
-    }
+    public bool Contains(string header) => bufferDictionary.ContainsKey(header);
+
     /// <summary>
     /// 获取头
     /// </summary>
     /// <returns></returns>
-    public string[] GetHeaders()
-    {
-        return [.. bufferDictionary.Keys];
-    }
+    public string[] GetHeaders() => [.. bufferDictionary.Keys];
+
     /// <summary>
     /// 获取枚举器
     /// </summary>
     /// <returns></returns>
-    public IEnumerator<KeyValuePair<string, byte[]>> GetEnumerator()
-    {
-        return bufferDictionary.GetEnumerator();
-    }
+    public IEnumerator<KeyValuePair<string, byte[]>> GetEnumerator() => bufferDictionary.GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return ((IEnumerable)bufferDictionary).GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)bufferDictionary).GetEnumerator();
 
     /// <summary>
     /// XFE的二进制数组协议
     /// </summary>
-    public XFEBuffer()
-    {
-        bufferDictionary = [];
-    }
+    public XFEBuffer() => bufferDictionary = [];
+
     /// <summary>
     /// XFE的二进制数组协议
     /// </summary>

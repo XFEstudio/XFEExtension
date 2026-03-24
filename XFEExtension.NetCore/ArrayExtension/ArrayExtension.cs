@@ -1,4 +1,6 @@
-﻿namespace XFEExtension.NetCore.ArrayExtension;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace XFEExtension.NetCore.ArrayExtension;
 
 /// <summary>
 /// 对数组的拓展
@@ -34,7 +36,7 @@ public static class ArrayExtension
         /// <typeparam name="T"></typeparam>
         /// <param name="propertyName">属性名称</param>
         /// <returns></returns>
-        public string ToXFEString(string propertyName) => arrays.Aggregate(string.Empty, (current, ary) => current + $"[+-{ary?.GetType()?.GetProperty(propertyName)?.GetValue(ary)?.ToString()?.Replace("[+", "[++").Replace("+]", "++]")}-+]");
+        public string ToXFEString(string propertyName) => arrays.Aggregate(string.Empty, (current, ary) => current + $"[+-{ary.GetType().GetProperty(propertyName)?.GetValue(ary)?.ToString()?.Replace("[+", "[++").Replace("+]", "++]")}-+]");
     }
 
 
@@ -69,6 +71,7 @@ public static class ArrayExtension
         /// 获取数组中的类型
         /// </summary>
         /// <returns></returns>
+        [return: NotNullIfNotNull(nameof(objects))]
         public Type[]? GetTypes()
         {
             if (objects is null)

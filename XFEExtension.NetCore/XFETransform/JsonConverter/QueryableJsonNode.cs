@@ -1,4 +1,6 @@
-﻿namespace XFEExtension.NetCore.XFETransform.JsonConverter;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace XFEExtension.NetCore.XFETransform.JsonConverter;
 
 /// <summary>
 /// 可查询节点
@@ -85,13 +87,13 @@ public class QueryableJsonNode(JsonNode jsonNode) : INodeBase, IQueryableJsonNod
     /// </summary>
     /// <returns></returns>
     /// <exception cref="NullReferenceException"></exception>
-    public List<Dictionary<string, ValueNode>> PackageInListObject() => InnerValue is List<Dictionary<string, ValueNode>> innerValue ? innerValue : throw new NullReferenceException();
+    public List<Dictionary<string, ValueNode>> PackageInListObject() => InnerValue as List<Dictionary<string, ValueNode>> ?? throw new NullReferenceException();
     /// <summary>
     /// 对对象内对象属性值进行打包
     /// </summary>
     /// <returns></returns>
     /// <exception cref="NullReferenceException"></exception>
-    public Dictionary<string, ValueNode> PackageObject() => InnerValue is Dictionary<string, ValueNode> innerValue ? innerValue : throw new NullReferenceException();
+    public Dictionary<string, ValueNode> PackageObject() => InnerValue as Dictionary<string, ValueNode> ?? throw new NullReferenceException();
     /// <summary>
     /// 获取所有子节点
     /// </summary>
@@ -102,10 +104,12 @@ public class QueryableJsonNode(JsonNode jsonNode) : INodeBase, IQueryableJsonNod
     /// 隐式将Json字符串转换为可查询节点
     /// </summary>
     /// <param name="jsonString"></param>
-    public static implicit operator QueryableJsonNode(string jsonString) => new(new JsonNodeConverter(jsonString).ConvertToJsonNode());
+    [return: NotNullIfNotNull(nameof(jsonString))]
+    public static implicit operator QueryableJsonNode?(string? jsonString) => jsonString is null ? null : new(new JsonNodeConverter(jsonString).ConvertToJsonNode());
     /// <summary>
     /// 隐式将Json字符串转换为节点值
     /// </summary>
     /// <param name="queryableJsonNode"></param>
+    [return: NotNullIfNotNull(nameof(queryableJsonNode))]
     public static implicit operator string?(QueryableJsonNode? queryableJsonNode) => queryableJsonNode?.ToString();
 }

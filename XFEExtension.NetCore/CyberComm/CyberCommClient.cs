@@ -111,20 +111,27 @@ public class CyberCommClient
                     }
                 }
                 var receivedBinaryBuffer = bufferList.ToArray();
-                if (receiveResult.MessageType == WebSocketMessageType.Text)
+                switch (receiveResult.MessageType)
                 {
-                    var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
-                    MessageReceived?.Invoke(this, new CyberCommClientEventArgsImpl(ClientWebSocket, receivedMessage, receiveResult.EndOfMessage));
+                    case WebSocketMessageType.Text:
+                    {
+                        var receivedMessage = Encoding.UTF8.GetString(receivedBinaryBuffer);
+                        MessageReceived?.Invoke(this, new CyberCommClientEventArgsImpl(ClientWebSocket, receivedMessage, receiveResult.EndOfMessage));
+                        break;
+                    }
+                    case WebSocketMessageType.Binary:
+                        MessageReceived?.Invoke(this, new CyberCommClientEventArgsImpl(ClientWebSocket, receivedBinaryBuffer, receiveResult.EndOfMessage));
+                        break;
+                    case WebSocketMessageType.Close:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
-                if (receiveResult.MessageType == WebSocketMessageType.Binary)
-                {
-                    MessageReceived?.Invoke(this, new CyberCommClientEventArgsImpl(ClientWebSocket, receivedBinaryBuffer, receiveResult.EndOfMessage));
-                }
-                if (receiveResult.MessageType == WebSocketMessageType.Close)
-                {
-                    await ClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
-                    break;
-                }
+
+                if (receiveResult.MessageType != WebSocketMessageType.Close)
+                    continue;
+                await ClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                break;
             }
             catch (Exception ex)
             {
@@ -165,7 +172,7 @@ public class CyberCommClient
         try
         {
             byte[] sendBuffer = Encoding.UTF8.GetBytes(message);
-            await ClientWebSocket!.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+            await ClientWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
         }
         catch (Exception ex)
         {
@@ -181,7 +188,7 @@ public class CyberCommClient
     {
         try
         {
-            await ClientWebSocket!.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, CancellationToken.None);
+            await ClientWebSocket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, CancellationToken.None);
         }
         catch (Exception ex)
         {
@@ -194,7 +201,7 @@ public class CyberCommClient
     /// <returns></returns>
     public async Task CloseCyberCommClient()
     {
-        await ClientWebSocket!.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+        await ClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
     }
     #endregion
     #region 构造函数

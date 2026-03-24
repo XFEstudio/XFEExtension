@@ -35,7 +35,7 @@ public static class MatrixOfArrayExtension
             {
                 Console.Write($"{arrays[i][j]}\t");
             }
-            Console.Write($"{arrays[i][j++]}]\n");
+            Console.Write($"{arrays[i][j]}]\n");
         }
     }
     /// <summary>
@@ -53,7 +53,7 @@ public static class MatrixOfArrayExtension
             {
                 Console.Write($"{arrays[i, j]}\t");
             }
-            Console.Write($"{arrays[i, j++]}]\n");
+            Console.Write($"{arrays[i, j]}]\n");
         }
     }
 }

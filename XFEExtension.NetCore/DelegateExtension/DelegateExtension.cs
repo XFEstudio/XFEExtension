@@ -17,4 +17,4 @@ public delegate void XFEEventHandler<T1, T2>(T1 sender, T2 e);
 /// <summary>
 /// 委托事件拓展
 /// </summary>
-public static class DelegateExtension { }
+public static class DelegateExtension;
