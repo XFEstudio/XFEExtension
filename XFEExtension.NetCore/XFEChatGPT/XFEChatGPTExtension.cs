@@ -17,28 +17,22 @@ public static class XFEChatGPTExtension
         {
             return true;
         }
-        else
+
+        if (xFEGPTMessages[0].Role != "system")
         {
-            if (xFEGPTMessages[0].Role != "system")
+            return false;
+        }
+
+        string lastRole = xFEGPTMessages[0].Role;
+        for (int i = 1; i < xFEGPTMessages.Length; i++)
+        {
+            if (xFEGPTMessages[i].Role == lastRole)
             {
                 return false;
             }
-            else
-            {
-                string lastRole = xFEGPTMessages[0].Role;
-                for (int i = 1; i < xFEGPTMessages.Length; i++)
-                {
-                    if (xFEGPTMessages[i].Role == lastRole)
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        lastRole = xFEGPTMessages[i].Role;
-                    }
-                }
-                return true;
-            }
+
+            lastRole = xFEGPTMessages[i].Role;
         }
+        return true;
     }
 }

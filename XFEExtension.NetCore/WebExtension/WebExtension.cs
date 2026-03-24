@@ -29,10 +29,8 @@ public static class WebExtension
         {
             return await response.Content.ReadAsStringAsync();
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     /// <summary>
@@ -53,10 +51,8 @@ public static class WebExtension
         {
             return response.Content.ReadAsStringAsync().Result;
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     /// <summary>
@@ -78,10 +74,8 @@ public static class WebExtension
         {
             return await response.Content.ReadAsStringAsync();
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     /// <summary>
@@ -103,10 +97,8 @@ public static class WebExtension
         {
             return response.Content.ReadAsStringAsync().Result;
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     /// <summary>
@@ -129,10 +121,8 @@ public static class WebExtension
         {
             return await response.Content.ReadAsStringAsync();
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     /// <summary>
@@ -155,10 +145,8 @@ public static class WebExtension
         {
             return response.Content.ReadAsStringAsync().Result;
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     /// <summary>
@@ -172,8 +160,7 @@ public static class WebExtension
         response.EnsureSuccessStatusCode();
         if (response.Content.Headers.ContentDisposition?.FileName is null)
             return Path.GetFileName(response.RequestMessage?.RequestUri?.AbsolutePath);
-        else
-            return response.Content.Headers.ContentDisposition.FileNameStar;
+        return response.Content.Headers.ContentDisposition.FileNameStar;
     }
 
     /// <summary>

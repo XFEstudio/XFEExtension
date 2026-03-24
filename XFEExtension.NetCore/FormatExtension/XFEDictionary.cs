@@ -1,4 +1,6 @@
-﻿namespace XFEExtension.NetCore.FormatExtension;
+﻿using System.Collections;
+
+namespace XFEExtension.NetCore.FormatExtension;
 
 /// <summary>
 /// XFE唯一字典存储
@@ -201,8 +203,7 @@ public class XFEDictionary : ICollection<XFEEntry>
         var entry = xFEDictionaryList.Find(x => x.Header == headerString);
         if (entry is not null)
             return xFEDictionaryList.Remove(entry);
-        else
-            return false;
+        return false;
     }
     /// <summary>
     /// 移除指定范围的数组
@@ -234,7 +235,7 @@ public class XFEDictionary : ICollection<XFEEntry>
             }
         }
     }
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+    IEnumerator IEnumerable.GetEnumerator()
     {
         return xFEDictionaryList.GetEnumerator();
     }

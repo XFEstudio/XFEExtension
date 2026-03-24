@@ -46,7 +46,7 @@ public class XCCMessage(string messageId, XCCTextMessageType messageType, string
     /// <returns></returns>
     public override string ToString()
     {
-        return new string[] { MessageId, MessageType.ToString(), Message, Sender, SendTime.ToString() }.ToXFEString();
+        return new[] { MessageId, MessageType.ToString(), Message, Sender, SendTime.ToString() }.ToXFEString();
     }
     /// <summary>
     /// 将封装后的XCC消息字符串转换为XCC消息对象

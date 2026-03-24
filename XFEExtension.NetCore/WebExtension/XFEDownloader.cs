@@ -1,5 +1,5 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Headers;
 using XFEExtension.NetCore.DelegateExtension;
 using XFEExtension.NetCore.FileExtension;
 using XFEExtension.NetCore.TaskExtension;
@@ -75,7 +75,7 @@ public class XFEDownloader : IDisposable
                 long currentSegmentDownloadedBuffeSize = startPosition - startBufferIndex;
                 var httpClient = new HttpClient();
                 httpClientList.Add(httpClient);
-                httpClient.DefaultRequestHeaders.Range = new System.Net.Http.Headers.RangeHeaderValue(startPosition, endPosition);
+                httpClient.DefaultRequestHeaders.Range = new RangeHeaderValue(startPosition, endPosition);
                 if (continueDownload)
                     totalRead += currentSegmentDownloadedBuffeSize;
                 var cancellationTokenSource = new CancellationTokenSource();

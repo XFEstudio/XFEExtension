@@ -33,9 +33,7 @@ public class GPTMessage(string role, string content)
         {
             return lowerRole;
         }
-        else
-        {
-            throw new XFEChatGPTException($"角色名称不合法：{inputRole}\n应为system，user或assistant三者中的一个");
-        }
+
+        throw new XFEChatGPTException($"角色名称不合法：{inputRole}\n应为system，user或assistant三者中的一个");
     }
 }

@@ -14,7 +14,7 @@ public abstract class XCCGroup
     private event EndTaskTrigger<bool>? UpdateTaskTrigger;
     private readonly XCCNetWorkBase workBase;
     private int reconnectTimes = -1;
-    private bool readyToClose = false;
+    private bool readyToClose;
     #region 公有属性
     /// <summary>
     /// 客户端标识名
@@ -31,11 +31,11 @@ public abstract class XCCGroup
     /// <summary>
     /// 明文传输服务器是否连接
     /// </summary>
-    public bool TextMessageClientConnected { get; private set; } = false;
+    public bool TextMessageClientConnected { get; private set; }
     /// <summary>
     /// 文件传输服务器是否连接
     /// </summary>
-    public bool FileTransportClientConnected { get; private set; } = false;
+    public bool FileTransportClientConnected { get; private set; }
     /// <summary>
     /// WebSocket明文传输客户端
     /// </summary>
@@ -89,7 +89,7 @@ public abstract class XCCGroup
             {
                 return;
             }
-            if (TextMessageClientConnected == true)
+            if (TextMessageClientConnected)
             {
                 workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.TextMessageClient, TextMessageClientWebSocket, FileTransportClientWebSocket, false));
             }
@@ -157,8 +157,6 @@ public abstract class XCCGroup
                             case "[XCCVideo]":
                                 messageType = XCCTextMessageType.Video;
                                 break;
-                            default:
-                                break;
                         }
                         workBase.textMessageReceived?.Invoke(this, new XCCTextMessageReceivedEventArgsImpl(this, TextMessageClientWebSocket, FileTransportClientWebSocket, XCCClientType.TextMessageClient, messageId, messageType, message, senderName, sendTime, isHistory));
                     }
@@ -186,7 +184,7 @@ public abstract class XCCGroup
             catch (Exception ex)
             {
                 try { await TextMessageClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close", CancellationToken.None); } catch { }
-                if (TextMessageClientConnected == true)
+                if (TextMessageClientConnected)
                 {
                     workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.TextMessageClient, TextMessageClientWebSocket, FileTransportClientWebSocket, false));
                 }
@@ -239,7 +237,7 @@ public abstract class XCCGroup
             {
                 return;
             }
-            if (FileTransportClientConnected == true)
+            if (FileTransportClientConnected)
             {
                 workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.FileTransportClient, TextMessageClientWebSocket, FileTransportClientWebSocket, false));
             }
@@ -325,7 +323,7 @@ public abstract class XCCGroup
             catch (Exception ex)
             {
                 try { await FileTransportClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close", CancellationToken.None); } catch { }
-                if (FileTransportClientConnected == true)
+                if (FileTransportClientConnected)
                 {
                     workBase.connectionClosed?.Invoke(this, new XCCConnectionClosedEventArgsImpl(this, XCCClientType.FileTransportClient, TextMessageClientWebSocket, FileTransportClientWebSocket, false));
                 }
@@ -372,7 +370,7 @@ public abstract class XCCGroup
     {
         try
         {
-            byte[] sendBuffer = Encoding.UTF8.GetBytes(new string[] { messageId, "[XCCTextMessage]", message }.ToXFEString());
+            byte[] sendBuffer = Encoding.UTF8.GetBytes(new[] { messageId, "[XCCTextMessage]", message }.ToXFEString());
             await TextMessageClientWebSocket!.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
             var endTask = Task.Run(async () =>
             {
@@ -507,7 +505,7 @@ public abstract class XCCGroup
         try
         {
             var messageId = Guid.NewGuid().ToString();
-            byte[] sendBuffer = Encoding.UTF8.GetBytes(new string[] { messageId, "[XCCGetHistory]", "[XCCGetHistory]" }.ToXFEString());
+            byte[] sendBuffer = Encoding.UTF8.GetBytes(new[] { messageId, "[XCCGetHistory]", "[XCCGetHistory]" }.ToXFEString());
             await TextMessageClientWebSocket!.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
             var endTask = Task.Run(async () =>
             {

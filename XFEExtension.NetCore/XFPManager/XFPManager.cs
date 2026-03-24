@@ -82,7 +82,7 @@ public class XFPManager
         Properties = [];
         for (int i = 0; i < nameAndValue.Length; i += 2)
         {
-            Properties.Add(new XProperty() { Name = nameAndValue[i].ToString()!, Property = nameAndValue[i + 1] });
+            Properties.Add(new XProperty { Name = nameAndValue[i].ToString()!, Property = nameAndValue[i + 1] });
         }
     }
 }

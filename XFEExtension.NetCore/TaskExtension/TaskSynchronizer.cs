@@ -19,8 +19,7 @@ public class TaskSynchronizer
     {
         if (CurrentTask is not null)
             return CurrentTask.GetAwaiter();
-        else
-            return Task.CompletedTask.GetAwaiter();
+        return Task.CompletedTask.GetAwaiter();
     }
     /// <summary>
     /// 添加任务

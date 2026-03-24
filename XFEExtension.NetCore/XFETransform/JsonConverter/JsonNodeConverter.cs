@@ -202,8 +202,6 @@ public class JsonNodeConverter(string jsonString)
                             currentPropertyValue += "\"";
                             currentState = CurrentState.StringPropertyValue;
                             break;
-                        default:
-                            break;
                     }
                     break;
                 case '\'':
@@ -235,8 +233,6 @@ public class JsonNodeConverter(string jsonString)
                             }
                             break;
                         case CurrentState.None:
-                            break;
-                        default:
                             break;
                     }
                     break;
@@ -298,35 +294,39 @@ public class JsonNodeConverter(string jsonString)
             currentPropertyValue = currentPropertyValue.Replace("\"", "");
             return ValueType.Text;
         }
-        else if (currentPropertyValue.Equals("null", StringComparison.CurrentCultureIgnoreCase))
+
+        if (currentPropertyValue.Equals("null", StringComparison.CurrentCultureIgnoreCase))
         {
             return ValueType.Null;
         }
-        else if (currentPropertyValue.StartsWith('\''))
+
+        if (currentPropertyValue.StartsWith('\''))
         {
             currentPropertyValue = currentPropertyValue.Replace("'", "");
             return ValueType.Char;
         }
-        else if (currentPropertyValue.Contains('.'))
+
+        if (currentPropertyValue.Contains('.'))
         {
             return ValueType.Float;
         }
-        else if (bool.TryParse(currentPropertyValue, out _))
+
+        if (bool.TryParse(currentPropertyValue, out _))
         {
             return ValueType.Boolean;
         }
-        else if (int.TryParse(currentPropertyValue, out _))
+
+        if (int.TryParse(currentPropertyValue, out _))
         {
             return ValueType.Int;
         }
-        else if (long.TryParse(currentPropertyValue, out _))
+
+        if (long.TryParse(currentPropertyValue, out _))
         {
             return ValueType.Long;
         }
-        else
-        {
-            return ValueType.None;
-        }
+
+        return ValueType.None;
     }
     private static JsonPropertyNode? SummonJsonPropertyNode(ValueType currentValueType, int currentLayer, string currentPropertyName, string currentPropertyValue)
     {
@@ -350,10 +350,8 @@ public class JsonNodeConverter(string jsonString)
                 _ => null,
             };
         }
-        else
-        {
-            return jsonComplexPropertyNode.DescendingNodes.Find(node => node.PropertyName == nodeProperties[0]) is JsonNode jsonNode ? new(jsonNode) : null;
-        }
+
+        return jsonComplexPropertyNode.DescendingNodes.Find(node => node.PropertyName == nodeProperties[0]) is JsonNode jsonNode ? new(jsonNode) : null;
     }
 }
 enum CurrentState

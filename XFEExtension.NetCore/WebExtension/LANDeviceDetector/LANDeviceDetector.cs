@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Net.NetworkInformation;
 using XFEExtension.NetCore.DelegateExtension;
-using XFEExtension.NetCore.WebExtension;
 
 namespace XFEExtension.NetCore.WebExtension.LANDeviceDetector;
 
@@ -73,8 +72,7 @@ public class LANDeviceDetector
                 var device = new LANDeviceImpl(reply.Address, hostEntry, hostEntry?.HostName);
                 if (FindDevices.Any(d => d.IPAddress.ToString() == reply.Address.ToString()))
                     return;
-                else
-                    FindDevices.Add(device);
+                FindDevices.Add(device);
                 DeviceFind?.Invoke(device);
             }));
         }

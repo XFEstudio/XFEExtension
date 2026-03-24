@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.Versioning;
 using System.Security.Principal;
 
 namespace XFEExtension.NetCore.PermissionExtension;
@@ -7,8 +8,8 @@ namespace XFEExtension.NetCore.PermissionExtension;
 /// <summary>
 /// UAC权限（管理员权限）
 /// </summary>
-[System.Runtime.Versioning.SupportedOSPlatform("windows")]
-public static partial class AdministratorPermission
+[SupportedOSPlatform("windows")]
+public static class AdministratorPermission
 {
     /// <summary>
     /// 当前请求的状态

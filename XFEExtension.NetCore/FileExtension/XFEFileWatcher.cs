@@ -52,8 +52,6 @@ public class XFEFileWatcher
             case WatcherChangeTypes.Deleted:
                 FileDeleted?.Invoke(sender, e);
                 break;
-            default:
-                break;
         }
     }
 

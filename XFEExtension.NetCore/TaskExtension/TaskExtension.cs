@@ -7,7 +7,7 @@ namespace XFEExtension.NetCore.TaskExtension;
 /// </summary>
 public static class TaskExtension
 {
-    private static long cTimeCounter = 0;
+    private static long cTimeCounter;
     #region 新建任务并开始
     /// <summary>
     /// 新建一个任务并开始

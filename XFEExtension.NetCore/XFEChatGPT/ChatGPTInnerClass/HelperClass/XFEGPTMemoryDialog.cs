@@ -119,16 +119,14 @@ public abstract class XFEGPTMemoryDialog : IEnumerable<XFEGPTMessage>
             {
                 throw new XFEChatGPTException("系统消息无法更改");
             }
+
+            if (clear)
+            {
+                xFEGPTMessages.GetXFEGPTMessageByMessageId(messageId)!.GPTMessage.Content = nowMessage;
+            }
             else
             {
-                if (clear)
-                {
-                    xFEGPTMessages.GetXFEGPTMessageByMessageId(messageId)!.GPTMessage.Content = nowMessage;
-                }
-                else
-                {
-                    xFEGPTMessages.GetXFEGPTMessageByMessageId(messageId)!.GPTMessage.Content += nowMessage;
-                }
+                xFEGPTMessages.GetXFEGPTMessageByMessageId(messageId)!.GPTMessage.Content += nowMessage;
             }
         }
     }

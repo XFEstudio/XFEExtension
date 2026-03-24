@@ -27,10 +27,8 @@ public class XFEChatGPT : XFEChatGPTBase
             {
                 throw new XFEChatGPTException("自定义数据模式下不可获取");
             }
-            else
-            {
-                return xFEAskGPTMessage.SystemContent;
-            }
+
+            return xFEAskGPTMessage.SystemContent;
         }
         set
         {
@@ -38,10 +36,8 @@ public class XFEChatGPT : XFEChatGPTBase
             {
                 throw new XFEChatGPTException("自定义数据模式下不可设置");
             }
-            else
-            {
-                xFEAskGPTMessage.SystemContent = value;
-            }
+
+            xFEAskGPTMessage.SystemContent = value;
         }
     }
     /// <summary>
@@ -55,10 +51,8 @@ public class XFEChatGPT : XFEChatGPTBase
             {
                 throw new XFEChatGPTException("自定义数据模式下不可获取");
             }
-            else
-            {
-                return xFEAskGPTMessage.AskContent;
-            }
+
+            return xFEAskGPTMessage.AskContent;
         }
         set
         {
@@ -66,10 +60,8 @@ public class XFEChatGPT : XFEChatGPTBase
             {
                 throw new XFEChatGPTException("自定义数据模式下不可设置");
             }
-            else
-            {
-                xFEAskGPTMessage.AskContent = value;
-            }
+
+            xFEAskGPTMessage.AskContent = value;
         }
     }
     /// <summary>
@@ -83,10 +75,8 @@ public class XFEChatGPT : XFEChatGPTBase
             {
                 return xFEAskGPTMessage.EnvironmentGPTData!.Model.GetModel();
             }
-            else
-            {
-                return xFEAskGPTMessage.ChatGPTModel!.GetModel();
-            }
+
+            return xFEAskGPTMessage.ChatGPTModel!.GetModel();
         }
         set
         {
@@ -131,10 +121,8 @@ public class XFEChatGPT : XFEChatGPTBase
             {
                 return xFEAskGPTMessage.EnvironmentGPTData!.Stream;
             }
-            else
-            {
-                return xFEAskGPTMessage.Stream;
-            }
+
+            return xFEAskGPTMessage.Stream;
         }
     }
     /// <summary>
@@ -281,7 +269,8 @@ public class XFEChatGPT : XFEChatGPTBase
                             XFEChatGPTMessageReceived?.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs("[XFEDONE]", messageId, GenerateState.End));
                             break;
                         }
-                        else if (nowReceivedMessage.Contains("[XFERemoteAPIError]"))
+
+                        if (nowReceivedMessage.Contains("[XFERemoteAPIError]"))
                         {
                             if (!isStarted)
                             {
@@ -305,7 +294,8 @@ public class XFEChatGPT : XFEChatGPTBase
                             XFEChatGPTMessageReceived?.Invoke(this, new PrivateXFEGPTMessageReceivedEventArgs("[XFEDONE]", messageId, GenerateState.End));
                             break;
                         }
-                        else if (nowReceivedMessage.Contains("[XFERemoteAPIError]"))
+
+                        if (nowReceivedMessage.Contains("[XFERemoteAPIError]"))
                         {
                             if (!isStarted)
                             {

@@ -30,10 +30,10 @@ public abstract class MessageChoice
     /// <param name="index"></param>
     public MessageChoice(GPTMessage delta, GPTMessage message, string finishReason, int index)
     {
-        this.Delta = delta;
-        this.Message = message;
-        this.FinishReason = finishReason;
-        this.Index = index;
+        Delta = delta;
+        Message = message;
+        FinishReason = finishReason;
+        Index = index;
     }
     /// <summary>
     /// GPT消息链的组成单元
@@ -43,8 +43,8 @@ public abstract class MessageChoice
     /// <param name="index">消息索引</param>
     public MessageChoice(GPTMessage message, string finishReason, int index)
     {
-        this.Message = message;
-        this.FinishReason = finishReason;
-        this.Index = index;
+        Message = message;
+        FinishReason = finishReason;
+        Index = index;
     }
 }

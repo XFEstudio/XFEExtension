@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Text;
 using XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.DefaultClass;
 using XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass;
@@ -150,22 +149,21 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
             {
                 throw new XFEChatGPTException("dialogMessage的格式不正确！应为string[任意数量,2]");
             }
-            else if (dialogMessage.Length % 2 == 1)
+
+            if (dialogMessage.Length % 2 == 1)
             {
                 throw new XFEChatGPTException("dialogMessage不合法！只能成对添加user和assistant");
             }
-            else
+
+            string[] messageId = new string[dialogMessage.Length];
+            for (int i = 0; i < dialogMessage.Length; i += 2)
             {
-                string[] messageId = new string[dialogMessage.Length];
-                for (int i = 0; i < dialogMessage.Length; i += 2)
-                {
-                    messageId[i] = Guid.NewGuid().ToString();
-                    messageId[i + 1] = messageId[i] + "_Assistant";
-                    xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i == 0 ? 0 : i / 2, 0])));
-                    xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i == 0 ? 0 : i / 2, 1])));
-                }
-                return messageId;
+                messageId[i] = Guid.NewGuid().ToString();
+                messageId[i + 1] = messageId[i] + "_Assistant";
+                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i == 0 ? 0 : i / 2, 0])));
+                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i == 0 ? 0 : i / 2, 1])));
             }
+            return messageId;
         }
         catch (IndexOutOfRangeException ex)
         {
@@ -187,18 +185,16 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
             {
                 throw new XFEChatGPTException("dialogMessage不合法！只能成对添加user和assistant");
             }
-            else
+
+            string[] messageId = new string[dialogMessage.Length];
+            for (int i = 0; i < dialogMessage.Length; i += 2)
             {
-                string[] messageId = new string[dialogMessage.Length];
-                for (int i = 0; i < dialogMessage.Length; i += 2)
-                {
-                    messageId[i] = Guid.NewGuid().ToString();
-                    messageId[i + 1] = messageId[i] + "_Assistant";
-                    xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i])));
-                    xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i + 1])));
-                }
-                return messageId;
+                messageId[i] = Guid.NewGuid().ToString();
+                messageId[i + 1] = messageId[i] + "_Assistant";
+                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i])));
+                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i + 1])));
             }
+            return messageId;
         }
         catch (IndexOutOfRangeException ex)
         {
@@ -220,21 +216,21 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
             {
                 throw new XFEChatGPTException("messageId与dialogMessage数量不对应");
             }
-            else if (dialogMessage.GetLength(1) != 2)
+
+            if (dialogMessage.GetLength(1) != 2)
             {
                 throw new XFEChatGPTException("dialogMessage的格式不正确！应为string[任意数量,2]");
             }
-            else if (dialogMessage.Length % 2 == 1)
+
+            if (dialogMessage.Length % 2 == 1)
             {
                 throw new XFEChatGPTException("dialogMessage不合法！只能成对添加user和assistant");
             }
-            else
+
+            for (int i = 0; i < dialogMessage.Length; i += 2)
             {
-                for (int i = 0; i < dialogMessage.Length; i += 2)
-                {
-                    xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i == 0 ? 0 : i / 2, 0])));
-                    xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i == 0 ? 0 : i / 2, 1])));
-                }
+                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i == 0 ? 0 : i / 2, 0])));
+                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i == 0 ? 0 : i / 2, 1])));
             }
         }
         catch (IndexOutOfRangeException ex)
@@ -257,17 +253,16 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
             {
                 throw new XFEChatGPTException("messageId与dialogMessage数量不对应");
             }
-            else if (dialogMessage.Length % 2 == 1)
+
+            if (dialogMessage.Length % 2 == 1)
             {
                 throw new XFEChatGPTException("dialogMessage不合法！只能成对添加user和assistant");
             }
-            else
+
+            for (int i = 0; i < dialogMessage.Length; i += 2)
             {
-                for (int i = 0; i < dialogMessage.Length; i += 2)
-                {
-                    xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i])));
-                    xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i + 1])));
-                }
+                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i], new GPTMessage("user", dialogMessage[i])));
+                xFEGPTMemoryDialog[dialogId].Add(new XFEGPTMessage(messageId[i + 1], new GPTMessage("assistant", dialogMessage[i + 1])));
             }
         }
         catch (IndexOutOfRangeException ex)
@@ -415,7 +410,8 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                             XFEChatGPTMessageReceived?.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs("[XFEDONE]", messageId, GenerateState.End, dialogId));
                             break;
                         }
-                        else if (nowReceivedMessage.Contains("[XFERemoteAPIError]"))
+
+                        if (nowReceivedMessage.Contains("[XFERemoteAPIError]"))
                         {
                             if (!isStarted)
                             {
@@ -447,7 +443,8 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                             XFEChatGPTMessageReceived?.Invoke(this, new PrivateMemorableGPTMessageReceivedEventArgs("[XFEDONE]", messageId, GenerateState.End, dialogId));
                             break;
                         }
-                        else if (nowReceivedMessage.Contains("[XFERemoteAPIError]"))
+
+                        if (nowReceivedMessage.Contains("[XFERemoteAPIError]"))
                         {
                             if (!isStarted)
                             {

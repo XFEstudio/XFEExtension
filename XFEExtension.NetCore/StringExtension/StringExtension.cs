@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
 using XFEExtension.NetCore.XFETransform;
@@ -89,7 +90,7 @@ public static partial class StringExtension
             try
             {
                 telephoneNum = Regex.Replace(telephoneNum, @"(@)(.+)$", DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
-                var validDomain = new System.Net.Mail.MailAddress(telephoneNum).Host;
+                var validDomain = new MailAddress(telephoneNum).Host;
                 return Regex.IsMatch(telephoneNum, @"^(?("")("".+?""@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)[0-9a-zA-Z]\@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,}))$", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
             }
             catch (FormatException)
@@ -196,10 +197,8 @@ public static partial class StringExtension
                 }
                 return result;
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         /// <summary>
@@ -256,24 +255,22 @@ public static partial class StringExtension
                     stringBuilder.Append(str[startIndex..]);
                     break;
                 }
+
+                // 在指定宽度范围内寻找最后一个空格字符
+                int lastSpaceIndex = str.LastIndexOf(' ', endIndex, width);
+                if (lastSpaceIndex > startIndex)
+                {
+                    // 如果找到了空格字符，则将文本从起始位置到空格字符位置添加到结果中，并进行换行
+                    stringBuilder.Append(str[startIndex..lastSpaceIndex]);
+                    stringBuilder.AppendLine();
+                    startIndex = lastSpaceIndex + 1;
+                }
                 else
                 {
-                    // 在指定宽度范围内寻找最后一个空格字符
-                    int lastSpaceIndex = str.LastIndexOf(' ', endIndex, width);
-                    if (lastSpaceIndex > startIndex)
-                    {
-                        // 如果找到了空格字符，则将文本从起始位置到空格字符位置添加到结果中，并进行换行
-                        stringBuilder.Append(str[startIndex..lastSpaceIndex]);
-                        stringBuilder.AppendLine();
-                        startIndex = lastSpaceIndex + 1;
-                    }
-                    else
-                    {
-                        // 如果没有找到空格字符，则直接添加指定宽度的文本到结果中，并进行换行
-                        stringBuilder.Append(str.AsSpan(startIndex, width));
-                        stringBuilder.AppendLine();
-                        startIndex += width;
-                    }
+                    // 如果没有找到空格字符，则直接添加指定宽度的文本到结果中，并进行换行
+                    stringBuilder.Append(str.AsSpan(startIndex, width));
+                    stringBuilder.AppendLine();
+                    startIndex += width;
                 }
             }
 
@@ -414,7 +411,7 @@ public static partial class StringExtension
         /// <returns>分割后的带分割器字符串数组</returns>
         public string[] SplitAndKeepDelimiter(string delimiter, bool removeEmptyString)
         {
-            return SplitAndKeepDelimiter(str, [delimiter], removeEmptyString);
+            return str.SplitAndKeepDelimiter([delimiter], removeEmptyString);
         }
 
         /// <summary>
@@ -424,7 +421,7 @@ public static partial class StringExtension
         /// <returns>分割后的带分割器字符串数组</returns>
         public string[] SplitAndKeepDelimiter(string delimiter)
         {
-            return SplitAndKeepDelimiter(str, [delimiter], true);
+            return str.SplitAndKeepDelimiter([delimiter], true);
         }
 
         /// <summary>
@@ -434,7 +431,7 @@ public static partial class StringExtension
         /// <returns>分割后的带分割器字符串数组</returns>
         public string[] SplitAndKeepDelimiter(string[] delimiter)
         {
-            return SplitAndKeepDelimiter(str, delimiter, true);
+            return str.SplitAndKeepDelimiter(delimiter, true);
         }
     }
 

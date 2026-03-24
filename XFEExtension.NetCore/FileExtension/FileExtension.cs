@@ -240,12 +240,12 @@ public static class FileExtension
         /// </summary>
         /// <param name="startPosition">起始搜寻位置</param>
         /// <returns>一个长整型，介于起始位置和结束位置之间</returns>
-        public async Task<long> GetValidPosition(long startPosition) => await GetValidPosition(fileStream, startPosition, fileStream.Length);
+        public async Task<long> GetValidPosition(long startPosition) => await fileStream.GetValidPosition(startPosition, fileStream.Length);
 
         /// <summary>
         /// 获取文件的有效起始位置
         /// </summary>
         /// <returns>一个长整型，介于起始位置和结束位置之间</returns>
-        public async Task<long> GetValidPosition() => await GetValidPosition(fileStream, 0, fileStream.Length);
+        public async Task<long> GetValidPosition() => await fileStream.GetValidPosition(0, fileStream.Length);
     }
 }

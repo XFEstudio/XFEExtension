@@ -1,4 +1,6 @@
-﻿namespace XFEExtension.NetCore.ObjectExtension;
+﻿using System.Reflection;
+
+namespace XFEExtension.NetCore.ObjectExtension;
 
 /// <summary>
 /// 所有类的基类的拓展
@@ -14,7 +16,7 @@ public static class ObjectExtension
         /// </summary>
         /// <returns>浅拷贝后的对象</returns>
         /// <exception cref="ArgumentNullException">无类型错误</exception>
-        public T ActiveCopyOf() => source is null ? throw new ArgumentNullException(nameof(source)) : (T)source.GetType().GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)?.Invoke(source, null)!;
+        public T ActiveCopyOf() => source is null ? throw new ArgumentNullException(nameof(source)) : (T)source.GetType().GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic)?.Invoke(source, null)!;
 
         /// <summary>
         /// 进行静态拷贝

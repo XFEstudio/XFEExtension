@@ -13,13 +13,13 @@ class XFEAskGPTMessage
     public string? AskContent { get; set; }
     public XFEAskGPTMessage(bool isSelfEditData, bool stream, string chatGPTModel, EnvironmentGPTData? environmentGPTData, XFEComProtocol comProtocol, string systemContent, string askContent)
     {
-        this.IsSelfEditData = isSelfEditData;
-        this.Stream = stream;
-        this.ChatGPTModel = chatGPTModel;
-        this.EnvironmentGPTData = environmentGPTData;
-        this.ComProtocol = comProtocol;
-        this.SystemContent = systemContent;
-        this.AskContent = askContent;
+        IsSelfEditData = isSelfEditData;
+        Stream = stream;
+        ChatGPTModel = chatGPTModel;
+        EnvironmentGPTData = environmentGPTData;
+        ComProtocol = comProtocol;
+        SystemContent = systemContent;
+        AskContent = askContent;
     }
     public XFEAskGPTMessage() { }
 }

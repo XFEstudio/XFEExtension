@@ -182,7 +182,7 @@ public class CyberCommServer
         {
             serverURLs.Add($"http://*:{port}/");
         }
-        this.ServerURLs = [.. serverURLs];
+        ServerURLs = [.. serverURLs];
         AutoReceiveCompletedMessage = true;
     }
     /// <summary>
@@ -191,7 +191,7 @@ public class CyberCommServer
     /// <param name="serverURLs">服务器URL</param>
     public CyberCommServer(params string[] serverURLs)
     {
-        this.ServerURLs = serverURLs;
+        ServerURLs = serverURLs;
         AutoReceiveCompletedMessage = true;
     }
     /// <summary>
@@ -201,7 +201,7 @@ public class CyberCommServer
     /// <param name="serverURLs">服务器URL</param>
     public CyberCommServer(bool autoReceiveCompletedMessage = true, params string[] serverURLs)
     {
-        this.ServerURLs = serverURLs;
+        ServerURLs = serverURLs;
         AutoReceiveCompletedMessage = autoReceiveCompletedMessage;
     }
     #endregion

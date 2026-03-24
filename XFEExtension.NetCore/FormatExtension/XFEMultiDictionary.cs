@@ -1,4 +1,6 @@
-﻿namespace XFEExtension.NetCore.FormatExtension;
+﻿using System.Collections;
+
+namespace XFEExtension.NetCore.FormatExtension;
 
 /// <summary>
 /// XFE可重复字典存储
@@ -176,8 +178,7 @@ public class XFEMultiDictionary : ICollection<XFEEntry>
         var entry = xFEMultiDictionaryList.Find(x => x.Header == headerString);
         if (entry is not null)
             return xFEMultiDictionaryList.Remove(entry);
-        else
-            return false;
+        return false;
     }
     /// <summary>
     /// 移除指定范围的数组
@@ -210,7 +211,7 @@ public class XFEMultiDictionary : ICollection<XFEEntry>
         }
     }
 
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+    IEnumerator IEnumerable.GetEnumerator()
     {
         return xFEMultiDictionaryList.GetEnumerator();
     }

@@ -176,7 +176,7 @@ public static class BufferExtension
         /// </summary>
         /// <param name="headers"></param>
         /// <returns></returns>
-        public byte[] AddHeaderAndPack(params byte[] headers) => new List<byte[]>() { headers, buffer }.PackBuffer();
+        public byte[] AddHeaderAndPack(params byte[] headers) => new List<byte[]> { headers, buffer }.PackBuffer();
 
         /// <summary>
         /// 将XEFBuffer转换为BufferList

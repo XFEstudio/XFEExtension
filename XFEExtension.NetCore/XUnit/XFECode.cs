@@ -13,9 +13,9 @@ namespace XFEExtension.NetCore.XUnit;
 /// </summary>
 public abstract class XFECode
 {
-    private static int cTimeCounter = 0;
-    private static bool initialized = false;
-    private static bool currentMethodIsAsserted = false;
+    private static int cTimeCounter;
+    private static bool initialized;
+    private static bool currentMethodIsAsserted;
     private static string currentAssertMessage = string.Empty;
     #region 暂停
     /// <summary>
@@ -275,11 +275,11 @@ public abstract class XFECode
                             Console.Write("开始执行");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.ForegroundColor = mainColor;
-                            Console.Write($"\t方法：");
+                            Console.Write("\t方法：");
                             Console.ForegroundColor = methodColor;
                             Console.Write(method.Name);
                             Console.ForegroundColor = mainColor;
-                            Console.Write($"\t类：");
+                            Console.Write("\t类：");
                             Console.ForegroundColor = classColor;
                             Console.WriteLine($"{subClass.Name}\n");
                             Console.ResetColor();
@@ -425,7 +425,7 @@ public abstract class XFECode
                 #endregion
                 var classAttributes = subClass.GetCustomAttributes<CTestAttribute>();
                 var classRunMethods = subClass.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).Where(m => m.IsDefined(typeof(MTestAttribute)));
-                foreach (var classAttribute in classAttributes.Cast<CTestAttribute>())
+                foreach (var classAttribute in classAttributes)
                 {
                     var isFirstMethod = true;
                     var failedList = new List<MethodAndCounter>();
@@ -523,7 +523,7 @@ public abstract class XFECode
                                 }
                             }
                         }
-                        foreach (MTestAttribute attribute in attributes.Cast<MTestAttribute>())
+                        foreach (MTestAttribute attribute in attributes)
                         {
                             if (attribute is MTestAttribute methodAttribute)
                             {
@@ -593,11 +593,11 @@ public abstract class XFECode
                                 Console.Write("开始执行");
                                 Console.BackgroundColor = ConsoleColor.Black;
                                 Console.ForegroundColor = mainColor;
-                                Console.Write($"\t方法：");
+                                Console.Write("\t方法：");
                                 Console.ForegroundColor = methodColor;
                                 Console.Write(method.Name);
                                 Console.ForegroundColor = mainColor;
-                                Console.Write($"\t类：");
+                                Console.Write("\t类：");
                                 Console.ForegroundColor = classColor;
                                 Console.WriteLine($"{subClass.Name}\n");
                                 Console.ResetColor();

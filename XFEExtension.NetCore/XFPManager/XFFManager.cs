@@ -83,7 +83,7 @@ public class XFFManager
         Fields = [];
         for (int i = 0; i < nameAndValue.Length; i += 2)
         {
-            Fields.Add(new XField() { name = nameAndValue[i].ToString(), field = nameAndValue[i + 1] });
+            Fields.Add(new XField { name = nameAndValue[i].ToString(), field = nameAndValue[i + 1] });
         }
     }
 }

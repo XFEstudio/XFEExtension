@@ -10,7 +10,7 @@ public class XCCMessageReceiveHelper
 {
     private readonly Dictionary<string, XCCFile> xCCFileDictionary = [];
     private readonly Dictionary<string, List<XCCMessage>> xCCMessageDictionary = [];
-    private bool loaded = false;
+    private bool loaded;
     /// <summary>
     /// 自动保存到本地
     /// </summary>
@@ -242,8 +242,6 @@ public class XCCMessageReceiveHelper
             case XCCTextMessageType.Video:
                 ReceiveFilePlaceHolder(e, XCCFileType.Video);
                 break;
-            default:
-                break;
         }
     }
     private void ReceiveBinaryMessage(object? sender, XCCBinaryMessageReceivedEventArgs e)
@@ -278,8 +276,6 @@ public class XCCMessageReceiveHelper
                     break;
                 case XCCBinaryMessageType.Video:
                     fileType = XCCFileType.Video;
-                    break;
-                default:
                     break;
             }
             var xCCFile = new XCCFile(e.GroupId, e.MessageId!, fileType, e.Sender!, e.SendTime, e.BinaryMessage);

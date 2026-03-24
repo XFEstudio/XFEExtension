@@ -1,4 +1,6 @@
-﻿namespace XFEExtension.NetCore.ThreadExtension;
+﻿using System.Runtime.Versioning;
+
+namespace XFEExtension.NetCore.ThreadExtension;
 
 /// <summary>
 /// 线程的拓展
@@ -121,7 +123,7 @@ public static class ThreadExtension
     /// <param name="parameter">传递的参数</param>
     /// <param name="apartmentState">线程的状态</param>
     /// <returns></returns>
-    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("windows")]
     public static Thread StartNewThread(ParameterizedThreadStart method, object parameter, ApartmentState apartmentState)
     {
         Thread thread = new(method);
@@ -137,7 +139,7 @@ public static class ThreadExtension
     /// <param name="method">线程方法</param>
     /// <param name="apartmentState">线程的状态</param>
     /// <returns></returns>
-    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("windows")]
     public static Thread StartNewThread(ThreadStart method, ApartmentState apartmentState)
     {
         Thread thread = new(method);

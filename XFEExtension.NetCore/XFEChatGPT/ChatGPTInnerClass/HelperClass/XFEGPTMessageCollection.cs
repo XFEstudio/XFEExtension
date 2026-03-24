@@ -47,10 +47,8 @@ public class XFEGPTMessageCollection : IEnumerable<XFEGPTMessage>
             {
                 return xFEGPTMessages[0].GPTMessage.Content;
             }
-            else
-            {
-                throw new XFEChatGPTException("消息集合中没有系统消息！");
-            }
+
+            throw new XFEChatGPTException("消息集合中没有系统消息！");
         }
         set
         {

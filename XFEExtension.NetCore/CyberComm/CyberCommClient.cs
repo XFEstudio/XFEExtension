@@ -17,7 +17,7 @@ public class CyberCommClient
     /// <summary>
     /// 是否已连接
     /// </summary>
-    public bool IsConnected { get; private set; } = false;
+    public bool IsConnected { get; private set; }
     /// <summary>
     /// 是否自动重连
     /// </summary>
@@ -71,7 +71,7 @@ public class CyberCommClient
         }
         catch (Exception ex)
         {
-            if (IsConnected == true)
+            if (IsConnected)
             {
                 ConnectionClosed?.Invoke(this, EventArgs.Empty);
             }
@@ -128,7 +128,7 @@ public class CyberCommClient
             }
             catch (Exception ex)
             {
-                if (IsConnected == true)
+                if (IsConnected)
                 {
                     ConnectionClosed?.Invoke(this, EventArgs.Empty);
                 }

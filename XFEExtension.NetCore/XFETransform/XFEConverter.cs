@@ -99,96 +99,96 @@ public class XFEConverter
             var isBasicType = IsBasicType(type);
             if (isBasicType)
                 return new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, true, value);
-            else
+            if (type.IsAssignableTo(typeof(Enum)))
             {
-                if (type.IsAssignableTo(typeof(Enum)))
-                {
-                    return new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, ObjectPlace.Enum, layer, type, false, value);
-                }
-                else if (value is Exception exception)
-                {
-                    return new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, false, exception.ToString());
-                }
-                else if (type.IsAssignableTo(typeof(Array)))
-                {
-                    var arrayObjects = new List<IObjectInfo>();
-                    var currentCount = 0;
-                    foreach (var item in (Array)value)
-                    {
-                        currentCount++;
-                        try
-                        {
-                            arrayObjects.Add(GetObjectInfo(stringConverter, "数组成员", ObjectPlace.ArrayMember, layer + 1, currentFatherList, item.GetType(), item, onlyProperty, onlyPublic, stopInThisLayer, maxLayer, maxArrayCount, currentFieldInfo, currentPropertyInfo));
-                        }
-                        catch
-                        {
-                            arrayObjects.Add(GetObjectInfo(stringConverter, "数组成员", ObjectPlace.ArrayMember, layer + 1, currentFatherList, null, null, onlyProperty, onlyPublic, stopInThisLayer, maxLayer, maxArrayCount, currentFieldInfo, currentPropertyInfo));
-                        }
-                        if (currentCount > maxArrayCount && maxArrayCount != -1)
-                        {
-                            arrayObjects.Add(new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, true, $"数组数量超出设定最大值（{maxArrayCount}）"));
-                            break;
-                        }
-                    }
-                    return new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, false, true, value, arrayObjects);
-                }
-                else if (type.IsAssignableTo(typeof(IEnumerable)))
-                {
-                    var enumerableObjects = new List<IObjectInfo>();
-                    var currentCount = 0;
-                    foreach (var item in (IEnumerable)value)
-                    {
-                        currentCount++;
-                        try
-                        {
-                            enumerableObjects.Add(GetObjectInfo(stringConverter, "列表成员", ObjectPlace.ListMember, layer + 1, currentFatherList, item.GetType(), item, onlyProperty, onlyPublic, stopInThisLayer, maxLayer, maxArrayCount, currentFieldInfo, currentPropertyInfo));
-                        }
-                        catch
-                        {
-                            enumerableObjects.Add(GetObjectInfo(stringConverter, "列表成员", ObjectPlace.ListMember, layer + 1, currentFatherList, null, null, onlyProperty, onlyPublic, stopInThisLayer, maxLayer, maxArrayCount, currentFieldInfo, currentPropertyInfo));
-                        }
-                        if (currentCount > maxArrayCount && maxArrayCount != -1)
-                        {
-                            enumerableObjects.Add(new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, true, $"列表数量超出设定最大值（{maxArrayCount}）"));
-                            break;
-                        }
-                    }
-                    return new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, false, true, value, enumerableObjects);
-                }
-                if (stopInThisLayer)
-                {
-                    return new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, false, false, value);
-                }
-                var isType = value is Type || type.FullName == "System.RuntimeType";
-                var subObjects = new List<IObjectInfo>();
-                foreach (var memberInfo in type.GetMembers((onlyPublic ? BindingFlags.Public : BindingFlags.NonPublic | BindingFlags.Public) | BindingFlags.Instance | BindingFlags.Static))
-                {
-                    if (memberInfo is PropertyInfo propertyInfo)
-                    {
-                        try
-                        {
-                            subObjects.Add(GetObjectInfo(stringConverter, propertyInfo.Name, ObjectPlace.Property, layer + 1, currentFatherList, propertyInfo.PropertyType, propertyInfo.GetValue(value), onlyProperty, onlyPublic, isType, maxLayer, maxArrayCount, null, propertyInfo));
-                        }
-                        catch
-                        {
-                            subObjects.Add(GetObjectInfo(stringConverter, propertyInfo.Name, ObjectPlace.Property, layer + 1, currentFatherList, propertyInfo.PropertyType, null, onlyProperty, onlyPublic, isType, maxLayer, maxArrayCount, null, propertyInfo));
-                        }
-                        continue;
-                    }
-                    if (!onlyProperty && memberInfo is FieldInfo fieldInfo)
-                    {
-                        try
-                        {
-                            subObjects.Add(GetObjectInfo(stringConverter, fieldInfo.Name, ObjectPlace.Field, layer + 1, currentFatherList, fieldInfo.FieldType, fieldInfo.GetValue(value), onlyProperty, onlyPublic, isType, maxLayer, maxArrayCount, fieldInfo, null));
-                        }
-                        catch
-                        {
-                            subObjects.Add(GetObjectInfo(stringConverter, fieldInfo.Name, ObjectPlace.Property, layer + 1, currentFatherList, fieldInfo.FieldType, null, onlyProperty, onlyPublic, isType, maxLayer, maxArrayCount, fieldInfo, null));
-                        }
-                    }
-                }
-                return new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, false, false, value, subObjects);
+                return new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, ObjectPlace.Enum, layer, type, false, value);
             }
+
+            if (value is Exception exception)
+            {
+                return new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, false, exception.ToString());
+            }
+
+            if (type.IsAssignableTo(typeof(Array)))
+            {
+                var arrayObjects = new List<IObjectInfo>();
+                var currentCount = 0;
+                foreach (var item in (Array)value)
+                {
+                    currentCount++;
+                    try
+                    {
+                        arrayObjects.Add(GetObjectInfo(stringConverter, "数组成员", ObjectPlace.ArrayMember, layer + 1, currentFatherList, item.GetType(), item, onlyProperty, onlyPublic, stopInThisLayer, maxLayer, maxArrayCount, currentFieldInfo, currentPropertyInfo));
+                    }
+                    catch
+                    {
+                        arrayObjects.Add(GetObjectInfo(stringConverter, "数组成员", ObjectPlace.ArrayMember, layer + 1, currentFatherList, null, null, onlyProperty, onlyPublic, stopInThisLayer, maxLayer, maxArrayCount, currentFieldInfo, currentPropertyInfo));
+                    }
+                    if (currentCount > maxArrayCount && maxArrayCount != -1)
+                    {
+                        arrayObjects.Add(new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, true, $"数组数量超出设定最大值（{maxArrayCount}）"));
+                        break;
+                    }
+                }
+                return new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, false, true, value, arrayObjects);
+            }
+
+            if (type.IsAssignableTo(typeof(IEnumerable)))
+            {
+                var enumerableObjects = new List<IObjectInfo>();
+                var currentCount = 0;
+                foreach (var item in (IEnumerable)value)
+                {
+                    currentCount++;
+                    try
+                    {
+                        enumerableObjects.Add(GetObjectInfo(stringConverter, "列表成员", ObjectPlace.ListMember, layer + 1, currentFatherList, item.GetType(), item, onlyProperty, onlyPublic, stopInThisLayer, maxLayer, maxArrayCount, currentFieldInfo, currentPropertyInfo));
+                    }
+                    catch
+                    {
+                        enumerableObjects.Add(GetObjectInfo(stringConverter, "列表成员", ObjectPlace.ListMember, layer + 1, currentFatherList, null, null, onlyProperty, onlyPublic, stopInThisLayer, maxLayer, maxArrayCount, currentFieldInfo, currentPropertyInfo));
+                    }
+                    if (currentCount > maxArrayCount && maxArrayCount != -1)
+                    {
+                        enumerableObjects.Add(new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, true, $"列表数量超出设定最大值（{maxArrayCount}）"));
+                        break;
+                    }
+                }
+                return new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, false, true, value, enumerableObjects);
+            }
+            if (stopInThisLayer)
+            {
+                return new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, false, false, value);
+            }
+            var isType = value is Type || type.FullName == "System.RuntimeType";
+            var subObjects = new List<IObjectInfo>();
+            foreach (var memberInfo in type.GetMembers((onlyPublic ? BindingFlags.Public : BindingFlags.NonPublic | BindingFlags.Public) | BindingFlags.Instance | BindingFlags.Static))
+            {
+                if (memberInfo is PropertyInfo propertyInfo)
+                {
+                    try
+                    {
+                        subObjects.Add(GetObjectInfo(stringConverter, propertyInfo.Name, ObjectPlace.Property, layer + 1, currentFatherList, propertyInfo.PropertyType, propertyInfo.GetValue(value), onlyProperty, onlyPublic, isType, maxLayer, maxArrayCount, null, propertyInfo));
+                    }
+                    catch
+                    {
+                        subObjects.Add(GetObjectInfo(stringConverter, propertyInfo.Name, ObjectPlace.Property, layer + 1, currentFatherList, propertyInfo.PropertyType, null, onlyProperty, onlyPublic, isType, maxLayer, maxArrayCount, null, propertyInfo));
+                    }
+                    continue;
+                }
+                if (!onlyProperty && memberInfo is FieldInfo fieldInfo)
+                {
+                    try
+                    {
+                        subObjects.Add(GetObjectInfo(stringConverter, fieldInfo.Name, ObjectPlace.Field, layer + 1, currentFatherList, fieldInfo.FieldType, fieldInfo.GetValue(value), onlyProperty, onlyPublic, isType, maxLayer, maxArrayCount, fieldInfo));
+                    }
+                    catch
+                    {
+                        subObjects.Add(GetObjectInfo(stringConverter, fieldInfo.Name, ObjectPlace.Property, layer + 1, currentFatherList, fieldInfo.FieldType, null, onlyProperty, onlyPublic, isType, maxLayer, maxArrayCount, fieldInfo));
+                    }
+                }
+            }
+            return new ObjectInfoImpl(currentFieldInfo, currentPropertyInfo, stringConverter, name, objectPlace, layer, type, false, false, value, subObjects);
         }
         catch (Exception ex)
         {
