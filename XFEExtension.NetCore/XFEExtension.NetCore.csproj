@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>4.0.2</Version>
+    <Version>4.0.3</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -21,10 +21,8 @@
     <PackageReleaseNotes>
       ## 调整
 
-      重命名IpAddress为IPAddress以统一命名风格
-
-      将CyberCommServerEventArgs及相关引用中的IpAddress属性重命名为IPAddress，包含构造参数、注释和所有使用位置，提升代码一致性和可读性。
-      同时将项目版本号从4.0.1升级到4.0.2。
+      重命名WsHeader为WSHeader并升级版本至4.0.3
+      统一CyberCommServerEventArgs参数名为WSHeader，更新相关注释以保持一致性；在类型声明后补充了发送文本消息的注释说明；项目版本号由4.0.2提升至4.0.3。
 
       ## 新增
 
