@@ -274,17 +274,17 @@ public class CustomServer
     private void CyberCommServer_MessageReceived(object? sender, CyberCommServerEventArgs e)
     {
         e.ReplyMessage("服务器已接收消息");
-        Console.WriteLine($"收到客户端[{e.IpAddress}]消息：{e.TextMessage}");//明文传输实例
+        Console.WriteLine($"收到客户端[{e.IPAddress}]消息：{e.TextMessage}");//明文传输实例
     }
 
     private void CyberCommServer_ClientConnected(object? sender, CyberCommServerEventArgs e)
     {
-        Console.WriteLine($"新客户端连接：{e.IpAddress}");
+        Console.WriteLine($"新客户端连接：{e.IPAddress}");
     }
 
     private void CyberCommServer_ConnectionClosed(object? sender, CyberCommServerEventArgs e)
     {
-        Console.WriteLine($"客户端[{e.IpAddress}]断开连接");
+        Console.WriteLine($"客户端[{e.IPAddress}]断开连接");
     }
 
     private void CyberCommServer_ServerStarted(object? sender, EventArgs e)

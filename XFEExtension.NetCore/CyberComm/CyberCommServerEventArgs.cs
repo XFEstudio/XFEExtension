@@ -13,11 +13,11 @@ namespace XFEExtension.NetCore.CyberComm;
 /// <param name="CurrentWebSocket"> 当前WebSocket </param>
 /// <param name="WsHeader"> 客户端请求头 </param>
 /// <param name="Exception"> 异常消息（如果有的话） </param>
-/// <param name="IpAddress"> 客户端IP地址 </param>
+/// <param name="IPAddress"> 客户端IP地址 </param>
 /// <param name="TextMessage"> 文本消息 </param>
 /// <param name="BinaryMessage"> 二进制消息 </param>
 /// <param name="EndOfMessage">消息是否结束</param>
-public abstract record CyberCommServerEventArgs(Uri? RequestUrl, BackMessageType MessageType, WebSocket CurrentWebSocket, NameValueCollection WsHeader, XFECyberCommException? Exception, string IpAddress, string? TextMessage, byte[]? BinaryMessage, bool EndOfMessage)
+public abstract record CyberCommServerEventArgs(Uri? RequestUrl, BackMessageType MessageType, WebSocket CurrentWebSocket, NameValueCollection WsHeader, XFECyberCommException? Exception, string IPAddress, string? TextMessage, byte[]? BinaryMessage, bool EndOfMessage)
 {
     /// <summary>
     /// 发送文本消息
