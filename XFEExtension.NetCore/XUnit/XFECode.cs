@@ -15,10 +15,10 @@ namespace XFEExtension.NetCore.XUnit;
 /// </summary>
 public abstract class XFECode
 {
-    private static int _cTimeCounter;
-    private static bool _initialized;
-    private static bool _currentMethodIsAsserted;
-    private static string _currentAssertMessage = string.Empty;
+    private static int s_cTimeCounter;
+    private static bool s_initialized;
+    private static bool s_currentMethodIsAsserted;
+    private static string s_currentAssertMessage = string.Empty;
     #region 暂停
     /// <summary>
     /// 暂停
@@ -103,23 +103,23 @@ public abstract class XFECode
         timeCounter.Start();
         action?.Invoke();
         timeCounter.Stop();
-        _cTimeCounter++;
+        s_cTimeCounter++;
         var elapsedTime = timeCounter.Elapsed;
         if (!autoOutPut)
             return elapsedTime;
 
         if (elapsedTime.TotalHours >= 1)
-            Console.WriteLine($"标识名：{timerName}\t执行批次：{_cTimeCounter}\t执行时间：{elapsedTime}");
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{s_cTimeCounter}\t执行时间：{elapsedTime}");
         else if (elapsedTime.TotalMinutes >= 1)
-            Console.WriteLine($"标识名：{timerName}\t执行批次：{_cTimeCounter}\t执行时间: {Math.Floor(elapsedTime.TotalMinutes)} 分 {elapsedTime.Seconds} 秒");
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{s_cTimeCounter}\t执行时间: {Math.Floor(elapsedTime.TotalMinutes)} 分 {elapsedTime.Seconds} 秒");
         else if (elapsedTime.TotalSeconds >= 1)
-            Console.WriteLine($"标识名：{timerName}\t执行批次：{_cTimeCounter}\t执行时间: {elapsedTime.TotalSeconds:F3} 秒");
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{s_cTimeCounter}\t执行时间: {elapsedTime.TotalSeconds:F3} 秒");
         else if (elapsedTime.TotalMilliseconds >= 1)
-            Console.WriteLine($"标识名：{timerName}\t执行批次：{_cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds:F3} 毫秒");
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{s_cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds:F3} 毫秒");
         else if (elapsedTime.TotalMicroseconds >= 1)
-            Console.WriteLine($"标识名：{timerName}\t执行批次：{_cTimeCounter}\t执行时间: {elapsedTime.TotalMicroseconds:F3} 微秒");
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{s_cTimeCounter}\t执行时间: {elapsedTime.TotalMicroseconds:F3} 微秒");
         else
-            Console.WriteLine($"标识名：{timerName}\t执行批次：{_cTimeCounter}\t执行时间: {elapsedTime.TotalNanoseconds:F3} 纳秒");
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{s_cTimeCounter}\t执行时间: {elapsedTime.TotalNanoseconds:F3} 纳秒");
         return elapsedTime;
     }
     /// <summary>
@@ -135,23 +135,23 @@ public abstract class XFECode
         timeCounter.Start();
         await action?.Invoke()!;
         timeCounter.Stop();
-        _cTimeCounter++;
+        s_cTimeCounter++;
         var elapsedTime = timeCounter.Elapsed;
         if (!autoOutPut)
             return elapsedTime;
 
         if (elapsedTime.TotalHours >= 1)
-            Console.WriteLine($"标识名：{timerName}\t执行批次：{_cTimeCounter}\t执行时间：{elapsedTime}");
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{s_cTimeCounter}\t执行时间：{elapsedTime}");
         else if (elapsedTime.TotalMinutes >= 1)
-            Console.WriteLine($"标识名：{timerName}\t执行批次：{_cTimeCounter}\t执行时间: {Math.Floor(elapsedTime.TotalMinutes)} 分 {elapsedTime.Seconds} 秒");
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{s_cTimeCounter}\t执行时间: {Math.Floor(elapsedTime.TotalMinutes)} 分 {elapsedTime.Seconds} 秒");
         else if (elapsedTime.TotalSeconds >= 1)
-            Console.WriteLine($"标识名：{timerName}\t执行批次：{_cTimeCounter}\t执行时间: {elapsedTime.TotalSeconds:F3} 秒");
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{s_cTimeCounter}\t执行时间: {elapsedTime.TotalSeconds:F3} 秒");
         else if (elapsedTime.TotalMilliseconds >= 1)
-            Console.WriteLine($"标识名：{timerName}\t执行批次：{_cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds:F3} 毫秒");
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{s_cTimeCounter}\t执行时间: {elapsedTime.TotalMilliseconds:F3} 毫秒");
         else if (elapsedTime.TotalMicroseconds >= 1)
-            Console.WriteLine($"标识名：{timerName}\t执行批次：{_cTimeCounter}\t执行时间: {elapsedTime.TotalMicroseconds:F3} 微秒");
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{s_cTimeCounter}\t执行时间: {elapsedTime.TotalMicroseconds:F3} 微秒");
         else
-            Console.WriteLine($"标识名：{timerName}\t执行批次：{_cTimeCounter}\t执行时间: {elapsedTime.TotalNanoseconds:F3} 纳秒");
+            Console.WriteLine($"标识名：{timerName}\t执行批次：{s_cTimeCounter}\t执行时间: {elapsedTime.TotalNanoseconds:F3} 纳秒");
         return elapsedTime;
     }
     /// <summary>
@@ -161,9 +161,9 @@ public abstract class XFECode
     /// <exception cref="XFEExtensionException"></exception>
     public static async Task RunTest()
     {
-        if (_initialized)
+        if (s_initialized)
             return;
-        _initialized = true;
+        s_initialized = true;
         var isFirstClass = true;
         //var subClasses = Assembly.GetEntryAssembly()?.GetTypes().Where(type => type.IsSubclassOf(typeof(XFECode)));
         var allClasses = Assembly.GetEntryAssembly()?.GetTypes();
@@ -282,7 +282,7 @@ public abstract class XFECode
                                     }
                                 }
                             }
-                            _currentMethodIsAsserted = false;
+                            s_currentMethodIsAsserted = false;
                             if (method.ReturnType == typeof(Task))
                             {
                                 timeCounter.Start();
@@ -311,15 +311,15 @@ public abstract class XFECode
                                     }
                                 }
                             }
-                            if (_currentMethodIsAsserted)
+                            if (s_currentMethodIsAsserted)
                             {
                                 isSuccessful = false;
                                 if (failedMessage == string.Empty)
-                                    failedMessage = _currentAssertMessage;
+                                    failedMessage = s_currentAssertMessage;
                                 else
-                                    failedMessage += $"\n{_currentAssertMessage}";
-                                _currentMethodIsAsserted = false;
-                                _currentAssertMessage = string.Empty;
+                                    failedMessage += $"\n{s_currentAssertMessage}";
+                                s_currentMethodIsAsserted = false;
+                                s_currentAssertMessage = string.Empty;
                             }
                         }
                         catch (Exception e)
@@ -328,7 +328,7 @@ public abstract class XFECode
                             failedMessage = e.InnerException is not null ? e.InnerException.Message : e.Message;
                         }
                         var elapsedTime = timeCounter.Elapsed - selfTimeCounter.Elapsed;
-                        _cTimeCounter++;
+                        s_cTimeCounter++;
                         Console.BackgroundColor = ConsoleColor.Black;
                         Console.WriteLine();
                         Console.BackgroundColor = mainColor;
@@ -338,7 +338,7 @@ public abstract class XFECode
                         Console.ForegroundColor = mainColor;
                         Console.Write("\t执行批次：");
                         Console.ForegroundColor = counterColor;
-                        Console.Write(_cTimeCounter);
+                        Console.Write(s_cTimeCounter);
                         Console.ForegroundColor = mainColor;
                         Console.Write("\t执行时间：");
                         Console.ForegroundColor = timeColor;
@@ -542,7 +542,7 @@ public abstract class XFECode
                             object? result = null;
                             try
                             {
-                                _currentMethodIsAsserted = false;
+                                s_currentMethodIsAsserted = false;
                                 if (useXFEConsole)
                                 {
                                     if (Type.GetType("XFEExtension.NetCore.XFEConsole.XFEConsole, XFEExtension.NetCore.XFEConsole") is { } type)
@@ -583,15 +583,15 @@ public abstract class XFECode
                                         }
                                     }
                                 }
-                                if (_currentMethodIsAsserted)
+                                if (s_currentMethodIsAsserted)
                                 {
                                     isSuccessful = false;
                                     if (failedMessage == string.Empty)
-                                        failedMessage = _currentAssertMessage;
+                                        failedMessage = s_currentAssertMessage;
                                     else
-                                        failedMessage += $"\n{_currentAssertMessage}";
-                                    _currentMethodIsAsserted = false;
-                                    _currentAssertMessage = string.Empty;
+                                        failedMessage += $"\n{s_currentAssertMessage}";
+                                    s_currentMethodIsAsserted = false;
+                                    s_currentAssertMessage = string.Empty;
                                 }
                             }
                             catch (Exception e)
@@ -600,7 +600,7 @@ public abstract class XFECode
                                 failedMessage = e.InnerException is not null ? e.InnerException.Message : e.Message;
                             }
                             var elapsedTime = timeCounter.Elapsed - selfTimeCounter.Elapsed;
-                            _cTimeCounter++;
+                            s_cTimeCounter++;
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.WriteLine();
                             Console.BackgroundColor = mainColor;
@@ -610,7 +610,7 @@ public abstract class XFECode
                             Console.ForegroundColor = mainColor;
                             Console.Write("\t执行批次：");
                             Console.ForegroundColor = counterColor;
-                            Console.Write(_cTimeCounter);
+                            Console.Write(s_cTimeCounter);
                             Console.ForegroundColor = mainColor;
                             Console.Write("\t执行时间：");
                             Console.ForegroundColor = timeColor;
@@ -651,7 +651,7 @@ public abstract class XFECode
                                 Console.BackgroundColor = ConsoleColor.Black;
                                 Console.ForegroundColor = failColor;
                                 Console.WriteLine($"\t失败原因：{failedMessage}");
-                                failedList.Add(new MethodAndCounter(method, _cTimeCounter, failedMessage));
+                                failedList.Add(new MethodAndCounter(method, s_cTimeCounter, failedMessage));
                             }
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write("\n");
@@ -672,7 +672,7 @@ public abstract class XFECode
                         }
                     }
                     classTimeCounter.Stop();
-                    _cTimeCounter++;
+                    s_cTimeCounter++;
                     Console.WriteLine("\n\n\n\n\n");
                     Console.BackgroundColor = mainColor;
                     Console.ForegroundColor = ConsoleColor.Black;
@@ -681,7 +681,7 @@ public abstract class XFECode
                     Console.ForegroundColor = mainColor;
                     Console.Write("\t执行批次：");
                     Console.ForegroundColor = counterColor;
-                    Console.Write(_cTimeCounter);
+                    Console.Write(s_cTimeCounter);
                     Console.ForegroundColor = mainColor;
                     Console.Write("\t执行时间：");
                     Console.ForegroundColor = timeColor;
@@ -748,8 +748,8 @@ public abstract class XFECode
     {
         if (condition)
             return true;
-        _currentMethodIsAsserted = true;
-        _currentAssertMessage = "断言失败：期望为真，实际为假";
+        s_currentMethodIsAsserted = true;
+        s_currentAssertMessage = "断言失败：期望为真，实际为假";
         return false;
     }
 
@@ -762,8 +762,8 @@ public abstract class XFECode
     {
         if (condition)
             return true;
-        _currentMethodIsAsserted = true;
-        _currentAssertMessage = message;
+        s_currentMethodIsAsserted = true;
+        s_currentAssertMessage = message;
         return false;
     }
 
@@ -775,8 +775,8 @@ public abstract class XFECode
     {
         if (!condition)
             return true;
-        _currentMethodIsAsserted = true;
-        _currentAssertMessage = "断言失败：期望为假，实际为真";
+        s_currentMethodIsAsserted = true;
+        s_currentAssertMessage = "断言失败：期望为假，实际为真";
         return false;
     }
 
@@ -789,8 +789,8 @@ public abstract class XFECode
     {
         if (!condition)
             return true;
-        _currentMethodIsAsserted = true;
-        _currentAssertMessage = message;
+        s_currentMethodIsAsserted = true;
+        s_currentAssertMessage = message;
         return false;
     }
 
@@ -805,8 +805,8 @@ public abstract class XFECode
         var result = !EqualityComparer<T>.Default.Equals(expected, actual);
         if (!result)
             return true;
-        _currentMethodIsAsserted = true;
-        _currentAssertMessage = $"断言失败：期望 {expected}，实际 {actual}";
+        s_currentMethodIsAsserted = true;
+        s_currentAssertMessage = $"断言失败：期望 {expected}，实际 {actual}";
         return false;
     }
 
@@ -822,8 +822,8 @@ public abstract class XFECode
         var result = !EqualityComparer<T>.Default.Equals(expected, actual);
         if (!result)
             return true;
-        _currentMethodIsAsserted = true;
-        _currentAssertMessage = message;
+        s_currentMethodIsAsserted = true;
+        s_currentAssertMessage = message;
         return false;
     }
 }
