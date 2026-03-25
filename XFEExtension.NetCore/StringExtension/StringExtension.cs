@@ -282,7 +282,7 @@ public static partial class StringExtension
         /// <param name="remarkName">对象别名</param>
         /// <param name="onlyProperty"></param>
         /// <param name="onlyPublic"></param>
-        public string? X(bool onlyProperty = true, bool onlyPublic = true, string remarkName = "分析对象")
+        public string X(bool onlyProperty = true, bool onlyPublic = true, string remarkName = "分析对象")
         {
             var fatherList = new List<object>();
             if (obj is not null)
@@ -316,7 +316,7 @@ public static partial class StringExtension
     /// <returns></returns>
     public static string GenerateRandomString(int length)
     {
-        var allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        const string allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         Random random = new();
         var randomChars = new char[length];
 
