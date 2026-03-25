@@ -128,21 +128,16 @@ public static partial class StringExtension
     extension([NotNullWhen(false)] string? str)
     {
         /// <summary>
-        /// 判断字符串是否是 null 、空字符串和仅包含空格的字符串
-        /// </summary>
-        public bool IsWhiteSpace { get=> str?.IsNullOrWhiteSpace() ?? true; }
-
-        /// <summary>
         /// 判断字符串是否为 null 或者是空字符串
         /// </summary>
         /// <returns></returns>
-        public bool IsNullOrEmpty() => string.IsNullOrEmpty(str);
+        public bool IsNullOrEmpty => string.IsNullOrEmpty(str);
 
         /// <summary>
         /// 判断字符串是否是 null 、空字符串和仅包含空格的字符串
         /// </summary>
         /// <returns></returns>
-        public bool IsNullOrWhiteSpace() => string.IsNullOrWhiteSpace(str);
+        public bool IsNullOrWhiteSpace => string.IsNullOrWhiteSpace(str);
     }
 
     private static string DomainMapper(Match match)

@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>4.0.4</Version>
+    <Version>4.1.0</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -21,7 +21,9 @@
     <PackageReleaseNotes>
       ## 调整
 
-      优化代码架构
+      重构字符串扩展属性并升级版本号
+
+      将 IsNullOrEmpty 和 IsNullOrWhiteSpace 从方法改为属性，移除 IsWhiteSpace 属性。同时将项目版本号从 4.0.4 升级到 4.1.0。
 
       ## 新增
 
