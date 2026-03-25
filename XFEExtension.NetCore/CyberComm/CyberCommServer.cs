@@ -15,7 +15,7 @@ public class CyberCommServer
     /// <summary>
     /// 服务器绑定的URL
     /// </summary>
-    public string[] ServerUrLs { get; set; } = [];
+    public string[] ServerUrlArray { get; set; } = [];
     /// <summary>
     /// 字节流缓冲区长度
     /// </summary>
@@ -63,7 +63,7 @@ public class CyberCommServer
         try
         {
             Server = new();
-            foreach (var url in ServerUrLs)
+            foreach (var url in ServerUrlArray)
             {
                 Server.Prefixes.Add(url);
             }
@@ -185,27 +185,27 @@ public class CyberCommServer
     /// <param name="listenPorts">监听端口</param>
     public CyberCommServer(params int[] listenPorts)
     {
-        var serverUrLs = listenPorts.Select(port => $"http://*:{port}/").ToList();
-        ServerUrLs = [.. serverUrLs];
+        var serverUrlArray = listenPorts.Select(port => $"http://*:{port}/").ToList();
+        ServerUrlArray = [.. serverUrlArray];
         AutoReceiveCompletedMessage = true;
     }
     /// <summary>
     /// CyberComm服务器，使用URL创建
     /// </summary>
-    /// <param name="serverUrLs">服务器URL</param>
-    public CyberCommServer(params string[] serverUrLs)
+    /// <param name="serverUrlArray">服务器URL</param>
+    public CyberCommServer(params string[] serverUrlArray)
     {
-        ServerUrLs = serverUrLs;
+        ServerUrlArray = serverUrlArray;
         AutoReceiveCompletedMessage = true;
     }
     /// <summary>
     /// CyberComm服务器，使用URL创建
     /// </summary>
     /// <param name="autoReceiveCompletedMessage">是否自动接收完整消息</param>
-    /// <param name="serverUrLs">服务器URL</param>
-    public CyberCommServer(bool autoReceiveCompletedMessage = true, params string[] serverUrLs)
+    /// <param name="serverUrlArray">服务器URL</param>
+    public CyberCommServer(bool autoReceiveCompletedMessage = true, params string[] serverUrlArray)
     {
-        ServerUrLs = serverUrLs;
+        ServerUrlArray = serverUrlArray;
         AutoReceiveCompletedMessage = autoReceiveCompletedMessage;
     }
     #endregion
