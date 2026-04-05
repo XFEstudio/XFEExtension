@@ -18,7 +18,7 @@ public sealed class MNRTestAttribute : MRTestAttribute
     public MNRTestAttribute(string methodOtherName, params object[] valuesAndResult)
     {
         MethodOtherName = methodOtherName;
-        ReturnValue = valuesAndResult[valuesAndResult.Length - 1];
+        ReturnValue = valuesAndResult[^1];
         Params = valuesAndResult.Take(valuesAndResult.Length - 1).ToArray();
     }
     /// <summary>
