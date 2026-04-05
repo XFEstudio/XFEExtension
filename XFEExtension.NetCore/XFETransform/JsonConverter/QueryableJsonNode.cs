@@ -107,6 +107,25 @@ public class QueryableJsonNode(JsonNode jsonNode) : INodeBase, IQueryableJsonNod
     [return: NotNullIfNotNull(nameof(jsonString))]
     public static implicit operator QueryableJsonNode?(string? jsonString) => jsonString is null ? null : new(new JsonNodeConverter(jsonString).ConvertToJsonNode());
     /// <summary>
+    /// Retrieves the child node at the specified path from the given queryable JSON node.
+    /// </summary>
+    /// <remarks>This operator provides a convenient way to access nested nodes within a JSON structure using
+    /// a path string. The path format and supported syntax depend on the implementation of the indexer.</remarks>
+    /// <param name="queryableJsonNode">The source JSON node to query. Can be null.</param>
+    /// <param name="nodePath">The path to the child node to retrieve. Must not be null.</param>
+    /// <returns>The child node at the specified path, or null if the path does not exist or the source node is null.</returns>
+    public static QueryableJsonNode? operator >(QueryableJsonNode? queryableJsonNode, string nodePath) => queryableJsonNode?[nodePath];
+    /// <summary>
+    /// Retrieves the child node at the specified path from the given queryable JSON node.
+    /// </summary>
+    /// <remarks>This operator provides a convenient syntax for accessing child nodes within a JSON structure
+    /// using a string path. If the specified path does not exist, the result is null.</remarks>
+    /// <param name="queryableJsonNode">The parent JSON node to query. Can be null.</param>
+    /// <param name="nodePath">The path of the child node to retrieve. Must not be null.</param>
+    /// <returns>A QueryableJsonNode representing the child node at the specified path, or null if the parent node is null or the
+    /// path does not exist.</returns>
+    public static QueryableJsonNode? operator <(QueryableJsonNode? queryableJsonNode, string nodePath) => queryableJsonNode?[nodePath];
+    /// <summary>
     /// 隐式将Json字符串转换为节点值
     /// </summary>
     /// <param name="queryableJsonNode"></param>
