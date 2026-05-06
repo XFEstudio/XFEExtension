@@ -13,6 +13,7 @@ permissions:
 env:
   DOTNET_VERSION: 10.0.x
   SOLUTION_PATH: XFEExtension.slnx
+  EXCLUDED_PROJECT_PATH: XFEExtension/XFEExtension.csproj
 
 jobs:
   build:
@@ -27,8 +28,25 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Prepare build solution
+        shell: pwsh
+        run: |
+          [xml]$solution = Get-Content "${{ env.SOLUTION_PATH }}" -Raw
+          $excludedProjectPath = "${{ env.EXCLUDED_PROJECT_PATH }}"
+          $projects = @($solution.Solution.Project)
+
+          foreach ($project in $projects) {
+            if ($project.Path -eq $excludedProjectPath) {
+              [void]$project.ParentNode.RemoveChild($project)
+            }
+          }
+
+          $buildSolutionPath = Join-Path "${{ runner.temp }}" "build.slnx"
+          $solution.Save($buildSolutionPath)
+          "BUILD_SOLUTION_PATH=$buildSolutionPath" >> $env:GITHUB_ENV
+
       - name: Restore
-        run: dotnet restore ${{ env.SOLUTION_PATH }}
+        run: dotnet restore ${{ env.BUILD_SOLUTION_PATH }}
 
       - name: Build
-        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore -p:GeneratePackageOnBuild=false -p:ContinuousIntegrationBuild=true
+        run: dotnet build ${{ env.BUILD_SOLUTION_PATH }} --configuration Release --no-restore -p:GeneratePackageOnBuild=false -p:ContinuousIntegrationBuild=true
