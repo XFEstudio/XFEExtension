@@ -11,8 +11,8 @@ internal class Program
         value = jsonNode > "test1" > "subObject" > "testText";
         value = jsonNode < "test1" < "subObject" < "testText";
         value = jsonNode < "test1" > "subObject" < "testText" > "myProperty";
-        value = jsonNode - "test1" - "subObject" - "testText" - "myProperty";
-        value = jsonNode / "test1" / "subObject" / "testText" / "myProperty";
+        //value = jsonNode - "test1" - "subObject" - "testText" - "myProperty";
+        //value = jsonNode / "test1" / "subObject" / "testText" / "myProperty";
         //var testClass = new TestClass("123", "sda", 12);
         //testClass.ToJson().CW();
     }
