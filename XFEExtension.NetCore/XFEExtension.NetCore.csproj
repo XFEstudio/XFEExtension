@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>4.2.0</Version>
+    <Version>4.2.1</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -21,11 +21,11 @@
     <PackageReleaseNotes>
       ## 调整
 
-      无
+      优化md文档，新增工作流
 
       ## 新增
 
-      新增JsonNode操作符
+      无
 
       ## 严重
 
