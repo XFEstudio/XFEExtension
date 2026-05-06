@@ -1,6 +1,6 @@
 [![NuGet Version](https://img.shields.io/nuget/v/xfeextension.netcore?label=NuGet&logo=NuGet&color=004880)](https://www.nuget.org/packages/XFEExtension.NetCore/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/xfeextension.netcore?color=004880&label=Downloads&logo=NuGet)](https://www.nuget.org/packages/XFEExtension.NetCore/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/XFEstudio/XFEExtension/blob/master/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/download)
 
 English | [简体中文](README.zh-CN.md)
@@ -58,7 +58,7 @@ foreach (var node in packageList)
     Console.WriteLine($"ID: {node["id"]}\tDocument: {node["text"]}"); // access properties directly
 }
 
-var packageObject = jsonNode["package:object", "code", "message"].PackageInListObject(); // package as object
+var packageObject = jsonNode["package:object", "code", "message"].PackageObject(); // package as object
 foreach (var node in packageObject)
 {
     Console.WriteLine($"PropertyName: {node.Key}\tValue: {node.Value}\tValueType: {node.Value.ValueType}"); // iterate properties

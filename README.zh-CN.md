@@ -1,6 +1,6 @@
 [![NuGet Version](https://img.shields.io/nuget/v/xfeextension.netcore?label=NuGet&logo=NuGet&color=004880)](https://www.nuget.org/packages/XFEExtension.NetCore/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/xfeextension.netcore?color=004880&label=下载量&logo=NuGet)](https://www.nuget.org/packages/XFEExtension.NetCore/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/XFEstudio/XFEExtension/blob/master/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/download)
 
 [English](README.md) | 简体中文
@@ -58,7 +58,7 @@ foreach (var node in packageList)
     Console.WriteLine($"ID：{node["id"]}\tDocument：{node["text"]}");//直接提取属性
 }
 
-var packageObject = jsonNode["package:object", "code", "message"].PackageInListObject();//打包对象
+var packageObject = jsonNode["package:object", "code", "message"].PackageObject();//打包对象
 foreach (var node in packageObject)
 {
     Console.WriteLine($"PropertyName：{node.Key}\tValue：{node.Value}\tValueType：{node.Value.ValueType}");//遍历属性
@@ -367,8 +367,8 @@ await group.StartXCC();//启动该群组的网络通讯
 ```csharp
 XFEDownloader xFEDownloader = new()
 {
-    DownloadUrl = "https://www.nuget.org/api/v2/package/XFE%E5%90%84%E7%B1%BB%E6%8B%93%E5%B1%95.NetCore/1.2.2",
-    SavePath = "XFEExtension.NetCore.nuget",
+    DownloadUrl = "https://www.nuget.org/api/v2/package/XFEExtension.NetCore/4.1.0",
+    SavePath = "XFEExtension.NetCore.nupkg",
     FileSegmentCount = 9 //设置9个线程来加速下载，建议数量不超过15个
 };
 xFEDownloader.BufferDownloaded += (sender, e) =>
