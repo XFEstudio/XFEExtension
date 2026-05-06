@@ -58,10 +58,6 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <None Include="..\XFEstudio.pfx">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
     <None Include="..\logoIcon.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
