@@ -41,7 +41,7 @@ jobs:
             }
           }
 
-          $buildSolutionPath = Join-Path "${{ runner.temp }}" "build.slnx"
+          $buildSolutionPath = Join-Path "${{ github.workspace }}" "build.filtered.slnx"
           $solution.Save($buildSolutionPath)
           "BUILD_SOLUTION_PATH=$buildSolutionPath" >> $env:GITHUB_ENV
 
