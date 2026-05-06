@@ -13,7 +13,7 @@ permissions:
 env:
   DOTNET_VERSION: 10.0.x
   SOLUTION_PATH: XFEExtension.slnx
-  PROJECT_PATH: XFEExtension/XFEExtension.NetCore/XFEExtension.NetCore.csproj
+  PROJECT_PATH: XFEExtension.NetCore/XFEExtension.NetCore.csproj
 
 jobs:
   build:
