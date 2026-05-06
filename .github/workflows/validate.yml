@@ -13,7 +13,6 @@ permissions:
 env:
   DOTNET_VERSION: 10.0.x
   SOLUTION_PATH: XFEExtension.slnx
-  PROJECT_PATH: XFEExtension.NetCore/XFEExtension.NetCore.csproj
 
 jobs:
   build:
@@ -32,4 +31,4 @@ jobs:
         run: dotnet restore ${{ env.SOLUTION_PATH }}
 
       - name: Build
-        run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore -p:GeneratePackageOnBuild=false -p:ContinuousIntegrationBuild=true
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore -p:GeneratePackageOnBuild=false -p:ContinuousIntegrationBuild=true
