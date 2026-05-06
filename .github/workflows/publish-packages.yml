@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Package version to publish, for example 3.0.9
+        description: Package version to publish, for example 1.0.0
         required: true
         type: string
       skip_nuget_org:
@@ -23,7 +23,7 @@ permissions:
 env:
   DOTNET_VERSION: 10.0.x
   SOLUTION_PATH: XFEExtension.slnx
-  PROJECT_PATH: XFEExtension.NetCore/XFEExtension.NetCore.csproj
+  PROJECT_PATH: XFEExtension/XFEExtension.NetCore/XFEExtension.NetCore.csproj
   PACKAGE_OUTPUT_DIR: ${{ github.workspace }}/artifacts/packages
 
 jobs:
