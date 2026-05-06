@@ -1,28 +1,33 @@
-[![](https://img.shields.io/nuget/dt/xfeextension.netcore?color=004880&label=Downloads&logo=NuGet)](https://www.nuget.org/packages/XFEExtension.NetCore/)
+[![NuGet Version](https://img.shields.io/nuget/v/xfeextension.netcore?label=NuGet&logo=NuGet&color=004880)](https://www.nuget.org/packages/XFEExtension.NetCore/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/xfeextension.netcore?color=004880&label=Downloads&logo=NuGet)](https://www.nuget.org/packages/XFEExtension.NetCore/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/download)
 
-# XFEExtension (XFEExtension)
+English | [简体中文](README.zh-CN.md)
 
-## 描述
+# XFEExtension
 
-XFEExtension是一个C#的DLL库，旨在优化C#代码中常用语句的使用，并提供更简洁的访问方式，快速搭建服务器/客户端，免费ChatGPTAPI接口，免费通讯服务器，XFE下载器，新增格式等
+## Description
 
-## 用途
+XFEExtension is a C# DLL library designed to optimize common statements in C# code and provide more concise access patterns, rapid server/client setup, a free ChatGPT API interface, a free communication server, an XFE downloader, new formats, and more.
 
-XFEExtension库适用于各种C#项目，特别适合在需要提高代码可读性的情况下使用。它包含了许多常见操作的拓展方法，使得代码编写更加高效和简便。以下是一些XFEExtension的用途示例：
+## Purpose
 
-- **简化代码访问：** XFEExtension提供了更简洁的语法，使得代码中的访问操作更加清晰和易读。
+The XFEExtension library is suitable for a wide variety of C# projects, especially when improving code readability is a priority. It includes extension methods for many common operations, making code writing more efficient and straightforward. Here are some examples of what XFEExtension can do:
 
-- **优化性能：** 通过使用XFEExtension，您可以执行各种性能优化操作，提高应用程序的效率。
+- **Simplify code access:** XFEExtension provides cleaner syntax, making access operations in your code clearer and more readable.
 
-- **加速开发：** 通过减少样板代码，XFEExtension可以加速项目的开发过程，同时提高代码的可维护性。
+- **Optimize performance:** With XFEExtension you can perform various performance-optimization operations to improve application efficiency.
 
-# 示例（使用前记得进行相应的引用）
+- **Accelerate development:** By reducing boilerplate code, XFEExtension speeds up project development while improving code maintainability.
+
+# Examples (remember to add the appropriate `using` directives)
 
 ---
 
-## 使用Json自动解析，无需创建Json对象
+## Automatic JSON parsing without creating a JSON object
 
-#### 基础用法
+#### Basic usage
 
 ```csharp
 using XFEExtension.NetCore.XFETransform.JsonConverter;
@@ -30,210 +35,210 @@ using XFEExtension.NetCore.XFETransform.JsonConverter;
 var jsonString = """
                  {
                      "status": 500,
-                     "message": "没有找到"
+                     "message": "Not found"
                  }
                  """;
 QueryableJsonNode jsonNode = jsonString;
-if(jsonNode["status"] == "500")
+if (jsonNode["status"] == "500")
 {
     Console.WriteLine(jsonNode["message"]);
 }
 ```
 
-#### 查询并打包
+#### Query and package
 
 ```csharp
 var jsonString = """
-                 {"code":0,"message":"0","data":{"archives":[{"id":0,"text":"这是Json的使用教程文档","trash":"垃圾文本1"},{"id":1,"text":"在这里，你将了解JsonNode的查询方式","trash":"垃圾文本2"},{"id":2,"text":"Hello World！","trash":"垃圾文本3"}]}}
+                 {"code":0,"message":"0","data":{"archives":[{"id":0,"text":"This is a JSON tutorial document","trash":"trash text 1"},{"id":1,"text":"Here you will learn how to query JsonNode","trash":"trash text 2"},{"id":2,"text":"Hello World!","trash":"trash text 3"}]}}
                  """;
-var jsonNode = (QueryableJsonNode)targetJsonString;
-var packageList = jsonNode["data"]["archives"]["package:list", "id", "text"].PackageInListObject();//打包列表
+var jsonNode = (QueryableJsonNode)jsonString;
+var packageList = jsonNode["data"]["archives"]["package:list", "id", "text"].PackageInListObject(); // package as list
 foreach (var node in packageList)
 {
-    Console.WriteLine($"ID：{node["id"]}\tDocument：{node["text"]}");//直接提取属性
+    Console.WriteLine($"ID: {node["id"]}\tDocument: {node["text"]}"); // access properties directly
 }
 
-var packageObject = jsonNode["package:object", "code", "message"].PackageInListObject();//打包对象
+var packageObject = jsonNode["package:object", "code", "message"].PackageObject(); // package as object
 foreach (var node in packageObject)
 {
-    Console.WriteLine($"PropertyName：{node.Key}\tValue：{node.Value}\tValueType：{node.Value.ValueType}");//遍历属性
+    Console.WriteLine($"PropertyName: {node.Key}\tValue: {node.Value}\tValueType: {node.Value.ValueType}"); // iterate properties
 }
 ```
 
-## 使用LANDeviceDetector来检测本地局域网内的所有设备
+## Using LANDeviceDetector to detect all devices on the local network
 
-#### 基础用法
+#### Basic usage
 
 ```csharp
 var lANDeviceDetector = new LANDeviceDetector();
 lANDeviceDetector.DeviceFind += (sender) =>
 {
-    Console.WriteLine($"IP地址:{sender.IPAddress}\t设备名称:{sender.DeviceName}");
+    Console.WriteLine($"IP: {sender.IPAddress}\tDevice name: {sender.DeviceName}");
 };
 await lANDeviceDetector.StartDetecting();
 ```
 
-#### 自定义扫描频段
+#### Custom scan subnet
 
 ```csharp
-var lANDeviceDetector = new LANDeviceDetector("100.73.121.*");//这将扫描100.73.121.1到100.73.121.255的IP地址
+var lANDeviceDetector = new LANDeviceDetector("100.73.121.*"); // scans 100.73.121.1 – 100.73.121.255
 lANDeviceDetector.DeviceFind += (sender) =>
 {
-    Console.WriteLine($"IP地址:{sender.IPAddress}\t设备名称:{sender.DeviceName}");
+    Console.WriteLine($"IP: {sender.IPAddress}\tDevice name: {sender.DeviceName}");
 };
 await lANDeviceDetector.StartDetecting();
 ```
 
-#### 自定义超时
+#### Custom timeout
 
 ```csharp
-var lANDeviceDetector = new LANDeviceDetector("100.73.121.*", 2000);//这将会设置超时为2000ms
+var lANDeviceDetector = new LANDeviceDetector("100.73.121.*", 2000); // sets timeout to 2000 ms
 lANDeviceDetector.DeviceFind += (sender) =>
 {
-    Console.WriteLine($"IP地址:{sender.IPAddress}\t设备名称:{sender.DeviceName}");
+    Console.WriteLine($"IP: {sender.IPAddress}\tDevice name: {sender.DeviceName}");
 };
 await lANDeviceDetector.StartDetecting();
 ```
 
 ---
 
-## 使用X方法分析对象信息，简化调试流程
+## Using the X method to analyze object information and simplify debugging
 
-#### 在控制台输出（仅适用于C#的控制台应用程序）
+#### Output to console (console applications only)
 
 ```csharp
-var testClass = new TestClass("测试名称", "测试描述", 15);//假如这是你需要分析的某个对象
-testClass.X();//这会将该对象的所有信息输出到控制台
+var testClass = new TestClass("Test Name", "Test Description", 15); // the object you want to analyze
+testClass.X(); // prints all information about the object to the console
 ```
 
-#### 在调试信息中输出（使用与所有类型的C#程序）
+#### Output to trace/debug output (all C# application types)
 
 ```csharp
-var testClass = new TestClass("测试名称", "测试描述", 15);//假如这是你需要分析的某个对象
-testClass.XL();//这会将该对象的所有信息输出到调试信息输出中
+var testClass = new TestClass("Test Name", "Test Description", 15); // the object you want to analyze
+testClass.XL(); // writes all information about the object to the debug trace output
 ```
 
 ---
 
-## XFE的ChatGPT使用示例
+## XFE ChatGPT usage examples
 
-#### 最简单的用法
+#### Simplest usage
 
 ```csharp
-//询问GPT并接收回复
-var result = await XFEChatGPT.SendAndGetGPTResponse("你好");
+// Ask GPT and receive a reply
+var result = await XFEChatGPT.SendAndGetGPTResponse("Hello");
 Console.WriteLine(result);
 ```
 
-#### 一般用法
+#### General usage
 
 ```csharp
-//使用XFEChatGPT类来进行GPT的交互
-XFEChatGPT xFEChatGPT = new XFEChatGPT("你是一个人工智能AI", true);
+// Use XFEChatGPT for interactive GPT conversations
+XFEChatGPT xFEChatGPT = new XFEChatGPT("You are an AI assistant", true);
 
-//订阅事件
+// Subscribe to events
 xFEChatGPT.XFEChatGPTMessageReceived += (sender, e) =>
 {
     switch (e.GenerateState)
     {
         case GenerateState.Start:
-            Console.Write("【输出开始】ChatGPT:");
+            Console.Write("[Generation started] ChatGPT:");
             break;
         case GenerateState.Continue:
             Console.Write(e.Message);
             break;
         case GenerateState.End:
-            Console.WriteLine("【输出完成】");
+            Console.WriteLine("[Generation complete]");
             break;
         case GenerateState.Error:
-            Console.WriteLine($"【发生错误】{e.Message}");
+            Console.WriteLine($"[Error] {e.Message}");
             break;
         default:
             break;
     }
 };
 
-//输入询问内容
+// Read the user's question
 var askContent = Console.ReadLine();
 
-//发送生成随机ID并询问内容
+// Send with a random message ID
 xFEChatGPT.SendGPTMessage(Guid.NewGuid().ToString(), askContent);
 ```
 
-#### 推荐用法
+#### Recommended usage
 
 ```csharp
-//创建有记忆功能的XFEChatGPT对象
+// Create a MemorableXFEChatGPT object with conversation memory
 MemorableXFEChatGPT memorableXFEChatGPT = new MemorableXFEChatGPT();
 
-//创建一个新的对话并设置System内容
-memorableXFEChatGPT.CreateDialog("新的对话ID", "你是一个由寰宇朽力网络科技开发的人工智能AI", true, true);
+// Create a new dialog and set the system message
+memorableXFEChatGPT.CreateDialog("dialog-id", "You are an AI assistant developed by XFEstudio", true, true);
 
-//订阅消息接收事件
+// Subscribe to the message-received event
 memorableXFEChatGPT.XFEChatGPTMessageReceived += (sender, e) =>
 {
     switch (e.GenerateState)
     {
         case GenerateState.Start:
-            Console.Write("【输出开始】ChatGPT:");
+            Console.Write("[Generation started] ChatGPT:");
             break;
         case GenerateState.Continue:
             Console.Write(e.Message);
             break;
         case GenerateState.End:
-            Console.WriteLine("【输出完成】");
+            Console.WriteLine("[Generation complete]");
             break;
         case GenerateState.Error:
-            Console.WriteLine($"【发生错误】{e.Message}");
+            Console.WriteLine($"[Error] {e.Message}");
             break;
         default:
             break;
     }
 };
 
-//读取询问内容
+// Read the user's question
 var askContent = Console.ReadLine();
 
-//填写之前创建的对话ID，生成随机的消息ID，并输入刚刚读取的询问内容
-memorableXFEChatGPT.AskChatGPT("新的对话ID", Guid.NewGuid().ToString(), askContent);
+// Send using the dialog ID created above, a random message ID, and the question
+memorableXFEChatGPT.AskChatGPT("dialog-id", Guid.NewGuid().ToString(), askContent);
 ```
 
 ---
 
-## IO流拓展操作示例
+## IO stream extension examples
 
 ```csharp
-// 使用XFEExtension来简化文件读取/写入操作
+// Simplify file read/write operations with XFEExtension
 "Hello World!".WriteIn("test.txt");
 string txt = "test.txt".ReadOut();
 ```
 
 ---
 
-## XEA加密算法示例
+## XEA encryption algorithm example
 
 ```csharp
-// 使用XFEExtension来进行加密操作
-string text = "这是一段将要加密的文本";
-$"未加密内容：{text}".CW();
-string password = "这是一个秘钥";
-string encrypt = text.XEAEncrypt(password);//加密
-Console.WriteLine("加密内容：" + encrypt);
-Console.WriteLine("解密内容：" + encrypt.XEADecrypt(password));//解密
+// Encrypt and decrypt text using XFEExtension
+string text = "This is text that will be encrypted";
+$"Plain text: {text}".CW();
+string password = "my-secret-key";
+string encrypt = text.XEAEncrypt(password); // encrypt
+Console.WriteLine("Encrypted: " + encrypt);
+Console.WriteLine("Decrypted: " + encrypt.XEADecrypt(password)); // decrypt
 ```
 
 ---
 
-## 特性操作示例
+## Attribute access example
 
 ```csharp
-// 使用XFEExtension来简化特性读取操作
+// Simplify attribute reading with XFEExtension
 string str = testObject.GetAttribute<string>();
 ```
 
 ---
 
-## 使用XUnit测试框架
+## Using the XUnit testing framework
 
 ```csharp
 [CTest]
@@ -242,7 +247,7 @@ class TestClass : XFECode
     [MTest]
     void Test()
     {
-        Assert(true, "断言内容");
+        Assert(true, "assertion content");
     }
 }
 public class Program : XFECode
@@ -256,7 +261,7 @@ public class Program : XFECode
 
 ---
 
-## 快速搭建网络通讯服务器
+## Quickly set up a network communication server
 
 ```csharp
 public class CustomServer
@@ -273,30 +278,30 @@ public class CustomServer
 
     private void CyberCommServer_MessageReceived(object? sender, CyberCommServerEventArgs e)
     {
-        e.ReplyMessage("服务器已接收消息");
-        Console.WriteLine($"收到客户端[{e.IPAddress}]消息：{e.TextMessage}");//明文传输实例
+        e.ReplyMessage("Server received your message");
+        Console.WriteLine($"Message from client [{e.IPAddress}]: {e.TextMessage}"); // plain-text example
     }
 
     private void CyberCommServer_ClientConnected(object? sender, CyberCommServerEventArgs e)
     {
-        Console.WriteLine($"新客户端连接：{e.IPAddress}");
+        Console.WriteLine($"New client connected: {e.IPAddress}");
     }
 
     private void CyberCommServer_ConnectionClosed(object? sender, CyberCommServerEventArgs e)
     {
-        Console.WriteLine($"客户端[{e.IPAddress}]断开连接");
+        Console.WriteLine($"Client [{e.IPAddress}] disconnected");
     }
 
     private void CyberCommServer_ServerStarted(object? sender, EventArgs e)
     {
-        Console.WriteLine("服务器已启动");
+        Console.WriteLine("Server started");
     }
 }
 ```
 
 ---
 
-## 快速搭建网络通讯客户端
+## Quickly set up a network communication client
 
 ```csharp
 public class CustomClient
@@ -312,63 +317,63 @@ public class CustomClient
 
     private void CyberCommClient_MessageReceived(object? sender, CyberCommClientEventArgs e)
     {
-        Console.WriteLine($"收到消息：{e.TextMessage}");//接收明文消息
-        //此处可以进行消息回复
-        //e.ReplyMessage();
+        Console.WriteLine($"Message received: {e.TextMessage}"); // receive plain-text message
+        // reply here if needed:
+        // e.ReplyMessage();
     }
 
     private void CyberCommClient_ConnectionClosed(object? sender, EventArgs e)
     {
-        Console.WriteLine("与服务器断开连接");
+        Console.WriteLine("Disconnected from server");
     }
 
     private void CyberCommClient_Connected(object? sender, EventArgs e)
     {
-        Console.WriteLine("已连接到服务器");
-        CyberCommClient.SendTextMessage("这是一条测试消息");//以明文消息为示例
+        Console.WriteLine("Connected to server");
+        CyberCommClient.SendTextMessage("This is a test message"); // plain-text example
     }
 }
 ```
 
 ---
 
-## 使用XCC网络通讯API接口快速搭建聊天室
+## Build a chat room quickly using the XCC network communication API
 
 ```csharp
-XCCNetWork xCCNetWork = new();//创建XCC网络通讯基础
-var group = xCCNetWork.CreateGroup("测试群组", "测试人员");//创建网络通讯中的群组，输入群组名，群内名称
-#region 订阅事件
+XCCNetWork xCCNetWork = new(); // create XCC network base
+var group = xCCNetWork.CreateGroup("Test Group", "Member Name"); // create a group, provide group name and member name
+#region Subscribe to events
 xCCNetWork.Connected += (sender, e) =>
 {
-    Console.WriteLine($"群组：{e.Group.GroupId}\t连接成功");
-    group.SendTextMessage("测试消息");
+    Console.WriteLine($"Group: {e.Group.GroupId}\tConnected");
+    group.SendTextMessage("Test message");
 };
 xCCNetWork.ConnectionClosed += (sender, e) =>
 {
-    Console.WriteLine($"群组：{e.Group.GroupId}\t断开连接");
+    Console.WriteLine($"Group: {e.Group.GroupId}\tDisconnected");
 };
 xCCNetWork.TextMessageReceived += (sender, e) =>
 {
-    Console.WriteLine($"群组：{e.Group.GroupId}\t收到文本消息：{e.TextMessage}");
+    Console.WriteLine($"Group: {e.Group.GroupId}\tText message received: {e.TextMessage}");
 };
 #endregion
-await group.StartXCC();//启动该群组的网络通讯
+await group.StartXCC(); // start the group's network communication
 ```
 
 ---
 
-## 使用XFE下载器来加速下载文件（支持继续上次下载、多线程加速下载等操作）
+## Use XFEDownloader to accelerate file downloads (supports resuming and multi-threaded acceleration)
 
 ```csharp
 XFEDownloader xFEDownloader = new()
 {
-    DownloadUrl = "https://www.nuget.org/api/v2/package/XFE%E5%90%84%E7%B1%BB%E6%8B%93%E5%B1%95.NetCore/1.2.2",
-    SavePath = "XFEExtension.NetCore.nuget",
-    FileSegmentCount = 9 //设置9个线程来加速下载，建议数量不超过15个
+    DownloadUrl = "https://www.nuget.org/api/v2/package/XFEExtension.NetCore/4.1.0",
+    SavePath = "XFEExtension.NetCore.nupkg",
+    FileSegmentCount = 9 // use 9 threads to accelerate the download (recommended: no more than 15)
 };
 xFEDownloader.BufferDownloaded += (sender, e) =>
 {
-    Console.WriteLine($"进度：{e.DownloadedBufferSize.FileSize()}/{e.TotalBufferSize?.FileSize()}");
+    Console.WriteLine($"Progress: {e.DownloadedBufferSize.FileSize()}/{e.TotalBufferSize?.FileSize()}");
 };
 await xFEDownloader.Download();
 ```
