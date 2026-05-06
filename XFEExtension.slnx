@@ -1,0 +1,11 @@
+<Solution>
+  <Project Path="XFEExtension.NetCore.Analyzer.Test/XFEExtension.NetCore.Analyzer.Test.csproj" />
+  <Project Path="XFEExtension.NetCore.Analyzer/XFEExtension.NetCore.Analyzer.csproj" />
+  <Project Path="XFEExtension.NetCore.Test/XFEExtension.NetCore.Test.csproj">
+    <BuildDependency Project="XFEExtension.NetCore/XFEExtension.NetCore.csproj" />
+  </Project>
+  <Project Path="XFEExtension.NetCore/XFEExtension.NetCore.csproj">
+    <BuildDependency Project="XFEExtension.NetCore.Analyzer/XFEExtension.NetCore.Analyzer.csproj" />
+  </Project>
+  <Project Path="XFEExtension/XFEExtension.csproj" Id="864ed677-e30c-40c5-bf6a-2012cec0d8c7" />
+</Solution>
