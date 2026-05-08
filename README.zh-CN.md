@@ -1,11 +1,11 @@
-[![NuGet Version](https://img.shields.io/nuget/v/xfeextension.netcore?label=NuGet&logo=NuGet&color=004880)](https://www.nuget.org/packages/XFEExtension.NetCore/)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/xfeextension.netcore?color=004880&label=下载量&logo=NuGet)](https://www.nuget.org/packages/XFEExtension.NetCore/)
+# XFEExtension / .NetCore
+
+[![NuGet Version](https://img.shields.io/nuget/v/xfeextension.netcore?label=NuGet&logo=NuGet)](https://www.nuget.org/packages/XFEExtension.NetCore/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/xfeextension.netcore?label=Downloads&logo=NuGet)](https://www.nuget.org/packages/XFEExtension.NetCore/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/download)
 
-[English](README.md) | 简体中文
-
-# XFEExtension
+> 🌐 [English](https://github.com/XFEstudio/XFEExtension/blob/master/README.md) | 简体中文
 
 ## 描述
 
