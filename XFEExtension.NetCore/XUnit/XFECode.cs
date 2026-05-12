@@ -394,10 +394,10 @@ public abstract class XFECode
                             if (!failedStackTrace.NullOrWhiteSpace)
                             {
                                 Console.ForegroundColor = ConsoleColor.Black;
-                                Console.Write("异常堆栈");
+                                Console.Write("\n异常堆栈");
                                 Console.BackgroundColor = ConsoleColor.Black;
                                 Console.ForegroundColor = failColor;
-                                Console.WriteLine($"\t{failedStackTrace}");
+                                Console.WriteLine($"\t堆栈信息：{failedStackTrace}");
                             }
                         }
                         Console.BackgroundColor = ConsoleColor.Black;
@@ -676,10 +676,10 @@ public abstract class XFECode
                                 if (!failedStackTrace.NullOrWhiteSpace)
                                 {
                                     Console.ForegroundColor = ConsoleColor.Black;
-                                    Console.Write("异常堆栈");
+                                    Console.Write("\n异常堆栈");
                                     Console.BackgroundColor = ConsoleColor.Black;
                                     Console.ForegroundColor = failColor;
-                                    Console.WriteLine($"\t{failedStackTrace}");
+                                    Console.WriteLine($"\t堆栈信息：{failedStackTrace}");
                                 }
                                 failedList.Add(new MethodAndCounter(method, s_cTimeCounter, failedMessage));
                             }
