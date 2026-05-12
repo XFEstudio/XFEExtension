@@ -19,6 +19,7 @@ public abstract class XFECode
     private static bool s_initialized;
     private static bool s_currentMethodIsAsserted;
     private static string s_currentAssertMessage = string.Empty;
+
     #region 暂停
     /// <summary>
     /// 暂停
@@ -32,6 +33,7 @@ public abstract class XFECode
         }
         Console.ReadKey();
     }
+
     /// <summary>
     /// 暂停
     /// </summary>
@@ -41,6 +43,7 @@ public abstract class XFECode
         Console.WriteLine(showText);
         Console.ReadKey();
     }
+
     /// <summary>
     /// 暂停，按下指定按键继续
     /// </summary>
@@ -50,6 +53,7 @@ public abstract class XFECode
         Console.WriteLine($"按 {consoleKey} 键继续");
         while (Console.ReadKey().Key != consoleKey) ;
     }
+
     /// <summary>
     /// 暂停，按下指定按键继续
     /// </summary>
@@ -61,6 +65,7 @@ public abstract class XFECode
         while (Console.ReadKey().Key != consoleKey) ;
     }
     #endregion
+
     /// <summary>
     /// 并行循环指定次数
     /// </summary>
@@ -78,6 +83,7 @@ public abstract class XFECode
             await Task.WhenAll(taskList);
         return taskList;
     }
+
     /// <summary>
     /// 并行循环指定次数
     /// </summary>
@@ -90,6 +96,7 @@ public abstract class XFECode
             await action.StartNewTask();
         }
     }
+
     /// <summary>
     /// 计算一段代码执行所需时间
     /// </summary>
@@ -122,6 +129,7 @@ public abstract class XFECode
             Console.WriteLine($"标识名：{timerName}\t执行批次：{s_cTimeCounter}\t执行时间: {elapsedTime.TotalNanoseconds:F3} 纳秒");
         return elapsedTime;
     }
+
     /// <summary>
     /// 计算一段代码执行所需时间
     /// </summary>
@@ -154,6 +162,7 @@ public abstract class XFECode
             Console.WriteLine($"标识名：{timerName}\t执行批次：{s_cTimeCounter}\t执行时间: {elapsedTime.TotalNanoseconds:F3} 纳秒");
         return elapsedTime;
     }
+
     /// <summary>
     /// 计算一段代码执行所需时间
     /// </summary>
@@ -225,6 +234,7 @@ public abstract class XFECode
                         var isSuccessful = true;
                         var isResultEqual = true;
                         var failedMessage = string.Empty;
+                        var failedStackTrace = string.Empty;
                         Console.BackgroundColor = ConsoleColor.Black;
                         Console.ForegroundColor = methodBorderColor;
                         if (isFirstStaticMethod)
@@ -326,6 +336,7 @@ public abstract class XFECode
                         {
                             isSuccessful = false;
                             failedMessage = e.InnerException is not null ? e.InnerException.Message : e.Message;
+                            failedStackTrace = e.StackTrace;
                         }
                         var elapsedTime = timeCounter.Elapsed - selfTimeCounter.Elapsed;
                         s_cTimeCounter++;
@@ -379,6 +390,14 @@ public abstract class XFECode
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.ForegroundColor = failColor;
                             Console.WriteLine($"\t失败原因：{failedMessage}");
+                            Console.BackgroundColor = failColor;
+                            if (!failedStackTrace.NullOrWhiteSpace)
+                            {
+                                Console.Write("异常堆栈");
+                                Console.BackgroundColor = ConsoleColor.Black;
+                                Console.ForegroundColor = failColor;
+                                Console.WriteLine($"\t{failedStackTrace}");
+                            }
                         }
                         Console.BackgroundColor = ConsoleColor.Black;
                         Console.Write("\n");
@@ -497,6 +516,7 @@ public abstract class XFECode
                             var isSuccessful = true;
                             var isResultEqual = true;
                             var failedMessage = string.Empty;
+                            var failedStackTrace = string.Empty;
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.ForegroundColor = methodBorderColor;
                             if (isFirstMethod)
@@ -598,6 +618,7 @@ public abstract class XFECode
                             {
                                 isSuccessful = false;
                                 failedMessage = e.InnerException is not null ? e.InnerException.Message : e.Message;
+                                failedStackTrace = e.StackTrace;
                             }
                             var elapsedTime = timeCounter.Elapsed - selfTimeCounter.Elapsed;
                             s_cTimeCounter++;
@@ -651,6 +672,13 @@ public abstract class XFECode
                                 Console.BackgroundColor = ConsoleColor.Black;
                                 Console.ForegroundColor = failColor;
                                 Console.WriteLine($"\t失败原因：{failedMessage}");
+                                if (!failedStackTrace.NullOrWhiteSpace)
+                                {
+                                    Console.Write("异常堆栈");
+                                    Console.BackgroundColor = ConsoleColor.Black;
+                                    Console.ForegroundColor = failColor;
+                                    Console.WriteLine($"\t{failedStackTrace}");
+                                }
                                 failedList.Add(new MethodAndCounter(method, s_cTimeCounter, failedMessage));
                             }
                             Console.BackgroundColor = ConsoleColor.Black;
@@ -740,6 +768,7 @@ public abstract class XFECode
                 }
             }
     }
+
     /// <summary>
     /// 断言：判断条件为真
     /// </summary>

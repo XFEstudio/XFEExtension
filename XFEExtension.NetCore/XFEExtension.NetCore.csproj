@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>4.2.3</Version>
+    <Version>4.2.4-preview.1.0</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -20,8 +20,8 @@
     <PackageReleaseNotes>
       ## 调整
 
-      优化md文档，新增工作流
-
+      新增暂停与并行方法，完善异常输出与版本号
+      
       ## 新增
 
       无
