@@ -393,6 +393,7 @@ public abstract class XFECode
                             Console.BackgroundColor = failColor;
                             if (!failedStackTrace.NullOrWhiteSpace)
                             {
+                                Console.ForegroundColor = ConsoleColor.Black;
                                 Console.Write("异常堆栈");
                                 Console.BackgroundColor = ConsoleColor.Black;
                                 Console.ForegroundColor = failColor;
@@ -674,6 +675,7 @@ public abstract class XFECode
                                 Console.WriteLine($"\t失败原因：{failedMessage}");
                                 if (!failedStackTrace.NullOrWhiteSpace)
                                 {
+                                    Console.ForegroundColor = ConsoleColor.Black;
                                     Console.Write("异常堆栈");
                                     Console.BackgroundColor = ConsoleColor.Black;
                                     Console.ForegroundColor = failColor;
