@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="XFEExtension.NetCore.Benchmarks/XFEExtension.NetCore.Benchmarks.csproj" />
   <Project Path="XFEExtension.NetCore.Analyzer.Test/XFEExtension.NetCore.Analyzer.Test.csproj" />
   <Project Path="XFEExtension.NetCore.Analyzer/XFEExtension.NetCore.Analyzer.csproj" />
   <Project Path="XFEExtension.NetCore.Test/XFEExtension.NetCore.Test.csproj">

@@ -1227,9 +1227,24 @@ namespace XFEExtension
     }
     class MethodAndCounter
     {
+        /// <summary>
+        /// 获取或设置当前测试记录对应的方法反射信息。
+        /// </summary>
         public MethodInfo Method { get; set; }
+        /// <summary>
+        /// 获取或设置当前方法已执行或统计的次数。
+        /// </summary>
         public int Counter { get; set; }
+        /// <summary>
+        /// 获取或设置当前方法测试失败时使用的说明信息。
+        /// </summary>
         public string FailMessage { get; set; }
+        /// <summary>
+        /// 创建包含方法、计数值和失败说明的测试记录。
+        /// </summary>
+        /// <param name="method">当前测试记录对应的方法反射信息。</param>
+        /// <param name="counter">方法已执行或统计的次数。</param>
+        /// <param name="failMessage">方法测试失败时使用的说明信息。</param>
         public MethodAndCounter(MethodInfo method, int counter, string failMessage)
         {
             Method = method;

@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>5.0.0</Version>
+    <Version>5.1.0</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -20,15 +20,15 @@
     <PackageReleaseNotes>
       ## 调整
 
-      将测试框架迁移到独立的 XFEExtension.NetCore.XUnit 4.0 包，移除基础包中的重复 XUnit 类型。
+      JSON 查询改为按访问路径惰性扫描；旧版 QueryableJsonNode 由兼容包装器提供，不再在字符串转换时构建完整节点树。
 
       ## 新增
 
-      无
+      新增 XFEJson、XFEJsonNode、严格 JSON 验证、自研序列化/反序列化、数组索引、投影和强类型读取 API。
 
-      ## 严重
+      ## 兼容
 
-      无
+      旧版 JsonNodeConverter、QueryableJsonNode、ConvertToJson/ConvertFromJson 和 package:* API 已标记为过时，计划在 6.0 删除。
     </PackageReleaseNotes>
     <NeutralLanguage>zh-CN</NeutralLanguage>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>

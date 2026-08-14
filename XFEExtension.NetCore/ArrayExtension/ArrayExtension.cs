@@ -31,11 +31,10 @@ public static class ArrayExtension
     extension<T>(T[] arrays) where T : class
     {
         /// <summary>
-        /// 将数组转换为XFE格式字符串
+        /// 读取数组中每个对象的指定属性值，并将这些值转换为 XFE 格式字符串。
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="propertyName">属性名称</param>
-        /// <returns></returns>
+        /// <returns>由各对象指定属性值组成的 XFE 格式字符串。</returns>
         public string ToXFEString(string propertyName) => arrays.Aggregate(string.Empty, (current, ary) => current + $"[+-{ary.GetType().GetProperty(propertyName)?.GetValue(ary)?.ToString()?.Replace("[+", "[++").Replace("+]", "++]")}-+]");
     }
 

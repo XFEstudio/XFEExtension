@@ -25,45 +25,49 @@ XFEExtension库适用于各种C#项目，特别适合在需要提高代码可读
 
 ---
 
-## 使用Json自动解析，无需创建Json对象
+## 惰性 JSON 查询与编解码
 
-#### 基础用法
+`XFEJson.Parse` 不会在创建节点时解析全文。只有访问到某个对象或数组时才扫描对应容器，未访问的后代不会建立节点树或解码值。
 
-```csharp
-using XFEExtension.NetCore.XFETransform.JsonConverter;
-
-var jsonString = """
-                 {
-                     "status": 500,
-                     "message": "没有找到"
-                 }
-                 """;
-QueryableJsonNode jsonNode = jsonString;
-if(jsonNode["status"] == "500")
-{
-    Console.WriteLine(jsonNode["message"]);
-}
-```
-
-#### 查询并打包
+#### 查询对象和数组
 
 ```csharp
-var jsonString = """
-                 {"code":0,"message":"0","data":{"archives":[{"id":0,"text":"这是Json的使用教程文档","trash":"垃圾文本1"},{"id":1,"text":"在这里，你将了解JsonNode的查询方式","trash":"垃圾文本2"},{"id":2,"text":"Hello World！","trash":"垃圾文本3"}]}}
-                 """;
-var jsonNode = (QueryableJsonNode)jsonString;
-var packageList = jsonNode["data"]["archives"]["package:list", "id", "text"].PackageInListObject();//打包列表
-foreach (var node in packageList)
-{
-    Console.WriteLine($"ID：{node["id"]}\tDocument：{node["text"]}");//直接提取属性
-}
+using XFEExtension.NetCore.XFETransform.Json;
+using XFEExtension.NetCore.StringExtension.Json;
 
-var packageObject = jsonNode["package:object", "code", "message"].PackageObject();//打包对象
-foreach (var node in packageObject)
-{
-    Console.WriteLine($"PropertyName：{node.Key}\tValue：{node.Value}\tValueType：{node.Value.ValueType}");//遍历属性
-}
+XFEJsonNode json = """
+                   {
+                     "status": 200,
+                     "data": {
+                       "items": [
+                         { "id": 1, "text": "第一项", "unused": { "large": true } },
+                         { "id": 2, "text": "第二项" }
+                       ]
+                     }
+                   }
+                   """;
+
+var status = json["status"]?.GetInt32();
+var secondId = (json > "data" > "items" > 1 > "id")?.GetInt64();
+var projections = json["data"]!["items"]!.ProjectArray("id", "text");
 ```
+
+属性不存在或数组越界时索引器返回 `null`。字符串、数字和布尔值通过 `GetString`、`GetInt32`、`GetDouble`、`GetBoolean` 等强类型 API 读取。
+
+#### 序列化与反序列化
+
+```csharp
+var model = XFEJson.Deserialize<MyModel>(jsonText);
+var jsonText = XFEJson.Serialize(model, new XFEJsonOptions
+{
+    PropertyNamingPolicy = XFEJsonPropertyNamingPolicy.CamelCase,
+    WriteIndented = true
+});
+
+// 也可以使用扩展方法：model.ToJson()、jsonText.FromJson<MyModel>()
+```
+
+惰性查询只保证已访问片段合法。需要在处理前确认整个输入时，请调用 `XFEJson.Validate(jsonText)` 或 `XFEJson.TryValidate(jsonText, out var error)`。旧版 `QueryableJsonNode` 和 `package:*` API 在 5.x 中仍可使用，但已标记为过时。
 
 ## 使用LANDeviceDetector来检测本地局域网内的所有设备
 

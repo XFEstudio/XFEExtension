@@ -25,45 +25,49 @@ The XFEExtension library is suitable for a wide variety of C# projects, especial
 
 ---
 
-## Automatic JSON parsing without creating a JSON object
+## Lazy JSON navigation and serialization
 
-#### Basic usage
+`XFEJson.Parse` does not parse the complete document when the root node is created. A container is scanned only when it is queried, and unvisited descendants are not materialized or decoded.
 
-```csharp
-using XFEExtension.NetCore.XFETransform.JsonConverter;
-
-var jsonString = """
-                 {
-                     "status": 500,
-                     "message": "Not found"
-                 }
-                 """;
-QueryableJsonNode jsonNode = jsonString;
-if (jsonNode["status"] == "500")
-{
-    Console.WriteLine(jsonNode["message"]);
-}
-```
-
-#### Query and package
+#### Query objects and arrays
 
 ```csharp
-var jsonString = """
-                 {"code":0,"message":"0","data":{"archives":[{"id":0,"text":"This is a JSON tutorial document","trash":"trash text 1"},{"id":1,"text":"Here you will learn how to query JsonNode","trash":"trash text 2"},{"id":2,"text":"Hello World!","trash":"trash text 3"}]}}
-                 """;
-var jsonNode = (QueryableJsonNode)jsonString;
-var packageList = jsonNode["data"]["archives"]["package:list", "id", "text"].PackageInListObject(); // package as list
-foreach (var node in packageList)
-{
-    Console.WriteLine($"ID: {node["id"]}\tDocument: {node["text"]}"); // access properties directly
-}
+using XFEExtension.NetCore.XFETransform.Json;
+using XFEExtension.NetCore.StringExtension.Json;
 
-var packageObject = jsonNode["package:object", "code", "message"].PackageObject(); // package as object
-foreach (var node in packageObject)
-{
-    Console.WriteLine($"PropertyName: {node.Key}\tValue: {node.Value}\tValueType: {node.Value.ValueType}"); // iterate properties
-}
+XFEJsonNode json = """
+                   {
+                     "status": 200,
+                     "data": {
+                       "items": [
+                         { "id": 1, "text": "first", "unused": { "large": true } },
+                         { "id": 2, "text": "second" }
+                       ]
+                     }
+                   }
+                   """;
+
+var status = json["status"]?.GetInt32();
+var secondId = (json > "data" > "items" > 1 > "id")?.GetInt64();
+var projections = json["data"]!["items"]!.ProjectArray("id", "text");
 ```
+
+Missing properties and out-of-range array indexes return `null`. Read scalar values with typed APIs such as `GetString`, `GetInt32`, `GetDouble`, and `GetBoolean`.
+
+#### Serialize and deserialize
+
+```csharp
+var model = XFEJson.Deserialize<MyModel>(jsonText);
+var jsonText = XFEJson.Serialize(model, new XFEJsonOptions
+{
+    PropertyNamingPolicy = XFEJsonPropertyNamingPolicy.CamelCase,
+    WriteIndented = true
+});
+
+// Extension forms are also available: model.ToJson(), jsonText.FromJson<MyModel>()
+```
+
+Lazy navigation guarantees only that visited fragments are valid. Call `XFEJson.Validate(jsonText)` or `XFEJson.TryValidate(jsonText, out var error)` when the whole input must be checked first. The old `QueryableJsonNode` and `package:*` APIs remain available in 5.x but are obsolete.
 
 ## Using LANDeviceDetector to detect all devices on the local network
 
