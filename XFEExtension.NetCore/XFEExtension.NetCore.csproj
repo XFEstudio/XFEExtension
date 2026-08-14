@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>4.2.4</Version>
+    <Version>5.0.0</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -20,7 +20,7 @@
     <PackageReleaseNotes>
       ## 调整
 
-      提升异常堆栈输出可读性并升级版本号
+      将测试框架迁移到独立的 XFEExtension.NetCore.XUnit 4.0 包，移除基础包中的重复 XUnit 类型。
 
       ## 新增
 

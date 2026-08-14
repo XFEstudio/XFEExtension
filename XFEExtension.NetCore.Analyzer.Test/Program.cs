@@ -1,14 +1,12 @@
 ﻿using XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
 using XFEExtension.NetCore.XFETransform;
 using XFEExtension.NetCore.XFETransform.StringConverter;
-using XFEExtension.NetCore.XUnit.Attributes;
 
 namespace XFEExtension.NetCore.Analyzer.Test;
 
 internal class Program
 {
-    [SMTest]
-    public static async void TestNamedPipeAsync()
+    public static void Main()
     {
         var testClass = new TestClass("测试类", "测试描述：我上早八", 56)
         {

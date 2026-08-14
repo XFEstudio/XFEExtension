@@ -238,26 +238,13 @@ string str = testObject.GetAttribute<string>();
 
 ---
 
-## Using the XUnit testing framework
+## Testing framework moved to its own package
 
-```csharp
-[CTest]
-class TestClass : XFECode
-{
-    [MTest]
-    void Test()
-    {
-        Assert(true, "assertion content");
-    }
-}
-public class Program : XFECode
-{
-    public static void Main(string[] args)
-    {
-        Pause();
-    }
-}
-```
+Starting with XFEExtension.NetCore 5.0, the testing framework is provided by the
+`XFEExtension.NetCore.XUnit` 4.0 package. The base extension package no longer
+defines `XFECode`, `CTest`, `MTest`, or `SMTest`.
+
+Use `[Test]`, `[TestCase]`, `[Benchmark]`, and `Assert` from the dedicated package.
 
 ---
 
