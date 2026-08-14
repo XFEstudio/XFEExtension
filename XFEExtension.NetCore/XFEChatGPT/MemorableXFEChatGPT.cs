@@ -5,6 +5,7 @@ using XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.DefaultClass;
 using XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass;
 using XFEExtension.NetCore.XFEChatGPT.OtherInnerClass;
 using XFEExtension.NetCore.XFETransform;
+using XFEExtension.NetCore.XFETransform.Json;
 
 namespace XFEExtension.NetCore.XFEChatGPT;
 
@@ -378,13 +379,13 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                 await webSocket.ConnectAsync(new Uri("ws://gpt.api.xfegzs.com/"), CancellationToken.None);
                 if (nowDialog.MemorableMode)
                 {
-                    var json = nowDialog.CreateAskMessage().ConvertToJson();
+                    var json = XFEJson.Serialize(nowDialog.CreateAskMessage());
                     if (json is not null)
                         await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(json)), WebSocketMessageType.Text, true, CancellationToken.None);
                 }
                 else
                 {
-                    var json = new XFEAskGPTMessage(false, nowDialog.StreamMode, nowDialog.ChatGPTModel.GetModelString(), null, nowDialog.XFEComProtocol, nowDialog.System, nowDialog[^1].GPTMessage.Content).ConvertToJson();
+                    var json = XFEJson.Serialize(new XFEAskGPTMessage(false, nowDialog.StreamMode, nowDialog.ChatGPTModel.GetModelString(), null, nowDialog.XFEComProtocol, nowDialog.System, nowDialog[^1].GPTMessage.Content));
                     if (json is not null)
                         await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(json)), WebSocketMessageType.Text, true, CancellationToken.None);
                 }
@@ -513,13 +514,13 @@ public class MemorableXFEChatGPT : XFEChatGPTBase
                 await webSocket.ConnectAsync(new Uri("ws://gpt.api.xfegzs.com/"), CancellationToken.None);
                 if (nowDialog.MemorableMode)
                 {
-                    var json = nowDialog.CreateAskMessage().ConvertToJson();
+                    var json = XFEJson.Serialize(nowDialog.CreateAskMessage());
                     if (json is not null)
                         await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(json)), WebSocketMessageType.Text, true, CancellationToken.None);
                 }
                 else
                 {
-                    var json = new XFEAskGPTMessage(false, nowDialog.StreamMode, nowDialog.ChatGPTModel.GetModelString(), null, nowDialog.XFEComProtocol, nowDialog.System, nowDialog[^1].GPTMessage.Content).ConvertToJson();
+                    var json = XFEJson.Serialize(new XFEAskGPTMessage(false, nowDialog.StreamMode, nowDialog.ChatGPTModel.GetModelString(), null, nowDialog.XFEComProtocol, nowDialog.System, nowDialog[^1].GPTMessage.Content));
                     if (json is not null)
                         await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(json)), WebSocketMessageType.Text, true, CancellationToken.None);
                 }

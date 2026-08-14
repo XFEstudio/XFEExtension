@@ -1496,13 +1496,44 @@ namespace XFEExtension.XFEChatGPT
     #region ChatGPT自定义类
     class XFEAskGPTMessage
     {
+        /// <summary>
+        /// 获取或设置是否直接使用调用方提供的 GPT 环境数据。
+        /// </summary>
         public bool isSelfEditData { get; set; }
+        /// <summary>
+        /// 获取或设置是否以流式方式接收 GPT 响应。
+        /// </summary>
         public bool stream { get; set; }
+        /// <summary>
+        /// 获取或设置请求使用的 GPT 模型名称。
+        /// </summary>
         public string chatGPTModel { get; set; }
+        /// <summary>
+        /// 获取或设置调用方自定义的 GPT 环境数据。
+        /// </summary>
         public EnvironmentGPTData EnvironmentGPTData { get; set; }
+        /// <summary>
+        /// 获取或设置请求使用的 XFE 通讯协议。
+        /// </summary>
         public XFEComProtocol comProtocol { get; set; }
+        /// <summary>
+        /// 获取或设置用于定义 GPT 行为的系统消息内容。
+        /// </summary>
         public string systemContent { get; set; }
+        /// <summary>
+        /// 获取或设置发送给 GPT 的提问内容。
+        /// </summary>
         public string askContent { get; set; }
+        /// <summary>
+        /// 使用请求模式、模型、环境数据及消息内容创建 GPT 请求消息。
+        /// </summary>
+        /// <param name="isSelfEditData">是否直接使用调用方提供的 GPT 环境数据。</param>
+        /// <param name="stream">是否以流式方式接收 GPT 响应。</param>
+        /// <param name="chatGPTModel">请求使用的 GPT 模型名称。</param>
+        /// <param name="EnvironmentGPTData">调用方自定义的 GPT 环境数据。</param>
+        /// <param name="comProtocol">请求使用的 XFE 通讯协议。</param>
+        /// <param name="systemContent">用于定义 GPT 行为的系统消息内容。</param>
+        /// <param name="askContent">发送给 GPT 的提问内容。</param>
         public XFEAskGPTMessage(bool isSelfEditData, bool stream, string chatGPTModel, EnvironmentGPTData EnvironmentGPTData, XFEComProtocol comProtocol, string systemContent, string askContent)
         {
             this.isSelfEditData = isSelfEditData;
@@ -1513,6 +1544,9 @@ namespace XFEExtension.XFEChatGPT
             this.systemContent = systemContent;
             this.askContent = askContent;
         }
+        /// <summary>
+        /// 创建一个使用默认属性值的空 GPT 请求消息。
+        /// </summary>
         public XFEAskGPTMessage() { }
     }
     /// <summary>
@@ -1547,6 +1581,12 @@ namespace XFEExtension.XFEChatGPT
     }
     class PrivateXFEGPTMessageReceivedEventArgs : XFEGPTMessageReceivedEventArgs
     {
+        /// <summary>
+        /// 创建包含消息内容、接收器 ID 和生成状态的 GPT 消息接收事件参数实现。
+        /// </summary>
+        /// <param name="message">从服务器接收到的消息内容。</param>
+        /// <param name="id">消息接收器 ID。</param>
+        /// <param name="generateState">当前消息的生成状态。</param>
         public PrivateXFEGPTMessageReceivedEventArgs(string message, string id, GenerateState generateState) : base(message, id, generateState)
         {
 
@@ -1575,6 +1615,13 @@ namespace XFEExtension.XFEChatGPT
     }
     class PrivateMemorableGPTMessageReceivedEventArgs : MemorableGPTMessageReceivedEventArgs
     {
+        /// <summary>
+        /// 创建包含对话 ID 的记忆模式 GPT 消息接收事件参数实现。
+        /// </summary>
+        /// <param name="message">从服务器接收到的消息内容。</param>
+        /// <param name="id">消息接收器 ID。</param>
+        /// <param name="generateState">当前消息的生成状态。</param>
+        /// <param name="dialogId">消息所属的对话 ID。</param>
         public PrivateMemorableGPTMessageReceivedEventArgs(string message, string id, GenerateState generateState, string dialogId) : base(message, id, generateState, dialogId)
         {
 
@@ -1582,10 +1629,23 @@ namespace XFEExtension.XFEChatGPT
     }
     class PrivateMessageChoice : MessageChoice
     {
+        /// <summary>
+        /// 创建同时包含流式增量消息和完整消息的 GPT 候选结果。
+        /// </summary>
+        /// <param name="delta">流式接收时的增量消息。</param>
+        /// <param name="message">本次候选结果的完整消息。</param>
+        /// <param name="finish_reason">消息生成结束的原因。</param>
+        /// <param name="index">候选结果在响应中的索引。</param>
         public PrivateMessageChoice(GPTMessage delta, GPTMessage message, string finish_reason, int index) : base(delta, message, finish_reason, index)
         {
 
         }
+        /// <summary>
+        /// 创建仅包含完整消息的 GPT 候选结果。
+        /// </summary>
+        /// <param name="message">本次候选结果的完整消息。</param>
+        /// <param name="finish_reason">消息生成结束的原因。</param>
+        /// <param name="index">候选结果在响应中的索引。</param>
         public PrivateMessageChoice(GPTMessage message, string finish_reason, int index) : base(message, finish_reason, index)
         {
 
@@ -1593,6 +1653,15 @@ namespace XFEExtension.XFEChatGPT
     }
     class PrivateReceivedGPTMessage : ReceivedGPTMessage
     {
+        /// <summary>
+        /// 使用响应元数据、令牌用量和候选结果创建接收到的 GPT 消息实现。
+        /// </summary>
+        /// <param name="id">GPT 响应的消息 ID。</param>
+        /// <param name="object">响应对象的类型标识。</param>
+        /// <param name="created">响应的创建时间戳。</param>
+        /// <param name="model">生成响应所使用的 GPT 模型。</param>
+        /// <param name="usage">本次响应的令牌使用情况。</param>
+        /// <param name="choices">GPT 返回的候选消息集合。</param>
         public PrivateReceivedGPTMessage(string id, string @object, long created, string model, TokenUsage usage, PrivateMessageChoice[] choices) : base(id, @object, created, model, usage, choices)
         {
 
@@ -2028,6 +2097,9 @@ namespace XFEExtension.XFEChatGPT
     }
     class PrivateXFEGPTMemoryDialog : XFEGPTMemoryDialog
     {
+        /// <summary>
+        /// 创建一个使用默认设置的 GPT 记忆对话实现。
+        /// </summary>
         public PrivateXFEGPTMemoryDialog() { }
     }
     /// <summary>
@@ -2086,8 +2158,19 @@ namespace XFEExtension.XFEChatGPT
     #region 其余类
     class MessageIdAndThread
     {
+        /// <summary>
+        /// 获取或设置后台处理线程所对应的消息 ID。
+        /// </summary>
         public string messageId { get; set; }
+        /// <summary>
+        /// 获取或设置处理该消息的线程。
+        /// </summary>
         public Thread thread { get; set; }
+        /// <summary>
+        /// 创建消息 ID 与后台处理线程之间的关联记录。
+        /// </summary>
+        /// <param name="messageId">后台处理线程所对应的消息 ID。</param>
+        /// <param name="thread">处理该消息的线程。</param>
         public MessageIdAndThread(string messageId, Thread thread)
         {
             this.messageId = messageId;
@@ -2096,7 +2179,16 @@ namespace XFEExtension.XFEChatGPT
     }
     class MessageIdDialogIdAndThread : MessageIdAndThread
     {
+        /// <summary>
+        /// 获取或设置后台处理线程所对应的对话 ID。
+        /// </summary>
         public string dialogId { get; set; }
+        /// <summary>
+        /// 创建消息 ID、对话 ID 与后台处理线程之间的关联记录。
+        /// </summary>
+        /// <param name="messageId">后台处理线程所对应的消息 ID。</param>
+        /// <param name="dialogId">后台处理线程所对应的对话 ID。</param>
+        /// <param name="thread">处理该消息的线程。</param>
         public MessageIdDialogIdAndThread(string messageId, string dialogId, Thread thread) : base(messageId, thread)
         {
             this.dialogId = dialogId;

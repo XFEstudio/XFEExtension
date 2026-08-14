@@ -5,6 +5,7 @@ using XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.DefaultClass;
 using XFEExtension.NetCore.XFEChatGPT.ChatGPTInnerClass.HelperClass;
 using XFEExtension.NetCore.XFEChatGPT.OtherInnerClass;
 using XFEExtension.NetCore.XFETransform;
+using XFEExtension.NetCore.XFETransform.Json;
 
 namespace XFEExtension.NetCore.XFEChatGPT;
 
@@ -194,7 +195,7 @@ public class XFEChatGPT : XFEChatGPTBase
                 #region 进行HTTP请求
                 ClientWebSocket webSocket = new();
                 await webSocket.ConnectAsync(new Uri("ws://gpt.api.xfegzs.com/"), CancellationToken.None);
-                var json = _xFEAskGPTMessage.ConvertToJson();
+                var json = XFEJson.Serialize(_xFEAskGPTMessage);
                 if (json is not null)
                     await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(json)), WebSocketMessageType.Text, true, CancellationToken.None);
                 #endregion
@@ -287,7 +288,7 @@ public class XFEChatGPT : XFEChatGPTBase
                 #region 进行HTTP请求
                 ClientWebSocket webSocket = new();
                 await webSocket.ConnectAsync(new Uri("ws://gpt.api.xfegzs.com/"), CancellationToken.None);
-                var json = _xFEAskGPTMessage.ConvertToJson();
+                var json = XFEJson.Serialize(_xFEAskGPTMessage);
                 if (json is not null)
                     await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(json)), WebSocketMessageType.Text, true, CancellationToken.None);
                 #endregion

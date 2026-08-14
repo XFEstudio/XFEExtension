@@ -1,23 +1,18 @@
-﻿using XFEExtension.NetCore.XFETransform;
-using XFEExtension.NetCore.XFETransform.ObjectInfoAnalyzer;
-using XFEExtension.NetCore.XFETransform.StringConverter;
+using XFEExtension.NetCore.XFETransform.Json;
 
 namespace XFEExtension.NetCore.StringExtension.Json;
 
 /// <summary>
-/// 对string类进行Json操作的扩展
+/// 字符串查找及 JSON 编解码扩展。
 /// </summary>
 public static class JsonStringExtension
 {
-    /// <param name="str">被匹配的字符串</param>
+    /// <param name="str">被操作的字符串。</param>
     extension(string str)
     {
         /// <summary>
-        /// 根据给定的开头和末尾返回查找到的第一个匹配的字符串（全匹配）
+        /// 根据给定的开头和末尾返回查找到的第一个匹配字符串。
         /// </summary>
-        /// <param name="beginString">匹配开头字符串</param>
-        /// <param name="endString">匹配结尾字符串</param>
-        /// <returns>返回夹在开头和末尾中间的字符串</returns>
         public string GetStringBetweenTwoString(string beginString, string endString)
         {
             if (str == string.Empty)
@@ -26,33 +21,39 @@ public static class JsonStringExtension
             if (beginIndex is -1 or 0)
                 return string.Empty;
             var endIndex = str.IndexOf(endString, beginIndex, StringComparison.Ordinal);
-            return endIndex is -1 or 0 ? string.Empty : str.Substring(beginIndex + beginString.Length, endIndex - beginIndex - beginString.Length);
+            return endIndex is -1 or 0
+                ? string.Empty
+                : str.Substring(beginIndex + beginString.Length, endIndex - beginIndex - beginString.Length);
         }
 
         /// <summary>
-        /// 通过给定的文本格式查找对应的字段
+        /// 通过给定文本格式查找对应字段。
         /// </summary>
-        /// <param name="form">查找的文本格式</param>
-        /// <returns></returns>
-        public string GetTextByForm(string form)
-        {
-            return str.GetStringBetweenTwoString(form + ":", ",");
-        }
+        public string GetTextByForm(string form) => str.GetStringBetweenTwoString(form + ":", ",");
+
+        /// <summary>
+        /// 将当前 JSON 字符串反序列化为指定类型。
+        /// </summary>
+        public T? FromJson<T>(XFEJsonOptions? options = null) => XFEJson.Deserialize<T>(str, options);
     }
 
-    /// <param name="obj">待转换对象</param>
+    /// <param name="obj">待转换对象。</param>
     extension(object obj)
     {
         /// <summary>
-        /// 转化为Json字符串文本
+        /// 转换为 JSON 字符串。
         /// </summary>
-        /// <param name="formatted">格式化Json（自动换行和空格对齐）</param>
-        /// <returns></returns>
-        public string ToJson(bool formatted = false) => XFEConverter.GetObjectInfo(formatted ? StringConverter.FormattedJsonTransformer : StringConverter.JsonTransformer, string.Empty, ObjectPlace.Main, 0, [obj], obj.GetType(), obj).OutPutObject();
+        public string ToJson(bool formatted = false) =>
+            XFEJson.Serialize(obj, new XFEJsonOptions { WriteIndented = formatted });
 
         /// <summary>
-        /// 转化为Json字符串文本
+        /// 使用指定选项转换为 JSON 字符串。
         /// </summary>
-        public string Json { get => obj.ToJson(); }
+        public string ToJson(XFEJsonOptions options) => XFEJson.Serialize(obj, options);
+
+        /// <summary>
+        /// JSON 字符串文本。
+        /// </summary>
+        public string Json => obj.ToJson();
     }
 }

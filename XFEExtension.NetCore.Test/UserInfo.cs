@@ -1,5 +1,8 @@
 ﻿namespace PDDShopManagementSystem.AdminTool.Model;
 
+/// <summary>
+/// 表示店铺管理场景中的用户登录、活动期限及封禁状态信息。
+/// </summary>
 public class UserInfo
 {
     /// <summary>

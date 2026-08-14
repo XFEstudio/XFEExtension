@@ -1,174 +1,32 @@
-﻿using System.Collections;
-using System.Reflection;
 using XFEExtension.NetCore.Exceptions;
+using XFEExtension.NetCore.XFETransform.Json;
 
 namespace XFEExtension.NetCore.XFETransform;
 
 /// <summary>
-/// XFEJson转换器
+/// 旧版 JSON 转换入口。新代码应使用 <see cref="XFEJson"/>。
 /// </summary>
 public static class XFEJsonTransformer
 {
-    #region 对象转Json字符串
     /// <summary>
-    /// 将对象转换为Json字符串
+    /// 将对象转换为 JSON 字符串。
     /// </summary>
-    /// <param name="obj"></param>
-    /// <returns></returns>
-    /// <exception cref="XFEJsonTransformException">空对象异常</exception>
+    [Obsolete("请使用 XFEJson.Serialize 或 ToJson。")]
     public static string? ConvertToJson(this object? obj)
     {
         if (obj is null)
-        {
             throw new XFEJsonTransformException("对象为空");
-        }
-
-        var type = obj.GetType();
-
-        if (IsSimpleType(type))
-        {
-            return GetSimpleValueAsString(obj);
-        }
-
-        if (type.IsArray || typeof(IEnumerable).IsAssignableFrom(type))
-        {
-            return ConvertArrayOrEnumerableToJson(obj);
-        }
-
-        return ConvertObjectToJson(obj);
+        return XFEJson.Serialize(obj);
     }
 
-    private static bool IsSimpleType(Type type)
-    {
-        return type.IsPrimitive || type == typeof(string) || type == typeof(decimal) || type == typeof(DateTime);
-    }
-
-    private static string? GetSimpleValueAsString(object value)
-    {
-        return value switch
-        {
-            string => $"\"{value}\"",
-            DateTime dateTime => $"\"{dateTime:s}\"",
-            bool boolValue => boolValue ? "true" : "false",
-            _ => value.ToString()
-        };
-    }
-
-
-    private static string ConvertArrayOrEnumerableToJson(object obj)
-    {
-        if (obj is not IEnumerable array)
-            return string.Empty;
-
-        var jsonElements = (from object? item in array select item.ConvertToJson() into json select json ?? string.Empty).ToList();
-
-        return $"[{string.Join(",", jsonElements)}]";
-    }
-
-    private static string ConvertObjectToJson(object obj)
-    {
-        var type = obj.GetType();
-        var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(p => p.CanRead);
-
-        var jsonProperties = new List<string>();
-
-        foreach (var property in properties)
-        {
-            var propertyName = property.Name;
-            var propertyValue = property.GetValue(obj);
-
-            if (propertyValue is null)
-            {
-                jsonProperties.Add($"\"{propertyName}\":null");
-            }
-            else
-            {
-                jsonProperties.Add(property.PropertyType.IsEnum
-                    ? $"\"{propertyName}\":{(int)propertyValue}"
-                    : $"\"{propertyName}\":{propertyValue.ConvertToJson()}");
-            }
-        }
-
-        return $"{{{string.Join(",", jsonProperties)}}}";
-    }
-    #endregion
-    #region Json字符串转对象
     /// <summary>
-    /// 将Json字符串转换为对象
+    /// 将 JSON 字符串转换为对象。
     /// </summary>
-    /// <typeparam name="T">待转换的类型</typeparam>
-    /// <param name="jsonString"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    public static T ConvertFromJson<T>(string jsonString) where T : new()
+    [Obsolete("请使用 XFEJson.Deserialize<T> 或 FromJson<T>。")]
+    public static T ConvertFromJson<T>(string jsonString)
     {
         if (string.IsNullOrEmpty(jsonString))
-        {
-            throw new ArgumentException("Json字符串为空");
-        }
-
-        var jsonObject = Activator.CreateInstance<T>()!;
-
-        var jsonProperties = GetJsonProperties(jsonString);
-        var objectType = typeof(T);
-
-        foreach ((string key, string propertyValue) in jsonProperties)
-        {
-            var property = objectType.GetProperty(key);
-            if (property is null)
-                continue;
-            var convertedValue = ConvertToPropertyValue(propertyValue, property.PropertyType);
-            property.SetValue(jsonObject, convertedValue);
-        }
-
-        return jsonObject;
+            throw new ArgumentException("JSON 字符串为空。", nameof(jsonString));
+        return XFEJson.Deserialize<T>(jsonString)!;
     }
-
-    private static Dictionary<string, string> GetJsonProperties(string jsonString)
-    {
-        var jsonProperties = new Dictionary<string, string>();
-
-        var jsonTokens = jsonString.Trim('{', '}').Split(',');
-
-        foreach (var jsonToken in jsonTokens)
-        {
-            var propertyParts = jsonToken.Split(':');
-            if (propertyParts.Length != 2)
-                continue;
-            var propertyName = propertyParts[0].Trim('\"');
-            var propertyValue = propertyParts[1].Trim();
-
-            jsonProperties[propertyName] = propertyValue;
-        }
-
-        return jsonProperties;
-    }
-
-    private static object ConvertToPropertyValue(string propertyValue, Type targetType)
-    {
-        if (targetType == typeof(string))
-        {
-            return propertyValue.Trim('\"');
-        }
-
-        if (targetType == typeof(int))
-        {
-            return int.Parse(propertyValue);
-        }
-
-        if (targetType == typeof(decimal))
-        {
-            return decimal.Parse(propertyValue);
-        }
-
-        if (targetType == typeof(DateTime))
-        {
-            return DateTime.Parse(propertyValue.Trim('\"'));
-        }
-
-        return targetType.IsEnum ? Enum.Parse(targetType, propertyValue) : throw new NotSupportedException($"不支持的属性类型: {targetType.Name}");
-    }
-
-    #endregion
 }

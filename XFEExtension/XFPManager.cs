@@ -5,12 +5,18 @@ namespace XFEExtension.XFPManager
     internal class XProperty
     {
         private object property;
+        /// <summary>
+        /// 获取或设置由属性管理器读取或写入的属性值。
+        /// </summary>
         public object Property
         {
             get { return property; }
             set { property = value; }
         }
         private string propertyName;
+        /// <summary>
+        /// 获取或设置该属性在被管理对象中的名称。
+        /// </summary>
         public string Name
         {
             get { return propertyName; }
@@ -19,7 +25,13 @@ namespace XFEExtension.XFPManager
     }
     internal class XField
     {
+        /// <summary>
+        /// 存储由字段管理器读取或写入的字段值。
+        /// </summary>
         public object Field;
+        /// <summary>
+        /// 存储该字段在被管理对象中的名称。
+        /// </summary>
         public string Name;
     }
     /// <summary>

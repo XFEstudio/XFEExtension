@@ -3,6 +3,7 @@
 /// <summary>
 /// 值类型
 /// </summary>
+[Obsolete("请使用 XFEJsonValueKind 或强类型读取 API。")]
 public enum ValueType
 {
     /// <summary>

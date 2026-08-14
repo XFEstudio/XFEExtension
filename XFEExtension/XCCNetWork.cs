@@ -1521,10 +1521,25 @@ namespace XFEExtension.CyberComm.XCCNetWork
     }
     class XCCConnectionClosedEventArgsImpl : XCCConnectionClosedEventArgs
     {
+        /// <summary>
+        /// 使用群组、连接类型、传输客户端及关闭状态创建 XCC 会话关闭事件参数。
+        /// </summary>
+        /// <param name="group">触发关闭事件的 XCC 群组。</param>
+        /// <param name="xCCClientType">关闭连接对应的 XCC 客户端类型。</param>
+        /// <param name="textMessageClientWebSocket">用于明文消息传输的 WebSocket 客户端。</param>
+        /// <param name="fileTransportClientWebSocket">用于文件传输的 WebSocket 客户端。</param>
+        /// <param name="closedNormally">连接是否按正常流程关闭。</param>
         public XCCConnectionClosedEventArgsImpl(XCCGroup group, XCCClientType xCCClientType, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket, bool closedNormally) : base(group, xCCClientType, textMessageClientWebSocket, fileTransportClientWebSocket, closedNormally) { }
     }
     class XCCConnectedEventArgsImpl : XCCConnectedEventArgs
     {
+        /// <summary>
+        /// 使用群组、连接类型及传输客户端创建 XCC 连接成功事件参数。
+        /// </summary>
+        /// <param name="group">触发连接事件的 XCC 群组。</param>
+        /// <param name="xCCClientType">已建立连接的 XCC 客户端类型。</param>
+        /// <param name="textMessageClientWebSocket">用于明文消息传输的 WebSocket 客户端。</param>
+        /// <param name="fileTransportClientWebSocket">用于文件传输的 WebSocket 客户端。</param>
         public XCCConnectedEventArgsImpl(XCCGroup group, XCCClientType xCCClientType, ClientWebSocket textMessageClientWebSocket, ClientWebSocket fileTransportClientWebSocket) : base(group, xCCClientType, textMessageClientWebSocket, fileTransportClientWebSocket) { }
     }
     class XCCTextMessageReceivedEventArgsImpl : XCCTextMessageReceivedEventArgs
