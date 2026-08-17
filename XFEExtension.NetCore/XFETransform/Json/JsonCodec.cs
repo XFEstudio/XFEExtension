@@ -164,21 +164,21 @@ internal static class JsonCodec
                 writer.Append(((IFormattable)value).ToString(null, CultureInfo.InvariantCulture)!);
                 return true;
             case TypeCode.Single:
-            {
-                var number = (float)value;
-                if (!float.IsFinite(number))
-                    throw JsonSource.ConversionError("JSON 不支持 NaN 或无穷大浮点数。", path);
-                writer.Append(number.ToString("R", CultureInfo.InvariantCulture));
-                return true;
-            }
+                {
+                    var number = (float)value;
+                    if (!float.IsFinite(number))
+                        throw JsonSource.ConversionError("JSON 不支持 NaN 或无穷大浮点数。", path);
+                    writer.Append(number.ToString("R", CultureInfo.InvariantCulture));
+                    return true;
+                }
             case TypeCode.Double:
-            {
-                var number = (double)value;
-                if (!double.IsFinite(number))
-                    throw JsonSource.ConversionError("JSON 不支持 NaN 或无穷大浮点数。", path);
-                writer.Append(number.ToString("R", CultureInfo.InvariantCulture));
-                return true;
-            }
+                {
+                    var number = (double)value;
+                    if (!double.IsFinite(number))
+                        throw JsonSource.ConversionError("JSON 不支持 NaN 或无穷大浮点数。", path);
+                    writer.Append(number.ToString("R", CultureInfo.InvariantCulture));
+                    return true;
+                }
             default:
                 return false;
         }
@@ -361,7 +361,7 @@ internal static class JsonCodec
             return decimalValue;
         if (double.TryParse(span, NumberStyles.Float, CultureInfo.InvariantCulture, out var doubleValue) && double.IsFinite(doubleValue))
             return doubleValue;
-        throw node.Error("JSON 数字超出受支持的动态数值范围。") ;
+        throw node.Error("JSON 数字超出受支持的动态数值范围。");
     }
 
     private static Dictionary<string, object?> ReadUntypedObject(XFEJsonNode node, JsonSettings settings, int depth)

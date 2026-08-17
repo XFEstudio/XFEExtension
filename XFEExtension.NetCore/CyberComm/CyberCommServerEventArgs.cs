@@ -19,6 +19,9 @@ namespace XFEExtension.NetCore.CyberComm;
 /// <param name="EndOfMessage">消息是否结束</param>
 public abstract record CyberCommServerEventArgs(Uri? RequestUrl, BackMessageType MessageType, WebSocket CurrentWebSocket, NameValueCollection WSHeader, XFECyberCommException? Exception, string IPAddress, string? TextMessage, byte[]? BinaryMessage, bool EndOfMessage)
 {
+    private Func<ReadOnlyMemory<byte>, WebSocketMessageType, CancellationToken, ValueTask<CyberCommSendResult>>? SendHandler { get; init; }
+    private Func<WebSocketCloseStatus, string, CancellationToken, ValueTask<CyberCommSendResult>>? CloseHandler { get; init; }
+
     /// <summary>
     /// 发送文本消息
     /// </summary>
@@ -30,7 +33,13 @@ public abstract record CyberCommServerEventArgs(Uri? RequestUrl, BackMessageType
         try
         {
             var sendBuffer = Encoding.UTF8.GetBytes(message);
-            await CurrentWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+            if (SendHandler is not null)
+            {
+                var result = await SendHandler(sendBuffer, WebSocketMessageType.Text, CancellationToken.None).ConfigureAwait(false);
+                if (!result.IsSuccess) throw result.Exception ?? new InvalidOperationException($"发送失败：{result.Status}");
+            }
+            else
+                await CurrentWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
         }
         catch (Exception ex)
         {
@@ -47,7 +56,13 @@ public abstract record CyberCommServerEventArgs(Uri? RequestUrl, BackMessageType
     {
         try
         {
-            await CurrentWebSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Binary, true, CancellationToken.None);
+            if (SendHandler is not null)
+            {
+                var result = await SendHandler(bytes, WebSocketMessageType.Binary, CancellationToken.None).ConfigureAwait(false);
+                if (!result.IsSuccess) throw result.Exception ?? new InvalidOperationException($"发送失败：{result.Status}");
+            }
+            else
+                await CurrentWebSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Binary, true, CancellationToken.None);
         }
         catch (Exception ex)
         {
@@ -62,7 +77,10 @@ public abstract record CyberCommServerEventArgs(Uri? RequestUrl, BackMessageType
     {
         try
         {
-            await CurrentWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection Closed", CancellationToken.None);
+            if (CloseHandler is not null)
+                await CloseHandler(WebSocketCloseStatus.NormalClosure, "Connection Closed", CancellationToken.None).ConfigureAwait(false);
+            else
+                await CurrentWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection Closed", CancellationToken.None);
         }
         catch (Exception ex)
         {
@@ -93,4 +111,10 @@ public abstract record CyberCommServerEventArgs(Uri? RequestUrl, BackMessageType
     internal CyberCommServerEventArgs(Uri? requestUrl, WebSocket webSocket, XFECyberCommException ex, string ipAddress, NameValueCollection wsHeader) : this(requestUrl, BackMessageType.Error, webSocket, wsHeader, ex, ipAddress, null, null, true)
     {
     }
+
+    internal CyberCommServerEventArgs WithTransport(CyberCommWebSocketPeer peer) => this with
+    {
+        SendHandler = peer.SendAsync,
+        CloseHandler = peer.CloseAsync
+    };
 }

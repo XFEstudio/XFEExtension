@@ -41,7 +41,7 @@ public class LanDeviceDetector
     /// <param name="timeOut">超时</param>
     public LanDeviceDetector(string iPStart = "default", int timeOut = 100)
     {
-        if(iPStart == "default")
+        if (iPStart == "default")
         {
             var localIPAddress = WebExtension.GetLocalIPAddress();
             IPStart = localIPAddress is not null ? $"{string.Join(".", localIPAddress.ToString().Split('.')[..3])}.*" : "192.168.1.*";

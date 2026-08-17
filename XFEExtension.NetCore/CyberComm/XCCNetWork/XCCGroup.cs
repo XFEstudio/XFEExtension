@@ -1,9 +1,9 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
+using System.Collections.Concurrent;
 using XFEExtension.NetCore.ArrayExtension;
 using XFEExtension.NetCore.BufferExtension;
 using XFEExtension.NetCore.Exceptions;
-using XFEExtension.NetCore.TaskExtension;
 
 namespace XFEExtension.NetCore.CyberComm.XCCNetWork;
 
@@ -13,10 +13,13 @@ namespace XFEExtension.NetCore.CyberComm.XCCNetWork;
 /// </summary>
 public abstract class XCCGroup
 {
-    private event EndTaskTrigger<bool>? UpdateTaskTrigger;
+    private readonly ConcurrentDictionary<string, TaskCompletionSource<bool>> _pendingAcknowledgements = new(StringComparer.Ordinal);
+    private readonly SemaphoreSlim _textSendGate = new(1, 1);
+    private readonly SemaphoreSlim _fileSendGate = new(1, 1);
     private readonly XCCNetWorkBase _workBase;
     private int _reconnectTimes = -1;
     private bool _readyToClose;
+    private readonly Uri _serverUri;
     #region 公有属性
     /// <summary>
     /// 客户端标识名
@@ -46,6 +49,10 @@ public abstract class XCCGroup
     /// WebSocket文件传输客户端
     /// </summary>
     public ClientWebSocket? FileTransportClientWebSocket { get; private set; }
+    /// <summary>允许发送的最大文本消息字节数。</summary>
+    public int MaxTextMessageBytes { get; set; } = 1024 * 1024;
+    /// <summary>允许发送的最大二进制消息字节数。</summary>
+    public long MaxBinaryMessageBytes { get; set; } = 64 * 1024 * 1024;
     #endregion
     #region 公有方法
     /// <summary>
@@ -74,7 +81,7 @@ public abstract class XCCGroup
     {
     XCCReconnect:
         TextMessageClientWebSocket = new ClientWebSocket();
-        var serverUri = new Uri("ws://xcc.api.xfegzs.com");
+        var serverUri = _serverUri;
         var base64GroupId = Convert.ToBase64String(Encoding.UTF8.GetBytes(GroupId));
         var base64SenderId = Convert.ToBase64String(Encoding.UTF8.GetBytes(Sender));
         TextMessageClientWebSocket.Options.SetRequestHeader("Group", base64GroupId);
@@ -102,7 +109,7 @@ public abstract class XCCGroup
             {
                 if (_reconnectTimes <= reconnectMaxTimes || reconnectMaxTimes == -1)
                 {
-                    Thread.Sleep(reconnectTryDelay);
+                    await Task.Delay(reconnectTryDelay);
                     goto XCCReconnect;
                 }
             }
@@ -170,7 +177,7 @@ public abstract class XCCGroup
                             var signature = Encoding.UTF8.GetString(xFEBuffer["Type"]);
                             var messageId = Encoding.UTF8.GetString(xFEBuffer["ID"]);
                             if (signature == "callback")
-                                UpdateTaskTrigger?.Invoke(true, messageId);
+                                CompleteAcknowledgement(messageId);
                         }
                         catch (Exception ex)
                         {
@@ -196,7 +203,7 @@ public abstract class XCCGroup
                 {
                     if (autoReconnect)
                     {
-                        Thread.Sleep(reconnectTryDelay);
+                        await Task.Delay(reconnectTryDelay);
                         if (_reconnectTimes <= reconnectMaxTimes || reconnectMaxTimes == -1)
                             goto XCCReconnect;
                     }
@@ -221,7 +228,7 @@ public abstract class XCCGroup
     {
     XCCReconnect:
         FileTransportClientWebSocket = new ClientWebSocket();
-        Uri serverUri = new("ws://xcc.api.xfegzs.com");
+        var serverUri = _serverUri;
         var base64GroupId = Convert.ToBase64String(Encoding.UTF8.GetBytes(GroupId));
         var base64SenderId = Convert.ToBase64String(Encoding.UTF8.GetBytes(Sender));
         FileTransportClientWebSocket.Options.SetRequestHeader("Group", base64GroupId);
@@ -249,7 +256,7 @@ public abstract class XCCGroup
             {
                 if (_reconnectTimes <= reconnectMaxTimes || reconnectMaxTimes == -1)
                 {
-                    Thread.Sleep(reconnectTryDelay);
+                    await Task.Delay(reconnectTryDelay);
                     goto XCCReconnect;
                 }
             }
@@ -309,7 +316,7 @@ public abstract class XCCGroup
                             messageType = XCCBinaryMessageType.Video;
                             break;
                         case "callback":
-                            UpdateTaskTrigger?.Invoke(true, messageId);
+                            CompleteAcknowledgement(messageId);
                             continue;
                         default:
                             messageType = XCCBinaryMessageType.Binary;
@@ -334,7 +341,7 @@ public abstract class XCCGroup
                 {
                     if (autoReconnect)
                     {
-                        Thread.Sleep(reconnectTryDelay);
+                        await Task.Delay(reconnectTryDelay);
                         if (_reconnectTimes <= reconnectMaxTimes || reconnectMaxTimes == -1)
                             goto XCCReconnect;
                     }
@@ -352,7 +359,11 @@ public abstract class XCCGroup
     /// 等待明文服务器和文件服务器均连接
     /// </summary>
     /// <returns></returns>
-    public async Task WaitConnect() => await Task.Run(() => { while (!TextMessageClientConnected || !FileTransportClientConnected) { } });
+    public async Task WaitConnect(CancellationToken cancellationToken = default)
+    {
+        while (!TextMessageClientConnected || !FileTransportClientConnected)
+            await Task.Delay(25, cancellationToken);
+    }
     /// <summary>
     /// 发送文本消息
     /// </summary>
@@ -372,14 +383,11 @@ public abstract class XCCGroup
     {
         try
         {
+            if (Encoding.UTF8.GetByteCount(message) > MaxTextMessageBytes)
+                throw new XFECyberCommException("XCC 文本消息超过允许的大小");
             var sendBuffer = Encoding.UTF8.GetBytes(new[] { messageId, "[XCCTextMessage]", message }.ToXFEString());
-            await TextMessageClientWebSocket!.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
-            _ = Task.Run(async () =>
-            {
-                await Task.Delay(timeout);
-                UpdateTaskTrigger?.Invoke(false, messageId);
-            });
-            return await new XFEWaitTask<bool>(ref UpdateTaskTrigger!, messageId);
+            return await SendAndWaitForAcknowledgementAsync(messageId, timeout, _textSendGate, cancellationToken =>
+                TextMessageClientWebSocket!.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, cancellationToken));
         }
         catch (Exception ex)
         {
@@ -421,14 +429,11 @@ public abstract class XCCGroup
     {
         try
         {
+            if (message.LongLength > MaxBinaryMessageBytes)
+                throw new XFECyberCommException("XCC 二进制消息超过允许的大小");
             var xFEBuffer = new XFEBuffer(Sender, message, "Type", Encoding.UTF8.GetBytes(signature), "ID", Encoding.UTF8.GetBytes(messageId));
-            await FileTransportClientWebSocket!.SendAsync(new ArraySegment<byte>(xFEBuffer.ToBuffer()), WebSocketMessageType.Binary, true, CancellationToken.None);
-            _ = Task.Run(async () =>
-            {
-                await Task.Delay(timeout);
-                UpdateTaskTrigger?.Invoke(false, messageId);
-            });
-            return await new XFEWaitTask<bool>(ref UpdateTaskTrigger!, messageId);
+            return await SendAndWaitForAcknowledgementAsync(messageId, timeout, _fileSendGate, cancellationToken =>
+                FileTransportClientWebSocket!.SendAsync(new ArraySegment<byte>(xFEBuffer.ToBuffer()), WebSocketMessageType.Binary, true, cancellationToken));
         }
         catch (Exception ex)
         {
@@ -464,6 +469,7 @@ public abstract class XCCGroup
     /// <exception cref="XFECyberCommException"></exception>
     public async Task<bool> SendImage(string filePath)
     {
+        EnsureFileSize(filePath);
         try { return await SendSignedBinaryMessage(await File.ReadAllBytesAsync(filePath), "image", 60000); } catch (Exception ex) { throw new XFECyberCommException("客户端发送图片到服务器时出现异常", ex); }
     }
     /// <summary>
@@ -474,6 +480,7 @@ public abstract class XCCGroup
     /// <exception cref="XFECyberCommException"></exception>
     public async Task<bool> SendVideo(string filePath)
     {
+        EnsureFileSize(filePath);
         try { return await SendSignedBinaryMessage(await File.ReadAllBytesAsync(filePath), "video", 300000); } catch (Exception ex) { throw new XFECyberCommException("客户端发送视频到服务器时出现异常", ex); }
     }
     /// <summary>
@@ -484,6 +491,7 @@ public abstract class XCCGroup
     /// <exception cref="XFECyberCommException"></exception>
     public async Task<bool> SendAudio(string filePath)
     {
+        EnsureFileSize(filePath);
         try { return await SendSignedBinaryMessage(await File.ReadAllBytesAsync(filePath), "audio"); } catch (Exception ex) { throw new XFECyberCommException("客户端发送音频到服务器时出现异常", ex); }
     }
     /// <summary>
@@ -506,13 +514,8 @@ public abstract class XCCGroup
         {
             var messageId = Guid.NewGuid().ToString();
             var sendBuffer = Encoding.UTF8.GetBytes(new[] { messageId, "[XCCGetHistory]", "[XCCGetHistory]" }.ToXFEString());
-            await TextMessageClientWebSocket!.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
-            _ = Task.Run(async () =>
-            {
-                await Task.Delay(5000);
-                UpdateTaskTrigger?.Invoke(false, messageId);
-            });
-            return await new XFEWaitTask<bool>(ref UpdateTaskTrigger!, messageId);
+            return await SendAndWaitForAcknowledgementAsync(messageId, 5000, _textSendGate, cancellationToken =>
+                TextMessageClientWebSocket!.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, cancellationToken));
         }
         catch (Exception ex)
         {
@@ -537,12 +540,54 @@ public abstract class XCCGroup
             throw new XFECyberCommException("客户端关闭连接时出现异常", ex);
         }
     }
+
+    private void CompleteAcknowledgement(string messageId)
+    {
+        if (_pendingAcknowledgements.TryGetValue(messageId, out var completion))
+            completion.TrySetResult(true);
+    }
+
+    private void EnsureFileSize(string filePath)
+    {
+        var file = new FileInfo(filePath);
+        if (!file.Exists) throw new FileNotFoundException("未找到待发送文件", filePath);
+        if (file.Length > MaxBinaryMessageBytes) throw new XFECyberCommException("XCC 文件超过允许的大小");
+    }
+
+    private async Task<bool> SendAndWaitForAcknowledgementAsync(
+        string messageId,
+        int timeoutMilliseconds,
+        SemaphoreSlim sendGate,
+        Func<CancellationToken, Task> send)
+    {
+        if (timeoutMilliseconds <= 0) throw new ArgumentOutOfRangeException(nameof(timeoutMilliseconds));
+        var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        if (!_pendingAcknowledgements.TryAdd(messageId, completion))
+            throw new XFECyberCommException($"消息 ID '{messageId}' 正在等待 ACK，不能重复发送");
+        using var timeout = new CancellationTokenSource(TimeSpan.FromMilliseconds(timeoutMilliseconds));
+        try
+        {
+            await sendGate.WaitAsync(timeout.Token).ConfigureAwait(false);
+            try { await send(timeout.Token).ConfigureAwait(false); }
+            finally { sendGate.Release(); }
+            return await completion.Task.WaitAsync(timeout.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (timeout.IsCancellationRequested)
+        {
+            return false;
+        }
+        finally
+        {
+            _pendingAcknowledgements.TryRemove(new KeyValuePair<string, TaskCompletionSource<bool>>(messageId, completion));
+        }
+    }
     #endregion
-    internal XCCGroup(string signature, string groupId, string sender, XCCNetWorkBase xCCNetWorkBase)
+    internal XCCGroup(string signature, string groupId, string sender, Uri serverUri, XCCNetWorkBase xCCNetWorkBase)
     {
         Signature = signature;
         GroupId = groupId;
         Sender = sender;
+        _serverUri = serverUri;
         _workBase = xCCNetWorkBase;
     }
 }
