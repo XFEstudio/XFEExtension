@@ -162,29 +162,29 @@ internal static class JsonScanner
                     case 'r': builder.Append('\r'); break;
                     case 't': builder.Append('\t'); break;
                     case 'u':
-                    {
-                        var first = ReadHexCodeUnit(source, ref index, path);
-                        if (char.IsHighSurrogate((char)first))
                         {
-                            if (index + 1 >= text.Length || text[index] != '\\' || text[index + 1] != 'u')
-                                throw source.Error("高代理项之后缺少低代理项。", index, path);
-                            index += 2;
-                            var second = ReadHexCodeUnit(source, ref index, path);
-                            if (!char.IsLowSurrogate((char)second))
-                                throw source.Error("高代理项之后不是合法的低代理项。", index - 4, path);
-                            builder.Append((char)first);
-                            builder.Append((char)second);
+                            var first = ReadHexCodeUnit(source, ref index, path);
+                            if (char.IsHighSurrogate((char)first))
+                            {
+                                if (index + 1 >= text.Length || text[index] != '\\' || text[index + 1] != 'u')
+                                    throw source.Error("高代理项之后缺少低代理项。", index, path);
+                                index += 2;
+                                var second = ReadHexCodeUnit(source, ref index, path);
+                                if (!char.IsLowSurrogate((char)second))
+                                    throw source.Error("高代理项之后不是合法的低代理项。", index - 4, path);
+                                builder.Append((char)first);
+                                builder.Append((char)second);
+                            }
+                            else if (char.IsLowSurrogate((char)first))
+                            {
+                                throw source.Error("JSON 字符串包含孤立的低代理项。", index - 4, path);
+                            }
+                            else
+                            {
+                                builder.Append((char)first);
+                            }
+                            break;
                         }
-                        else if (char.IsLowSurrogate((char)first))
-                        {
-                            throw source.Error("JSON 字符串包含孤立的低代理项。", index - 4, path);
-                        }
-                        else
-                        {
-                            builder.Append((char)first);
-                        }
-                        break;
-                    }
                     default:
                         throw source.Error($"不支持的 JSON 转义字符“\\{escaped}”。", index - 2, path);
                 }

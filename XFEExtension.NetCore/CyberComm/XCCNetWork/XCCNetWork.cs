@@ -10,6 +10,8 @@ public class XCCNetWork
     /// XCC当前群组
     /// </summary>
     public List<XCCGroup> Groups { get; set; }
+    /// <summary>显式配置的 XCC WSS 端点。</summary>
+    public Uri? ServerUri { get; set; }
     /// <summary>
     /// 明文消息接收时触发
     /// </summary>
@@ -88,7 +90,8 @@ public class XCCNetWork
     /// <returns></returns>
     public XCCGroup CreateGroup(string groupId, string sender)
     {
-        var group = new XCCGroupImpl(Guid.NewGuid().ToString(), groupId, sender, _xCCNetWorkBase);
+        var serverUri = ServerUri ?? throw new InvalidOperationException("必须先配置 XCC ServerUri，且生产环境应使用 wss");
+        var group = new XCCGroupImpl(Guid.NewGuid().ToString(), groupId, sender, serverUri, _xCCNetWorkBase);
         Groups.Add(group);
         return group;
     }
@@ -99,5 +102,12 @@ public class XCCNetWork
     {
         _xCCNetWorkBase = new XCCNetWorkBase();
         Groups = [];
+    }
+
+    /// <summary>使用显式端点创建 XCC 会话。</summary>
+    public XCCNetWork(Uri serverUri) : this()
+    {
+        if (serverUri.Scheme is not ("ws" or "wss")) throw new ArgumentException("XCC 端点必须使用 ws 或 wss", nameof(serverUri));
+        ServerUri = serverUri;
     }
 }

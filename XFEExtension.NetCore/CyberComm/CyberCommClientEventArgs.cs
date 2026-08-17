@@ -15,6 +15,9 @@ namespace XFEExtension.NetCore.CyberComm;
 /// <param name="EndOfMessage">是否发送完成</param>
 public abstract record CyberCommClientEventArgs(BackMessageType MessageType, ClientWebSocket CurrentWebSocket, string? TextMessage, XFECyberCommException? Exception, byte[]? BinaryMessage, bool EndOfMessage)
 {
+    private Func<ReadOnlyMemory<byte>, WebSocketMessageType, CancellationToken, ValueTask<CyberCommSendResult>>? SendHandler { get; init; }
+    private Func<WebSocketCloseStatus, string, CancellationToken, ValueTask<CyberCommSendResult>>? CloseHandler { get; init; }
+
     /// <summary>
     /// 发送文本消息
     /// </summary>
@@ -26,7 +29,13 @@ public abstract record CyberCommClientEventArgs(BackMessageType MessageType, Cli
         try
         {
             var sendBuffer = Encoding.UTF8.GetBytes(message);
-            await CurrentWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+            if (SendHandler is not null)
+            {
+                var result = await SendHandler(sendBuffer, WebSocketMessageType.Text, CancellationToken.None).ConfigureAwait(false);
+                if (!result.IsSuccess) throw result.Exception ?? new InvalidOperationException($"发送失败：{result.Status}");
+            }
+            else
+                await CurrentWebSocket.SendAsync(new ArraySegment<byte>(sendBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
         }
         catch (Exception ex)
         {
@@ -41,7 +50,10 @@ public abstract record CyberCommClientEventArgs(BackMessageType MessageType, Cli
     {
         try
         {
-            await CurrentWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection Closed", CancellationToken.None);
+            if (CloseHandler is not null)
+                await CloseHandler(WebSocketCloseStatus.NormalClosure, "Connection Closed", CancellationToken.None).ConfigureAwait(false);
+            else
+                await CurrentWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection Closed", CancellationToken.None);
         }
         catch (Exception ex)
         {
@@ -57,4 +69,10 @@ public abstract record CyberCommClientEventArgs(BackMessageType MessageType, Cli
     internal CyberCommClientEventArgs(ClientWebSocket clientWebSocket, XFECyberCommException ex) : this(BackMessageType.Error, clientWebSocket, null, ex, null, true)
     {
     }
+
+    internal CyberCommClientEventArgs WithTransport(CyberCommWebSocketPeer peer) => this with
+    {
+        SendHandler = peer.SendAsync,
+        CloseHandler = peer.CloseAsync
+    };
 }

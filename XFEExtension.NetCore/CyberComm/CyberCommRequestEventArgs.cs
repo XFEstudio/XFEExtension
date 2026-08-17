@@ -1,72 +1,133 @@
-﻿using System.Collections.Specialized;
+using System.Collections.Specialized;
 using System.Net;
 using System.Text;
 
 namespace XFEExtension.NetCore.CyberComm;
 
 /// <summary>
-/// CyberComm服务器Http请求事件参数
+/// CyberComm HTTP 请求事件参数。新代码应优先使用 <see cref="CyberCommHttpRequestContext"/>。
 /// </summary>
-/// <param name="RequestUrl">请求的URL地址</param>
-/// <param name="RequestMethod">请求方法</param>
-/// <param name="RequestBody">当请求方法为POST时的请求体</param>
-/// <param name="RequestHeaders">请求头</param>
-/// <param name="QueryString">查询请求</param>
-/// <param name="Request">请求对象</param>
-/// <param name="Response">响应对象</param>
-/// <param name="ClientIP">客户端IP</param>
-public abstract record CyberCommRequestEventArgs(Uri? RequestUrl, string RequestMethod, string? RequestBody, NameValueCollection RequestHeaders, NameValueCollection QueryString, HttpListenerRequest Request, HttpListenerResponse Response, string ClientIP)
+public abstract record CyberCommRequestEventArgs
 {
-    /// <summary>
-    /// 回复消息并关闭连接
-    /// </summary>
-    /// <param name="message">待回复消息</param>
-    /// <param name="statusCode">状态码</param>
-    /// <returns></returns>
-    public async Task ReplyAndClose(string message, HttpStatusCode statusCode = HttpStatusCode.OK)
+    private readonly HttpListenerRequest? _request;
+    private readonly HttpListenerResponse? _response;
+
+    protected CyberCommRequestEventArgs(CyberCommHttpRequestContext context)
     {
-        Response.StatusCode = (int)statusCode;
-        var buffer = Encoding.UTF8.GetBytes(message);
-        Response.ContentLength64 = buffer.Length;
-        await Response.OutputStream.WriteAsync(buffer);
-        Response.Close();
+        Context = context;
+        RequestUrl = context.RequestUri;
+        RequestMethod = context.Method;
+        RequestBody = context.Body.IsEmpty ? null : context.RequestBody;
+        RequestHeaders = ToNameValueCollection(context.Headers);
+        QueryString = ToNameValueCollection(context.Query);
+        ClientIP = context.ClientIp;
     }
+
+    protected CyberCommRequestEventArgs(Uri? requestUrl, string requestMethod, string? requestBody,
+        NameValueCollection requestHeaders, NameValueCollection queryString, HttpListenerRequest request,
+        HttpListenerResponse response, string clientIP)
+    {
+        RequestUrl = requestUrl;
+        RequestMethod = requestMethod;
+        RequestBody = requestBody;
+        RequestHeaders = requestHeaders;
+        QueryString = queryString;
+        _request = request;
+        _response = response;
+        ClientIP = clientIP;
+    }
+
+    public CyberCommHttpRequestContext? Context { get; }
+    public Uri? RequestUrl { get; }
+    public string RequestMethod { get; }
+    public string? RequestBody { get; }
+    public NameValueCollection RequestHeaders { get; }
+    public NameValueCollection QueryString { get; }
+
+    /// <summary>旧 HttpListener 请求。Socket 传输模式下为 null。</summary>
+    [Obsolete("请使用 Context 和与监听器无关的请求属性")]
+    public HttpListenerRequest? Request => _request;
+
+    /// <summary>旧 HttpListener 响应。Socket 传输模式下为 null。</summary>
+    [Obsolete("请使用 Context.Response 或 ReplyAndClose")]
+    public HttpListenerResponse? Response => _response;
+
+    public string ClientIP { get; }
+    /// <summary>贯穿请求、响应和日志的关联标识。</summary>
+    public string CorrelationId => Context?.CorrelationId ?? string.Empty;
+
     /// <summary>
-    /// 回复消息
+    /// 从跨平台 HTTP 上下文创建兼容事件参数。
     /// </summary>
-    /// <param name="message">待回复消息</param>
-    /// <returns></returns>
+    public static CyberCommRequestEventArgs FromContext(CyberCommHttpRequestContext context)
+        => new CyberCommRequestEventArgsImpl(context);
+
+    public async Task ReplyAndClose(string message, HttpStatusCode statusCode = HttpStatusCode.OK)
+        => await ReplyAndClose(message, statusCode, "text/plain; charset=utf-8").ConfigureAwait(false);
+
+    /// <summary>写入带内容类型的响应并结束请求。</summary>
+    public async Task ReplyAndClose(string message, HttpStatusCode statusCode, string contentType)
+    {
+        if (Context is not null)
+        {
+            await Context.Response.WriteTextAsync(message, statusCode, contentType).ConfigureAwait(false);
+            Context.Response.Complete();
+            return;
+        }
+        var response = _response ?? throw new InvalidOperationException("当前请求没有响应对象");
+        response.StatusCode = (int)statusCode;
+        response.ContentType = contentType;
+        var buffer = Encoding.UTF8.GetBytes(message);
+        response.ContentLength64 = buffer.Length;
+        await response.OutputStream.WriteAsync(buffer).ConfigureAwait(false);
+        response.Close();
+    }
+
     public async Task ReplyMessage(string message)
     {
+        if (Context is not null)
+        {
+            await Context.Response.WriteTextAsync(message).ConfigureAwait(false);
+            return;
+        }
+        var response = _response ?? throw new InvalidOperationException("当前请求没有响应对象");
         var buffer = Encoding.UTF8.GetBytes(message);
-        Response.ContentLength64 = buffer.Length;
-        await Response.OutputStream.WriteAsync(buffer);
+        response.ContentLength64 = buffer.Length;
+        await response.OutputStream.WriteAsync(buffer).ConfigureAwait(false);
     }
-    /// <summary>
-    /// 回复二进制消息
-    /// </summary>
-    /// <param name="bytes">二进制消息</param>
-    /// <returns></returns>
+
     public async Task ReplyBinaryMessage(byte[] bytes)
     {
-        Response.ContentLength64 = bytes.Length;
-        await Response.OutputStream.WriteAsync(bytes);
+        if (Context is not null)
+        {
+            await Context.Response.WriteAsync(bytes).ConfigureAwait(false);
+            return;
+        }
+        var response = _response ?? throw new InvalidOperationException("当前请求没有响应对象");
+        response.ContentLength64 = bytes.Length;
+        await response.OutputStream.WriteAsync(bytes).ConfigureAwait(false);
     }
-    /// <summary>
-    /// 关闭连接
-    /// </summary>
-    /// <param name="statusCode">状态码</param>
+
     public void Close(HttpStatusCode statusCode = HttpStatusCode.OK)
     {
-        Response.StatusCode = (int)statusCode;
-        Response.Close();
+        if (Context is not null)
+        {
+            Context.Response.Complete(statusCode);
+            return;
+        }
+        var response = _response ?? throw new InvalidOperationException("当前请求没有响应对象");
+        response.StatusCode = (int)statusCode;
+        response.Close();
     }
-    /// <summary>
-    /// 以错误请求关闭连接
-    /// </summary>
-    public void CloseWhitBadRequest()
+
+    public void CloseWhitBadRequest() => Close(HttpStatusCode.BadRequest);
+
+    private static NameValueCollection ToNameValueCollection(IReadOnlyDictionary<string, IReadOnlyList<string>> source)
     {
-        Response.StatusCode = 400;
-        Response.Close();
+        var result = new NameValueCollection(StringComparer.OrdinalIgnoreCase);
+        foreach (var (name, values) in source)
+            foreach (var value in values)
+                result.Add(name, value);
+        return result;
     }
 }
