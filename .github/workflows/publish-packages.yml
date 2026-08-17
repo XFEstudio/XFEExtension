@@ -2,6 +2,8 @@ name: Publish Packages
 
 on:
   push:
+    branches-ignore:
+      - "**"
     tags:
       - "v*"
   workflow_dispatch:
@@ -95,6 +97,8 @@ jobs:
 
       - name: Publish to GitHub Packages
         shell: pwsh
+        env:
+          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: |
           $packages = Get-ChildItem -Path "${{ env.PACKAGE_OUTPUT_DIR }}" -Filter "*.nupkg" -File
           if ($packages.Count -eq 0) {
@@ -102,7 +106,7 @@ jobs:
           }
 
           foreach ($package in $packages) {
-            dotnet nuget push $package.FullName --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --api-key "${{ secrets.GH_PACKAGES_TOKEN }}" --skip-duplicate
+            dotnet nuget push $package.FullName --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --api-key "$env:GH_PACKAGES_TOKEN" --skip-duplicate
           }
 
       - name: Publish to NuGet.org

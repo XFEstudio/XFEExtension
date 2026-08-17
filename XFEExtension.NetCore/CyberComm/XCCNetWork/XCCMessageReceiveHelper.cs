@@ -1,5 +1,6 @@
 ﻿using XFEExtension.NetCore.DelegateExtension;
 using XFEExtension.NetCore.Exceptions;
+using System.Text;
 using XFEExtension.NetCore.FormatExtension;
 
 namespace XFEExtension.NetCore.CyberComm.XCCNetWork;
@@ -9,7 +10,7 @@ namespace XFEExtension.NetCore.CyberComm.XCCNetWork;
 /// </summary>
 public class XCCMessageReceiveHelper
 {
-    private readonly Dictionary<string, XCCFile> _xCCFileDictionary = [];
+    private readonly Dictionary<(string GroupId, string MessageId), XCCFile> _xCCFileDictionary = [];
     private readonly Dictionary<string, List<XCCMessage>> _xCCMessageDictionary = [];
     private bool _loaded;
     /// <summary>
@@ -20,6 +21,10 @@ public class XCCMessageReceiveHelper
     /// 保存的根目录
     /// </summary>
     public string SavePathRoot { get; set; }
+    /// <summary>单个文件的最大字节数。</summary>
+    public long MaxFileBytes { get; set; } = 64 * 1024 * 1024;
+    /// <summary>单条文本消息的最大 UTF-8 字节数。</summary>
+    public int MaxTextMessageBytes { get; set; } = 1024 * 1024;
     /// <summary>
     /// 接收到文件事件
     /// </summary>
@@ -49,10 +54,11 @@ public class XCCMessageReceiveHelper
                 foreach (var groupIdFullPath in Directory.EnumerateDirectories(SavePathRoot))
                 {
                     var groupId = Path.GetFileName(groupIdFullPath);
-                    if (File.Exists($"{groupIdFullPath}/XFEMessage/XFEMessage.xfe"))
+                    var messagePath = Path.Combine(groupIdFullPath, "XFEMessage", "XFEMessage.xfe");
+                    if (File.Exists(messagePath))
                     {
                         var xCCMessageList = new List<XCCMessage>();
-                        foreach (var entry in new XFEMultiDictionary(File.ReadAllText($"{groupIdFullPath}/XFEMessage/XFEMessage.xfe")))
+                        foreach (var entry in new XFEMultiDictionary(File.ReadAllText(messagePath)))
                         {
                             var xCCMessage = XCCMessage.ConvertToXCCMessage(entry.Content, groupId);
                             xCCMessageList.Add(xCCMessage);
@@ -81,10 +87,11 @@ public class XCCMessageReceiveHelper
     {
         await Task.Run(() =>
         {
-            if (File.Exists($"{SavePathRoot}/{groupId}/XFEMessage/XFEMessage.xfe"))
+            var messagePath = Path.Combine(GetSafeGroupDirectory(groupId), "XFEMessage", "XFEMessage.xfe");
+            if (File.Exists(messagePath))
             {
                 var xCCMessageList = new List<XCCMessage>();
-                foreach (var entry in new XFEMultiDictionary(File.ReadAllText($"{SavePathRoot}/{groupId}/XFEMessage/XFEMessage.xfe")))
+                foreach (var entry in new XFEMultiDictionary(File.ReadAllText(messagePath)))
                 {
                     var xCCMessage = XCCMessage.ConvertToXCCMessage(entry.Content, groupId);
                     xCCMessageList.Add(xCCMessage);
@@ -110,9 +117,8 @@ public class XCCMessageReceiveHelper
         {
             foreach (var groupId in _xCCMessageDictionary.Keys)
             {
-                foreach (var file in Directory.EnumerateFiles($"{SavePathRoot}/{groupId}"))
+                foreach (var filePath in Directory.EnumerateFiles(GetSafeGroupDirectory(groupId), "*.xfe", SearchOption.TopDirectoryOnly))
                 {
-                    var filePath = $"{SavePathRoot}/{groupId}/{file}";
                     var messageId = Path.GetFileNameWithoutExtension(filePath);
                     if (!_xCCMessageDictionary.TryGetValue(groupId, out var value) || value.Find(x => x.MessageId == messageId) is null)
                     {
@@ -124,12 +130,12 @@ public class XCCMessageReceiveHelper
     }
     private XCCFile? LoadFile(XCCMessage xCCMessage)
     {
-        var filePath = $"{SavePathRoot}/{xCCMessage.GroupId}/{xCCMessage.MessageId}.xfe";
+        var filePath = GetSafeFilePath(xCCMessage.GroupId, xCCMessage.MessageId);
         byte[]? fileBuffer = null;
-        if (File.Exists(filePath))
+        if (File.Exists(filePath) && new FileInfo(filePath).Length <= MaxFileBytes)
             fileBuffer = File.ReadAllBytes(filePath);
         XCCFile xCCFile;
-        if (_xCCFileDictionary.TryGetValue(xCCMessage.MessageId, out var value))
+        if (_xCCFileDictionary.TryGetValue((xCCMessage.GroupId, xCCMessage.MessageId), out var value))
         {
             if (!value.Loaded && fileBuffer is not null)
                 value.LoadFile(fileBuffer);
@@ -149,7 +155,7 @@ public class XCCMessageReceiveHelper
             default:
                 return null;
         }
-        _xCCFileDictionary.Add(xCCMessage.MessageId, xCCFile);
+        _xCCFileDictionary.Add((xCCMessage.GroupId, xCCMessage.MessageId), xCCFile);
         return xCCFile;
     }
     /// <summary>
@@ -159,15 +165,18 @@ public class XCCMessageReceiveHelper
     /// <returns></returns>
     public XCCFile? GetFile(string messageId)
     {
-        return _xCCFileDictionary.TryGetValue(messageId, out var value) ? value : null;
+        return _xCCFileDictionary.FirstOrDefault(pair => pair.Key.MessageId == messageId).Value;
     }
+    /// <summary>按群组和消息 ID 获取文件，避免跨群 ID 冲突。</summary>
+    public XCCFile? GetFile(string groupId, string messageId) =>
+        _xCCFileDictionary.TryGetValue((groupId, messageId), out var value) ? value : null;
     /// <summary>
     /// 添加文件
     /// </summary>
     /// <param name="xCCFile">XCC文件实例</param>
     public void AddFile(XCCFile xCCFile)
     {
-        _xCCFileDictionary.Add(xCCFile.MessageId, xCCFile);
+        _xCCFileDictionary.Add((xCCFile.GroupId, xCCFile.MessageId), xCCFile);
         if (AutoSaveInLocal && xCCFile.FileBuffer is not null)
             SaveFile(xCCFile);
     }
@@ -177,11 +186,11 @@ public class XCCMessageReceiveHelper
     /// <param name="xCCFile">XCC文件实例</param>
     public void SaveFile(XCCFile xCCFile)
     {
-        if (!Directory.Exists($"{SavePathRoot}/{xCCFile.GroupId}"))
-        {
-            Directory.CreateDirectory($"{SavePathRoot}/{xCCFile.GroupId}");
-        }
-        File.WriteAllBytes($"{SavePathRoot}/{xCCFile.GroupId}/{xCCFile.MessageId}.xfe", xCCFile.FileBuffer!);
+        if (xCCFile.FileBuffer is null) throw new ArgumentException("文件内容不能为空", nameof(xCCFile));
+        if (xCCFile.FileBuffer.LongLength > MaxFileBytes) throw new XFEExtensionException("文件超过允许的大小");
+        var filePath = GetSafeFilePath(xCCFile.GroupId, xCCFile.MessageId);
+        Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+        AtomicWrite(filePath, xCCFile.FileBuffer);
     }
     /// <summary>
     /// 保存群组消息
@@ -189,7 +198,7 @@ public class XCCMessageReceiveHelper
     /// <param name="groupId"></param>
     public void SaveMessage(string groupId)
     {
-        var filePath = $"{SavePathRoot}/{groupId}/XFEMessage";
+        var filePath = Path.Combine(GetSafeGroupDirectory(groupId), "XFEMessage");
         if (!Directory.Exists(filePath))
         {
             Directory.CreateDirectory(filePath);
@@ -199,19 +208,24 @@ public class XCCMessageReceiveHelper
         {
             storageDictionary.Add(xCCMessage.MessageId, xCCMessage.ToString());
         }
-        File.WriteAllText(filePath + "/XFEMessage.xfe", storageDictionary.ToString());
+        AtomicWrite(Path.Combine(filePath, "XFEMessage.xfe"), System.Text.Encoding.UTF8.GetBytes(storageDictionary.ToString()));
     }
     private void ReceiveFilePlaceHolder(XCCTextMessageReceivedEventArgs e, XCCFileType fileType)
     {
         var xCCFile = new XCCFile(e.GroupId, e.MessageId!, fileType, e.Sender!, e.SendTime);
-        _xCCFileDictionary.TryAdd(e.MessageId!, xCCFile);
+        _xCCFileDictionary.TryAdd((e.GroupId, e.MessageId!), xCCFile);
         FileReceived?.Invoke(e.IsHistory, xCCFile);
         if (AutoSaveInLocal)
             SaveMessage(e.GroupId);
     }
     private void ReceiveTextMessage(object? sender, XCCTextMessageReceivedEventArgs e)
     {
-        var message = new XCCMessage(e.MessageId!, e.MessageType, e.TextMessage, e.Sender!, e.SendTime, e.GroupId);
+        if (Encoding.UTF8.GetByteCount(e.TextMessage ?? string.Empty) > MaxTextMessageBytes)
+        {
+            ExceptionOccurred?.Invoke(new XFECyberCommException("接收到的 XCC 文本消息超过允许的大小"));
+            return;
+        }
+        var message = new XCCMessage(e.MessageId!, e.MessageType, e.TextMessage ?? string.Empty, e.Sender!, e.SendTime, e.GroupId);
         if (_xCCMessageDictionary.TryGetValue(e.GroupId, out var value))
         {
             if (value.Find(x => x.MessageId == e.MessageId) is null)
@@ -252,7 +266,12 @@ public class XCCMessageReceiveHelper
             AudioBufferReceived?.Invoke(e.BinaryMessage);
             return;
         }
-        if (_xCCFileDictionary.TryGetValue(e.MessageId!, out var value))
+        if (e.BinaryMessage.LongLength > MaxFileBytes)
+        {
+            ExceptionOccurred?.Invoke(new XFECyberCommException("接收到的 XCC 文件超过允许的大小"));
+            return;
+        }
+        if (_xCCFileDictionary.TryGetValue((e.GroupId, e.MessageId!), out var value))
         {
             if (!value.Loaded)
             {
@@ -279,7 +298,7 @@ public class XCCMessageReceiveHelper
                     break;
             }
             var xCCFile = new XCCFile(e.GroupId, e.MessageId!, fileType, e.Sender!, e.SendTime, e.BinaryMessage);
-            _xCCFileDictionary.Add(e.MessageId!, xCCFile);
+            _xCCFileDictionary.Add((e.GroupId, e.MessageId!), xCCFile);
             if (!e.IsHistory)
                 FileReceived?.Invoke(e.IsHistory, xCCFile);
         }
@@ -296,7 +315,7 @@ public class XCCMessageReceiveHelper
     public XCCMessageReceiveHelper(string savePathRoot, bool autoSaveInLocal = true)
     {
         AutoSaveInLocal = autoSaveInLocal;
-        SavePathRoot = savePathRoot;
+        SavePathRoot = Path.GetFullPath(savePathRoot);
     }
     /// <summary>
     /// XCC消息接收器
@@ -307,9 +326,46 @@ public class XCCMessageReceiveHelper
     public XCCMessageReceiveHelper(string savePathRoot, XCCNetWork xCCNetWork, bool autoSaveInLocal = true)
     {
         AutoSaveInLocal = autoSaveInLocal;
-        SavePathRoot = savePathRoot;
+        SavePathRoot = Path.GetFullPath(savePathRoot);
         xCCNetWork.TextMessageReceived += ReceiveTextMessage;
         xCCNetWork.BinaryMessageReceived += ReceiveBinaryMessage;
         xCCNetWork.ExceptionMessageReceived += XCCNetWork_ExceptionMessageReceived;
+    }
+
+    private string GetSafeGroupDirectory(string groupId)
+    {
+        ValidatePathSegment(groupId, nameof(groupId));
+        var root = Path.GetFullPath(SavePathRoot);
+        var path = Path.GetFullPath(Path.Combine(root, groupId));
+        if (!path.StartsWith(root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            throw new XFEExtensionException("群组路径超出保存根目录");
+        return path;
+    }
+
+    private string GetSafeFilePath(string groupId, string messageId)
+    {
+        ValidatePathSegment(messageId, nameof(messageId));
+        return Path.Combine(GetSafeGroupDirectory(groupId), $"{messageId}.xfe");
+    }
+
+    private static void ValidatePathSegment(string value, string parameterName)
+    {
+        if (string.IsNullOrWhiteSpace(value) || value is "." or ".." ||
+            value.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || value.Contains(Path.DirectorySeparatorChar) || value.Contains(Path.AltDirectorySeparatorChar))
+            throw new ArgumentException("标识不能包含路径字符", parameterName);
+    }
+
+    private static void AtomicWrite(string path, byte[] content)
+    {
+        var temporaryPath = $"{path}.{Guid.NewGuid():N}.tmp";
+        try
+        {
+            File.WriteAllBytes(temporaryPath, content);
+            File.Move(temporaryPath, path, true);
+        }
+        finally
+        {
+            if (File.Exists(temporaryPath)) File.Delete(temporaryPath);
+        }
     }
 }

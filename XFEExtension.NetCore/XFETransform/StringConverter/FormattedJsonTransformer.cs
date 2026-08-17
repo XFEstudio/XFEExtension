@@ -34,15 +34,15 @@ public class FormattedJsonTransformer : StringConverter
                         outPutString += $"{tabString}\"{objectInfo.Value}\"";
                         break;
                     default:
-                    {
-                        if (objectInfo.ObjectPlace == ObjectPlace.Enum)
-                            outPutString += $"{tabString}{(int)objectInfo.Value}";
-                        else if (objectInfo.Value is bool)
-                            outPutString += $"{tabString}{objectInfo.Value.ToString()?.ToLower()}";
-                        else
-                            outPutString += $"{tabString}\"{objectInfo.Value}\"";
-                        break;
-                    }
+                        {
+                            if (objectInfo.ObjectPlace == ObjectPlace.Enum)
+                                outPutString += $"{tabString}{(int)objectInfo.Value}";
+                            else if (objectInfo.Value is bool)
+                                outPutString += $"{tabString}{objectInfo.Value.ToString()?.ToLower()}";
+                            else
+                                outPutString += $"{tabString}\"{objectInfo.Value}\"";
+                            break;
+                        }
                 }
             }
             else
@@ -56,15 +56,15 @@ public class FormattedJsonTransformer : StringConverter
                         outPutString += $"{tabString}\"{objectInfo.Name}\": \"{objectInfo.Value}\"";
                         break;
                     default:
-                    {
-                        if (objectInfo.ObjectPlace == ObjectPlace.Enum)
-                            outPutString += $"{tabString}\"{objectInfo.Name}\": {(int)objectInfo.Value}";
-                        else if (objectInfo.Value is bool)
-                            outPutString += $"{tabString}\"{objectInfo.Name}\": {objectInfo.Value.ToString()?.ToLower()}";
-                        else
-                            outPutString += $"{tabString}\"{objectInfo.Name}\": \"{objectInfo.Value}\"";
-                        break;
-                    }
+                        {
+                            if (objectInfo.ObjectPlace == ObjectPlace.Enum)
+                                outPutString += $"{tabString}\"{objectInfo.Name}\": {(int)objectInfo.Value}";
+                            else if (objectInfo.Value is bool)
+                                outPutString += $"{tabString}\"{objectInfo.Name}\": {objectInfo.Value.ToString()?.ToLower()}";
+                            else
+                                outPutString += $"{tabString}\"{objectInfo.Name}\": \"{objectInfo.Value}\"";
+                            break;
+                        }
                 }
             }
         }

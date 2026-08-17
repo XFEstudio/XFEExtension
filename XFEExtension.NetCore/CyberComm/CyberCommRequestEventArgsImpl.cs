@@ -5,6 +5,10 @@ namespace XFEExtension.NetCore.CyberComm;
 
 record CyberCommRequestEventArgsImpl : CyberCommRequestEventArgs
 {
+    public CyberCommRequestEventArgsImpl(CyberCommHttpRequestContext context) : base(context)
+    {
+    }
+
     /// <summary>
     /// 使用 HTTP 请求、响应及客户端信息创建 CyberComm 服务器请求事件参数。
     /// </summary>
