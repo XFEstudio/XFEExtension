@@ -53,6 +53,8 @@ public abstract record CyberCommRequestEventArgs
     public HttpListenerResponse? Response => _response;
 
     public string ClientIP { get; }
+    /// <summary>实际接受当前连接的本地监听端口；旧 HttpListener 兼容模式下取请求 URL 端口。</summary>
+    public int LocalPort => Context?.LocalPort ?? RequestUrl?.Port ?? 0;
     /// <summary>贯穿请求、响应和日志的关联标识。</summary>
     public string CorrelationId => Context?.CorrelationId ?? string.Empty;
 
