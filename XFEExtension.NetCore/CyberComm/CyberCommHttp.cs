@@ -17,6 +17,7 @@ public sealed class CyberCommHttpRequestContext
         IReadOnlyDictionary<string, IReadOnlyList<string>> query,
         ReadOnlyMemory<byte> body,
         string clientIp,
+        int localPort,
         string correlationId)
     {
         RequestUri = requestUri;
@@ -25,6 +26,7 @@ public sealed class CyberCommHttpRequestContext
         Query = query;
         Body = body;
         ClientIp = clientIp;
+        LocalPort = localPort;
         CorrelationId = correlationId;
     }
 
@@ -35,6 +37,8 @@ public sealed class CyberCommHttpRequestContext
     public ReadOnlyMemory<byte> Body { get; }
     public string RequestBody => Encoding.UTF8.GetString(Body.Span);
     public string ClientIp { get; }
+    /// <summary>实际接受当前连接的本地监听端口，不受 Host 请求头或反向代理公开端口影响。</summary>
+    public int LocalPort { get; }
     public string CorrelationId { get; }
     public CyberCommHttpResponse Response { get; } = new();
 }
