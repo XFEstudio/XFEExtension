@@ -22,6 +22,9 @@ public abstract record CyberCommServerEventArgs(Uri? RequestUrl, BackMessageType
     private Func<ReadOnlyMemory<byte>, WebSocketMessageType, CancellationToken, ValueTask<CyberCommSendResult>>? SendHandler { get; init; }
     private Func<WebSocketCloseStatus, string, CancellationToken, ValueTask<CyberCommSendResult>>? CloseHandler { get; init; }
 
+    /// <summary>实际接受当前连接的本地监听端口，不受 Host 请求头或反向代理公开端口影响。</summary>
+    public int LocalPort { get; internal init; }
+
     /// <summary>
     /// 发送文本消息
     /// </summary>
@@ -102,14 +105,17 @@ public abstract record CyberCommServerEventArgs(Uri? RequestUrl, BackMessageType
             throw new XFECyberCommException("强制关闭服务器端连接时出现异常", ex);
         }
     }
-    internal CyberCommServerEventArgs(Uri? requestUrl, WebSocket webSocket, string message, string ipAddress, NameValueCollection wsHeader, bool endOfMessage) : this(requestUrl, BackMessageType.Text, webSocket, wsHeader, null, ipAddress, message, null, endOfMessage)
+    internal CyberCommServerEventArgs(Uri? requestUrl, WebSocket webSocket, string message, string ipAddress, NameValueCollection wsHeader, bool endOfMessage, int localPort) : this(requestUrl, BackMessageType.Text, webSocket, wsHeader, null, ipAddress, message, null, endOfMessage)
     {
+        LocalPort = localPort;
     }
-    internal CyberCommServerEventArgs(Uri? requestUrl, WebSocket webSocket, byte[] bytes, string ipAddress, NameValueCollection wsHeader, bool endOfMessage) : this(requestUrl, BackMessageType.Binary, webSocket, wsHeader, null, ipAddress, null, bytes, endOfMessage)
+    internal CyberCommServerEventArgs(Uri? requestUrl, WebSocket webSocket, byte[] bytes, string ipAddress, NameValueCollection wsHeader, bool endOfMessage, int localPort) : this(requestUrl, BackMessageType.Binary, webSocket, wsHeader, null, ipAddress, null, bytes, endOfMessage)
     {
+        LocalPort = localPort;
     }
-    internal CyberCommServerEventArgs(Uri? requestUrl, WebSocket webSocket, XFECyberCommException ex, string ipAddress, NameValueCollection wsHeader) : this(requestUrl, BackMessageType.Error, webSocket, wsHeader, ex, ipAddress, null, null, true)
+    internal CyberCommServerEventArgs(Uri? requestUrl, WebSocket webSocket, XFECyberCommException ex, string ipAddress, NameValueCollection wsHeader, int localPort) : this(requestUrl, BackMessageType.Error, webSocket, wsHeader, ex, ipAddress, null, null, true)
     {
+        LocalPort = localPort;
     }
 
     internal CyberCommServerEventArgs WithTransport(CyberCommWebSocketPeer peer) => this with

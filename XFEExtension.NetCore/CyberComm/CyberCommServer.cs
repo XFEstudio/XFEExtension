@@ -345,6 +345,7 @@ public sealed class CyberCommServer : IAsyncDisposable
     {
         using (client)
         {
+            var localPort = ((IPEndPoint?)client.Client.LocalEndPoint)?.Port ?? endpoint.Port;
             Stream stream = client.GetStream();
             if (endpoint.UseTls)
             {
@@ -393,14 +394,14 @@ public sealed class CyberCommServer : IAsyncDisposable
                         {
                             connection.IsWebSocket = true;
                             var webSocketStream = reader.DetachStream();
-                            await ProcessWebSocketAsync(webSocketStream, request, options, clientIp, connection, serverToken).ConfigureAwait(false);
+                            await ProcessWebSocketAsync(webSocketStream, request, options, clientIp, localPort, connection, serverToken).ConfigureAwait(false);
                             return;
                         }
 
                         connection.IsHandlingRequest = true;
                         try
                         {
-                            await ProcessHttpRequestAsync(stream, request, options, clientIp, serverToken).ConfigureAwait(false);
+                            await ProcessHttpRequestAsync(stream, request, options, clientIp, localPort, serverToken).ConfigureAwait(false);
                         }
                         finally
                         {
@@ -426,10 +427,12 @@ public sealed class CyberCommServer : IAsyncDisposable
         }
     }
 
-    private async Task ProcessHttpRequestAsync(Stream stream, CyberCommParsedRequest request, CyberCommServerOptions options, string clientIp, CancellationToken serverToken)
+    private async Task ProcessHttpRequestAsync(Stream stream, CyberCommParsedRequest request, CyberCommServerOptions options,
+        string clientIp, int localPort, CancellationToken serverToken)
     {
         var body = options.ReadHttpRequestBody ? request.Body : ReadOnlyMemory<byte>.Empty;
-        var context = new CyberCommHttpRequestContext(request.RequestUri, request.Method, request.Headers, request.Query, body, clientIp, Guid.NewGuid().ToString("N"));
+        var context = new CyberCommHttpRequestContext(request.RequestUri, request.Method, request.Headers, request.Query,
+            body, clientIp, localPort, Guid.NewGuid().ToString("N"));
         context.Response.Headers["X-Correlation-Id"] = context.CorrelationId;
         using var handlerSource = CancellationTokenSource.CreateLinkedTokenSource(serverToken);
         if (options.Limits.HandlerTimeout != Timeout.InfiniteTimeSpan)
@@ -479,7 +482,7 @@ public sealed class CyberCommServer : IAsyncDisposable
     }
 
     private async Task ProcessWebSocketAsync(Stream stream, CyberCommParsedRequest request, CyberCommServerOptions options,
-        string clientIp, ActiveConnection connection, CancellationToken serverToken)
+        string clientIp, int localPort, ActiveConnection connection, CancellationToken serverToken)
     {
         if (!ValidateWebSocketRequest(request, out var key))
         {
@@ -497,33 +500,35 @@ public sealed class CyberCommServer : IAsyncDisposable
         await using var peer = new CyberCommWebSocketPeer(webSocket, options.Limits);
         connection.Peer = peer;
         var headers = ToNameValueCollection(request.Headers);
-        var connectedArgs = new CyberCommServerEventArgsImpl(request.RequestUri, webSocket, string.Empty, clientIp, headers, true).WithTransport(peer);
+        var connectedArgs = new CyberCommServerEventArgsImpl(request.RequestUri, webSocket, string.Empty, clientIp, headers, true, localPort).WithTransport(peer);
         await InvokeWebSocketHandlerAsync(WebSocketConnectedHandler, ClientConnected, connectedArgs, serverToken).ConfigureAwait(false);
 
         try
         {
-            await ReceiveWebSocketMessagesAsync(webSocket, peer, request.RequestUri, headers, clientIp, options, serverToken).ConfigureAwait(false);
+            await ReceiveWebSocketMessagesAsync(webSocket, peer, request.RequestUri, headers, clientIp, localPort, options, serverToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException) when (serverToken.IsCancellationRequested)
         {
         }
         catch (Exception ex)
         {
-            var errorArgs = new CyberCommServerEventArgsImpl(request.RequestUri, webSocket, new XFECyberCommException("与客户端通讯期间发生异常", ex), clientIp, headers).WithTransport(peer);
+            var errorArgs = new CyberCommServerEventArgsImpl(request.RequestUri, webSocket,
+                new XFECyberCommException("与客户端通讯期间发生异常", ex), clientIp, headers, localPort).WithTransport(peer);
             await InvokeWebSocketHandlerAsync(WebSocketMessageHandler, MessageReceived, errorArgs, serverToken).ConfigureAwait(false);
         }
         finally
         {
             if (webSocket.State is WebSocketState.Open or WebSocketState.CloseReceived)
                 await peer.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection Closed", serverToken).ConfigureAwait(false);
-            var closedArgs = new CyberCommServerEventArgsImpl(request.RequestUri, webSocket, string.Empty, clientIp, headers, true).WithTransport(peer);
+            var closedArgs = new CyberCommServerEventArgsImpl(request.RequestUri, webSocket, string.Empty, clientIp, headers, true, localPort).WithTransport(peer);
             await InvokeWebSocketHandlerAsync(WebSocketClosedHandler, ConnectionClosed, closedArgs, CancellationToken.None).ConfigureAwait(false);
             connection.Peer = null;
         }
     }
 
     private async Task ReceiveWebSocketMessagesAsync(WebSocket webSocket, CyberCommWebSocketPeer peer, Uri requestUri,
-        NameValueCollection headers, string clientIp, CyberCommServerOptions options, CancellationToken cancellationToken)
+        NameValueCollection headers, string clientIp, int localPort, CyberCommServerOptions options,
+        CancellationToken cancellationToken)
     {
         var receiveSize = Math.Clamp(BufferLength, 1024, options.Limits.MaxWebSocketFrameBytes);
         var buffer = new byte[receiveSize];
@@ -541,7 +546,7 @@ public sealed class CyberCommServer : IAsyncDisposable
 
             if (!options.AssembleWebSocketMessages)
             {
-                await PublishWebSocketMessageAsync(webSocket, peer, requestUri, headers, clientIp, result.MessageType,
+                await PublishWebSocketMessageAsync(webSocket, peer, requestUri, headers, clientIp, localPort, result.MessageType,
                     buffer.AsMemory(0, result.Count).ToArray(), result.EndOfMessage, false, cancellationToken).ConfigureAwait(false);
                 continue;
             }
@@ -568,13 +573,14 @@ public sealed class CyberCommServer : IAsyncDisposable
                 return;
             }
             if (result.MessageType == WebSocketMessageType.Close) break;
-            await PublishWebSocketMessageAsync(webSocket, peer, requestUri, headers, clientIp, messageType, message.ToArray(), true, true, cancellationToken).ConfigureAwait(false);
+            await PublishWebSocketMessageAsync(webSocket, peer, requestUri, headers, clientIp, localPort,
+                messageType, message.ToArray(), true, true, cancellationToken).ConfigureAwait(false);
         }
     }
 
     private async Task PublishWebSocketMessageAsync(WebSocket webSocket, CyberCommWebSocketPeer peer, Uri requestUri,
-        NameValueCollection headers, string clientIp, WebSocketMessageType messageType, byte[] payload, bool endOfMessage,
-        bool validateUtf8, CancellationToken cancellationToken)
+        NameValueCollection headers, string clientIp, int localPort, WebSocketMessageType messageType, byte[] payload,
+        bool endOfMessage, bool validateUtf8, CancellationToken cancellationToken)
     {
         CyberCommServerEventArgs args;
         if (messageType == WebSocketMessageType.Text)
@@ -586,10 +592,10 @@ public sealed class CyberCommServer : IAsyncDisposable
                 await peer.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Invalid UTF-8", cancellationToken).ConfigureAwait(false);
                 return;
             }
-            args = new CyberCommServerEventArgsImpl(requestUri, webSocket, text, clientIp, headers, endOfMessage);
+            args = new CyberCommServerEventArgsImpl(requestUri, webSocket, text, clientIp, headers, endOfMessage, localPort);
         }
         else if (messageType == WebSocketMessageType.Binary)
-            args = new CyberCommServerEventArgsImpl(requestUri, webSocket, payload, clientIp, headers, endOfMessage);
+            args = new CyberCommServerEventArgsImpl(requestUri, webSocket, payload, clientIp, headers, endOfMessage, localPort);
         else
             throw new ArgumentOutOfRangeException(nameof(messageType));
         await InvokeWebSocketHandlerAsync(WebSocketMessageHandler, MessageReceived, args.WithTransport(peer), cancellationToken).ConfigureAwait(false);

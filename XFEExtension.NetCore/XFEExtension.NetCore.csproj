@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>5.2.0</Version>
+    <Version>5.2.1</Version>
     <Title>XFEExtension</Title>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension</RepositoryUrl>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -19,6 +19,8 @@
     <PackageTags>XFE;拓展;GPT;Server;服务器;测试;XFEExtension</PackageTags>
     <PackageReleaseNotes>
       ## 调整
+
+      CyberComm 请求上下文和 WebSocket 事件现在公开实际本地监听端口，支持 CDN/反向代理公开端口与回源端口不同的场景。
 
       JSON 查询改为按访问路径惰性扫描；旧版 QueryableJsonNode 由兼容包装器提供，不再在字符串转换时构建完整节点树。
 
